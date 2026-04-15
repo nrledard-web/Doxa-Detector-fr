@@ -1,10 +1,6 @@
-# -----------------------------
-# Imports
-# -----------------------------
 import streamlit as st
 import json
 import re
-import io
 from dataclasses import dataclass
 from typing import Dict, List, Optional
 
@@ -13,8 +9,6 @@ import requests
 from ddgs import DDGS
 from newspaper import Article
 import matplotlib.pyplot as plt
-from matplotlib.patches import Polygon
-from mpl_toolkits.mplot3d import Axes3D
 from mpl_toolkits.mplot3d.art3d import Poly3DCollection
 
 try:
@@ -40,92 +34,8 @@ st.set_page_config(
 )
 
 st.image("banner2.png", use_container_width=True)
-
 st.caption("Laboratoire de calibration cognitive — M = (G + N) − D")
 st.markdown("---")
-
-# -----------------------------
-# Bannière professionnelle
-# -----------------------------
-
-
-def plot_cognitive_triangle_3d(G: float, N: float, D: float):
-    """
-    Triangle cognitif 3D
-    G = gnōsis (savoir articulé)
-    N = nous (compréhension intégrée)
-    D = doxa (certitude assertive)
-
-    Les valeurs sont attendues entre 0 et 10.
-    """
-
-    G_pt = [10, 0, 0]
-    N_pt = [0, 10, 0]
-    D_pt = [0, 0, 10]
-    P = [G, N, D]
-
-    fig = plt.figure(figsize=(8, 7))
-    ax = fig.add_subplot(111, projection="3d")
-
-    verts = [[G_pt, N_pt, D_pt]]
-    tri = Poly3DCollection(verts, alpha=0.18, edgecolor="black", linewidths=1.5)
-    ax.add_collection3d(tri)
-
-    ax.plot([G_pt[0], N_pt[0]], [G_pt[1], N_pt[1]], [G_pt[2], N_pt[2]], linewidth=2)
-    ax.plot([N_pt[0], D_pt[0]], [N_pt[1], D_pt[1]], [N_pt[2], D_pt[2]], linewidth=2)
-    ax.plot([D_pt[0], G_pt[0]], [D_pt[1], G_pt[1]], [D_pt[2], G_pt[2]], linewidth=2)
-
-    ax.scatter(*G_pt, s=80)
-    ax.scatter(*N_pt, s=80)
-    ax.scatter(*D_pt, s=80)
-
-    ax.text(G_pt[0] + 0.3, G_pt[1], G_pt[2], "G", fontsize=12, weight="bold")
-    ax.text(N_pt[0], N_pt[1] + 0.3, N_pt[2], "N", fontsize=12, weight="bold")
-    ax.text(D_pt[0], D_pt[1], D_pt[2] + 0.3, "D", fontsize=12, weight="bold")
-
-    ax.scatter(*P, s=140, marker="o")
-    ax.text(P[0] + 0.2, P[1] + 0.2, P[2] + 0.2, "Texte", fontsize=11, weight="bold")
-
-    ax.plot([0, G], [0, 0], [0, 0], linestyle="--", linewidth=1)
-    ax.plot([0, 0], [0, N], [0, 0], linestyle="--", linewidth=1)
-    ax.plot([0, 0], [0, 0], [0, D], linestyle="--", linewidth=1)
-
-    ax.plot([0, G], [0, N], [0, D], linestyle=":", linewidth=1.5)
-
-    ax.set_xlim(0, 10)
-    ax.set_ylim(0, 10)
-    ax.set_zlim(0, 10)
-
-    ax.set_xlabel("G — gnōsis")
-    ax.set_ylabel("N — nous")
-    ax.set_zlabel("D — doxa")
-    ax.set_title("Triangle cognitif 3D")
-    ax.view_init(elev=24, azim=35)
-
-    return fig
-
-
-
-# -----------------------------
-# OpenAI client
-# -----------------------------
-def get_openai_client() -> Optional["OpenAI"]:
-
-    if OpenAI is None:
-        return None
-
-    api_key = st.secrets.get("OPENAI_API_KEY")
-
-    if not api_key:
-        return None
-
-    try:
-        return OpenAI(api_key=api_key)
-    except Exception:
-        return None
-
-
-client = get_openai_client()
 
 
 # -----------------------------
@@ -264,14 +174,81 @@ T = {
 
 
 # -----------------------------
+# Triangle cognitif 3D
+# -----------------------------
+def plot_cognitive_triangle_3d(G: float, N: float, D: float):
+    G_pt = [10, 0, 0]
+    N_pt = [0, 10, 0]
+    D_pt = [0, 0, 10]
+    P = [G, N, D]
+
+    fig = plt.figure(figsize=(8, 7))
+    ax = fig.add_subplot(111, projection="3d")
+
+    verts = [[G_pt, N_pt, D_pt]]
+    tri = Poly3DCollection(verts, alpha=0.18, edgecolor="black", linewidths=1.5)
+    ax.add_collection3d(tri)
+
+    ax.plot([G_pt[0], N_pt[0]], [G_pt[1], N_pt[1]], [G_pt[2], N_pt[2]], linewidth=2)
+    ax.plot([N_pt[0], D_pt[0]], [N_pt[1], D_pt[1]], [N_pt[2], D_pt[2]], linewidth=2)
+    ax.plot([D_pt[0], G_pt[0]], [D_pt[1], G_pt[1]], [D_pt[2], G_pt[2]], linewidth=2)
+
+    ax.scatter(*G_pt, s=80)
+    ax.scatter(*N_pt, s=80)
+    ax.scatter(*D_pt, s=80)
+
+    ax.text(G_pt[0] + 0.3, G_pt[1], G_pt[2], "G", fontsize=12, weight="bold")
+    ax.text(N_pt[0], N_pt[1] + 0.3, N_pt[2], "N", fontsize=12, weight="bold")
+    ax.text(D_pt[0], D_pt[1], D_pt[2] + 0.3, "D", fontsize=12, weight="bold")
+
+    ax.scatter(*P, s=140, marker="o")
+    ax.text(P[0] + 0.2, P[1] + 0.2, P[2] + 0.2, "Texte", fontsize=11, weight="bold")
+
+    ax.plot([0, G], [0, 0], [0, 0], linestyle="--", linewidth=1)
+    ax.plot([0, 0], [0, N], [0, 0], linestyle="--", linewidth=1)
+    ax.plot([0, 0], [0, 0], [0, D], linestyle="--", linewidth=1)
+    ax.plot([0, G], [0, N], [0, D], linestyle=":", linewidth=1.5)
+
+    ax.set_xlim(0, 10)
+    ax.set_ylim(0, 10)
+    ax.set_zlim(0, 10)
+
+    ax.set_xlabel("G — gnōsis")
+    ax.set_ylabel("N — nous")
+    ax.set_zlabel("D — doxa")
+    ax.set_title("Triangle cognitif 3D")
+    ax.view_init(elev=24, azim=35)
+
+    return fig
+
+
+# -----------------------------
+# OpenAI client
+# -----------------------------
+def get_openai_client() -> Optional["OpenAI"]:
+    if OpenAI is None:
+        return None
+
+    api_key = st.secrets.get("OPENAI_API_KEY")
+    if not api_key:
+        return None
+
+    try:
+        return OpenAI(api_key=api_key)
+    except Exception:
+        return None
+
+
+client = get_openai_client()
+
+
+# -----------------------------
 # Header
 # -----------------------------
 st.title("DOXA Detector")
 
 with st.container(border=True):
-
     st.subheader("Analyser la fiabilité d’un texte")
-
     st.write(
         "DOXA Detector aide à comprendre si un texte repose sur des faits solides "
         "ou sur une rhétorique persuasive."
@@ -298,7 +275,7 @@ with st.container(border=True):
 
 
 # -----------------------------
-# Cognition model
+# Modèle de cognition
 # -----------------------------
 class Cognition:
     def __init__(self, gnosis: float, nous: float, doxa: float):
@@ -332,7 +309,7 @@ class Cognition:
 
 
 # -----------------------------
-# Example data
+# Exemple
 # -----------------------------
 SAMPLE_ARTICLE = (
     "L'intelligence artificielle va remplacer 80% des emplois d'ici 2030, selon une étude choc publiée hier par le cabinet GlobalTech. "
@@ -365,21 +342,16 @@ def extract_article_from_url(url: str) -> str:
 
 @st.cache_data(show_spinner=False, ttl=1800)
 def search_articles_by_keyword(keyword: str, max_results: int = 10) -> List[Dict]:
-
     articles = []
     seen_urls = set()
 
-    # -----------------------------
-    # 1) NewsAPI d'abord
-    # -----------------------------
     api_key = st.secrets.get("NEWS_API_KEY")
 
     if api_key:
         url = "https://newsapi.org/v2/everything"
-
         params = {
             "q": keyword,
-            "language": "en",
+            "language": "fr",
             "sortBy": "relevancy",
             "pageSize": max_results * 2,
             "apiKey": api_key,
@@ -387,40 +359,30 @@ def search_articles_by_keyword(keyword: str, max_results: int = 10) -> List[Dict
 
         try:
             response = requests.get(url, params=params, timeout=10)
-
             if response.status_code == 200:
                 data = response.json()
-
                 for art in data.get("articles", []):
                     article_url = art.get("url")
                     title = art.get("title")
-                    source = art.get("source", {}).get("name", "Unknown")
+                    source = art.get("source", {}).get("name", "Source inconnue")
 
                     if not article_url or article_url in seen_urls:
                         continue
 
                     seen_urls.add(article_url)
-
-                    articles.append(
-                        {
-                            "title": title,
-                            "url": article_url,
-                            "source": source,
-                        }
-                    )
+                    articles.append({
+                        "title": title,
+                        "url": article_url,
+                        "source": source,
+                    })
 
                     if len(articles) >= max_results:
                         return articles
-
             else:
-                st.warning(f"NewsAPI HTTP error {response.status_code}")
-
+                st.warning(f"Erreur HTTP NewsAPI : {response.status_code}")
         except Exception as e:
-            st.warning(f"NewsAPI error: {e}")
+            st.warning(f"Erreur NewsAPI : {e}")
 
-    # -----------------------------
-    # 2) Fallback DuckDuckGo
-    # -----------------------------
     trusted_domains = [
         "lemonde.fr", "lefigaro.fr", "liberation.fr", "francetvinfo.fr",
         "lexpress.fr", "lepoint.fr", "nouvelobs.com", "la-croix.com",
@@ -435,12 +397,12 @@ def search_articles_by_keyword(keyword: str, max_results: int = 10) -> List[Dict
 
     try:
         with DDGS() as ddgs:
-            query = f"{keyword} news article analysis study report"
+            query = f"{keyword} actualité article analyse étude rapport"
             ddg_results = list(ddgs.text(query, max_results=max_results * 5))
 
             for r in ddg_results:
                 url = r.get("href", "")
-                title = r.get("title", "Untitled")
+                title = r.get("title", "Sans titre")
 
                 if not url or url in seen_urls:
                     continue
@@ -449,7 +411,6 @@ def search_articles_by_keyword(keyword: str, max_results: int = 10) -> List[Dict
                     continue
 
                 seen_urls.add(url)
-
                 results.append(
                     {
                         "title": title,
@@ -462,7 +423,7 @@ def search_articles_by_keyword(keyword: str, max_results: int = 10) -> List[Dict
                     break
 
     except Exception as e:
-        st.warning(f"Search error: {e}")
+        st.warning(f"Erreur de recherche : {e}")
 
     return results
 
@@ -482,24 +443,23 @@ class Claim:
 
 
 SOURCE_CUES = [
-    "selon", "affirme", "déclare", "rapport", "étude", "expert", "source", "dit", "écrit", "publié",
-    "according to", "claims", "states", "report", "study", "expert", "source", "says", "writes", "published",
-    "según", "informe", "estudio", "experto", "fuente", "publicado",
+    "selon", "affirme", "déclare", "rapport", "étude", "expert",
+    "source", "dit", "écrit", "publié", "annonce", "confirme", "révèle",
 ]
+
 ABSOLUTIST_WORDS = [
-    "toujours", "jamais", "absolument", "certain", "prouvé", "incontestable", "tous", "aucun",
-    "always", "never", "absolutely", "certain", "proven", "unquestionable", "all", "none",
-    "siempre", "nunca", "absolutamente", "cierto", "probado", "incuestionable", "todos", "ninguno",
+    "toujours", "jamais", "absolument", "certain", "certaine",
+    "prouvé", "prouvée", "incontestable", "tous", "aucun",
 ]
+
 EMOTIONAL_WORDS = [
-    "choc", "incroyable", "terrible", "peur", "menace", "scandale", "révolution", "urgent",
-    "shock", "incredible", "terrible", "fear", "threat", "scandal", "revolution", "urgent",
-    "choque", "increíble", "miedo", "amenaza", "escándalo", "revolución", "urgente",
+    "choc", "incroyable", "terrible", "peur", "menace",
+    "scandale", "révolution", "urgent", "catastrophe", "crise",
 ]
+
 NUANCE_MARKERS = [
-    "cependant", "pourtant", "néanmoins", "toutefois", "mais", "nuancer", "prudence", "possible", "peut-être",
-    "however", "yet", "nevertheless", "nonetheless", "but", "nuance", "caution", "possible", "maybe",
-    "sin embargo", "no obstante", "pero", "matizar", "prudencia", "posible", "quizá",
+    "cependant", "pourtant", "néanmoins", "toutefois", "mais",
+    "nuancer", "prudence", "possible", "peut-être", "semble",
 ]
 
 
@@ -507,9 +467,7 @@ def analyze_claim(sentence: str) -> Claim:
     has_number = bool(re.search(r"\d+", sentence))
     has_date = bool(
         re.search(
-            r"\d{4}|janvier|février|mars|avril|mai|juin|juillet|août|septembre|octobre|novembre|décembre|"
-            r"monday|tuesday|wednesday|thursday|friday|saturday|sunday|"
-            r"enero|febrero|marzo|abril|mayo|junio|julio|agosto|septiembre|octubre|noviembre|diciembre",
+            r"\d{4}|janvier|février|mars|avril|mai|juin|juillet|août|septembre|octobre|novembre|décembre",
             sentence,
             re.I,
         )
@@ -556,7 +514,7 @@ def analyze_article(text: str) -> Dict:
     G = clamp(source_markers * 1.5 + citation_like * 0.5, 0, 10)
     N = clamp(nuance_markers * 2 + (article_length / 100), 0, 10)
 
-    certainty = len(re.findall(r"certain|absolument|prouvé|évident|incontestable|certainly|absolutely|proven|obvious|unquestionable|cierto|absolutamente|probado", text.lower()))
+    certainty = len(re.findall(r"certain|absolument|prouvé|évident|incontestable", text.lower()))
     emotional = len(re.findall(r"|".join(re.escape(w) for w in EMOTIONAL_WORDS), text.lower()))
 
     D = clamp(certainty * 2 + emotional * 1.5, 0, 10)
@@ -620,7 +578,6 @@ def analyze_article(text: str) -> Dict:
     if sum(1 for c in claims if c.status == T["very_fragile"]) >= 2:
         weaknesses.append(T["multiple_claims_very_fragile"])
 
-    M = (G + N) - D
     ME = (2 * D) - (G + N)
 
     return {
@@ -658,8 +615,8 @@ def analyze_multiple_articles(keyword: str, max_results: int = 10) -> List[Dict]
                 results.append(
                     {
                         "Source": art["source"],
-                        "Title": art["title"],
-                        "Classic Score": analysis["M"],
+                        "Titre": art["title"],
+                        "Score classique": analysis["M"],
                         "Hard Fact Score": analysis["hard_fact_score"],
                         "Verdict": analysis["verdict"],
                         "URL": art["url"],
@@ -668,17 +625,16 @@ def analyze_multiple_articles(keyword: str, max_results: int = 10) -> List[Dict]
         except Exception:
             continue
     return results
+
+
 @st.cache_data(show_spinner=False, ttl=1800)
 def fetch_text_for_textarea(url: str) -> str:
-    """
-    Charge le texte principal d'une URL pour l'envoyer
-    dans la zone d'analyse.
-    """
     try:
         text = extract_article_from_url(url)
         return (text or "").strip()
     except Exception:
         return ""
+
 
 # -----------------------------
 # Corroboration
@@ -694,9 +650,15 @@ def extract_key_sentences_for_corroboration(text: str, max_sentences: int = 5) -
             score += 2
         if re.search(r"[A-Z][a-z]+(?:\s+[A-Z][a-z]+)+|[A-Z]{2,}", s):
             score += 2
-        if any(word in s.lower() for word in ["selon", "affirme", "déclare", "rapport", "étude", "expert", "source", "publié", "annonce", "confirme", "révèle", "according to", "report", "study", "expert"]):
+        if any(word in s.lower() for word in [
+            "selon", "affirme", "déclare", "rapport", "étude",
+            "expert", "source", "publié", "annonce", "confirme", "révèle"
+        ]):
             score += 1
-        if any(word in s.lower() for word in ["absolument", "certain", "jamais", "toujours", "incontestable", "choc", "scandale", "révolution", "urgent", "absolutely", "certain", "never", "always", "urgent"]):
+        if any(word in s.lower() for word in [
+            "absolument", "certain", "jamais", "toujours",
+            "incontestable", "choc", "scandale", "révolution", "urgent"
+        ]):
             score += 1
         scored.append((score, s))
     scored.sort(reverse=True, key=lambda x: x[0])
@@ -717,12 +679,10 @@ def extract_claim_features(claim: str) -> Dict:
     proper_names = re.findall(r"[A-Z][a-z]+(?:\s+[A-Z][a-z]+)+|[A-Z]{2,}", claim)
     words = re.findall(r"\b\w+\b", claim.lower())
     stopwords = {
-        "les", "des", "une", "dans", "avec", "pour", "that", "this", "from", "have",
-        "will", "être", "sont", "mais", "plus", "comme", "nous", "vous", "they",
-        "their", "about", "into", "sur", "par", "est", "ont", "aux", "the", "and",
+        "les", "des", "une", "dans", "avec", "pour", "être", "sont", "mais",
+        "plus", "comme", "nous", "vous", "sur", "par", "est", "ont", "aux",
         "du", "de", "la", "le", "un", "et", "ou", "en", "à", "au", "ce",
         "ces", "ses", "son", "sa", "qui", "que", "quoi", "dont", "ainsi", "alors",
-        "los", "las", "del", "para", "con", "como", "pero", "sobre", "este", "esta",
     }
     keywords = [w for w in words if len(w) > 4 and w not in stopwords]
     return {
@@ -748,9 +708,8 @@ def score_match_between_claim_and_result(claim: str, result_text: str) -> Dict:
     score += min(keyword_hits, 5) * 1.2
 
     contradiction_markers = [
-        "false", "faux", "misleading", "trompeur", "incorrect", "inexact",
-        "debunked", "démenti", "refuted", "réfuté", "no evidence", "aucune preuve",
-        "falso", "engañoso", "desmentido", "refutado", "sin pruebas",
+        "faux", "trompeur", "incorrect", "inexact",
+        "démenti", "réfuté", "aucune preuve",
     ]
     contradiction_signal = any(marker in rt for marker in contradiction_markers)
 
@@ -835,16 +794,16 @@ def corroborate_claims(text: str, max_claims: int = 5, max_results_per_claim: in
                     }
                 )
     except Exception as e:
-        st.warning(f"Corroboration error: {e}")
+        st.warning(f"Erreur de corroboration : {e}")
 
     return corroboration_results
 
 
 # -----------------------------
-# AI helpers
+# IA helpers
 # -----------------------------
 @st.cache_data(show_spinner=False)
-def generate_ai_summary(lang: str, article_text: str, result: Dict, max_chars: int = 7000) -> str:
+def generate_ai_summary(article_text: str, result: Dict, max_chars: int = 7000) -> str:
     if client is None:
         return ""
 
@@ -853,10 +812,10 @@ def generate_ai_summary(lang: str, article_text: str, result: Dict, max_chars: i
     for c in result.get("claims", [])[:8]:
         claims_preview.append(
             {
-                "claim": c.text,
-                "status": c.status,
-                "verifiability": c.verifiability,
-                "risk": c.risk,
+                "affirmation": c.text,
+                "statut": c.status,
+                "verifiabilite": c.verifiability,
+                "risque": c.risk,
                 "has_number": c.has_number,
                 "has_date": c.has_date,
                 "has_named_entity": c.has_named_entity,
@@ -865,23 +824,22 @@ def generate_ai_summary(lang: str, article_text: str, result: Dict, max_chars: i
         )
 
     prompt = f"""
-You are a rigorous critical-reading assistant.
-Write in the selected language: {lang}
+Tu es un assistant de lecture critique rigoureux.
 
-Your task:
-1. Summarize the overall credibility profile of the text.
-2. Explain the difference between structural plausibility and factual robustness.
-3. Point out the 3 main strengths.
-4. Point out the 3 main weaknesses.
-5. End with a prudent verdict.
+Ta tâche :
+1. Résumer le profil global de crédibilité du texte.
+2. Expliquer la différence entre plausibilité structurelle et robustesse factuelle.
+3. Identifier les 3 principales forces.
+4. Identifier les 3 principales fragilités.
+5. Terminer par un verdict prudent.
 
-Constraints:
-- Be clear, concise, and concrete.
-- Do not invent facts.
-- Do not say the text is true or false with certainty unless the evidence clearly justifies it.
-- Base yourself on the heuristic metrics below.
+Contraintes :
+- Sois clair, concis et concret.
+- N’invente aucun fait.
+- N’affirme pas avec certitude qu’un texte est vrai ou faux sans justification solide.
+- Appuie-toi sur les métriques heuristiques ci-dessous.
 
-Heuristic analysis:
+Analyse heuristique :
 {json.dumps({
     'G': result.get('G'),
     'N': result.get('N'),
@@ -897,7 +855,7 @@ Heuristic analysis:
     'red_flags': result.get('red_flags', []),
 }, ensure_ascii=False, indent=2)}
 
-Text to analyze:
+Texte à analyser :
 {short_text}
 """
 
@@ -905,41 +863,11 @@ Text to analyze:
         response = client.responses.create(model="gpt-4o", input=prompt)
         return response.output_text.strip()
     except Exception as e:
-        return f"AI error: {e}"
-
-
-@st.cache_data(show_spinner=False)
-def explain_claim_with_ai(lang: str, claim_text: str, claim_data: Dict) -> str:
-    if client is None:
-        return ""
-
-    prompt = f"""
-You are a critical fact-checking assistant.
-Write in the selected language: {lang}
-
-Explain why this sentence received its score.
-Be concrete and structured in 4 short parts:
-1. What makes it verifiable
-2. What makes it fragile
-3. What would be needed to verify it properly
-4. Final caution level
-
-Sentence:
-{claim_text}
-
-Claim data:
-{json.dumps(claim_data, ensure_ascii=False, indent=2)}
-"""
-
-    try:
-        response = client.responses.create(model="gpt-4o-mini", input=prompt)
-        return response.output_text.strip()
-    except Exception as e:
-        return f"AI error: {e}"
+        return f"Erreur IA : {e}"
 
 
 # -----------------------------
-# Settings panel
+# Réglages
 # -----------------------------
 with st.expander(T["settings"], expanded=False):
     use_sample = st.button(T["load_example"])
@@ -955,12 +883,18 @@ with st.expander(T["settings"], expanded=False):
 
 if "article" not in st.session_state:
     st.session_state.article = SAMPLE_ARTICLE
-
 if "article_source" not in st.session_state:
     st.session_state.article_source = "paste"
-
 if "loaded_url" not in st.session_state:
     st.session_state.loaded_url = ""
+if "last_result" not in st.session_state:
+    st.session_state.last_result = None
+if "last_article" not in st.session_state:
+    st.session_state.last_article = ""
+if "multi_results" not in st.session_state:
+    st.session_state.multi_results = []
+if "last_keyword" not in st.session_state:
+    st.session_state.last_keyword = ""
 
 if use_sample:
     st.session_state.article = SAMPLE_ARTICLE
@@ -969,7 +903,7 @@ if use_sample:
 
 
 # -----------------------------
-# Multi-article section
+# Analyse multi-articles
 # -----------------------------
 st.subheader(T["topic_section"])
 keyword = st.text_input(T["topic"], placeholder=T["topic_placeholder"])
@@ -977,27 +911,21 @@ keyword = st.text_input(T["topic"], placeholder=T["topic_placeholder"])
 if st.button(T["analyze_topic"], key="analyze_topic"):
     if keyword.strip():
         st.info(T["searching"])
-        st.session_state.multi_results = analyze_multiple_articles(
-            keyword.strip(),
-            max_results=10
-        )
+        st.session_state.multi_results = analyze_multiple_articles(keyword.strip(), max_results=10)
         st.session_state.last_keyword = keyword.strip()
     else:
         st.session_state.multi_results = []
         st.warning(T["enter_keyword_first"])
 
 if st.session_state.get("multi_results"):
-    df_multi = pd.DataFrame(st.session_state.multi_results).sort_values(
-        "Hard Fact Score",
-        ascending=False
-    )
+    df_multi = pd.DataFrame(st.session_state.multi_results).sort_values("Hard Fact Score", ascending=False)
 
     st.success(f"{len(df_multi)} {T['articles_analyzed']}")
 
     c1, c2 = st.columns(2)
     c1.metric(T["analyzed_articles"], len(df_multi))
     c2.metric(T["avg_hard_fact"], round(df_multi["Hard Fact Score"].mean(), 1))
-    st.metric(T["avg_classic_score"], round(df_multi["Classic Score"].mean(), 1))
+    st.metric(T["avg_classic_score"], round(df_multi["Score classique"].mean(), 1))
 
     ecart_type_hf = df_multi["Hard Fact Score"].std()
     indice_doxa = "high" if ecart_type_hf < 1.5 else ("medium" if ecart_type_hf < 3 else "low")
@@ -1013,40 +941,28 @@ if st.session_state.get("multi_results"):
 
     for i, row in df_multi.reset_index(drop=True).iterrows():
         with st.container(border=True):
-            st.markdown(f"### {row['Title']}")
+            st.markdown(f"### {row['Titre']}")
             st.caption(f"{row['Source']}")
 
             score = row["Hard Fact Score"]
-
             if score <= 6:
-                color = "🔴"
-                label = "Fragile"
+                color, label = "🔴", "Fragile"
             elif score <= 11:
-                color = "🟠"
-                label = "Douteux"
+                color, label = "🟠", "Douteux"
             elif score <= 15:
-                color = "🟡"
-                label = "Plausible"
+                color, label = "🟡", "Plausible"
             else:
-                color = "🟢"
-                label = "Robuste"
+                color, label = "🟢", "Robuste"
 
             st.markdown(f"**{color} Score : {score}/20 — {label}**")
             st.progress(score / 20)
 
             col1, col2 = st.columns(2)
-
             with col1:
-                st.link_button(
-                    "🌐 Ouvrir l'article",
-                    row["URL"],
-                    use_container_width=True
-                )
-
+                st.link_button("🌐 Ouvrir l'article", row["URL"], use_container_width=True)
             with col2:
                 if st.button(f"📥 Charger pour analyse", key=f"load_article_{i}"):
                     loaded_text = fetch_text_for_textarea(row["URL"])
-
                     if loaded_text:
                         st.session_state.article = loaded_text
                         st.session_state.article_source = "url"
@@ -1055,9 +971,12 @@ if st.session_state.get("multi_results"):
                         st.rerun()
                     else:
                         st.warning("Impossible d'extraire le texte.")
-
 elif st.session_state.get("last_keyword"):
     st.warning(T["no_exploitable_articles_found"])
+
+
+# -----------------------------
+# Chargement URL
 # -----------------------------
 with st.form("url_form"):
     url = st.text_input(T["url"])
@@ -1079,18 +998,13 @@ if load_url_submitted:
 
 
 # -----------------------------
-# Main article form
-# -----------------------------
-# -----------------------------
-# -----------------------------
-# Zone de saisie + micro visuellement collé au texte
+# Zone d’analyse
 # -----------------------------
 previous_article = st.session_state.article
 
 st.markdown("### Zone d’analyse")
 
 with st.container(border=True):
-
     st.caption("Collez un texte, chargez une URL, ou dictez directement.")
 
     if MICRO_AVAILABLE:
@@ -1108,7 +1022,6 @@ with st.container(border=True):
             st.session_state.article_source = "paste"
             st.success("Texte dicté reçu.")
             st.rerun()
-
     else:
         st.info("Microphone indisponible sur cette version.")
 
@@ -1120,55 +1033,29 @@ with st.container(border=True):
             label_visibility="collapsed",
             placeholder=T["paste"]
         )
-
-        analyze_submitted = st.form_submit_button(
-            T["analyze"],
-            use_container_width=True
-        )
+        analyze_submitted = st.form_submit_button(T["analyze"], use_container_width=True)
 
 if article.strip() != previous_article.strip():
     st.session_state.article_source = "paste"
 
-
-source_label = (
-    T["manual_paste"]
-    if st.session_state.get("article_source") == "paste"
-    else T["loaded_url_source"]
-)
-
+source_label = T["manual_paste"] if st.session_state.get("article_source") == "paste" else T["loaded_url_source"]
 st.caption(f"{T['text_source']} : {source_label}")
 
 if st.session_state.get("loaded_url"):
     st.caption(f"URL : {st.session_state.loaded_url}")
 
-if "last_result" not in st.session_state:
-    st.session_state.last_result = None
-
-if "last_article" not in st.session_state:
-    st.session_state.last_article = ""
-
-if "ai_summary" not in st.session_state:
-    st.session_state.ai_summary = ""
-
-if "multi_results" not in st.session_state:
-    st.session_state.multi_results = []
-
-if "last_keyword" not in st.session_state:
-    st.session_state.last_keyword = ""
 
 # -----------------------------
-# Main analysis
+# Analyse principale
 # -----------------------------
 if analyze_submitted:
     st.session_state.last_result = analyze_article(article)
     st.session_state.last_article = article
-    st.session_state.ai_summary = ""
 
 result = st.session_state.last_result
 article_for_analysis = st.session_state.last_article
 
 if result:
-
     col1, col2, col3 = st.columns(3)
     col1.metric(T["classic_score"], result["M"], help=T["help_classic_score"])
     col2.metric(T["improved_score"], result["improved"], help=T["help_improved_score"])
@@ -1187,18 +1074,16 @@ if result:
     st.subheader(f"{couleur} {T['credibility_gauge']} : {etiquette}")
     st.progress(score / 20)
     st.caption(f"{T['score']} : {score}/20 — {message}")
-    st.subheader("Diagnostic cognitif")
 
+    st.subheader("Diagnostic cognitif")
     life_score = round((result["hard_fact_score"] / 20) * 100, 1)
     mecroyance_bar = max(0.0, min(1.0, (result["M"] + 10) / 30))
 
     col1, col2 = st.columns(2)
-
     with col1:
         st.write("Vitalité cognitive")
         st.progress(life_score / 100)
         st.caption(f"{life_score}%")
-
     with col2:
         st.write("Indice de mécroyance")
         st.progress(mecroyance_bar)
@@ -1223,60 +1108,54 @@ if result:
     st.divider()
     st.subheader("Triangle cognitif G-N-D")
     st.caption("Le texte est placé dans l’espace de la cognition : savoir articulé, compréhension intégrée, et certitude assertive.")
-
-    fig_triangle = plot_cognitive_triangle_3d(
-        result["G"],
-        result["N"],
-        result["D"]
-    )
+    fig_triangle = plot_cognitive_triangle_3d(result["G"], result["N"], result["D"])
     st.pyplot(fig_triangle, use_container_width=True)
 
-    st.subheader("Cognitive Metrics")
-
+    st.subheader("Métriques cognitives")
     col1, col2 = st.columns(2)
-
     with col1:
-        st.metric("Mécroyance Index (M)", round(result["M"], 2))
-
+        st.metric("Indice de mécroyance (M)", round(result["M"], 2))
     with col2:
-        st.metric("Mendacity Index (ME)", round(result["ME"], 2))
-    delta_mm = round(result["M"] - result["ME"], 2)
-    st.caption(f"Cognitive gap (M − ME) : {delta_mm}")
-    if result["M"] > result["ME"] + 1:
-        dominant_pattern = "Dominant pattern: mécroyance"
-    elif result["ME"] > result["M"] + 1:
-        dominant_pattern = "Dominant pattern: strategic lying"
-    else:
-        dominant_pattern = "Dominant pattern: mixed or ambiguous"
+        st.metric("Indice de mensonge (ME)", round(result["ME"], 2))
 
-    st.subheader("Dominant cognitive pattern")
+    delta_mm = round(result["M"] - result["ME"], 2)
+    st.caption(f"Écart cognitif (M − ME) : {delta_mm}")
+
+    if result["M"] > result["ME"] + 1:
+        dominant_pattern = "Structure dominante : mécroyance"
+    elif result["ME"] > result["M"] + 1:
+        dominant_pattern = "Structure dominante : mensonge stratégique"
+    else:
+        dominant_pattern = "Structure dominante : mixte ou ambiguë"
+
+    st.subheader("Structure cognitive dominante")
     st.write(dominant_pattern)
 
     if result["ME"] > result["M"] and result["ME"] > 0:
-        cognitive_type = "Possible strategic lying"
+        cognitive_type = "Mensonge stratégique possible"
     elif result["M"] < 0:
-        cognitive_type = "High mécroyance / cognitive closure"
+        cognitive_type = "Forte mécroyance / clôture cognitive"
     else:
-        cognitive_type = "Likely sincere but misaligned cognition"
+        cognitive_type = "Cognition probablement sincère mais désalignée"
 
-    st.subheader("Cognitive Interpretation")
+    st.subheader("Interprétation cognitive")
     st.write(cognitive_type)
 
     if result["M"] - result["ME"] > 3:
-        diagnosis = "Strong mécroyance structure"
+        diagnosis = "Structure de mécroyance forte"
     elif result["M"] > result["ME"]:
-        diagnosis = "Moderate mécroyance structure"
+        diagnosis = "Structure de mécroyance modérée"
     elif abs(result["M"] - result["ME"]) <= 1:
-        diagnosis = "Ambiguous cognitive structure"
+        diagnosis = "Structure cognitive ambiguë"
     else:
-        diagnosis = "Possible strategic deception"
+        diagnosis = "Tromperie stratégique possible"
 
-    st.subheader("Cognitive diagnosis")
+    st.subheader("Diagnostic cognitif")
     st.write(diagnosis)
+
     conflict = abs(result["M"] - result["ME"])
     conflict_bar = min(conflict / 10, 1)
-
-    st.write("Cognitive tension (mécroyance vs mendacity)")
+    st.write("Tension cognitive (mécroyance vs mensonge)")
     st.progress(conflict_bar)
 
     with st.expander(T["strengths_detected"], expanded=True):
@@ -1332,7 +1211,7 @@ if result:
         st.dataframe(claims_df, use_container_width=True, hide_index=True)
     else:
         st.info(T["paste_longer_text"])
- 
+
     st.divider()
     st.subheader(T["ai_module"])
     st.caption(T["ai_module_caption"])
@@ -1341,16 +1220,17 @@ if result:
         st.warning(T["ai_unavailable"])
     else:
         if st.button(T["generate_ai_analysis"], key="generate_ai_analysis"):
-            with st.spinner("AI is analyzing..."):
-                ai_summary = generate_ai_summary(lang, article_for_analysis, result)
+            with st.spinner("Analyse IA en cours..."):
+                ai_summary = generate_ai_summary(article_for_analysis, result)
             st.subheader(T["ai_analysis_result"])
             st.markdown(ai_summary)
+
     if st.session_state.get("article_source") == "paste":
         st.divider()
         st.subheader(T["external_corroboration_module"])
         st.caption(T["external_corroboration_caption"])
         with st.spinner(T["corroboration_in_progress"]):
-            corroboration = corroborate_claims(article, max_claims=5, max_results_per_claim=3)
+            corroboration = corroborate_claims(article_for_analysis, max_claims=5, max_results_per_claim=3)
         if corroboration:
             for i, item in enumerate(corroboration, start=1):
                 title_preview = item["claim"][:140] + ("..." if len(item["claim"]) > 140 else "")
@@ -1375,7 +1255,7 @@ else:
 
 
 # -----------------------------
-# Method section
+# Méthode
 # -----------------------------
 if show_method:
     st.subheader(T["method"])
@@ -1392,8 +1272,10 @@ if show_method:
         f"- **{T['cognitive_closure']}** : `(D * S) / (G + N)`\n\n"
         f"{T['disclaimer']}"
     )
+
+
 # -----------------------------
-# Laboratoire interactif de la mécroyance
+# Laboratoire interactif
 # -----------------------------
 st.divider()
 st.subheader("Laboratoire interactif de la mécroyance")
@@ -1402,15 +1284,12 @@ st.caption(
     "Modifiez les paramètres pour observer l’évolution des stades cognitifs."
 )
 
-# Curseurs
 g_game = st.slider("G — gnōsis (savoir articulé)", 0.0, 10.0, 5.0, 0.5)
 n_game = st.slider("N — nous (intégration vécue)", 0.0, 10.0, 5.0, 0.5)
 d_game = st.slider("D — doxa (certitude / saturation)", 0.0, 10.0, 5.0, 0.5)
 
-# Calcul
 m_game = round((g_game + n_game) - d_game, 1)
 
-# Affichage formule
 st.markdown(
     f"""
     <div style="
@@ -1430,7 +1309,6 @@ st.markdown(
     unsafe_allow_html=True,
 )
 
-# Détermination du stade
 if m_game < 0:
     stage = "Fermeture cognitive"
     explanation = "La certitude dépasse la compréhension : la pensée se verrouille."
@@ -1456,12 +1334,10 @@ else:
     explanation = "Horizon théorique de cohérence maximale."
     percent = 100
 
-# Affichage stable du stade
 st.markdown(f"**Stade actuel : {stage}**")
 st.progress(percent / 100)
 st.caption(f"M = {m_game} — {explanation}")
 
-# Frise cognitive
 st.markdown("### Évolution cognitive")
 
 stages = [
@@ -1474,16 +1350,12 @@ stages = [
 ]
 
 cols = st.columns(len(stages))
-
 for i, (name, low, high) in enumerate(stages):
     active = low <= m_game < high
-
     with cols[i]:
         if active:
             st.success(name)
         else:
             st.info(name)
 
-st.caption(
-    "Lorsque G et N augmentent sans inflation de D, la cognition gagne en revisabilité."
-)
+st.caption("Lorsque G et N augmentent sans inflation de D, la cognition gagne en revisabilité.")
