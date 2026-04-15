@@ -346,6 +346,85 @@ def search_articles_by_keyword(keyword: str, max_results: int = 10) -> List[Dict
     seen_urls = set()
 
     api_key = st.secrets.get("NEWS_API_KEY")
+    from_date_iso = (datetime.utcnow() - timedelta(days=7)).strftime("%Y-%m-%d")
+
+    # -----------------------------
+    # 1) Priorité : NewsAPI
+    # -----------------------------
+    if api_key:
+        url = "https://newsapi.org/v2/everything"
+        params = {
+            "q": keyword,
+            "language": "fr",
+            "sortBy": "publishedAt",
+            "pageSize": max_results * 3,
+            "apiKey": api_key,
+        }
+
+        try:
+            response = requests.get(url, params=params, timeout=10)
+
+            if response.status_code == 200:
+                data = response.json()
+
+                for art in data.get("articles", []):
+                    article_url = art.get("url")
+                    title = art.get("title", "Sans titre")
+                    source = art.get("source", {}).get("name", "Source inconnue")
+                    published_at = art.get("publishedAt", "")
+
+                    if not article_url or article_url in seen_urls:
+                        continue
+
+                    seen_urls.add(article_url)
+
+                    articles.append({
+                        "title": title,
+                        "url": article_url,
+                        "source": source,
+                        "published_at": published_at,
+                    })
+
+                    if len(articles) >= max_results:
+                        return articles
+
+        except Exception as e:
+            st.warning(f"Erreur NewsAPI : {e}")
+
+    # -----------------------------
+    # 2) Fallback DDGS
+    # -----------------------------
+    try:
+        with DDGS() as ddgs:
+            query = f"{keyword} actualité France"
+            results = list(ddgs.text(query, max_results=max_results * 5))
+
+            for r in results:
+                url = r.get("href", "")
+                title = r.get("title", "Sans titre")
+
+                if not url or url in seen_urls:
+                    continue
+
+                seen_urls.add(url)
+
+                articles.append({
+                    "title": title,
+                    "url": url,
+                    "source": url.split("/")[2] if "://" in url else url,
+                    "published_at": "",
+                })
+
+                if len(articles) >= max_results:
+                    break
+
+    except Exception as e:
+        st.warning(f"Erreur DDGS : {e}")
+
+    return articles
+    
+
+    api_key = st.secrets.get("NEWS_API_KEY")
 
     if api_key:
         url = "https://newsapi.org/v2/everything"
