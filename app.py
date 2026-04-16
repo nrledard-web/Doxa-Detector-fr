@@ -1229,16 +1229,9 @@ if result:
     st.subheader("Diagnostic cognitif")
     st.write(diagnosis)
 
-    conflict = abs(result["M"] - result["ME"])
-    conflict_bar = min(conflict / 10, 1)
-
-    st.write(diagnosis)
-
-    conflict = abs(result["M"] - result["ME"])
-    conflict_bar = min(conflict / 10, 1)
-
-ME_gauge = (3 * result["D"]) - (result["G"] + result["N"])
-gauge_value, gauge_label, gauge_color = compute_lie_gauge(result["M"], ME_gauge)
+    gauge_value, gauge_label, gauge_color, ME_gauge = compute_lie_gauge(
+        result["G"], result["N"], result["D"], result["M"]
+    )
 
     st.write("Tension cognitive (mécroyance vs mensonge)")
     st.caption(
@@ -1291,8 +1284,6 @@ gauge_value, gauge_label, gauge_color = compute_lie_gauge(result["M"], ME_gauge)
     st.divider()
     st.subheader("Structure cognitive du texte analysé")
     st.info(T["llm_intro"])
-
-    cog = Cognition(result["G"], result["N"], result["D"])
 
     cog = Cognition(result["G"], result["N"], result["D"])
     overconfidence = result["D"] - (result["G"] + result["N"])
@@ -1370,7 +1361,6 @@ gauge_value, gauge_label, gauge_color = compute_lie_gauge(result["M"], ME_gauge)
             st.info(T["no_corroboration_found"])
 else:
     st.info(T["paste_text_or_load_url"])
-
 
 # -----------------------------
 # Méthode
