@@ -12,6 +12,32 @@ from newspaper import Article
 import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d.art3d import Poly3DCollection
 
+# -----------------------------
+# Sources presse française
+# -----------------------------
+FRENCH_NEWS_DOMAINS = [
+
+# centre / généralistes
+"lemonde.fr",
+"francetvinfo.fr",
+"ouest-france.fr",
+
+# centre droit
+"lefigaro.fr",
+"lesechos.fr",
+
+# gauche
+"liberation.fr",
+"nouvelobs.com",
+
+# droite
+"valeursactuelles.com",
+
+# international
+"france24.com",
+"rfi.fr"
+]
+
 try:
     from openai import OpenAI
 except Exception:
