@@ -708,7 +708,7 @@ def analyze_article(text: str) -> Dict:
         "avg_claim_risk": avg_claim_risk,
         "avg_claim_verifiability": avg_claim_verifiability,
         "hard_fact_score": hard_fact_score,
-        "verdict": verdict,
+        "profil_solidite": verdict,
         "strengths": strengths,
         "weaknesses": weaknesses,
         "claims": claims,
