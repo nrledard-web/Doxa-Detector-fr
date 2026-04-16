@@ -71,6 +71,15 @@ st.image("banner2.png", use_container_width=True)
 st.caption("Laboratoire de calibration cognitive — M = (G + N) − D")
 st.markdown("---")
 
+st.markdown("""
+<style>
+div[data-testid="stProgressBar"] > div > div > div > div {
+    height: 20px;
+    border-radius: 8px;
+}
+</style>
+""", unsafe_allow_html=True)
+
 
 # -----------------------------
 # Textes FR uniques
