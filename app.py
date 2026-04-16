@@ -1303,7 +1303,7 @@ if result:
             st.success(T["no_major_weakness"])
 
     st.divider()
-    st.subheader(T["llm_analysis"])
+    st.subheader("Structure cognitive du texte analysé")
     st.info(T["llm_intro"])
 
     cog = Cognition(result["G"], result["N"], result["D"])
