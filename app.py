@@ -1032,7 +1032,9 @@ if st.button(T["analyze_topic"], key="analyze_topic"):
 
 if st.session_state.get("multi_results"):
     df_multi = pd.DataFrame(st.session_state.multi_results).sort_values("Hard Fact Score", ascending=False)
-
+    df_multi.rename(columns={
+    "verdict": "Profil de solidité"
+}, inplace=True)
     st.success(f"{len(df_multi)} {T['articles_analyzed']}")
 
     c1, c2 = st.columns(2)
