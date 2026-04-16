@@ -1286,7 +1286,7 @@ if result:
 )
 st.progress(conflict_bar)
 st.caption("Erreur sincère ⟵⟶ Manipulation probable")
-    st.progress(conflict_bar)
+st.progress(conflict_bar)
 
     with st.expander(T["strengths_detected"], expanded=True):
         if result["strengths"]:
