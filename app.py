@@ -1321,7 +1321,7 @@ if result:
         "Plus la barre est élevée, plus l’écart entre erreur sincère et mensonge probable est marqué."
     )
     st.progress(conflict_bar)
-    gauge_value, gauge_label, gauge_color = compute_lie_gauge(result["M"], result["ME"])
+gauge_value, gauge_label, gauge_color = compute_lie_gauge(result["M"], result["ME"])
 
 st.write("Tension cognitive (mécroyance vs mensonge)")
 
@@ -1349,25 +1349,26 @@ st.markdown(
     f"<b style='color:{gauge_color}'>{gauge_label}</b> — {round(gauge_value*100,1)}%",
     unsafe_allow_html=True
 )
-    st.caption("Erreur sincère ⟵⟶ Manipulation probable")
 
-    with st.expander(T["strengths_detected"], expanded=True):
-        if result["strengths"]:
-            for item in result["strengths"]:
-                st.success(item)
-        else:
-            st.info(T["few_strong_signals"])
+st.caption("Erreur sincère ⟵⟶ Manipulation probable")
 
-    with st.expander(T["weaknesses_detected"], expanded=True):
-        if result["weaknesses"]:
-            for item in result["weaknesses"]:
-                st.error(item)
-        else:
-            st.success(T["no_major_weakness"])
+with st.expander(T["strengths_detected"], expanded=True):
+    if result["strengths"]:
+        for item in result["strengths"]:
+            st.success(item)
+    else:
+        st.info(T["few_strong_signals"])
 
-    st.divider()
-    st.subheader("Structure cognitive du texte analysé")
-    st.info(T["llm_intro"])
+with st.expander(T["weaknesses_detected"], expanded=True):
+    if result["weaknesses"]:
+        for item in result["weaknesses"]:
+            st.error(item)
+    else:
+        st.success(T["no_major_weakness"])
+
+st.divider()
+st.subheader("Structure cognitive du texte analysé")
+st.info(T["llm_intro"])
 
     cog = Cognition(result["G"], result["N"], result["D"])
     overconfidence = result["D"] - (result["G"] + result["N"])
