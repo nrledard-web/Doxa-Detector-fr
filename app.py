@@ -1314,61 +1314,61 @@ if result:
     conflict = abs(result["M"] - result["ME"])
     conflict_bar = min(conflict / 10, 1)
 
+        gauge_value, gauge_label, gauge_color = compute_lie_gauge(result["M"], result["ME"])
+
     st.write("Tension cognitive (mécroyance vs mensonge)")
     st.caption(
-        "Cette barre indique si le discours ressemble plutôt à une erreur sincère "
-        "(mécroyance) ou à une possible manipulation. "
-        "Plus la barre est élevée, plus l’écart entre erreur sincère et mensonge probable est marqué."
+        "Cette jauge indique si le discours relève plutôt d’une erreur sincère "
+        "(mécroyance) ou d’une possible manipulation. "
+        "Plus la jauge progresse, plus la structure du texte se rapproche du mensonge."
     )
-    st.progress(conflict_bar)
-gauge_value, gauge_label, gauge_color = compute_lie_gauge(result["M"], result["ME"])
 
-st.write("Tension cognitive (mécroyance vs mensonge)")
-
-st.markdown(f"""
-<div style="width:100%; margin-top:10px; margin-bottom:10px;">
-    <div style="
-        width:100%;
-        height:26px;
-        background:#e5e7eb;
-        border-radius:12px;
-        overflow:hidden;
-        border:1px solid #cbd5e1;
-    ">
+    st.markdown(f"""
+    <div style="width:100%; margin-top:10px; margin-bottom:10px;">
         <div style="
-            width:{gauge_value*100}%;
-            height:100%;
-            background:{gauge_color};
-            transition:width 0.4s ease;
-        "></div>
+            width:100%;
+            height:26px;
+            background:#e5e7eb;
+            border-radius:12px;
+            overflow:hidden;
+            border:1px solid #cbd5e1;
+        ">
+            <div style="
+                width:{gauge_value*100}%;
+                height:100%;
+                background:{gauge_color};
+                transition:width 0.4s ease;
+            "></div>
+        </div>
     </div>
-</div>
-""", unsafe_allow_html=True)
+    """, unsafe_allow_html=True)
 
-st.markdown(
-    f"<b style='color:{gauge_color}'>{gauge_label}</b> — {round(gauge_value*100,1)}%",
-    unsafe_allow_html=True
-)
+    st.markdown(
+        f"<b style='color:{gauge_color}'>{gauge_label}</b> — {round(gauge_value*100,1)}%",
+        unsafe_allow_html=True
+    )
 
-st.caption("Erreur sincère ⟵⟶ Manipulation probable")
+    st.caption("Erreur sincère ⟵⟶ Manipulation probable")
 
-with st.expander(T["strengths_detected"], expanded=True):
-    if result["strengths"]:
-        for item in result["strengths"]:
-            st.success(item)
-    else:
-        st.info(T["few_strong_signals"])
+    with st.expander(T["strengths_detected"], expanded=True):
+        if result["strengths"]:
+            for item in result["strengths"]:
+                st.success(item)
+        else:
+            st.info(T["few_strong_signals"])
 
-with st.expander(T["weaknesses_detected"], expanded=True):
-    if result["weaknesses"]:
-        for item in result["weaknesses"]:
-            st.error(item)
-    else:
-        st.success(T["no_major_weakness"])
+    with st.expander(T["weaknesses_detected"], expanded=True):
+        if result["weaknesses"]:
+            for item in result["weaknesses"]:
+                st.error(item)
+        else:
+            st.success(T["no_major_weakness"])
 
-st.divider()
-st.subheader("Structure cognitive du texte analysé")
-st.info(T["llm_intro"])
+    st.divider()
+    st.subheader("Structure cognitive du texte analysé")
+    st.info(T["llm_intro"])
+
+    cog = Cognition(result["G"], result["N"], result["D"])
 
     cog = Cognition(result["G"], result["N"], result["D"])
     overconfidence = result["D"] - (result["G"] + result["N"])
