@@ -382,7 +382,6 @@ def extract_article_from_url(url: str) -> str:
     except Exception:
         return ""
 
-
 @st.cache_data(show_spinner=False, ttl=1800)
 def search_articles_by_keyword(keyword: str, max_results: int = 10) -> List[Dict]:
     articles = []
