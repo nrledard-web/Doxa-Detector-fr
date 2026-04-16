@@ -1278,15 +1278,15 @@ if result:
 
     conflict = abs(result["M"] - result["ME"])
     conflict_bar = min(conflict / 10, 1)
+
     st.write("Tension cognitive (mécroyance vs mensonge)")
     st.caption(
-    "Cette barre indique si le discours ressemble plutôt à une erreur sincère "
-    "(mécroyance) ou à une possible manipulation. "
-    "Plus la barre est élevée, plus l’écart entre erreur sincère et mensonge probable est marqué."
-)
-st.progress(conflict_bar)
-st.caption("Erreur sincère ⟵⟶ Manipulation probable")
-st.progress(conflict_bar)
+        "Cette barre indique si le discours ressemble plutôt à une erreur sincère "
+        "(mécroyance) ou à une possible manipulation. "
+        "Plus la barre est élevée, plus l’écart entre erreur sincère et mensonge probable est marqué."
+    )
+    st.progress(conflict_bar)
+    st.caption("Erreur sincère ⟵⟶ Manipulation probable")
 
     with st.expander(T["strengths_detected"], expanded=True):
         if result["strengths"]:
