@@ -33,6 +33,13 @@ FRENCH_NEWS_DOMAINS = [
 # droite
 "valeursactuelles.com",
 
+# droite radicale / extrême droite
+"fdesouche.com",
+"ripostelaique.com",
+"boulevardvoltaire.fr",
+"egaliteetreconciliation.fr",
+"reseauinternational.net"
+
 # international
 "france24.com",
 "rfi.fr"
