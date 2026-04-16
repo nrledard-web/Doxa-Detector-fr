@@ -1314,7 +1314,7 @@ if result:
     conflict = abs(result["M"] - result["ME"])
     conflict_bar = min(conflict / 10, 1)
 
-        gauge_value, gauge_label, gauge_color = compute_lie_gauge(result["M"], result["ME"])
+    gauge_value, gauge_label, gauge_color = compute_lie_gauge(result["M"], result["ME"])
 
     st.write("Tension cognitive (mécroyance vs mensonge)")
     st.caption(
