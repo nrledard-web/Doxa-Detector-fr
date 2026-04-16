@@ -1058,7 +1058,7 @@ if st.session_state.get("multi_results"):
             st.markdown(f"### {row['Titre']}")
             st.caption(f"{row['Source']}")
 
-            score = row["Hard Fact Score"]
+            score de crédibilité = row["Hard Fact Score"]
             if score <= 6:
                 color, label = "🔴", "Fragile"
             elif score <= 11:
