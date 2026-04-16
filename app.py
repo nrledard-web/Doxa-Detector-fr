@@ -456,7 +456,7 @@ def search_articles_by_keyword(keyword: str, max_results: int = 10) -> List[Dict
         st.warning(f"Erreur DDGS : {e}")
 
     return articles
-    
+
 
     api_key = st.secrets.get("NEWS_API_KEY")
 
@@ -708,6 +708,7 @@ def analyze_article(text: str) -> Dict:
         "avg_claim_risk": avg_claim_risk,
         "avg_claim_verifiability": avg_claim_verifiability,
         "hard_fact_score": hard_fact_score,
+        "verdict": verdict,
         "profil_solidite": verdict,
         "strengths": strengths,
         "weaknesses": weaknesses,
@@ -1032,9 +1033,7 @@ if st.button(T["analyze_topic"], key="analyze_topic"):
 
 if st.session_state.get("multi_results"):
     df_multi = pd.DataFrame(st.session_state.multi_results).sort_values("Hard Fact Score", ascending=False)
-    df_multi.rename(columns={
-    "verdict": "Profil de solidité"
-}, inplace=True)
+
     st.success(f"{len(df_multi)} {T['articles_analyzed']}")
 
     c1, c2 = st.columns(2)
