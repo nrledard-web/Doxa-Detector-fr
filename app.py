@@ -1197,7 +1197,7 @@ if result:
     st.subheader(f"{couleur} {T['credibility_gauge']} : {etiquette}")
     st.progress(score / 20)
     st.caption(f"{T['score']} : {score}/20 — {message}")
-    st.caption("Un texte réellement crédible se situe dans la zone « robuste ».")
+    st.caption("Sur cette échelle, un texte véritablement crédible se situe généralement dans la zone robuste.")
 
     st.subheader("Diagnostic cognitif")
     life_score = round((result["hard_fact_score"] / 20) * 100, 1)
