@@ -468,8 +468,9 @@ def search_articles_by_keyword(keyword: str, max_results: int = 10) -> List[Dict
 # -----------------------------
 # Jauge mécroyance / mensonge
 # -----------------------------
-def compute_lie_gauge(M: float, ME: float):
-    delta = ME - M
+def compute_lie_gauge(G: float, N: float, D: float, M: float):
+    ME_gauge = (3 * D) - (G + N)
+    delta = ME_gauge - M
 
     if delta <= 0:
         strength = min(abs(delta) / 10, 1.0)
@@ -481,7 +482,6 @@ def compute_lie_gauge(M: float, ME: float):
         else:
             label = "Mécroyance très forte"
             color = "#a16207"
-
     else:
         strength = min(delta / 10, 1.0)
         gauge = 0.33 + (0.67 * strength)
@@ -499,7 +499,7 @@ def compute_lie_gauge(M: float, ME: float):
             label = "Mensonge extrême"
             color = "#991b1b"
 
-    return round(gauge, 3), label, color
+    return round(gauge, 3), label, color, round(ME_gauge, 2)
 
     api_key = st.secrets.get("NEWS_API_KEY")
 
