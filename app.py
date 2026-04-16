@@ -382,6 +382,7 @@ def extract_article_from_url(url: str) -> str:
     except Exception:
         return ""
 
+
 @st.cache_data(show_spinner=False, ttl=1800)
 def search_articles_by_keyword(keyword: str, max_results: int = 10) -> List[Dict]:
     articles = []
@@ -389,41 +390,6 @@ def search_articles_by_keyword(keyword: str, max_results: int = 10) -> List[Dict
 
     api_key = st.secrets.get("NEWS_API_KEY")
     from_date_iso = (datetime.utcnow() - timedelta(days=7)).strftime("%Y-%m-%d")
-    # -----------------------------
-# Jauge mécroyance / mensonge
-# -----------------------------
-def compute_lie_gauge(M: float, ME: float):
-    delta = ME - M
-
-    if delta <= 0:
-        strength = min(abs(delta) / 10, 1.0)
-        gauge = 0.33 * strength
-
-        if gauge < 0.15:
-            label = "Mécroyance modérée"
-            color = "#ca8a04"
-        else:
-            label = "Mécroyance très forte"
-            color = "#a16207"
-
-    else:
-        strength = min(delta / 10, 1.0)
-        gauge = 0.33 + (0.67 * strength)
-
-        if gauge < 0.45:
-            label = "Mensonge naissant"
-            color = "#f97316"
-        elif gauge < 0.70:
-            label = "Mensonge modéré"
-            color = "#ea580c"
-        elif gauge < 0.90:
-            label = "Mensonge fort"
-            color = "#dc2626"
-        else:
-            label = "Mensonge extrême"
-            color = "#991b1b"
-
-    return round(gauge, 3), label, color
 
     # -----------------------------
     # 1) Priorité : NewsAPI
@@ -499,7 +465,41 @@ def compute_lie_gauge(M: float, ME: float):
         st.warning(f"Erreur DDGS : {e}")
 
     return articles
+# -----------------------------
+# Jauge mécroyance / mensonge
+# -----------------------------
+def compute_lie_gauge(M: float, ME: float):
+    delta = ME - M
 
+    if delta <= 0:
+        strength = min(abs(delta) / 10, 1.0)
+        gauge = 0.33 * strength
+
+        if gauge < 0.15:
+            label = "Mécroyance modérée"
+            color = "#ca8a04"
+        else:
+            label = "Mécroyance très forte"
+            color = "#a16207"
+
+    else:
+        strength = min(delta / 10, 1.0)
+        gauge = 0.33 + (0.67 * strength)
+
+        if gauge < 0.45:
+            label = "Mensonge naissant"
+            color = "#f97316"
+        elif gauge < 0.70:
+            label = "Mensonge modéré"
+            color = "#ea580c"
+        elif gauge < 0.90:
+            label = "Mensonge fort"
+            color = "#dc2626"
+        else:
+            label = "Mensonge extrême"
+            color = "#991b1b"
+
+    return round(gauge, 3), label, color
 
     api_key = st.secrets.get("NEWS_API_KEY")
 
