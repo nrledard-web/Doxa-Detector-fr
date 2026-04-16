@@ -469,40 +469,41 @@ def search_articles_by_keyword(keyword: str, max_results: int = 10) -> List[Dict
 # Jauge mécroyance / mensonge
 # -----------------------------
 def compute_lie_gauge(G: float, N: float, D: float, M: float):
+
     ME_gauge = (2 * D) - (G + N)
     delta = ME_gauge - M
 
-    # amplification douce de la jauge
-    amp = 6.0
+    # amplification contrôlée
+    amp = 8.0
+
+    strength = min(abs(delta) / amp, 1.0)
 
     if delta <= 0:
-        strength = min(abs(delta) / amp, 1.0)
-        gauge = 0.33 * strength
+        # zone mécroyance
+        gauge = 0.5 * (1 - strength)
 
-        if gauge < 0.15:
+        if gauge > 0.35:
             label = "Mécroyance modérée"
             color = "#ca8a04"
         else:
-            label = "Mécroyance très forte"
+            label = "Mécroyance forte"
             color = "#a16207"
-    else:
-        strength = min(delta / amp, 1.0)
-        gauge = 0.33 + (0.67 * strength)
 
-        if gauge < 0.45:
-            label = "Mensonge naissant"
+    else:
+        # zone mensonge
+        gauge = 0.5 + (0.5 * strength)
+
+        if gauge < 0.65:
+            label = "Mensonge possible"
             color = "#f97316"
-        elif gauge < 0.70:
-            label = "Mensonge modéré"
-            color = "#ea580c"
-        elif gauge < 0.90:
-            label = "Mensonge fort"
+        elif gauge < 0.85:
+            label = "Mensonge probable"
             color = "#dc2626"
         else:
             label = "Mensonge extrême"
             color = "#991b1b"
 
-    return round(gauge, 3), label, color, round(ME_gauge, 2)
+    return round(gauge,3), label, color, round(ME_gauge,2)
 
 
 @dataclass
