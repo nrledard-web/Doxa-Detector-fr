@@ -452,7 +452,77 @@ def compute_linguistic_suspicion(text: str) -> dict:
         "lack_of_nuance": lack_of_nuance,
         "trigger_count": raw_score,
     }
+    
+def detect_political_patterns(text: str):
+    """
+    Détecte des manœuvres discursives politiques ou rhétoriques
+    à partir de bibliothèques d'expressions.
+    Retourne :
+    - total_score : nombre total d'occurrences détectées
+    - results : nombre d'occurrences par catégorie
+    - matched_terms : expressions effectivement trouvées
+    """
+    if not text:
+        return 0, {}, {}
 
+    t = text.lower()
+
+    categories = {
+        "certitude": CERTITUDE_PERFORMATIVE,
+        "autorite": AUTORITE_VAGUE,
+        "dramatisation": DRAMATISATION,
+        "generalisation": GENERALISATION,
+        "naturalisation": NATURALISATION,
+        "ennemi": ENNEMI_ABSTRAIT,
+    }
+
+    results = {}
+    matched_terms = {}
+    total_score = 0
+
+    for name, terms in categories.items():
+        hits = [term for term in terms if term in t]
+        results[name] = len(hits)
+        matched_terms[name] = hits
+        total_score += len(hits)
+
+    return total_score, results, matched_terms
+
+
+def compute_rhetorical_pressure(results: dict) -> float:
+    """
+    Calcule une pression rhétorique pondérée entre 0.0 et 1.0
+    à partir des catégories détectées.
+    """
+    weights = {
+        "certitude": 1.2,
+        "autorite": 1.0,
+        "dramatisation": 1.3,
+        "generalisation": 1.1,
+        "naturalisation": 1.4,
+        "ennemi": 1.5,
+    }
+
+    weighted_score = 0.0
+
+    for cat, count in results.items():
+        weighted_score += count * weights.get(cat, 1.0)
+
+    return min(weighted_score / 10, 1.0)
+
+
+def interpret_rhetorical_pressure(value: float):
+    """
+    Traduit la pression rhétorique en étiquette + couleur.
+    """
+    if value < 0.20:
+        return "Faible", "#16a34a"
+    elif value < 0.40:
+        return "Modérée", "#ca8a04"
+    elif value < 0.70:
+        return "Élevée", "#f97316"
+    else:
+        return "Très élevée", "#dc2626"
 
 @st.cache_data(show_spinner=False, ttl=3600)
 def extract_article_from_url(url: str) -> str:
@@ -613,6 +683,72 @@ NUANCE_MARKERS = [
     "nuancer", "prudence", "possible", "peut-être", "semble",
 ]
 
+CERTITUDE_PERFORMATIVE = [
+    "il est évident",
+    "il est clair que",
+    "sans aucun doute",
+    "il est absolument certain",
+    "les faits sont clairs",
+    "personne ne peut nier",
+    "la réalité est simple",
+    "clearly",
+    "it is obvious",
+    "without any doubt",
+    "there is no doubt"
+]
+
+AUTORITE_VAGUE = [
+    "selon des experts",
+    "des sources indiquent",
+    "selon certains spécialistes",
+    "plusieurs analystes pensent",
+    "des rapports suggèrent",
+    "according to sources",
+    "experts say",
+    "insiders say",
+    "many specialists"
+]
+
+DRAMATISATION = [
+    "crise majeure",
+    "catastrophe imminente",
+    "menace historique",
+    "situation explosive",
+    "choc politique",
+    "crise sans précédent",
+    "unprecedented crisis",
+    "historic threat",
+    "major collapse"
+]
+
+GENERALISATION = [
+    "tout le monde sait",
+    "les citoyens pensent",
+    "les gens comprennent",
+    "les Français savent",
+    "everyone knows",
+    "people understand",
+    "everyone realizes"
+]
+
+NATURALISATION = [
+    "il n'y a pas d'alternative",
+    "c'est la seule solution",
+    "c'est inévitable",
+    "nous devons agir",
+    "unavoidable",
+    "necessary reform",
+    "no alternative"
+]
+
+ENNEMI_ABSTRAIT = [
+    "certaines forces",
+    "des intérêts puissants",
+    "certains groupes",
+    "des acteurs étrangers",
+    "hostile forces",
+    "external actors"
+]
 
 def analyze_claim(sentence: str) -> Claim:
     has_number = bool(re.search(r"\d+", sentence))
@@ -732,6 +868,9 @@ def analyze_article(text: str) -> Dict:
     ling = compute_linguistic_suspicion(text)
     L = ling["L"]
 
+    political_pattern_score, political_results, matched_terms = detect_political_patterns(text)
+    rhetorical_pressure_score = compute_rhetorical_pressure(political_results)
+
     ME_base = max(0, (2 * D) - (G + N))
     ME = round(ME_base * L, 2)
 
@@ -751,6 +890,10 @@ def analyze_article(text: str) -> Dict:
         "vague_authority": ling["vague_authority"],
         "dramatic_framing": ling["dramatic_framing"],
         "lack_of_nuance": ling["lack_of_nuance"],
+        "political_pattern_score": political_pattern_score,
+        "political_results": political_results,
+        "matched_terms": matched_terms,
+        "rhetorical_pressure_score": rhetorical_pressure_score,
         "V": V,
         "R": R,
         "improved": improved,
@@ -1354,6 +1497,63 @@ if result:
     )
 
     st.caption("Erreur sincère ⟵⟶ Manipulation probable")
+
+    st.divider()
+    st.subheader("Jauge de pression rhétorique")
+    st.caption(
+        "Cette jauge ne mesure pas un mensonge certain, mais l’intensité des procédés discursifs "
+        "susceptibles d’orienter, de verrouiller ou de dramatiser un discours."
+    )
+
+    rp = result["rhetorical_pressure_score"]
+    rp_label, rp_color = interpret_rhetorical_pressure(rp)
+
+    st.markdown(f"""
+    <div style="width:100%; margin-top:10px; margin-bottom:10px;">
+        <div style="
+            width:100%;
+            height:26px;
+            background:#e5e7eb;
+            border-radius:12px;
+            overflow:hidden;
+            border:1px solid #cbd5e1;
+        ">
+            <div style="
+                width:{rp*100}%;
+                height:100%;
+                background:{rp_color};
+                transition:width 0.4s ease;
+            "></div>
+        </div>
+    </div>
+    """, unsafe_allow_html=True)
+
+    st.markdown(
+        f"<b style='color:{rp_color}'>{rp_label}</b> — {round(rp*100, 1)}%",
+        unsafe_allow_html=True
+    )
+
+    st.caption("Pression rhétorique faible ⟵⟶ Pression rhétorique forte")
+
+    with st.expander("Voir les manœuvres discursives détectées", expanded=False):
+        if result["political_pattern_score"] == 0:
+            st.info("Aucun marqueur rhétorique politique saillant détecté.")
+        else:
+            st.metric("Score global de manœuvres discursives", result["political_pattern_score"])
+
+            labels = {
+                "certitude": "Certitude performative",
+                "autorite": "Autorité vague institutionnelle",
+                "dramatisation": "Dramatisation politique",
+                "generalisation": "Généralisation abusive",
+                "naturalisation": "Naturalisation idéologique",
+                "ennemi": "Ennemi abstrait",
+            }
+
+            for cat, count in result["political_results"].items():
+                if count > 0:
+                    st.markdown(f"**{labels.get(cat, cat)}** : {count}")
+                    st.caption(", ".join(result["matched_terms"][cat]))
 
     with st.expander(T["strengths_detected"], expanded=True):
         if result["strengths"]:
