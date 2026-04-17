@@ -769,6 +769,109 @@ CONFUSION_DELEGITIMATION = [
     "if you disagree you are on the wrong side of history"
 ]
 
+# -----------------------------
+# Bibliothèques rhétoriques
+# -----------------------------
+AUTORITE_ACADEMIQUE_VAGUE = [
+    "selon plusieurs études",
+    "selon certaines études",
+    "selon une étude récente",
+    "selon des chercheurs",
+    "selon certains chercheurs",
+    "selon plusieurs chercheurs",
+    "plusieurs études suggèrent",
+    "plusieurs travaux suggèrent",
+    "les analyses montrent",
+    "les analyses suggèrent",
+    "les données montrent",
+    "les données indiquent",
+    "les données disponibles",
+    "les recherches montrent",
+    "les recherches suggèrent",
+    "la littérature scientifique",
+    "le consensus scientifique",
+    "de nombreux spécialistes",
+    "certains spécialistes",
+    "de nombreux experts",
+    "certains experts",
+    "plusieurs experts",
+    "de nombreux analystes",
+    "plusieurs analystes",
+    "the data suggests",
+    "available data shows",
+    "research suggests",
+    "studies suggest",
+    "experts agree",
+    "many specialists"
+]
+
+DILUTION_RESPONSABILITE = [
+    "il ne s'agit pas d'accuser",
+    "il ne s'agit pas de blâmer",
+    "il ne s'agit pas de désigner",
+    "personne ne cherche à accuser",
+    "il faut simplement reconnaître",
+    "il faut seulement reconnaître",
+    "il s'agit simplement de constater",
+    "il s'agit seulement de constater",
+    "il convient de reconnaître",
+    "il faut admettre que",
+    "il serait naïf d'ignorer",
+    "ignorer cette réalité reviendrait à",
+    "ce n'est pas une accusation",
+    "sans mettre en cause quiconque",
+    "sans désigner de coupable",
+    "without blaming anyone",
+    "this is not about blaming",
+    "it is simply necessary to recognize",
+    "it would be naive to ignore"
+]
+CAUSALITE_IMPLICITE = [
+    "depuis que",
+    "depuis l'introduction de",
+    "depuis la mise en place de",
+    "depuis l'arrivée de",
+    "suite à",
+    "à cause de",
+    "en raison de",
+    "cela a conduit à",
+    "cela explique",
+    "cela montre que",
+    "ce qui prouve que",
+    "ce qui démontre que",
+    "ce qui explique que",
+    "c'est pourquoi",
+    "d'où",
+    "ce qui entraîne",
+    "ce qui conduit à",
+    "ce qui provoque",
+    "which explains",
+    "this proves that",
+    "this shows that",
+    "this leads to",
+]
+MORALISATION_DISCOURS = [
+    "il serait irresponsable de",
+    "nous avons le devoir de",
+    "nous avons la responsabilité de",
+    "la justice exige",
+    "la morale exige",
+    "il est moralement nécessaire",
+    "personne ne peut rester indifférent",
+    "nous ne pouvons pas rester indifférents",
+    "il serait immoral de",
+    "il serait injuste de",
+    "il est de notre devoir",
+    "nous devons protéger",
+    "nous devons défendre",
+    "nous devons agir",
+    "nous devons faire face",
+    "it would be irresponsible",
+    "we have a duty to",
+    "we have a responsibility to",
+    "justice requires",
+    "we cannot remain indifferent"
+]
 def detect_political_patterns(text: str):
     """
     Détecte des manœuvres discursives politiques ou rhétoriques
@@ -786,10 +889,22 @@ def detect_political_patterns(text: str):
     categories = {
         "certitude": CERTITUDE_PERFORMATIVE,
         "autorite": AUTORITE_VAGUE,
+        "autorite_academique": AUTORITE_ACADEMIQUE_VAGUE,
         "dramatisation": DRAMATISATION,
         "generalisation": GENERALISATION,
         "naturalisation": NATURALISATION,
         "ennemi": ENNEMI_ABSTRAIT,
+        "victimisation": VICTIMISATION,
+        "moralisation": MORALISATION,
+        "urgence": URGENCE,
+        "promesse": PROMESSE_EXCESSIVE,
+        "populisme": POPULISME_ANTI_ELITE,
+        "progressisme_identitaire": PROGRESSISME_IDENTITAIRE,
+        "socialisme_communisme": SOCIALISME_COMMUNISME,
+        "delegitimation": CONFUSION_DELEGITIMATION,
+        "dilution": DILUTION_RESPONSABILITE,
+        "causalite": CAUSALITE_IMPLICITE,
+        "moralisation": MORALISATION_DISCOURS,
     }
 
     results = {}
@@ -817,6 +932,7 @@ def compute_rhetorical_pressure(results: dict) -> float:
         "generalisation": 1.1,
         "naturalisation": 1.4,
         "ennemi": 1.5,
+        "causalite": 1.4,
     }
 
     weighted_score = 0.0
@@ -2013,6 +2129,7 @@ if result:
                 "generalisation": "Généralisation abusive",
                 "naturalisation": "Naturalisation idéologique",
                 "ennemi": "Ennemi abstrait",
+                "causalite": "Causalité implicite ou non démontrée",
             }
 
             for cat, count in result["political_results"].items():
