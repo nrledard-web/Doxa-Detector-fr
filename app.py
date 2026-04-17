@@ -38,7 +38,7 @@ FRENCH_NEWS_DOMAINS = [
 "ripostelaique.com",
 "boulevardvoltaire.fr",
 "egaliteetreconciliation.fr",
-"reseauinternational.net"
+"reseauinternational.net",
 
 # international
 "france24.com",
@@ -452,7 +452,323 @@ def compute_linguistic_suspicion(text: str) -> dict:
         "lack_of_nuance": lack_of_nuance,
         "trigger_count": raw_score,
     }
-    
+
+
+# -----------------------------
+# Bibliothèques rhétoriques
+# -----------------------------
+
+CERTITUDE_PERFORMATIVE = [
+    "il est évident",
+    "il est clair",
+    "une chose est claire",
+    "les faits sont clairs",
+    "les faits parlent d'eux-mêmes",
+    "personne ne peut nier",
+    "nul ne peut nier",
+    "il ne fait aucun doute",
+    "sans aucun doute",
+    "cela ne fait aucun doute",
+    "chacun peut voir",
+    "tout le monde voit bien",
+    "la réalité est simple",
+    "la vérité est simple",
+    "il est absolument certain",
+    "c'est une certitude",
+    "il est certain",
+    "c'est incontestable",
+    "c'est indiscutable",
+    "c'est incontestablement vrai",
+    "clearly",
+    "it is clear",
+    "it is obvious",
+    "there is no doubt",
+    "without any doubt",
+    "facts speak for themselves",
+    "nobody can deny"
+]
+
+AUTORITE_VAGUE = [
+    "selon des experts",
+    "de nombreux experts",
+    "des experts confirment",
+    "les experts disent",
+    "les spécialistes s'accordent",
+    "des spécialistes l'affirment",
+    "plusieurs analystes pensent",
+    "les observateurs constatent",
+    "selon certains spécialistes",
+    "des sources indiquent",
+    "selon des sources",
+    "des sources proches du dossier",
+    "des sources internes",
+    "des rapports suggèrent",
+    "des rapports confirment",
+    "les études montrent",
+    "des études montrent",
+    "les chiffres montrent",
+    "les indicateurs montrent",
+    "tout indique que",
+    "il ressort que",
+    "according to sources",
+    "experts say",
+    "specialists confirm",
+    "many analysts believe",
+    "reports confirm",
+    "studies show"
+]
+
+DRAMATISATION = [
+    "crise majeure",
+    "crise historique",
+    "crise sans précédent",
+    "catastrophe imminente",
+    "catastrophe annoncée",
+    "menace historique",
+    "menace grave",
+    "danger immense",
+    "danger majeur",
+    "situation explosive",
+    "situation critique",
+    "tournant historique",
+    "moment décisif",
+    "moment historique",
+    "choc politique",
+    "effondrement",
+    "effondrement annoncé",
+    "chaos",
+    "dérive grave",
+    "urgence nationale",
+    "révolution sans précédent",
+    "historic threat",
+    "major collapse",
+    "unprecedented crisis",
+    "critical situation",
+    "historic turning point"
+]
+
+GENERALISATION = [
+    "tout le monde sait",
+    "tout le monde voit bien",
+    "tout le monde comprend",
+    "chacun sait",
+    "chacun comprend",
+    "les français savent",
+    "les citoyens pensent",
+    "les gens comprennent",
+    "les gens savent",
+    "les familles voient bien",
+    "personne n'ignore",
+    "nul n'ignore",
+    "nous savons tous",
+    "on sait tous que",
+    "everyone knows",
+    "everyone understands",
+    "people know",
+    "ordinary people see it",
+    "nobody ignores"
+]
+
+NATURALISATION = [
+    "il n'y a pas d'alternative",
+    "il n'existe pas d'alternative",
+    "c'est la seule solution",
+    "c'est la seule voie",
+    "c'est inévitable",
+    "c'est nécessaire",
+    "nous devons agir",
+    "nous devons continuer",
+    "nous n'avons pas le choix",
+    "il faut poursuivre",
+    "il faut aller plus loin",
+    "il faut avancer",
+    "il faut tenir bon",
+    "il faut continuer sur cette voie",
+    "la seule politique possible",
+    "la seule réponse possible",
+    "no alternative",
+    "there is no alternative",
+    "the only solution",
+    "the only path",
+    "it is unavoidable",
+    "necessary reform"
+]
+
+ENNEMI_ABSTRAIT = [
+    "certaines forces",
+    "des forces hostiles",
+    "des intérêts puissants",
+    "certains groupes",
+    "des groupes d'influence",
+    "des acteurs étrangers",
+    "des puissances extérieures",
+    "les élites",
+    "les technocrates",
+    "les lobbies",
+    "les réseaux",
+    "ceux qui veulent affaiblir le pays",
+    "ceux qui refusent le changement",
+    "les ennemis de l'intérieur",
+    "les ennemis du peuple",
+    "hostile forces",
+    "external actors",
+    "powerful interests",
+    "hidden networks",
+    "enemies within"
+]
+
+VICTIMISATION = [
+    "on nous empêche d'agir",
+    "on veut nous faire taire",
+    "on refuse d'entendre le peuple",
+    "le peuple est abandonné",
+    "les français sont abandonnés",
+    "nous sommes attaqués",
+    "nous sommes affaiblis",
+    "nous sommes pénalisés",
+    "le pays est sacrifié",
+    "nos efforts sont méprisés",
+    "ordinary people are ignored",
+    "the people have been abandoned",
+    "we are being silenced",
+    "we are under attack"
+]
+
+MORALISATION = [
+    "c'est une question de responsabilité",
+    "c'est notre devoir",
+    "nous avons le devoir",
+    "nous devons être à la hauteur",
+    "ce serait irresponsable",
+    "il serait irresponsable",
+    "notre devoir moral",
+    "nous n'avons pas le droit d'échouer",
+    "nous devons protéger nos enfants",
+    "nous devons défendre l'avenir",
+    "it is our duty",
+    "it would be irresponsible",
+    "we must protect our children"
+]
+
+URGENCE = [
+    "il faut agir maintenant",
+    "il faut agir immédiatement",
+    "sans attendre",
+    "avant qu'il ne soit trop tard",
+    "il est encore temps",
+    "nous devons agir vite",
+    "immédiatement",
+    "dès maintenant",
+    "urgence absolue",
+    "time is running out",
+    "we must act now",
+    "before it is too late",
+    "immediately"
+]
+
+PROMESSE_EXCESSIVE = [
+    "nous allons tout changer",
+    "nous allons changer la vie",
+    "nous allons redresser le pays",
+    "nous allons sauver l'économie",
+    "nous allons protéger tout le monde",
+    "nous garantirons l'avenir",
+    "nous garantirons la prospérité",
+    "nous garantirons la sécurité",
+    "nous allons rétablir l'ordre",
+    "we will fix everything",
+    "we will restore prosperity",
+    "we will guarantee security"
+]
+
+POPULISME_ANTI_ELITE = [
+    "les élites ont trahi",
+    "les élites méprisent le peuple",
+    "le peuple contre les élites",
+    "les puissants contre le peuple",
+    "les technocrates",
+    "les bureaucrates de bruxelles",
+    "la caste",
+    "l'oligarchie",
+    "les élites mondialisées",
+    "le système est verrouillé",
+    "ceux d'en haut",
+    "la finance décide de tout",
+    "les banques gouvernent",
+    "les marchés imposent leur loi",
+    "ordinary people versus the elite",
+    "the elite has failed",
+    "the establishment betrayed the people",
+    "the system is rigged"
+]
+
+PROGRESSISME_IDENTITAIRE = [
+    "les dominations systémiques",
+    "la violence systémique",
+    "le racisme systémique",
+    "les discriminations structurelles",
+    "les privilèges invisibles",
+    "les privilèges blancs",
+    "les privilèges de classe",
+    "déconstruire les normes",
+    "déconstruire les stéréotypes",
+    "remettre en cause les normes",
+    "les identités minorisées",
+    "les corps minorisés",
+    "les personnes marginalisées",
+    "les vécus minoritaires",
+    "intersection des oppressions",
+    "les rapports de domination",
+    "check your privilege",
+    "systemic oppression",
+    "structural discrimination",
+    "deconstruct gender norms",
+    "marginalized voices",
+    "lived experience matters",
+    "the personal is political"
+]
+
+SOCIALISME_COMMUNISME = [
+    "les travailleurs exploités",
+    "la lutte des classes",
+    "le capital détruit",
+    "le capital exploite",
+    "les possédants",
+    "les exploiteurs",
+    "la bourgeoisie",
+    "le patronat prédateur",
+    "les riches doivent payer",
+    "reprendre les richesses",
+    "socialiser les moyens de production",
+    "redistribuer les richesses",
+    "mettre fin au capitalisme",
+    "abolir l'exploitation",
+    "protéger les services publics contre le marché",
+    "workers are exploited",
+    "class struggle",
+    "the ruling class",
+    "end capitalism",
+    "redistribute wealth",
+    "the wealthy must pay",
+    "public ownership"
+]
+
+CONFUSION_DELEGITIMATION = [
+    "tout populisme est d'extrême droite",
+    "le populisme mène toujours au fascisme",
+    "toute critique est réactionnaire",
+    "toute opposition est haineuse",
+    "qui n'est pas avec nous est contre nous",
+    "refuser cette réforme c'est refuser le progrès",
+    "critiquer cela c'est être raciste",
+    "critiquer cela c'est être sexiste",
+    "critiquer cela c'est être transphobe",
+    "toute réserve est suspecte",
+    "there is only one acceptable position",
+    "any criticism is hate",
+    "if you disagree you are on the wrong side of history"
+]
+
 def detect_political_patterns(text: str):
     """
     Détecte des manœuvres discursives politiques ou rhétoriques
@@ -523,6 +839,102 @@ def interpret_rhetorical_pressure(value: float):
         return "Élevée", "#f97316"
     else:
         return "Très élevée", "#dc2626"
+def compute_propaganda_gauge(
+    lie_gauge: float,
+    rhetorical_pressure: float,
+    political_pattern_score: int,
+    closure: float
+) -> float:
+    """
+    Jauge propagandiste globale entre 0 et 1.
+    Combine :
+    - tension cognitive
+    - pression rhétorique
+    - motifs politiques/idéologiques détectés
+    - fermeture cognitive
+    """
+    pattern_factor = min(political_pattern_score / 8, 1.0)
+    closure_factor = min(closure / 1.2, 1.0)
+
+    score = (
+        0.30 * lie_gauge +
+        0.35 * rhetorical_pressure +
+        0.20 * pattern_factor +
+        0.15 * closure_factor
+    )
+
+    return min(max(score, 0.0), 1.0)
+
+
+def interpret_propaganda_gauge(value: float):
+    """
+    Traduit l'indice propagandiste en étiquette + couleur + commentaire.
+    """
+    if value < 0.20:
+        return "Très faible", "#16a34a", "Le texte ne présente pas de structure propagandiste marquée."
+    elif value < 0.40:
+        return "Faible", "#84cc16", "Le discours peut orienter légèrement la perception, sans verrouillage fort."
+    elif value < 0.60:
+        return "Modéré", "#ca8a04", "Le texte contient plusieurs éléments compatibles avec une mise en orientation du lecteur."
+    elif value < 0.80:
+        return "Élevé", "#f97316", "Le discours semble fortement orienté et cherche à imposer un cadrage interprétatif."
+    else:
+        return "Très élevé", "#dc2626", "Le texte présente une structure fortement propagandiste ou de verrouillage idéologique."       
+
+def interpret_discursive_profile(
+    lie_gauge: float,
+    rhetorical_pressure: float,
+    propaganda_gauge: float
+) -> str:
+    """
+    Verdict global basé sur les 3 jauges discursives.
+    """
+    if propaganda_gauge >= 0.75 and rhetorical_pressure >= 0.60:
+        return "Structure discursive fortement propagandiste"
+    elif lie_gauge >= 0.65 and rhetorical_pressure >= 0.45:
+        return "Structure discursive manipulatoire probable"
+    elif propaganda_gauge >= 0.45 or rhetorical_pressure >= 0.45:
+        return "Discours fortement orienté"
+    elif lie_gauge < 0.40 and rhetorical_pressure < 0.35:
+        return "Discours plutôt sincère ou peu verrouillant"
+    else:
+        return "Discours ambigu ou mixte"
+
+def interpret_closure_gauge(value: float):
+    """
+    Traduit la clôture cognitive en étiquette + couleur + commentaire.
+    """
+    if value < 0.40:
+        return "Ouverture cognitive", "#16a34a", "Le texte reste assez révisable."
+    elif value < 0.75:
+        return "Rigidification modérée", "#ca8a04", "Le discours commence à se refermer sur ses certitudes."
+    elif value < 1.10:
+        return "Clôture élevée", "#f97316", "La certitude domine nettement l’ancrage cognitif."
+    else:
+        return "Clôture critique", "#dc2626", "Le texte semble fortement verrouillé par sa propre structure."
+
+
+def render_custom_gauge(value: float, color: str):
+    value = max(0.0, min(1.0, value))
+    st.markdown(f"""
+    <div style="width:100%; margin-top:10px; margin-bottom:10px;">
+        <div style="
+            width:100%;
+            height:26px;
+            background:#e5e7eb;
+            border-radius:12px;
+            overflow:hidden;
+            border:1px solid #cbd5e1;
+        ">
+            <div style="
+                width:{value*100}%;
+                height:100%;
+                background:{color};
+                transition:width 0.4s ease;
+            "></div>
+        </div>
+    </div>
+    """, unsafe_allow_html=True)       
 
 @st.cache_data(show_spinner=False, ttl=3600)
 def extract_article_from_url(url: str) -> str:
@@ -865,11 +1277,21 @@ def analyze_article(text: str) -> Dict:
     if sum(1 for c in claims if c.status == T["very_fragile"]) >= 2:
         weaknesses.append(T["multiple_claims_very_fragile"])
 
+    if emotional >= 2:
+        weaknesses.append(T["notable_emotional_sensational_charge"])
+    if source_markers == 0 and citation_like == 0:
+        weaknesses.append(T["almost_total_absence_of_verifiable_elements"])
+    if article_length < 80:
+        weaknesses.append(T["text_too_short"])
+    weaknesses.extend(red_flags)
+    if sum(1 for c in claims if c.status == T["very_fragile"]) >= 2:
+        weaknesses.append(T["multiple_claims_very_fragile"])
+
     ling = compute_linguistic_suspicion(text)
     L = ling["L"]
 
     political_pattern_score, political_results, matched_terms = detect_political_patterns(text)
-    rhetorical_pressure_score = compute_rhetorical_pressure(political_results)
+    rhetorical_pressure = compute_rhetorical_pressure(political_results)
 
     ME_base = max(0, (2 * D) - (G + N))
     ME = round(ME_base * L, 2)
@@ -884,8 +1306,9 @@ def analyze_article(text: str) -> Dict:
         "ME_base": ME_base,
         "ME": ME,
         "L": L,
+        
         "linguistic_trigger_count": ling["trigger_count"],
-        "rhetorical_pressure": ling["rhetorical_pressure"],
+        "linguistic_pressure_hits": ling["rhetorical_pressure"],
         "absolute_claims": ling["absolute_claims"],
         "vague_authority": ling["vague_authority"],
         "dramatic_framing": ling["dramatic_framing"],
@@ -893,7 +1316,7 @@ def analyze_article(text: str) -> Dict:
         "political_pattern_score": political_pattern_score,
         "political_results": political_results,
         "matched_terms": matched_terms,
-        "rhetorical_pressure_score": rhetorical_pressure_score,
+        "rhetorical_pressure": rhetorical_pressure,
         "V": V,
         "R": R,
         "improved": improved,
@@ -1505,7 +1928,7 @@ if result:
         "susceptibles d’orienter, de verrouiller ou de dramatiser un discours."
     )
 
-    rp = result["rhetorical_pressure_score"]
+    rp = result["rhetorical_pressure"]
     rp_label, rp_color = interpret_rhetorical_pressure(rp)
 
     st.markdown(f"""
@@ -1534,6 +1957,48 @@ if result:
     )
 
     st.caption("Pression rhétorique faible ⟵⟶ Pression rhétorique forte")
+
+    st.divider()
+    st.subheader("Jauge propagandiste")
+    st.caption(
+        "Cette jauge combine la tension cognitive, la pression rhétorique, "
+        "les motifs idéologiques détectés et le degré de fermeture cognitive. "
+        "Elle aide à estimer si le texte relève d’un simple discours orienté "
+        "ou d’une structure plus franchement propagandiste."
+    )
+
+    closure_for_discourse = (
+        (result["D"] * (1 + len(result["red_flags"]) / 5)) / (result["G"] + result["N"])
+        if (result["G"] + result["N"]) > 0 else 10
+    )
+
+    propaganda_value = compute_propaganda_gauge(
+        lie_gauge=gauge_value,
+        rhetorical_pressure=rp,
+        political_pattern_score=result["political_pattern_score"],
+        closure=closure_for_discourse
+    )
+
+    propaganda_label, propaganda_color, propaganda_text = interpret_propaganda_gauge(propaganda_value)
+
+    render_custom_gauge(propaganda_value, propaganda_color)
+
+    st.markdown(
+        f"<b style='color:{propaganda_color}'>{propaganda_label}</b> — {round(propaganda_value*100, 1)}%",
+        unsafe_allow_html=True
+    )
+
+    st.caption("Discours peu orienté ⟵⟶ Structure propagandiste")
+    st.caption(propaganda_text)
+
+    discursive_profile = interpret_discursive_profile(
+        lie_gauge=gauge_value,
+        rhetorical_pressure=rp,
+        propaganda_gauge=propaganda_value
+    )
+
+    st.subheader("Profil discursif global")
+    st.write(discursive_profile)
 
     with st.expander("Voir les manœuvres discursives détectées", expanded=False):
         if result["political_pattern_score"] == 0:
@@ -1585,6 +2050,28 @@ if result:
     c3, c4 = st.columns(2)
     c3.metric(T["revisability"], round(revisability, 2))
     c4.metric(T["cognitive_closure"], round(closure, 2))
+    st.divider()
+    st.subheader("Jauge de clôture cognitive")
+
+    st.caption(
+        "Cette jauge mesure le degré de verrouillage cognitif du texte. "
+        "Plus elle monte, plus la certitude domine le savoir et l’intégration."
+    )
+
+    closure_gauge = min(closure / 1.5, 1.0)
+
+    closure_label, closure_color, closure_text = interpret_closure_gauge(closure)
+
+    render_custom_gauge(closure_gauge, closure_color)
+
+    st.markdown(
+        f"<b style='color:{closure_color}'>{closure_label}</b> — {round(closure,2)}",
+        unsafe_allow_html=True
+    )
+
+    st.caption("Ouverture cognitive ⟵⟶ Clôture cognitive")
+
+    st.caption(closure_text)
     st.markdown(f"**{T['interpretation']} :** {cog.interpret()}")
 
     st.subheader(T["hard_fact_checking_by_claim"])
