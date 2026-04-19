@@ -424,7 +424,7 @@ def compute_linguistic_suspicion(text: str) -> dict:
     ]
 
     def count_hits(terms):
-        return sum(1 for term in terms if term in t)
+        return sum(1 for term in terms if contains_term(t, term))
 
     rhetorical_pressure = count_hits(rhetorical_pressure_terms)
     absolute_claims = count_hits(absolute_claim_terms)
@@ -458,165 +458,6 @@ def compute_linguistic_suspicion(text: str) -> dict:
 # -----------------------------
 # Bibliothèques rhétoriques
 # -----------------------------
-
-CERTITUDE_PERFORMATIVE = [
-    "il est évident",
-    "il est clair",
-    "une chose est claire",
-    "les faits sont clairs",
-    "les faits parlent d'eux-mêmes",
-    "personne ne peut nier",
-    "nul ne peut nier",
-    "il ne fait aucun doute",
-    "sans aucun doute",
-    "cela ne fait aucun doute",
-    "chacun peut voir",
-    "tout le monde voit bien",
-    "la réalité est simple",
-    "la vérité est simple",
-    "il est absolument certain",
-    "c'est une certitude",
-    "il est certain",
-    "c'est incontestable",
-    "c'est indiscutable",
-    "c'est incontestablement vrai",
-    "clearly",
-    "it is clear",
-    "it is obvious",
-    "there is no doubt",
-    "without any doubt",
-    "facts speak for themselves",
-    "nobody can deny"
-]
-
-AUTORITE_VAGUE = [
-    "selon des experts",
-    "de nombreux experts",
-    "des experts confirment",
-    "les experts disent",
-    "les spécialistes s'accordent",
-    "des spécialistes l'affirment",
-    "plusieurs analystes pensent",
-    "les observateurs constatent",
-    "selon certains spécialistes",
-    "des sources indiquent",
-    "selon des sources",
-    "des sources proches du dossier",
-    "des sources internes",
-    "des rapports suggèrent",
-    "des rapports confirment",
-    "les études montrent",
-    "des études montrent",
-    "les chiffres montrent",
-    "les indicateurs montrent",
-    "tout indique que",
-    "il ressort que",
-    "according to sources",
-    "experts say",
-    "specialists confirm",
-    "many analysts believe",
-    "reports confirm",
-    "studies show"
-]
-
-DRAMATISATION = [
-    "crise majeure",
-    "crise historique",
-    "crise sans précédent",
-    "catastrophe imminente",
-    "catastrophe annoncée",
-    "menace historique",
-    "menace grave",
-    "danger immense",
-    "danger majeur",
-    "situation explosive",
-    "situation critique",
-    "tournant historique",
-    "moment décisif",
-    "moment historique",
-    "choc politique",
-    "effondrement",
-    "effondrement annoncé",
-    "chaos",
-    "dérive grave",
-    "urgence nationale",
-    "révolution sans précédent",
-    "historic threat",
-    "major collapse",
-    "unprecedented crisis",
-    "critical situation",
-    "historic turning point"
-]
-
-GENERALISATION = [
-    "tout le monde sait",
-    "tout le monde voit bien",
-    "tout le monde comprend",
-    "chacun sait",
-    "chacun comprend",
-    "les français savent",
-    "les citoyens pensent",
-    "les gens comprennent",
-    "les gens savent",
-    "les familles voient bien",
-    "personne n'ignore",
-    "nul n'ignore",
-    "nous savons tous",
-    "on sait tous que",
-    "everyone knows",
-    "everyone understands",
-    "people know",
-    "ordinary people see it",
-    "nobody ignores"
-]
-
-NATURALISATION = [
-    "il n'y a pas d'alternative",
-    "il n'existe pas d'alternative",
-    "c'est la seule solution",
-    "c'est la seule voie",
-    "c'est inévitable",
-    "c'est nécessaire",
-    "nous devons agir",
-    "nous devons continuer",
-    "nous n'avons pas le choix",
-    "il faut poursuivre",
-    "il faut aller plus loin",
-    "il faut avancer",
-    "il faut tenir bon",
-    "il faut continuer sur cette voie",
-    "la seule politique possible",
-    "la seule réponse possible",
-    "no alternative",
-    "there is no alternative",
-    "the only solution",
-    "the only path",
-    "it is unavoidable",
-    "necessary reform"
-]
-
-ENNEMI_ABSTRAIT = [
-    "certaines forces",
-    "des forces hostiles",
-    "des intérêts puissants",
-    "certains groupes",
-    "des groupes d'influence",
-    "des acteurs étrangers",
-    "des puissances extérieures",
-    "les élites",
-    "les technocrates",
-    "les lobbies",
-    "les réseaux",
-    "ceux qui veulent affaiblir le pays",
-    "ceux qui refusent le changement",
-    "les ennemis de l'intérieur",
-    "les ennemis du peuple",
-    "hostile forces",
-    "external actors",
-    "powerful interests",
-    "hidden networks",
-    "enemies within"
-]
 
 VICTIMISATION = [
     "on nous empêche d'agir",
@@ -913,7 +754,7 @@ def detect_political_patterns(text: str):
     total_score = 0
 
     for name, terms in categories.items():
-        hits = [term for term in terms if term in t]
+        hits = [term for term in terms if contains_term(t, term)]
         results[name] = len(hits)
         matched_terms[name] = hits
         total_score += len(hits)
@@ -1700,7 +1541,89 @@ def detect_short_form_mode(text: str):
         "label": "Texte standard",
         "interpretation": "Longueur suffisante pour une lecture discursive plus stable."
     }
+# -----------------------------
+# Nouvelles bibliothèques rhétoriques
+# -----------------------------
+CAUSAL_OVERREACH_TERMS = [
+    "donc",
+    "par conséquent",
+    "ce qui prouve que",
+    "cela montre que",
+    "la preuve que",
+    "c'est pour cela que",
+    "donc forcément",
+    "depuis que",
+    "suite à",
+    "à cause de",
+    "en raison de",
+    "cela explique",
+    "ce qui explique que",
+    "ce qui entraîne",
+    "ce qui conduit à",
+    "ce qui provoque",
+    "therefore",
+    "this proves that",
+    "this shows that",
+    "this leads to",
+    "which explains",
+]
 
+VAGUE_AUTHORITY_TERMS = [
+    "selon des experts",
+    "selon des spécialistes",
+    "des scientifiques disent",
+    "des experts affirment",
+    "des études montrent",
+    "plusieurs études",
+    "selon une étude récente",
+    "selon certaines études",
+    "selon plusieurs études",
+    "selon des chercheurs",
+    "selon certains chercheurs",
+    "selon plusieurs chercheurs",
+    "plusieurs chercheurs",
+    "plusieurs experts",
+    "certains experts",
+    "de nombreux experts",
+    "de nombreux spécialistes",
+    "plusieurs analystes",
+    "des rapports suggèrent",
+    "les données montrent",
+    "les données indiquent",
+    "le consensus scientifique",
+    "according to experts",
+    "experts say",
+    "studies show",
+    "research suggests",
+    "scientific consensus",
+]
+
+EMOTIONAL_INTENSITY_TERMS = [
+    "scandale",
+    "honte",
+    "catastrophe",
+    "désastre",
+    "trahison",
+    "danger",
+    "peur",
+    "menace",
+    "crise",
+    "urgent",
+    "incroyable",
+    "terrible",
+    "révolution",
+    "effondrement",
+    "panique",
+    "massacre",
+    "destruction",
+    "panic",
+    "scandal",
+    "outrage",
+    "fear",
+    "collapse",
+    "crisis",
+    "urgent",
+]
 
 # -----------------------------
 # Qualifications normatives
@@ -1903,7 +1826,88 @@ def detect_propaganda_narrative(text: str):
         "emotional_terms": emotional_hits,
         "interpretation": interpretation,
     }
+def compute_causal_overreach(text: str):
+    if not text or not text.strip():
+        return {
+            "score": 0.0,
+            "markers": [],
+            "interpretation": "Aucune causalité abusive saillante détectée."
+        }
 
+    t = text.lower()
+    hits = unique_keep_order([term for term in CAUSAL_OVERREACH_TERMS if contains_term(t, term)])
+    score = min(len(hits) * 2.5 / 10, 1.0)
+
+    if score < 0.20:
+        interpretation = "Peu de glissements causaux détectés."
+    elif score < 0.40:
+        interpretation = "Le texte contient quelques raccourcis causaux."
+    elif score < 0.70:
+        interpretation = "Le texte présente plusieurs liens causaux fragiles."
+    else:
+        interpretation = "Le texte repose fortement sur des causalités affirmées sans démonstration suffisante."
+
+    return {
+        "score": round(score, 3),
+        "markers": hits,
+        "interpretation": interpretation,
+    }
+
+
+def compute_vague_authority(text: str):
+    if not text or not text.strip():
+        return {
+            "score": 0.0,
+            "markers": [],
+            "interpretation": "Aucune autorité vague saillante détectée."
+        }
+
+    t = text.lower()
+    hits = unique_keep_order([term for term in VAGUE_AUTHORITY_TERMS if contains_term(t, term)])
+    score = min(len(hits) * 2.5 / 10, 1.0)
+
+    if score < 0.20:
+        interpretation = "Peu d'autorités vagues détectées."
+    elif score < 0.40:
+        interpretation = "Le texte invoque quelques autorités imprécises."
+    elif score < 0.70:
+        interpretation = "Le texte s'appuie nettement sur des autorités non spécifiées."
+    else:
+        interpretation = "Le texte repose fortement sur des autorités vagues ou non traçables."
+
+    return {
+        "score": round(score, 3),
+        "markers": hits,
+        "interpretation": interpretation,
+    }
+
+
+def compute_emotional_intensity(text: str):
+    if not text or not text.strip():
+        return {
+            "score": 0.0,
+            "markers": [],
+            "interpretation": "Aucune charge émotionnelle saillante détectée."
+        }
+
+    t = text.lower()
+    hits = unique_keep_order([term for term in EMOTIONAL_INTENSITY_TERMS if contains_term(t, term)])
+    score = min(len(hits) * 2.2 / 10, 1.0)
+
+    if score < 0.15:
+        interpretation = "Le texte reste peu chargé émotionnellement."
+    elif score < 0.35:
+        interpretation = "Le texte contient quelques marqueurs émotionnels."
+    elif score < 0.60:
+        interpretation = "Le texte mobilise une charge émotionnelle notable."
+    else:
+        interpretation = "Le texte repose fortement sur une intensité émotionnelle orientant la lecture."
+
+    return {
+        "score": round(score, 3),
+        "markers": hits,
+        "interpretation": interpretation,
+    }
 def analyze_claim(sentence: str) -> Claim:
     s = sentence.lower()
 
@@ -1998,6 +2002,9 @@ def analyze_article(text: str) -> Dict:
     scientific_simulation_analysis = compute_scientific_simulation(text)
     propaganda_analysis = detect_propaganda_narrative(text)
     short_form_analysis = detect_short_form_mode(text)
+    causal_overreach_analysis = compute_causal_overreach(text)
+    vague_authority_analysis = compute_vague_authority(text)
+    emotional_intensity_analysis = compute_emotional_intensity(text)
 
     certainty = len(re.findall(r"certain|absolument|prouvé|évident|incontestable", text.lower()))
     emotional = len(re.findall(r"|".join(re.escape(w) for w in EMOTIONAL_WORDS), text.lower()))
@@ -2124,6 +2131,18 @@ def analyze_article(text: str) -> Dict:
         "scientific_simulation_markers": scientific_simulation_analysis["markers"],
         "scientific_simulation_interpretation": scientific_simulation_analysis["interpretation"],
         "scientific_simulation_details": scientific_simulation_analysis["details"],
+
+        "causal_overreach_score": causal_overreach_analysis["score"],
+        "causal_overreach_markers": causal_overreach_analysis["markers"],
+        "causal_overreach_interpretation": causal_overreach_analysis["interpretation"],
+
+        "vague_authority_score": vague_authority_analysis["score"],
+        "vague_authority_markers": vague_authority_analysis["markers"],
+        "vague_authority_interpretation": vague_authority_analysis["interpretation"],
+
+        "emotional_intensity_score": emotional_intensity_analysis["score"],
+        "emotional_intensity_markers": emotional_intensity_analysis["markers"],
+        "emotional_intensity_interpretation": emotional_intensity_analysis["interpretation"],
 
         "short_form_mode": short_form_analysis["is_short_form"],
         "short_form_label": short_form_analysis["label"],
@@ -2845,14 +2864,15 @@ if result:
     st.divider()
     st.subheader("Cartographie discursive complémentaire")
     st.caption(
-        "Ces six jauges affinent l'analyse en distinguant les jugements de valeur, les prémisses implicites, la narration propagandiste, la cohérence discursive, les confusions logiques et la scientificité rhétorique."
-        "les jugements présentés comme des faits, "
-        "les prémisses implicites non démontrées, "
-        "et la structuration narrative propagandiste."
+    "Ces neuf jauges affinent l’analyse en distinguant les jugements de valeur, "
+    "les prémisses implicites, la narration propagandiste, la cohérence discursive, "
+    "les confusions logiques, la scientificité rhétorique, la fausse causalité, "
+    "l’autorité vague et la charge émotionnelle."
     )
 
     row1_col1, row1_col2, row1_col3 = st.columns(3)
     row2_col1, row2_col2, row2_col3 = st.columns(3)
+    row3_col1, row3_col2, row3_col3 = st.columns(3)
 
     # -----------------------------
     # 1) Qualifications normatives
@@ -3091,6 +3111,108 @@ if result:
             markers = result.get("scientific_simulation_markers", [])
             if not markers:
                 st.info("Aucun marqueur de scientificité rhétorique détecté.")
+            else:
+                for marker in markers:
+                    st.warning(marker)
+
+    # -----------------------------
+    # 7) Fausse causalité
+    # -----------------------------
+    with row3_col1:
+        st.markdown("### Fausse causalité")
+        st.caption("Liens causaux affirmés plus vite qu'ils ne sont démontrés.")
+
+        causal_value = result["causal_overreach_score"]
+
+        if causal_value < 0.20:
+            causal_label, causal_color = "Faible", "#16a34a"
+        elif causal_value < 0.40:
+            causal_label, causal_color = "Modérée", "#ca8a04"
+        elif causal_value < 0.70:
+            causal_label, causal_color = "Élevée", "#f97316"
+        else:
+            causal_label, causal_color = "Très élevée", "#dc2626"
+
+        render_custom_gauge(causal_value, causal_color)
+
+        st.markdown(
+            f"<b style='color:{causal_color}'>{causal_label}</b> — {round(causal_value * 100, 1)}%",
+            unsafe_allow_html=True
+        )
+        st.caption(result["causal_overreach_interpretation"])
+
+        with st.expander("Voir les marqueurs", expanded=False):
+            markers = result.get("causal_overreach_markers", [])
+            if not markers:
+                st.info("Aucun marqueur de causalité abusive détecté.")
+            else:
+                for marker in markers:
+                    st.warning(marker)
+
+    # -----------------------------
+    # 8) Autorité vague
+    # -----------------------------
+    with row3_col2:
+        st.markdown("### Autorité vague")
+        st.caption("Appels à des experts, études ou spécialistes sans source précise.")
+
+        vague_auth_value = result["vague_authority_score"]
+
+        if vague_auth_value < 0.20:
+            vague_auth_label, vague_auth_color = "Faible", "#16a34a"
+        elif vague_auth_value < 0.40:
+            vague_auth_label, vague_auth_color = "Modérée", "#ca8a04"
+        elif vague_auth_value < 0.70:
+            vague_auth_label, vague_auth_color = "Élevée", "#f97316"
+        else:
+            vague_auth_label, vague_auth_color = "Très élevée", "#dc2626"
+
+        render_custom_gauge(vague_auth_value, vague_auth_color)
+
+        st.markdown(
+            f"<b style='color:{vague_auth_color}'>{vague_auth_label}</b> — {round(vague_auth_value * 100, 1)}%",
+            unsafe_allow_html=True
+        )
+        st.caption(result["vague_authority_interpretation"])
+
+        with st.expander("Voir les marqueurs", expanded=False):
+            markers = result.get("vague_authority_markers", [])
+            if not markers:
+                st.info("Aucun marqueur d'autorité vague détecté.")
+            else:
+                for marker in markers:
+                    st.warning(marker)
+
+    # -----------------------------
+    # 9) Charge émotionnelle
+    # -----------------------------
+    with row3_col3:
+        st.markdown("### Charge émotionnelle")
+        st.caption("Intensité affective du lexique utilisé pour orienter la lecture.")
+
+        emotional_value = result["emotional_intensity_score"]
+
+        if emotional_value < 0.15:
+            emotional_label, emotional_color = "Faible", "#16a34a"
+        elif emotional_value < 0.35:
+            emotional_label, emotional_color = "Modérée", "#ca8a04"
+        elif emotional_value < 0.60:
+            emotional_label, emotional_color = "Élevée", "#f97316"
+        else:
+            emotional_label, emotional_color = "Très élevée", "#dc2626"
+
+        render_custom_gauge(emotional_value, emotional_color)
+
+        st.markdown(
+            f"<b style='color:{emotional_color}'>{emotional_label}</b> — {round(emotional_value * 100, 1)}%",
+            unsafe_allow_html=True
+        )
+        st.caption(result["emotional_intensity_interpretation"])
+
+        with st.expander("Voir les marqueurs", expanded=False):
+            markers = result.get("emotional_intensity_markers", [])
+            if not markers:
+                st.info("Aucun marqueur émotionnel notable détecté.")
             else:
                 for marker in markers:
                     st.warning(marker)
