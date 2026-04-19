@@ -1597,6 +1597,54 @@ VAGUE_AUTHORITY_TERMS = [
     "research suggests",
     "scientific consensus",
 ]
+# -----------------------------
+# Généralisation abusive
+# -----------------------------
+GENERALIZATION_TERMS = [
+    "les médias",
+    "les politiciens",
+    "les scientifiques",
+    "les experts",
+    "les immigrés",
+    "les élites",
+    "les journalistes",
+    "les gouvernements",
+    "ils veulent",
+    "ils disent",
+    "ils savent",
+    "tout le monde sait",
+    "tout le monde voit"
+]
+
+# -----------------------------
+# Ennemi abstrait
+# -----------------------------
+ABSTRACT_ENEMY_TERMS = [
+    "le système",
+    "les élites",
+    "l'oligarchie",
+    "les puissants",
+    "les globalistes",
+    "les forces en place",
+    "l'establishment",
+    "les intérêts financiers",
+    "les dirigeants"
+]
+
+# -----------------------------
+# Certitude absolue
+# -----------------------------
+CERTAINTY_TERMS = [
+    "il est évident que",
+    "il est clair que",
+    "c'est indiscutable",
+    "sans aucun doute",
+    "la vérité est que",
+    "il est certain que",
+    "personne ne peut nier",
+    "il est incontestable",
+    "la preuve que"
+]
 
 EMOTIONAL_INTENSITY_TERMS = [
     "scandale",
@@ -1908,6 +1956,60 @@ def compute_emotional_intensity(text: str):
         "markers": hits,
         "interpretation": interpretation,
     }
+
+def compute_generalization(text: str):
+
+    text_lower = text.lower()
+
+    hits = [t for t in GENERALIZATION_TERMS if t in text_lower]
+
+    score = min(len(hits) * 2 / 10, 1.0)
+
+    if score < 0.2:
+        interpretation = "Peu de généralisation détectée."
+    elif score < 0.5:
+        interpretation = "Quelques généralisations apparaissent."
+    else:
+        interpretation = "Le discours simplifie le réel par catégories globales."
+
+    return score, interpretation, hits
+
+
+def compute_abstract_enemy(text: str):
+
+    text_lower = text.lower()
+
+    hits = [t for t in ABSTRACT_ENEMY_TERMS if t in text_lower]
+
+    score = min(len(hits) * 2.5 / 10, 1.0)
+
+    if score < 0.2:
+        interpretation = "Pas de désignation d'ennemi abstrait."
+    elif score < 0.5:
+        interpretation = "Quelques adversaires flous apparaissent."
+    else:
+        interpretation = "Le discours construit un adversaire abstrait."
+
+    return score, interpretation, hits
+
+
+def compute_certainty(text: str):
+
+    text_lower = text.lower()
+
+    hits = [t for t in CERTAINTY_TERMS if t in text_lower]
+
+    score = min(len(hits) * 2.5 / 10, 1.0)
+
+    if score < 0.2:
+        interpretation = "Discours relativement nuancé."
+    elif score < 0.5:
+        interpretation = "Certitude rhétorique modérée."
+    else:
+        interpretation = "Certitude absolue fortement affirmée."
+
+    return score, interpretation, hits
+    
 def analyze_claim(sentence: str) -> Claim:
     s = sentence.lower()
 
@@ -2005,6 +2107,9 @@ def analyze_article(text: str) -> Dict:
     causal_overreach_analysis = compute_causal_overreach(text)
     vague_authority_analysis = compute_vague_authority(text)
     emotional_intensity_analysis = compute_emotional_intensity(text)
+    generalization_analysis = compute_generalization(text)
+    abstract_enemy_analysis = compute_abstract_enemy(text)
+    certainty_analysis = compute_certainty(text)
 
     certainty = len(re.findall(r"certain|absolument|prouvé|évident|incontestable", text.lower()))
     emotional = len(re.findall(r"|".join(re.escape(w) for w in EMOTIONAL_WORDS), text.lower()))
@@ -2143,6 +2248,17 @@ def analyze_article(text: str) -> Dict:
         "emotional_intensity_score": emotional_intensity_analysis["score"],
         "emotional_intensity_markers": emotional_intensity_analysis["markers"],
         "emotional_intensity_interpretation": emotional_intensity_analysis["interpretation"],
+        "generalization_score": generalization_analysis[0],
+        "generalization_interpretation": generalization_analysis[1],
+        "generalization_markers": generalization_analysis[2],
+
+        "abstract_enemy_score": abstract_enemy_analysis[0],
+        "abstract_enemy_interpretation": abstract_enemy_analysis[1],
+        "abstract_enemy_markers": abstract_enemy_analysis[2],
+
+        "certainty_score": certainty_analysis[0],
+        "certainty_interpretation": certainty_analysis[1],
+        "certainty_markers": certainty_analysis[2],
 
         "short_form_mode": short_form_analysis["is_short_form"],
         "short_form_label": short_form_analysis["label"],
@@ -2864,15 +2980,17 @@ if result:
     st.divider()
     st.subheader("Cartographie discursive complémentaire")
     st.caption(
-    "Ces neuf jauges affinent l’analyse en distinguant les jugements de valeur, "
-    "les prémisses implicites, la narration propagandiste, la cohérence discursive, "
-    "les confusions logiques, la scientificité rhétorique, la fausse causalité, "
-    "l’autorité vague et la charge émotionnelle."
+        "Ces douze jauges affinent l’analyse en distinguant les jugements de valeur, "
+        "les prémisses implicites, la narration propagandiste, la cohérence discursive, "
+        "les confusions logiques, la scientificité rhétorique, la fausse causalité, "
+        "l’autorité vague, la charge émotionnelle, la généralisation abusive, "
+        "l’ennemi abstrait et la certitude absolue."
     )
 
     row1_col1, row1_col2, row1_col3 = st.columns(3)
     row2_col1, row2_col2, row2_col3 = st.columns(3)
     row3_col1, row3_col2, row3_col3 = st.columns(3)
+    row4_col1, row4_col2, row4_col3 = st.columns(3)
 
     # -----------------------------
     # 1) Qualifications normatives
@@ -3217,6 +3335,108 @@ if result:
                 for marker in markers:
                     st.warning(marker)
 
+    # -----------------------------
+    # 10) Généralisation abusive
+    # -----------------------------
+    with row4_col1:
+        st.markdown("### Généralisation abusive")
+        st.caption("Simplification du réel par catégories globales.")
+
+        generalization_value = result["generalization_score"]
+
+        if generalization_value < 0.20:
+            generalization_label, generalization_color = "Faible", "#16a34a"
+        elif generalization_value < 0.40:
+            generalization_label, generalization_color = "Modérée", "#ca8a04"
+        elif generalization_value < 0.70:
+            generalization_label, generalization_color = "Élevée", "#f97316"
+        else:
+            generalization_label, generalization_color = "Très élevée", "#dc2626"
+
+        render_custom_gauge(generalization_value, generalization_color)
+
+        st.markdown(
+            f"<b style='color:{generalization_color}'>{generalization_label}</b> — {round(generalization_value * 100, 1)}%",
+            unsafe_allow_html=True
+        )
+        st.caption(result["generalization_interpretation"])
+
+        with st.expander("Voir les marqueurs", expanded=False):
+            markers = result.get("generalization_markers", [])
+            if not markers:
+                st.info("Aucune généralisation abusive notable détectée.")
+            else:
+                for marker in markers:
+                    st.warning(marker)
+
+    # -----------------------------
+    # 11) Ennemi abstrait
+    # -----------------------------
+    with row4_col2:
+        st.markdown("### Ennemi abstrait")
+        st.caption("Construction d’un adversaire flou ou globalisant.")
+
+        abstract_enemy_value = result["abstract_enemy_score"]
+
+        if abstract_enemy_value < 0.20:
+            abstract_enemy_label, abstract_enemy_color = "Faible", "#16a34a"
+        elif abstract_enemy_value < 0.40:
+            abstract_enemy_label, abstract_enemy_color = "Modérée", "#ca8a04"
+        elif abstract_enemy_value < 0.70:
+            abstract_enemy_label, abstract_enemy_color = "Élevée", "#f97316"
+        else:
+            abstract_enemy_label, abstract_enemy_color = "Très élevée", "#dc2626"
+
+        render_custom_gauge(abstract_enemy_value, abstract_enemy_color)
+
+        st.markdown(
+            f"<b style='color:{abstract_enemy_color}'>{abstract_enemy_label}</b> — {round(abstract_enemy_value * 100, 1)}%",
+            unsafe_allow_html=True
+        )
+        st.caption(result["abstract_enemy_interpretation"])
+
+        with st.expander("Voir les marqueurs", expanded=False):
+            markers = result.get("abstract_enemy_markers", [])
+            if not markers:
+                st.info("Aucun ennemi abstrait notable détecté.")
+            else:
+                for marker in markers:
+                    st.warning(marker)
+
+    # -----------------------------
+    # 12) Certitude absolue
+    # -----------------------------
+    with row4_col3:
+        st.markdown("### Certitude absolue")
+        st.caption("Rigidité rhétorique et fermeture interprétative.")
+
+        certainty_value = result["certainty_score"]
+
+        if certainty_value < 0.20:
+            certainty_label, certainty_color = "Faible", "#16a34a"
+        elif certainty_value < 0.40:
+            certainty_label, certainty_color = "Modérée", "#ca8a04"
+        elif certainty_value < 0.70:
+            certainty_label, certainty_color = "Élevée", "#f97316"
+        else:
+            certainty_label, certainty_color = "Très élevée", "#dc2626"
+
+        render_custom_gauge(certainty_value, certainty_color)
+
+        st.markdown(
+            f"<b style='color:{certainty_color}'>{certainty_label}</b> — {round(certainty_value * 100, 1)}%",
+            unsafe_allow_html=True
+        )
+        st.caption(result["certainty_interpretation"])
+
+        with st.expander("Voir les marqueurs", expanded=False):
+            markers = result.get("certainty_markers", [])
+            if not markers:
+                st.info("Aucun marqueur fort de certitude absolue détecté.")
+            else:
+                for marker in markers:
+                    st.warning(marker)
+                
     with st.expander("Voir les manœuvres discursives détectées", expanded=False):
         if result["political_pattern_score"] == 0:
             st.info("Aucun marqueur rhétorique politique saillant détecté.")
