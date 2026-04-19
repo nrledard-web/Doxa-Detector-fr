@@ -4,6 +4,7 @@ import re
 from datetime import datetime, timedelta
 from dataclasses import dataclass
 from typing import Dict, List, Optional
+from collections import Counter
 
 import pandas as pd
 import requests
@@ -1001,15 +1002,22 @@ def interpret_propaganda_gauge(value: float):
 def interpret_discursive_profile(
     lie_gauge: float,
     rhetorical_pressure: float,
-    propaganda_gauge: float
+    propaganda_gauge: float,
+    premise_score: float = 0.0,
+    logic_confusion_score: float = 0.0,
+    scientific_simulation_score: float = 0.0,
+    discursive_coherence_score: float = 0.0,
 ) -> str:
-    """
-    Verdict global basé sur les 3 jauges discursives.
-    """
     if propaganda_gauge >= 0.75 and rhetorical_pressure >= 0.60:
         return "Structure discursive fortement propagandiste"
+    elif logic_confusion_score >= 0.55 and premise_score >= 0.45:
+        return "Discours cohérent reposant sur des prémisses fragiles"
+    elif scientific_simulation_score >= 0.50 and premise_score >= 0.35:
+        return "Discours pseudo-objectif ou pseudo-scientifique"
     elif lie_gauge >= 0.65 and rhetorical_pressure >= 0.45:
         return "Structure discursive manipulatoire probable"
+    elif discursive_coherence_score >= 13 and premise_score < 0.20 and logic_confusion_score < 0.20:
+        return "Discours plutôt cohérent et peu verrouillant"
     elif propaganda_gauge >= 0.45 or rhetorical_pressure >= 0.45:
         return "Discours fortement orienté"
     elif lie_gauge < 0.40 and rhetorical_pressure < 0.35:
@@ -1318,6 +1326,381 @@ def contains_term(text: str, term: str) -> bool:
         pattern = rf"\b{escaped}\b"
     return re.search(pattern, text.lower()) is not None
 
+# -----------------------------
+# Cohérence discursive / nouveaux modules
+# -----------------------------
+LOGICAL_CONNECTORS = [
+    "car", "donc", "ainsi", "puisque", "parce que",
+    "cependant", "pourtant", "toutefois", "néanmoins",
+    "en effet", "or", "alors", "mais",
+    "de plus", "en outre", "par conséquent", "dès lors"
+]
+
+DISCURSIVE_CONTRADICTION_PATTERNS = [
+    r"\btoujours\b.*\bjamais\b",
+    r"\bjamais\b.*\btoujours\b",
+    r"\btout\b.*\bsauf\b",
+    r"\brien\b.*\bmais\b",
+    r"\baucun\b.*\bmais\b",
+    r"\bobligatoire\b.*\bfacultatif\b",
+    r"\bimpossible\b.*\bpossible\b"
+]
+
+STOPWORDS_FR_EXTENDED = {
+    "le", "la", "les", "un", "une", "des", "du", "de", "d", "et", "ou",
+    "à", "au", "aux", "en", "dans", "sur", "pour", "par", "avec", "sans",
+    "ce", "cet", "cette", "ces", "qui", "que", "quoi", "dont", "où",
+    "je", "tu", "il", "elle", "nous", "vous", "ils", "elles",
+    "est", "sont", "était", "être", "a", "ont", "avait", "avoir",
+    "ne", "pas", "plus", "se", "sa", "son", "ses", "leur", "leurs",
+    "comme", "dans", "sur", "sous", "entre", "vers", "chez", "après",
+    "avant", "aussi", "encore", "très", "moins", "tout", "tous",
+    "toute", "toutes", "cela", "celui", "celle", "ceux", "celles",
+    "ainsi", "alors", "donc", "mais", "or"
+}
+
+IMPLICIT_PREMISE_MARKERS = {
+    "generalisation": [
+        "toujours", "jamais", "tout le monde", "personne", "tous", "aucun",
+        "inévitablement", "nécessairement", "everyone knows", "nobody can deny"
+    ],
+    "naturalisation": [
+        "il est évident que", "il est clair que", "de toute évidence",
+        "on sait que", "l'histoire montre que", "la réalité est simple",
+        "it is clear that", "it is obvious that", "history shows that"
+    ],
+    "autorite_vague": [
+        "les experts", "les spécialistes", "les chercheurs",
+        "selon des experts", "selon certains spécialistes",
+        "des études montrent", "le consensus scientifique",
+        "experts say", "studies show", "scientific consensus"
+    ],
+    "conclusion_forcee": [
+        "donc", "ainsi", "par conséquent", "dès lors",
+        "cela prouve que", "cela montre que", "ce qui démontre que",
+        "therefore", "this proves that", "this shows that"
+    ]
+}
+
+LOGIC_CONFUSION_MARKERS = {
+    "causalite_abusive": [
+        "cela prouve que", "cela montre que", "c'est pourquoi",
+        "ce qui explique que", "ce qui démontre que", "donc la cause",
+        "this proves that", "this shows that", "that is why"
+    ],
+    "extrapolation": [
+        "donc tous", "donc toujours", "donc jamais",
+        "par conséquent tout", "il faut en conclure que",
+        "therefore all", "therefore always", "necessarily all"
+    ],
+    "prediction_absolue": [
+        "inévitablement", "forcément", "il est certain que",
+        "il est impossible que", "finira par", "conduira nécessairement à",
+        "inevitably", "certainly", "it is impossible that"
+    ]
+}
+
+SCIENTIFIC_SIMULATION_MARKERS = {
+    "references_vagues": [
+        "des études montrent", "la science prouve", "les chercheurs disent",
+        "les scientifiques ont démontré", "plusieurs recherches montrent",
+        "according to studies", "science proves", "research shows"
+    ],
+    "technicite_rhetorique": [
+        "système", "structure", "dynamique", "modèle",
+        "mécanisme", "processus", "paradigme",
+        "system", "structure", "dynamics", "model", "mechanism", "process"
+    ],
+    "chiffres_sans_source": [
+        "pour cent",
+        "une étude récente",
+        "plusieurs recherches",
+        "des statistiques montrent",
+        "recent study",
+        "statistics show"
+    ]
+}
+
+def tokenize_words(text: str):
+    return re.findall(r"\b[\wÀ-ÿ'-]+\b", text.lower())
+
+def split_paragraphs(text: str):
+    parts = [p.strip() for p in re.split(r"\n\s*\n", text) if p.strip()]
+    if not parts and text.strip():
+        parts = [text.strip()]
+    return parts
+
+def extract_content_words(words):
+    return [w for w in words if w not in STOPWORDS_FR_EXTENDED and len(w) > 3]
+
+def top_keywords_from_text(text: str, n: int = 8):
+    words = tokenize_words(text)
+    content_words = extract_content_words(words)
+    freq = Counter(content_words)
+    return [w for w, _ in freq.most_common(n)]
+
+def interpret_discursive_coherence(score: float) -> str:
+    if score < 5:
+        return "Cohérence discursive faible"
+    elif score < 9:
+        return "Cohérence discursive limitée"
+    elif score < 13:
+        return "Cohérence discursive correcte"
+    elif score < 17:
+        return "Cohérence discursive solide"
+    return "Cohérence discursive très forte"
+
+def paragraph_overlap_score(paragraphs):
+    if len(paragraphs) < 2:
+        return 2.0
+
+    overlaps = []
+    para_keywords = [set(top_keywords_from_text(p, 8)) for p in paragraphs]
+
+    for i in range(len(para_keywords) - 1):
+        a = para_keywords[i]
+        b = para_keywords[i + 1]
+        if not a or not b:
+            overlaps.append(0)
+            continue
+
+        inter = len(a.intersection(b))
+        union = len(a.union(b))
+        overlaps.append(inter / union if union else 0)
+
+    avg_overlap = sum(overlaps) / len(overlaps) if overlaps else 0
+
+    if avg_overlap >= 0.35:
+        return 4.0
+    elif avg_overlap >= 0.20:
+        return 3.0
+    elif avg_overlap >= 0.10:
+        return 2.0
+    elif avg_overlap > 0:
+        return 1.0
+    return 0.0
+
+def topic_shift_penalty(paragraphs):
+    if len(paragraphs) < 2:
+        return 0.0
+
+    penalties = 0.0
+    para_keywords = [set(top_keywords_from_text(p, 8)) for p in paragraphs]
+
+    for i in range(len(para_keywords) - 1):
+        a = para_keywords[i]
+        b = para_keywords[i + 1]
+
+        if not a or not b:
+            penalties += 1.0
+            continue
+
+        common = len(a.intersection(b))
+        if common == 0:
+            penalties += 1.5
+        elif common == 1:
+            penalties += 0.5
+
+    return min(penalties, 4.0)
+
+def compute_discursive_coherence(text: str):
+    if not text or not text.strip():
+        return {
+            "score": 0.0,
+            "label": "Cohérence discursive faible",
+            "logic_score": 0.0,
+            "stability_score": 0.0,
+            "length_score": 0.0,
+            "paragraph_score": 0.0,
+            "contradiction_penalty": 0.0,
+            "topic_shift_penalty": 0.0,
+            "top_keywords": []
+        }
+
+    text_lower = text.lower().strip()
+    words = tokenize_words(text_lower)
+    word_count = len(words)
+    paragraphs = split_paragraphs(text)
+
+    logic_hits = sum(1 for connector in LOGICAL_CONNECTORS if contains_term(text_lower, connector))
+    logic_score = min(logic_hits * 1.2, 5.0)
+
+    content_words = extract_content_words(words)
+    freq = Counter(content_words)
+    top_keywords = freq.most_common(6)
+    repeated_keywords = sum(1 for _, count in top_keywords if count >= 2)
+    stability_score = min(repeated_keywords * 1.2, 4.0)
+
+    if word_count < 40:
+        length_score = 0.8
+    elif word_count < 80:
+        length_score = 2.0
+    elif word_count < 140:
+        length_score = 3.0
+    elif word_count < 220:
+        length_score = 4.0
+    else:
+        length_score = 5.0
+
+    paragraph_score = paragraph_overlap_score(paragraphs)
+
+    contradiction_hits = 0
+    for pattern in DISCURSIVE_CONTRADICTION_PATTERNS:
+        if re.search(pattern, text_lower, flags=re.DOTALL):
+            contradiction_hits += 1
+    contradiction_penalty = min(contradiction_hits * 2.0, 4.0)
+
+    shift_penalty = topic_shift_penalty(paragraphs)
+
+    raw_score = logic_score + stability_score + length_score + paragraph_score - contradiction_penalty - shift_penalty
+    score = clamp(raw_score, 0.0, 20.0)
+
+    return {
+        "score": round(score, 1),
+        "label": interpret_discursive_coherence(score),
+        "logic_score": round(logic_score, 1),
+        "stability_score": round(stability_score, 1),
+        "length_score": round(length_score, 1),
+        "paragraph_score": round(paragraph_score, 1),
+        "contradiction_penalty": round(contradiction_penalty, 1),
+        "topic_shift_penalty": round(shift_penalty, 1),
+        "top_keywords": top_keywords,
+    }
+
+def compute_implicit_premises(text: str):
+    if not text or not text.strip():
+        return {"score": 0.0, "details": {}, "markers": [], "interpretation": "Aucune prémisse implicite détectée."}
+
+    t = text.lower()
+    score = 0
+    details = {}
+    markers = []
+
+    for category, terms in IMPLICIT_PREMISE_MARKERS.items():
+        hits = [term for term in terms if contains_term(t, term)]
+        details[category] = len(hits)
+        markers.extend(hits)
+        score += len(hits)
+
+    score = min(score * 2, 20)
+    ratio = score / 20
+
+    if ratio < 0.20:
+        interpretation = "Peu de prémisses implicites détectées."
+    elif ratio < 0.40:
+        interpretation = "Le texte contient quelques prémisses implicites."
+    elif ratio < 0.70:
+        interpretation = "Le texte repose partiellement sur des prémisses présentées comme évidentes."
+    else:
+        interpretation = "Le texte repose fortement sur des prémisses implicites non démontrées."
+
+    return {
+        "score": round(ratio, 3),
+        "details": details,
+        "markers": unique_keep_order(markers),
+        "interpretation": interpretation,
+    }
+
+def compute_logic_confusion(text: str):
+    if not text or not text.strip():
+        return {"score": 0.0, "details": {}, "markers": [], "interpretation": "Aucune confusion logique saillante détectée."}
+
+    t = text.lower()
+    score = 0
+    details = {}
+    markers = []
+
+    for category, terms in LOGIC_CONFUSION_MARKERS.items():
+        hits = [term for term in terms if contains_term(t, term)]
+        details[category] = len(hits)
+        markers.extend(hits)
+        score += len(hits)
+
+    score = min(score * 2, 20)
+    ratio = score / 20
+
+    if ratio < 0.20:
+        interpretation = "Peu de confusions logiques détectées."
+    elif ratio < 0.40:
+        interpretation = "Le texte présente quelques simplifications logiques."
+    elif ratio < 0.70:
+        interpretation = "Le texte présente plusieurs confusions logiques notables."
+    else:
+        interpretation = "Le texte repose fortement sur des inférences fragiles ou abusives."
+
+    return {
+        "score": round(ratio, 3),
+        "details": details,
+        "markers": unique_keep_order(markers),
+        "interpretation": interpretation,
+    }
+
+def compute_scientific_simulation(text: str):
+    if not text or not text.strip():
+        return {
+            "score": 0.0,
+            "details": {},
+            "markers": [],
+            "interpretation": "Aucune simulation scientifique saillante détectée."
+        }
+
+    t = text.lower()
+    score = 0
+    details = {}
+    markers = []
+
+    for category, terms in SCIENTIFIC_SIMULATION_MARKERS.items():
+        hits = [term for term in terms if contains_term(t, term) or term in t]
+        details[category] = len(hits)
+        markers.extend(hits)
+        score += len(hits)
+
+    percent_matches = re.findall(r"\b\d+(?:[.,]\d+)?\s*%", text)
+    if percent_matches:
+        details["pourcentages"] = len(percent_matches)
+        markers.extend([f"pourcentage sans source explicite : {p}" for p in percent_matches[:5]])
+        score += min(len(percent_matches), 3)
+    else:
+        details["pourcentages"] = 0
+
+    score = min(score * 2, 20)
+    ratio = score / 20
+
+    if ratio < 0.20:
+        interpretation = "Peu de marqueurs de scientificité rhétorique détectés."
+    elif ratio < 0.40:
+        interpretation = "Le texte mobilise quelques codes d’objectivité scientifique."
+    elif ratio < 0.70:
+        interpretation = "Le texte utilise nettement une scientificité rhétorique."
+    else:
+        interpretation = "Le texte simule fortement l’objectivité scientifique sans support identifiable."
+
+    return {
+        "score": round(ratio, 3),
+        "details": details,
+        "markers": unique_keep_order(markers),
+        "interpretation": interpretation,
+    }
+
+def detect_short_form_mode(text: str):
+    words = tokenize_words(text)
+    word_count = len(words)
+
+    if word_count < 25:
+        return {
+            "is_short_form": True,
+            "word_count": word_count,
+            "label": "Mode aphorisme / texte court",
+            "interpretation": "Texte très court : les métriques factuelles et discursives doivent être lues avec prudence."
+        }
+
+    return {
+        "is_short_form": False,
+        "word_count": word_count,
+        "label": "Texte standard",
+        "interpretation": "Longueur suffisante pour une lecture discursive plus stable."
+    }
+
 
 # -----------------------------
 # Qualifications normatives
@@ -1609,8 +1992,12 @@ def analyze_article(text: str) -> Dict:
     N = clamp(nuance_markers * 2 + (article_length / 100), 0, 10)
 
     normative_analysis = detect_normative_charges(text)
-    premise_analysis = detect_ideological_premises(text)
+    discursive_analysis = compute_discursive_coherence(text)
+    premise_analysis = compute_implicit_premises(text)
+    logic_confusion_analysis = compute_logic_confusion(text)
+    scientific_simulation_analysis = compute_scientific_simulation(text)
     propaganda_analysis = detect_propaganda_narrative(text)
+    short_form_analysis = detect_short_form_mode(text)
 
     certainty = len(re.findall(r"certain|absolument|prouvé|évident|incontestable", text.lower()))
     emotional = len(re.findall(r"|".join(re.escape(w) for w in EMOTIONAL_WORDS), text.lower()))
@@ -1651,6 +2038,11 @@ def analyze_article(text: str) -> Dict:
     else:
         verdict = T["strong_credibility"]
 
+    if short_form_analysis["is_short_form"]:
+        hard_fact_score = max(hard_fact_score, 8.0)
+        if hard_fact_score < 10:
+            verdict = T["prudent_credibility"]
+
     strengths = []
     if source_markers >= 2:
         strengths.append(T["presence_of_source_markers"])
@@ -1687,6 +2079,8 @@ def analyze_article(text: str) -> Dict:
     discursive_boost = (
         normative_analysis["score"] * 2.0 +
         premise_analysis["score"] * 1.5 +
+        logic_confusion_analysis["score"] * 1.5 +
+        scientific_simulation_analysis["score"] * 1.2 +
         propaganda_analysis["score"] * 2.5
     )
 
@@ -1706,10 +2100,29 @@ def analyze_article(text: str) -> Dict:
         "normative_terms": normative_analysis["normative_terms"],
         "normative_judgment_markers": normative_analysis["judgment_markers"],
         "normative_interpretation": normative_analysis["interpretation"],
+        "discursive_coherence_score": discursive_analysis["score"],
+        "discursive_coherence_label": discursive_analysis["label"],
+        "discursive_coherence_details": discursive_analysis,
 
         "premise_score": premise_analysis["score"],
         "premise_markers": premise_analysis["markers"],
         "premise_interpretation": premise_analysis["interpretation"],
+        "premise_details": premise_analysis["details"],
+
+        "logic_confusion_score": logic_confusion_analysis["score"],
+        "logic_confusion_markers": logic_confusion_analysis["markers"],
+        "logic_confusion_interpretation": logic_confusion_analysis["interpretation"],
+        "logic_confusion_details": logic_confusion_analysis["details"],
+
+        "scientific_simulation_score": scientific_simulation_analysis["score"],
+        "scientific_simulation_markers": scientific_simulation_analysis["markers"],
+        "scientific_simulation_interpretation": scientific_simulation_analysis["interpretation"],
+        "scientific_simulation_details": scientific_simulation_analysis["details"],
+
+        "short_form_mode": short_form_analysis["is_short_form"],
+        "short_form_label": short_form_analysis["label"],
+        "short_form_interpretation": short_form_analysis["interpretation"],
+        "word_count_precise": short_form_analysis["word_count"],
 
         "propaganda_score": propaganda_analysis["score"],
         "propaganda_enemy_terms": propaganda_analysis["enemy_terms"],
@@ -2214,6 +2627,10 @@ if result:
     st.subheader(f"{couleur} {T['credibility_gauge']} : {etiquette}")
     st.progress(score / 20)
     st.caption(f"{T['score']} : {score}/20 — {message}")
+    
+    if result.get("short_form_mode"):
+        st.info(f"{result['short_form_label']} — {result['short_form_interpretation']}")
+        
     st.caption("Sur cette échelle, un texte véritablement crédible se situe généralement dans la zone robuste.")
 
     st.subheader("Diagnostic cognitif")
@@ -2409,7 +2826,11 @@ if result:
     discursive_profile = interpret_discursive_profile(
         lie_gauge=gauge_value,
         rhetorical_pressure=rp,
-        propaganda_gauge=propaganda_value
+        propaganda_gauge=propaganda_value,
+        premise_score=result["premise_score"],
+        logic_confusion_score=result["logic_confusion_score"],
+        scientific_simulation_score=result["scientific_simulation_score"],
+        discursive_coherence_score=result["discursive_coherence_score"],
     )
 
     st.subheader("Profil discursif global")
@@ -2424,12 +2845,13 @@ if result:
         "et la structuration narrative propagandiste."
     )
 
-    col1, col2, col3 = st.columns(3)
+    row1_col1, row1_col2, row1_col3 = st.columns(3)
+    row2_col1, row2_col2, row2_col3 = st.columns(3)
 
     # -----------------------------
     # 1) Qualifications normatives
     # -----------------------------
-    with col1:
+    with row1_col1:
         st.markdown("### Qualification normative")
         st.caption("Jugements de valeur présentés comme des faits.")
 
@@ -2471,7 +2893,7 @@ if result:
     # -----------------------------
     # 2) Prémisses idéologiques implicites
     # -----------------------------
-    with col2:
+    with row1_col2:
         st.markdown("### Prémisses implicites")
         st.caption("Idées présentées comme évidentes sans démonstration.")
 
@@ -2506,7 +2928,7 @@ if result:
     # -----------------------------
     # 3) Propagande narrative
     # -----------------------------
-    with col3:
+    with row1_col3:
         st.markdown("### Narration propagandiste")
         st.caption("Urgence, ennemi abstrait, certitude et charge émotionnelle.")
 
@@ -2557,6 +2979,115 @@ if result:
                     st.markdown("**Charge émotionnelle**")
                     for term in emotional_terms:
                         st.error(term)
+
+        # -----------------------------
+    # 4) Cohérence discursive
+    # -----------------------------
+    with row2_col1:
+        st.markdown("### Cohérence discursive")
+        st.caption("Solidité interne du texte, indépendamment de sa vérifiabilité.")
+
+        coherence_value = result["discursive_coherence_score"] / 20
+
+        if coherence_value < 0.20:
+            coherence_label, coherence_color = "Faible", "#dc2626"
+        elif coherence_value < 0.40:
+            coherence_label, coherence_color = "Limitée", "#f97316"
+        elif coherence_value < 0.65:
+            coherence_label, coherence_color = "Correcte", "#ca8a04"
+        elif coherence_value < 0.85:
+            coherence_label, coherence_color = "Solide", "#84cc16"
+        else:
+            coherence_label, coherence_color = "Très forte", "#16a34a"
+
+        render_custom_gauge(coherence_value, coherence_color)
+
+        st.markdown(
+            f"<b style='color:{coherence_color}'>{coherence_label}</b> — {result['discursive_coherence_score']}/20",
+            unsafe_allow_html=True
+        )
+        st.caption(result["discursive_coherence_label"])
+
+        with st.expander("Voir le détail", expanded=False):
+            d = result["discursive_coherence_details"]
+            st.write(f"**Logique discursive** : {d['logic_score']}/5")
+            st.write(f"**Stabilité thématique** : {d['stability_score']}/4")
+            st.write(f"**Longueur utile** : {d['length_score']}/5")
+            st.write(f"**Cohérence entre paragraphes** : {d['paragraph_score']}/4")
+            st.write(f"**Pénalité de contradiction** : -{d['contradiction_penalty']}")
+            st.write(f"**Pénalité de rupture thématique** : -{d['topic_shift_penalty']}")
+            if d["top_keywords"]:
+                st.write("**Mots-clés dominants**")
+                for word, count in d["top_keywords"]:
+                    st.write(f"- {word} ({count})")
+
+    # -----------------------------
+    # 5) Confusion logique
+    # -----------------------------
+    with row2_col2:
+        st.markdown("### Confusion logique")
+        st.caption("Causalité abusive, extrapolation, prédiction absolue.")
+
+        logic_value = result["logic_confusion_score"]
+
+        if logic_value < 0.20:
+            logic_label, logic_color = "Faible", "#16a34a"
+        elif logic_value < 0.40:
+            logic_label, logic_color = "Modérée", "#ca8a04"
+        elif logic_value < 0.70:
+            logic_label, logic_color = "Élevée", "#f97316"
+        else:
+            logic_label, logic_color = "Très élevée", "#dc2626"
+
+        render_custom_gauge(logic_value, logic_color)
+
+        st.markdown(
+            f"<b style='color:{logic_color}'>{logic_label}</b> — {round(logic_value * 100, 1)}%",
+            unsafe_allow_html=True
+        )
+        st.caption(result["logic_confusion_interpretation"])
+
+        with st.expander("Voir les marqueurs", expanded=False):
+            markers = result.get("logic_confusion_markers", [])
+            if not markers:
+                st.info("Aucune confusion logique saillante détectée.")
+            else:
+                for marker in markers:
+                    st.warning(marker)
+
+    # -----------------------------
+    # 6) Scientificité rhétorique
+    # -----------------------------
+    with row2_col3:
+        st.markdown("### Scientificité rhétorique")
+        st.caption("Simulation d’objectivité scientifique sans base identifiable.")
+
+        sim_value = result["scientific_simulation_score"]
+
+        if sim_value < 0.20:
+            sim_label, sim_color = "Faible", "#16a34a"
+        elif sim_value < 0.40:
+            sim_label, sim_color = "Modérée", "#ca8a04"
+        elif sim_value < 0.70:
+            sim_label, sim_color = "Élevée", "#f97316"
+        else:
+            sim_label, sim_color = "Très élevée", "#dc2626"
+
+        render_custom_gauge(sim_value, sim_color)
+
+        st.markdown(
+            f"<b style='color:{sim_color}'>{sim_label}</b> — {round(sim_value * 100, 1)}%",
+            unsafe_allow_html=True
+        )
+        st.caption(result["scientific_simulation_interpretation"])
+
+        with st.expander("Voir les marqueurs", expanded=False):
+            markers = result.get("scientific_simulation_markers", [])
+            if not markers:
+                st.info("Aucun marqueur de scientificité rhétorique détecté.")
+            else:
+                for marker in markers:
+                    st.warning(marker)
 
     with st.expander("Voir les manœuvres discursives détectées", expanded=False):
         if result["political_pattern_score"] == 0:
