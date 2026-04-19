@@ -1772,6 +1772,51 @@ def detect_normative_charges(text: str):
 
 
 # -----------------------------
+# Glissement sémantique
+# -----------------------------
+SEMANTIC_SHIFT_MARKERS = [
+    "invasion",
+    "submersion",
+    "effondrement",
+    "dictature sanitaire",
+    "tyrannie",
+    "système corrompu",
+    "oligarchie",
+    "propagande officielle",
+    "mensonge d'état",
+]
+
+def detect_semantic_shift(text: str):
+    if not text or not text.strip():
+        return {
+            "score": 0.0,
+            "markers": [],
+            "interpretation": "Aucun glissement sémantique détecté."
+        }
+
+    text_lower = text.lower()
+
+    markers = unique_keep_order(
+        [w for w in SEMANTIC_SHIFT_MARKERS if contains_term(text_lower, w)]
+    )
+
+    score = clamp(len(markers) * 2, 0, 20)
+
+    if score < 5:
+        interpretation = "Peu de glissements sémantiques détectés."
+    elif score < 10:
+        interpretation = "Quelques recadrages lexicaux sont présents."
+    else:
+        interpretation = "Le texte utilise plusieurs recadrages lexicaux stratégiques."
+
+    return {
+        "score": round(score / 20, 3),
+        "markers": markers,
+        "interpretation": interpretation
+    }
+
+
+# -----------------------------
 # Prémisses idéologiques implicites
 # -----------------------------
 IDEOLOGICAL_PREMISE_MARKERS = [
@@ -2112,6 +2157,242 @@ def compute_threat_amplification(text: str):
         interpretation = "Le discours repose fortement sur une amplification dramatique de la menace."
 
     return score, interpretation, hits
+
+
+# -----------------------------
+# 19) Fausse analogie
+# -----------------------------
+FALSE_ANALOGY_TERMS = [
+    "comme si", "c'est comme", "de la même manière que",
+    "exactement comme", "rien de différent de",
+    "comparable à", "similaire à", "équivalent à",
+    "just like", "exactly like", "similar to", "equivalent to"
+]
+
+def compute_false_analogy(text: str):
+    if not text or not text.strip():
+        return {
+            "score": 0.0,
+            "markers": [],
+            "interpretation": "Aucune fausse analogie saillante détectée."
+        }
+
+    text_lower = text.lower()
+    hits = [t for t in FALSE_ANALOGY_TERMS if contains_term(text_lower, t)]
+    score = min(len(hits) * 2.5 / 10, 1.0)
+
+    if score < 0.15:
+        interpretation = "Peu d’analogies douteuses détectées."
+    elif score < 0.35:
+        interpretation = "Le texte contient quelques rapprochements simplificateurs."
+    elif score < 0.60:
+        interpretation = "Le texte s’appuie sur plusieurs analogies fragiles."
+    else:
+        interpretation = "Le discours repose fortement sur des analogies trompeuses."
+
+    return {
+        "score": round(score, 3),
+        "markers": hits,
+        "interpretation": interpretation,
+    }
+
+
+# -----------------------------
+# 20) Surinterprétation factuelle
+# -----------------------------
+FACTUAL_OVERINTERPRETATION_TERMS = [
+    "cela prouve que", "cela démontre que", "cela montre bien que",
+    "la preuve que", "on voit bien que", "il faut en conclure que",
+    "ce simple fait prouve", "ce fait montre que",
+    "this proves that", "this demonstrates that", "this clearly shows that"
+]
+
+def compute_factual_overinterpretation(text: str):
+    if not text or not text.strip():
+        return {
+            "score": 0.0,
+            "markers": [],
+            "interpretation": "Aucune surinterprétation factuelle saillante détectée."
+        }
+
+    text_lower = text.lower()
+    hits = [t for t in FACTUAL_OVERINTERPRETATION_TERMS if contains_term(text_lower, t)]
+    score = min(len(hits) * 2.5 / 10, 1.0)
+
+    if score < 0.15:
+        interpretation = "Peu de surinterprétation factuelle détectée."
+    elif score < 0.35:
+        interpretation = "Le texte tire quelques conclusions un peu rapides."
+    elif score < 0.60:
+        interpretation = "Le texte surinterprète plusieurs éléments factuels."
+    else:
+        interpretation = "Le discours transforme fortement des faits partiels en conclusions globales."
+
+    return {
+        "score": round(score, 3),
+        "markers": hits,
+        "interpretation": interpretation,
+    }
+
+
+# -----------------------------
+# 21) Dissonance interne
+# -----------------------------
+INTERNAL_DISSONANCE_PATTERNS = [
+    r"\bil n'y a pas de preuve\b.*\bc'est certain\b",
+    r"\bon ne sait pas\b.*\bil est évident\b",
+    r"\bjamais\b.*\btoujours\b",
+    r"\btoujours\b.*\bjamais\b",
+    r"\baucun\b.*\btous\b",
+    r"\btous\b.*\baucun\b",
+    r"\bimpossible\b.*\bpossible\b",
+    r"\bpossible\b.*\bimpossible\b",
+]
+
+def compute_internal_dissonance(text: str):
+    if not text or not text.strip():
+        return {
+            "score": 0.0,
+            "markers": [],
+            "interpretation": "Aucune dissonance interne saillante détectée."
+        }
+
+    text_lower = text.lower()
+    hits = []
+
+    for pattern in INTERNAL_DISSONANCE_PATTERNS:
+        if re.search(pattern, text_lower, flags=re.DOTALL):
+            hits.append(pattern)
+
+    score = min(len(hits) * 3 / 10, 1.0)
+
+    if score < 0.15:
+        interpretation = "Peu de contradictions internes détectées."
+    elif score < 0.35:
+        interpretation = "Le texte contient quelques tensions internes."
+    elif score < 0.60:
+        interpretation = "Le texte présente plusieurs contradictions ou incohérences."
+    else:
+        interpretation = "Le discours est fortement traversé par des contradictions internes."
+
+    return {
+        "score": round(score, 3),
+        "markers": hits,
+        "interpretation": interpretation,
+    }
+
+
+# -----------------------------
+# 22) Saturation normative
+# -----------------------------
+SATURATION_NORMATIVE_TERMS = [
+    "scandaleux", "inacceptable", "honteux", "immoral", "criminel",
+    "odieux", "abject", "indigne", "dangereux", "toxique",
+    "scandalous", "unacceptable", "shameful", "immoral", "criminal"
+]
+
+def compute_normative_saturation(text: str):
+    if not text or not text.strip():
+        return {
+            "score": 0.0,
+            "markers": [],
+            "interpretation": "Aucune saturation normative saillante détectée."
+        }
+
+    text_lower = text.lower()
+    hits = [t for t in SATURATION_NORMATIVE_TERMS if contains_term(text_lower, t)]
+    score = min(len(hits) * 2.2 / 10, 1.0)
+
+    if score < 0.15:
+        interpretation = "Le texte reste peu saturé de jugements normatifs."
+    elif score < 0.35:
+        interpretation = "Le texte contient quelques jugements moraux appuyés."
+    elif score < 0.60:
+        interpretation = "Le texte est nettement saturé de qualifications normatives."
+    else:
+        interpretation = "Le discours remplace largement l’analyse par le jugement moral."
+
+    return {
+        "score": round(score, 3),
+        "markers": hits,
+        "interpretation": interpretation,
+    }
+
+
+# -----------------------------
+# 23) Rigidité doxique
+# -----------------------------
+DOXIC_RIGIDITY_TERMS = [
+    "il est évident que", "il est clair que", "sans aucun doute",
+    "personne ne peut nier", "tout le monde sait", "c'est incontestable",
+    "cela ne fait aucun doute", "il est absolument certain",
+    "it is obvious", "there is no doubt", "everyone knows"
+]
+
+def compute_doxic_rigidity(text: str):
+    if not text or not text.strip():
+        return {
+            "score": 0.0,
+            "markers": [],
+            "interpretation": "Aucune rigidité doxique saillante détectée."
+        }
+
+    text_lower = text.lower()
+    hits = [t for t in DOXIC_RIGIDITY_TERMS if contains_term(text_lower, t)]
+    score = min(len(hits) * 2.5 / 10, 1.0)
+
+    if score < 0.15:
+        interpretation = "Le discours reste relativement révisable."
+    elif score < 0.35:
+        interpretation = "Le texte montre quelques marqueurs de rigidité assertive."
+    elif score < 0.60:
+        interpretation = "Le texte présente une rigidité doxique notable."
+    else:
+        interpretation = "Le discours apparaît fortement verrouillé par ses certitudes."
+
+    return {
+        "score": round(score, 3),
+        "markers": hits,
+        "interpretation": interpretation,
+    }
+
+
+# -----------------------------
+# 24) Surdétermination narrative
+# -----------------------------
+NARRATIVE_OVERDETERMINATION_TERMS = [
+    "tout s'explique par", "tout vient de", "tout est lié à",
+    "tout cela fait partie du plan", "rien n'arrive par hasard",
+    "la cause de tout", "la clé de tout", "c'est toujours la même logique",
+    "everything is explained by", "nothing happens by chance", "part of the plan"
+]
+
+def compute_narrative_overdetermination(text: str):
+    if not text or not text.strip():
+        return {
+            "score": 0.0,
+            "markers": [],
+            "interpretation": "Aucune surdétermination narrative saillante détectée."
+        }
+
+    text_lower = text.lower()
+    hits = [t for t in NARRATIVE_OVERDETERMINATION_TERMS if contains_term(text_lower, t)]
+    score = min(len(hits) * 3 / 10, 1.0)
+
+    if score < 0.15:
+        interpretation = "Le texte ne repose pas sur un récit totalisant marqué."
+    elif score < 0.35:
+        interpretation = "Le texte propose quelques explications globalisantes."
+    elif score < 0.60:
+        interpretation = "Le discours tend à ramener des faits multiples à un récit unique."
+    else:
+        interpretation = "Le texte repose fortement sur une narration totalisante."
+
+    return {
+        "score": round(score, 3),
+        "markers": hits,
+        "interpretation": interpretation,
+    }
     
 def analyze_claim(sentence: str) -> Claim:
     s = sentence.lower()
@@ -2216,6 +2497,15 @@ def analyze_article(text: str) -> Dict:
     false_consensus_analysis = compute_false_consensus(text)
     binary_opposition_analysis = compute_binary_opposition(text)
     threat_amplification_analysis = compute_threat_amplification(text)
+    semantic_shift_analysis = detect_semantic_shift(text)
+    ideological_premise_analysis = detect_ideological_premises(text)
+
+    false_analogy_analysis = compute_false_analogy(text)
+    factual_overinterpretation_analysis = compute_factual_overinterpretation(text)
+    internal_dissonance_analysis = compute_internal_dissonance(text)
+    normative_saturation_analysis = compute_normative_saturation(text)
+    doxic_rigidity_analysis = compute_doxic_rigidity(text)
+    narrative_overdetermination_analysis = compute_narrative_overdetermination(text)
 
     certainty = len(re.findall(r"certain|absolument|prouvé|évident|incontestable", text.lower()))
     emotional = len(re.findall(r"|".join(re.escape(w) for w in EMOTIONAL_WORDS), text.lower()))
@@ -2324,6 +2614,15 @@ def analyze_article(text: str) -> Dict:
         "normative_terms": normative_analysis["normative_terms"],
         "normative_judgment_markers": normative_analysis["judgment_markers"],
         "normative_interpretation": normative_analysis["interpretation"],
+        
+        "semantic_shift_score": semantic_shift_analysis["score"],
+        "semantic_shift_markers": semantic_shift_analysis["markers"],
+        "semantic_shift_interpretation": semantic_shift_analysis["interpretation"],
+
+        "ideological_premise_score": ideological_premise_analysis["score"],
+        "ideological_premise_markers": ideological_premise_analysis["markers"],
+        "ideological_premise_interpretation": ideological_premise_analysis["interpretation"],
+
         "discursive_coherence_score": discursive_analysis["score"],
         "discursive_coherence_label": discursive_analysis["label"],
         "discursive_coherence_details": discursive_analysis,
@@ -2377,6 +2676,34 @@ def analyze_article(text: str) -> Dict:
         "threat_amplification_score": threat_amplification_analysis[0],
         "threat_amplification_interpretation": threat_amplification_analysis[1],
         "threat_amplification_markers": threat_amplification_analysis[2],
+
+                "ideological_premise_score": ideological_premise_analysis["score"],
+        "ideological_premise_markers": ideological_premise_analysis["markers"],
+        "ideological_premise_interpretation": ideological_premise_analysis["interpretation"],
+
+        "false_analogy_score": false_analogy_analysis["score"],
+        "false_analogy_markers": false_analogy_analysis["markers"],
+        "false_analogy_interpretation": false_analogy_analysis["interpretation"],
+
+        "factual_overinterpretation_score": factual_overinterpretation_analysis["score"],
+        "factual_overinterpretation_markers": factual_overinterpretation_analysis["markers"],
+        "factual_overinterpretation_interpretation": factual_overinterpretation_analysis["interpretation"],
+
+        "internal_dissonance_score": internal_dissonance_analysis["score"],
+        "internal_dissonance_markers": internal_dissonance_analysis["markers"],
+        "internal_dissonance_interpretation": internal_dissonance_analysis["interpretation"],
+
+        "normative_saturation_score": normative_saturation_analysis["score"],
+        "normative_saturation_markers": normative_saturation_analysis["markers"],
+        "normative_saturation_interpretation": normative_saturation_analysis["interpretation"],
+
+        "doxic_rigidity_score": doxic_rigidity_analysis["score"],
+        "doxic_rigidity_markers": doxic_rigidity_analysis["markers"],
+        "doxic_rigidity_interpretation": doxic_rigidity_analysis["interpretation"],
+
+        "narrative_overdetermination_score": narrative_overdetermination_analysis["score"],
+        "narrative_overdetermination_markers": narrative_overdetermination_analysis["markers"],
+        "narrative_overdetermination_interpretation": narrative_overdetermination_analysis["interpretation"],
 
         "short_form_mode": short_form_analysis["is_short_form"],
         "short_form_label": short_form_analysis["label"],
@@ -3098,11 +3425,15 @@ if result:
     st.divider()
     st.subheader("Cartographie discursive complémentaire")
     st.caption(
-        "Ces quinze jauges affinent l’analyse en distinguant les jugements de valeur, "
+        "Ces vingt-quatre jauges affinent l’analyse en distinguant les jugements de valeur, "
         "les prémisses implicites, la narration propagandiste, la cohérence discursive, "
         "les confusions logiques, la scientificité rhétorique, la fausse causalité, "
         "l’autorité vague, la charge émotionnelle, la généralisation abusive, "
-        "l’ennemi abstrait et la certitude absolue."
+        "l’ennemi abstrait, la certitude absolue, le faux consensus, l’opposition binaire, "
+        "l’amplification de menace, le glissement sémantique, les prémisses idéologiques, "
+        "la clôture cognitive, la fausse analogie, la surinterprétation factuelle, "
+        "la dissonance interne, la saturation normative, la rigidité doxique "
+        "et la surdétermination narrative."
     )
 
     row1_col1, row1_col2, row1_col3 = st.columns(3)
@@ -3110,6 +3441,10 @@ if result:
     row3_col1, row3_col2, row3_col3 = st.columns(3)
     row4_col1, row4_col2, row4_col3 = st.columns(3)
     row5_col1, row5_col2, row5_col3 = st.columns(3)
+    row6_col1, row6_col2, row6_col3 = st.columns(3)
+    row7_col1, row7_col2, row7_col3 = st.columns(3)
+    row8_col1, row8_col2, row8_col3 = st.columns(3)
+    
 
     # -----------------------------
     # 1) Qualifications normatives
@@ -3659,6 +3994,285 @@ if result:
             else:
                 for marker in markers:
                     st.warning(marker)
+
+        # -----------------------------
+    # 19) Fausse analogie
+    # -----------------------------
+    with row7_col1:
+        st.markdown("### Fausse analogie")
+        st.caption("Comparaisons trompeuses qui court-circuitent l’analyse.")
+
+        value = result["false_analogy_score"]
+
+        if value < 0.15:
+            label, color = "Faible", "#16a34a"
+        elif value < 0.35:
+            label, color = "Modérée", "#ca8a04"
+        elif value < 0.60:
+            label, color = "Élevée", "#f97316"
+        else:
+            label, color = "Très élevée", "#dc2626"
+
+        render_custom_gauge(value, color)
+        st.markdown(f"<b style='color:{color}'>{label}</b> — {round(value*100,1)}%", unsafe_allow_html=True)
+        st.caption(result["false_analogy_interpretation"])
+
+        with st.expander("Voir les marqueurs", expanded=False):
+            markers = result.get("false_analogy_markers", [])
+            if not markers:
+                st.info("Aucune fausse analogie notable détectée.")
+            else:
+                for marker in markers:
+                    st.warning(marker)
+
+    # -----------------------------
+    # 20) Surinterprétation factuelle
+    # -----------------------------
+    with row7_col2:
+        st.markdown("### Surinterprétation factuelle")
+        st.caption("Conclusions excessives tirées à partir d’indices partiels.")
+
+        value = result["factual_overinterpretation_score"]
+
+        if value < 0.15:
+            label, color = "Faible", "#16a34a"
+        elif value < 0.35:
+            label, color = "Modérée", "#ca8a04"
+        elif value < 0.60:
+            label, color = "Élevée", "#f97316"
+        else:
+            label, color = "Très élevée", "#dc2626"
+
+        render_custom_gauge(value, color)
+        st.markdown(f"<b style='color:{color}'>{label}</b> — {round(value*100,1)}%", unsafe_allow_html=True)
+        st.caption(result["factual_overinterpretation_interpretation"])
+
+        with st.expander("Voir les marqueurs", expanded=False):
+            markers = result.get("factual_overinterpretation_markers", [])
+            if not markers:
+                st.info("Aucune surinterprétation factuelle notable détectée.")
+            else:
+                for marker in markers:
+                    st.warning(marker)
+
+    # -----------------------------
+    # 21) Dissonance interne
+    # -----------------------------
+    with row7_col3:
+        st.markdown("### Dissonance interne")
+        st.caption("Contradictions ou incompatibilités au sein du même discours.")
+
+        value = result["internal_dissonance_score"]
+
+        if value < 0.15:
+            label, color = "Faible", "#16a34a"
+        elif value < 0.35:
+            label, color = "Modérée", "#ca8a04"
+        elif value < 0.60:
+            label, color = "Élevée", "#f97316"
+        else:
+            label, color = "Très élevée", "#dc2626"
+
+        render_custom_gauge(value, color)
+        st.markdown(f"<b style='color:{color}'>{label}</b> — {round(value*100,1)}%", unsafe_allow_html=True)
+        st.caption(result["internal_dissonance_interpretation"])
+
+        with st.expander("Voir les marqueurs", expanded=False):
+            markers = result.get("internal_dissonance_markers", [])
+            if not markers:
+                st.info("Aucune dissonance interne notable détectée.")
+            else:
+                for marker in markers:
+                    st.warning(marker)
+
+    # -----------------------------
+    # 22) Saturation normative
+    # -----------------------------
+    with row8_col1:
+        st.markdown("### Saturation normative")
+        st.caption("Accumulation de jugements moraux à la place de l’analyse.")
+
+        value = result["normative_saturation_score"]
+
+        if value < 0.15:
+            label, color = "Faible", "#16a34a"
+        elif value < 0.35:
+            label, color = "Modérée", "#ca8a04"
+        elif value < 0.60:
+            label, color = "Élevée", "#f97316"
+        else:
+            label, color = "Très élevée", "#dc2626"
+
+        render_custom_gauge(value, color)
+        st.markdown(f"<b style='color:{color}'>{label}</b> — {round(value*100,1)}%", unsafe_allow_html=True)
+        st.caption(result["normative_saturation_interpretation"])
+
+        with st.expander("Voir les marqueurs", expanded=False):
+            markers = result.get("normative_saturation_markers", [])
+            if not markers:
+                st.info("Aucune saturation normative notable détectée.")
+            else:
+                for marker in markers:
+                    st.warning(marker)
+
+    # -----------------------------
+    # 23) Rigidité doxique
+    # -----------------------------
+    with row8_col2:
+        st.markdown("### Rigidité doxique")
+        st.caption("Degré de fermeture du texte par excès de certitude partagée.")
+
+        value = result["doxic_rigidity_score"]
+
+        if value < 0.15:
+            label, color = "Faible", "#16a34a"
+        elif value < 0.35:
+            label, color = "Modérée", "#ca8a04"
+        elif value < 0.60:
+            label, color = "Élevée", "#f97316"
+        else:
+            label, color = "Très élevée", "#dc2626"
+
+        render_custom_gauge(value, color)
+        st.markdown(f"<b style='color:{color}'>{label}</b> — {round(value*100,1)}%", unsafe_allow_html=True)
+        st.caption(result["doxic_rigidity_interpretation"])
+
+        with st.expander("Voir les marqueurs", expanded=False):
+            markers = result.get("doxic_rigidity_markers", [])
+            if not markers:
+                st.info("Aucune rigidité doxique notable détectée.")
+            else:
+                for marker in markers:
+                    st.warning(marker)
+
+    # -----------------------------
+    # 24) Surdétermination narrative
+    # -----------------------------
+    with row8_col3:
+        st.markdown("### Surdétermination narrative")
+        st.caption("Réduction du réel à un récit unique supposé tout expliquer.")
+
+        value = result["narrative_overdetermination_score"]
+
+        if value < 0.15:
+            label, color = "Faible", "#16a34a"
+        elif value < 0.35:
+            label, color = "Modérée", "#ca8a04"
+        elif value < 0.60:
+            label, color = "Élevée", "#f97316"
+        else:
+            label, color = "Très élevée", "#dc2626"
+
+        render_custom_gauge(value, color)
+        st.markdown(f"<b style='color:{color}'>{label}</b> — {round(value*100,1)}%", unsafe_allow_html=True)
+        st.caption(result["narrative_overdetermination_interpretation"])
+
+        with st.expander("Voir les marqueurs", expanded=False):
+            markers = result.get("narrative_overdetermination_markers", [])
+            if not markers:
+                st.info("Aucune surdétermination narrative notable détectée.")
+            else:
+                for marker in markers:
+                    st.warning(marker)
+
+        # -----------------------------
+    # 16) Glissement sémantique
+    # -----------------------------
+    with row6_col1:
+        st.markdown("### Glissement sémantique")
+        st.caption("Recadrage lexical stratégique du réel par des termes orientés.")
+
+        semantic_value = result["semantic_shift_score"]
+
+        if semantic_value < 0.20:
+            semantic_label, semantic_color = "Faible", "#16a34a"
+        elif semantic_value < 0.40:
+            semantic_label, semantic_color = "Modérée", "#ca8a04"
+        elif semantic_value < 0.70:
+            semantic_label, semantic_color = "Élevée", "#f97316"
+        else:
+            semantic_label, semantic_color = "Très élevée", "#dc2626"
+
+        render_custom_gauge(semantic_value, semantic_color)
+
+        st.markdown(
+            f"<b style='color:{semantic_color}'>{semantic_label}</b> — {round(semantic_value * 100, 1)}%",
+            unsafe_allow_html=True
+        )
+        st.caption(result["semantic_shift_interpretation"])
+
+        with st.expander("Voir les marqueurs", expanded=False):
+            markers = result.get("semantic_shift_markers", [])
+            if not markers:
+                st.info("Aucun glissement sémantique notable détecté.")
+            else:
+                for marker in markers:
+                    st.warning(marker)
+
+        # -----------------------------
+    # 17) Prémisses idéologiques implicites
+    # -----------------------------
+    with row6_col2:
+        st.markdown("### Prémisses idéologiques")
+        st.caption("Présupposés idéologiques présentés comme allant de soi.")
+
+        ideological_value = result["ideological_premise_score"]
+
+        if ideological_value < 0.20:
+            ideological_label, ideological_color = "Faible", "#16a34a"
+        elif ideological_value < 0.40:
+            ideological_label, ideological_color = "Modérée", "#ca8a04"
+        elif ideological_value < 0.70:
+            ideological_label, ideological_color = "Élevée", "#f97316"
+        else:
+            ideological_label, ideological_color = "Très élevée", "#dc2626"
+
+        render_custom_gauge(ideological_value, ideological_color)
+
+        st.markdown(
+            f"<b style='color:{ideological_color}'>{ideological_label}</b> — {round(ideological_value * 100, 1)}%",
+            unsafe_allow_html=True
+        )
+        st.caption(result["ideological_premise_interpretation"])
+
+        with st.expander("Voir les marqueurs", expanded=False):
+            markers = result.get("ideological_premise_markers", [])
+            if not markers:
+                st.info("Aucune prémisse idéologique saillante détectée.")
+            else:
+                for marker in markers:
+                    st.warning(marker)
+
+        # -----------------------------
+    # 18) Clôture cognitive
+    # -----------------------------
+    with row6_col3:
+        st.markdown("### Clôture cognitive")
+        st.caption("Degré de verrouillage du discours par excès de certitude.")
+
+        closure_local = (
+            (result["D"] * (1 + len(result["red_flags"]) / 5)) / (result["G"] + result["N"])
+            if (result["G"] + result["N"]) > 0 else 10
+        )
+
+        closure_value = min(closure_local / 1.5, 1.0)
+
+        if closure_local < 0.40:
+            closure_label, closure_color = "Ouverte", "#16a34a"
+        elif closure_local < 0.75:
+            closure_label, closure_color = "Modérée", "#ca8a04"
+        elif closure_local < 1.10:
+            closure_label, closure_color = "Élevée", "#f97316"
+        else:
+            closure_label, closure_color = "Critique", "#dc2626"
+
+        render_custom_gauge(closure_value, closure_color)
+
+        st.markdown(
+            f"<b style='color:{closure_color}'>{closure_label}</b> — {round(closure_local, 2)}",
+            unsafe_allow_html=True
+        )
+        st.caption("Plus la certitude domine G + N, plus le texte se ferme.")
                 
     with st.expander("Voir les manœuvres discursives détectées", expanded=False):
         if result["political_pattern_score"] == 0:
