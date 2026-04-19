@@ -904,7 +904,7 @@ def detect_political_patterns(text: str):
         "delegitimation": CONFUSION_DELEGITIMATION,
         "dilution": DILUTION_RESPONSABILITE,
         "causalite": CAUSALITE_IMPLICITE,
-        "moralisation": MORALISATION_DISCOURS,
+        "moralisation_discours": MORALISATION_DISCOURS,
     }
 
     results = {}
@@ -2567,10 +2567,21 @@ if result:
             labels = {
                 "certitude": "Certitude performative",
                 "autorite": "Autorité vague institutionnelle",
+                "autorite_academique": "Autorité académique vague",
                 "dramatisation": "Dramatisation politique",
                 "generalisation": "Généralisation abusive",
                 "naturalisation": "Naturalisation idéologique",
                 "ennemi": "Ennemi abstrait",
+                "victimisation": "Victimisation discursive",
+                "moralisation": "Moralisation politique",
+                "moralisation_discours": "Moralisation du discours",
+                "urgence": "Urgence injonctive",
+                "promesse": "Promesse excessive",
+                "populisme": "Populisme anti-élite",
+                "progressisme_identitaire": "Progressisme identitaire",
+                "socialisme_communisme": "Cadre socialiste / communiste",
+                "delegitimation": "Délégitimation adverse",
+                "dilution": "Dilution de responsabilité",
                 "causalite": "Causalité implicite ou non démontrée",
             }
 
