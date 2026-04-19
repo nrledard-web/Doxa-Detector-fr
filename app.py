@@ -1672,6 +1672,36 @@ EMOTIONAL_INTENSITY_TERMS = [
     "crisis",
     "urgent",
 ]
+# -----------------------------
+# Faux consensus
+# -----------------------------
+CONSENSUS_TERMS = [
+    "tout le monde sait",
+    "tout le monde comprend",
+    "il est clair pour tous",
+    "personne ne doute",
+    "personne ne peut nier",
+    "chacun sait",
+    "il est évident pour tous",
+    "les experts s'accordent",
+    "tout le monde voit bien",
+]
+
+# -----------------------------
+# Opposition binaire
+# -----------------------------
+BINARY_OPPOSITION_TERMS = [
+    "eux contre nous",
+    "nous contre eux",
+    "le peuple contre",
+    "les élites contre",
+    "les honnêtes contre",
+    "les patriotes contre",
+    "les traîtres",
+    "les ennemis du peuple",
+    "ceux qui sont avec nous",
+    "ceux qui sont contre nous"
+]
 
 # -----------------------------
 # Qualifications normatives
@@ -2009,6 +2039,79 @@ def compute_certainty(text: str):
         interpretation = "Certitude absolue fortement affirmée."
 
     return score, interpretation, hits
+
+def compute_false_consensus(text: str):
+    text_lower = text.lower()
+
+    hits = [t for t in CONSENSUS_TERMS if contains_term(text_lower, t)]
+
+    score = min(len(hits) * 2.5 / 10, 1.0)
+
+    if score < 0.15:
+        interpretation = "Aucun faux consensus significatif détecté."
+    elif score < 0.35:
+        interpretation = "Le texte suggère légèrement une adhésion collective implicite."
+    elif score < 0.60:
+        interpretation = "Le texte met en scène un consensus supposé."
+    else:
+        interpretation = "Le texte s'appuie fortement sur un faux consensus rhétorique."
+
+    return score, interpretation, hits
+
+
+def compute_binary_opposition(text: str):
+    text_lower = text.lower()
+
+    hits = [t for t in BINARY_OPPOSITION_TERMS if contains_term(text_lower, t)]
+
+    score = min(len(hits) * 3 / 10, 1.0)
+
+    if score < 0.15:
+        interpretation = "Aucune opposition binaire significative détectée."
+    elif score < 0.35:
+        interpretation = "Tendance légère à structurer le discours en camps opposés."
+    elif score < 0.60:
+        interpretation = "Opposition binaire marquée entre groupes."
+    else:
+        interpretation = "Discours fortement structuré en camps antagonistes."
+
+    return score, interpretation, hits
+
+
+THREAT_AMPLIFICATION_TERMS = [
+    "menace existentielle",
+    "danger extrême",
+    "danger mortel",
+    "catastrophe imminente",
+    "effondrement total",
+    "destruction du pays",
+    "survie nationale",
+    "point de non-retour",
+    "invasion massive",
+    "submersion totale",
+    "chaos généralisé",
+    "crise terminale",
+    "menace historique",
+    "danger absolu",
+]
+
+def compute_threat_amplification(text: str):
+    text_lower = text.lower()
+
+    hits = [t for t in THREAT_AMPLIFICATION_TERMS if contains_term(text_lower, t)]
+
+    score = min(len(hits) * 3 / 10, 1.0)
+
+    if score < 0.15:
+        interpretation = "Aucune amplification de menace significative détectée."
+    elif score < 0.35:
+        interpretation = "Le texte contient quelques formulations alarmistes."
+    elif score < 0.60:
+        interpretation = "Le texte amplifie notablement la perception de menace."
+    else:
+        interpretation = "Le discours repose fortement sur une amplification dramatique de la menace."
+
+    return score, interpretation, hits
     
 def analyze_claim(sentence: str) -> Claim:
     s = sentence.lower()
@@ -2110,6 +2213,9 @@ def analyze_article(text: str) -> Dict:
     generalization_analysis = compute_generalization(text)
     abstract_enemy_analysis = compute_abstract_enemy(text)
     certainty_analysis = compute_certainty(text)
+    false_consensus_analysis = compute_false_consensus(text)
+    binary_opposition_analysis = compute_binary_opposition(text)
+    threat_amplification_analysis = compute_threat_amplification(text)
 
     certainty = len(re.findall(r"certain|absolument|prouvé|évident|incontestable", text.lower()))
     emotional = len(re.findall(r"|".join(re.escape(w) for w in EMOTIONAL_WORDS), text.lower()))
@@ -2259,6 +2365,18 @@ def analyze_article(text: str) -> Dict:
         "certainty_score": certainty_analysis[0],
         "certainty_interpretation": certainty_analysis[1],
         "certainty_markers": certainty_analysis[2],
+        
+        "false_consensus_score": false_consensus_analysis[0],
+        "false_consensus_interpretation": false_consensus_analysis[1],
+        "false_consensus_markers": false_consensus_analysis[2],
+
+        "binary_opposition_score": binary_opposition_analysis[0],
+        "binary_opposition_interpretation": binary_opposition_analysis[1],
+        "binary_opposition_markers": binary_opposition_analysis[2],
+
+        "threat_amplification_score": threat_amplification_analysis[0],
+        "threat_amplification_interpretation": threat_amplification_analysis[1],
+        "threat_amplification_markers": threat_amplification_analysis[2],
 
         "short_form_mode": short_form_analysis["is_short_form"],
         "short_form_label": short_form_analysis["label"],
@@ -2980,7 +3098,7 @@ if result:
     st.divider()
     st.subheader("Cartographie discursive complémentaire")
     st.caption(
-        "Ces douze jauges affinent l’analyse en distinguant les jugements de valeur, "
+        "Ces quinze jauges affinent l’analyse en distinguant les jugements de valeur, "
         "les prémisses implicites, la narration propagandiste, la cohérence discursive, "
         "les confusions logiques, la scientificité rhétorique, la fausse causalité, "
         "l’autorité vague, la charge émotionnelle, la généralisation abusive, "
@@ -2991,6 +3109,7 @@ if result:
     row2_col1, row2_col2, row2_col3 = st.columns(3)
     row3_col1, row3_col2, row3_col3 = st.columns(3)
     row4_col1, row4_col2, row4_col3 = st.columns(3)
+    row5_col1, row5_col2, row5_col3 = st.columns(3)
 
     # -----------------------------
     # 1) Qualifications normatives
@@ -3433,6 +3552,110 @@ if result:
             markers = result.get("certainty_markers", [])
             if not markers:
                 st.info("Aucun marqueur fort de certitude absolue détecté.")
+            else:
+                for marker in markers:
+                    st.warning(marker)
+
+        # -----------------------------
+    # 13) Faux consensus
+    # -----------------------------
+    with row5_col1:
+        st.markdown("### Faux consensus")
+        st.caption("Simulation d’un accord collectif présenté comme évident.")
+
+        false_consensus_value = result["false_consensus_score"]
+
+        if false_consensus_value < 0.15:
+            false_consensus_label, false_consensus_color = "Faible", "#16a34a"
+        elif false_consensus_value < 0.35:
+            false_consensus_label, false_consensus_color = "Modérée", "#ca8a04"
+        elif false_consensus_value < 0.60:
+            false_consensus_label, false_consensus_color = "Élevée", "#f97316"
+        else:
+            false_consensus_label, false_consensus_color = "Très élevée", "#dc2626"
+
+        render_custom_gauge(false_consensus_value, false_consensus_color)
+
+        st.markdown(
+            f"<b style='color:{false_consensus_color}'>{false_consensus_label}</b> — {round(false_consensus_value * 100, 1)}%",
+            unsafe_allow_html=True
+        )
+        st.caption(result["false_consensus_interpretation"])
+
+        with st.expander("Voir les marqueurs", expanded=False):
+            markers = result.get("false_consensus_markers", [])
+            if not markers:
+                st.info("Aucun faux consensus notable détecté.")
+            else:
+                for marker in markers:
+                    st.warning(marker)
+
+
+    # -----------------------------
+    # 14) Opposition binaire
+    # -----------------------------
+    with row5_col2:
+        st.markdown("### Opposition binaire")
+        st.caption("Découpage du discours en camps antagonistes.")
+
+        binary_value = result["binary_opposition_score"]
+
+        if binary_value < 0.15:
+            binary_label, binary_color = "Faible", "#16a34a"
+        elif binary_value < 0.35:
+            binary_label, binary_color = "Modérée", "#ca8a04"
+        elif binary_value < 0.60:
+            binary_label, binary_color = "Élevée", "#f97316"
+        else:
+            binary_label, binary_color = "Très élevée", "#dc2626"
+
+        render_custom_gauge(binary_value, binary_color)
+
+        st.markdown(
+            f"<b style='color:{binary_color}'>{binary_label}</b> — {round(binary_value * 100, 1)}%",
+            unsafe_allow_html=True
+        )
+        st.caption(result["binary_opposition_interpretation"])
+
+        with st.expander("Voir les marqueurs", expanded=False):
+            markers = result.get("binary_opposition_markers", [])
+            if not markers:
+                st.info("Aucune opposition binaire notable détectée.")
+            else:
+                for marker in markers:
+                    st.warning(marker)
+
+
+    # -----------------------------
+    # 15) Amplification de menace
+    # -----------------------------
+    with row5_col3:
+        st.markdown("### Amplification de menace")
+        st.caption("Exagération dramatique du danger ou de la gravité.")
+
+        threat_value = result["threat_amplification_score"]
+
+        if threat_value < 0.15:
+            threat_label, threat_color = "Faible", "#16a34a"
+        elif threat_value < 0.35:
+            threat_label, threat_color = "Modérée", "#ca8a04"
+        elif threat_value < 0.60:
+            threat_label, threat_color = "Élevée", "#f97316"
+        else:
+            threat_label, threat_color = "Très élevée", "#dc2626"
+
+        render_custom_gauge(threat_value, threat_color)
+
+        st.markdown(
+            f"<b style='color:{threat_color}'>{threat_label}</b> — {round(threat_value * 100, 1)}%",
+            unsafe_allow_html=True
+        )
+        st.caption(result["threat_amplification_interpretation"])
+
+        with st.expander("Voir les marqueurs", expanded=False):
+            markers = result.get("threat_amplification_markers", [])
+            if not markers:
+                st.info("Aucune amplification de menace notable détectée.")
             else:
                 for marker in markers:
                     st.warning(marker)
