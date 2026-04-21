@@ -1001,41 +1001,43 @@ def search_articles_by_keyword(keyword: str, max_results: int = 10) -> List[Dict
 def compute_lie_gauge(M: float, ME: float):
     """
     Axe unique :
-    0.0 = mécroyance maximale
-    0.5 = zone ambiguë / mixte
-    1.0 = mensonge maximal
+    0.0 = mécroyance forte
+    0.5 = zone ambiguë
+    1.0 = mensonge fort
+
+    M et ME sont d'abord normalisés pour éviter
+    qu'un seul indice n'écrase artificiellement l'autre.
     """
 
-    delta = ME - M
-    amp = 8.0
-    strength = min(abs(delta) / amp, 1.0)
+    # M : spectre théorique approximatif de -10 à +20
+    m_norm = max(0.0, min(1.0, (M + 10) / 30))
 
-    if delta <= 0:
-        gauge = 0.5 * (1 - strength)
+    # ME : compressé sur 0..20
+    me_norm = max(0.0, min(1.0, ME / 20))
 
-        if gauge > 0.35:
-            label = "Mécroyance modérée"
-            color = "#ca8a04"
-        else:
-            label = "Mécroyance forte"
-            color = "#a16207"
+    # Plus ME monte et plus M baisse, plus on va vers le mensonge
+    delta = me_norm - (1 - m_norm)
+
+    gauge = 0.5 + (delta * 0.8)
+    gauge = max(0.0, min(1.0, gauge))
+
+    if gauge < 0.20:
+        label = "Mécroyance forte"
+        color = "#a16207"
+    elif gauge < 0.40:
+        label = "Mécroyance modérée"
+        color = "#ca8a04"
+    elif gauge < 0.60:
+        label = "Zone ambiguë"
+        color = "#f59e0b"
+    elif gauge < 0.80:
+        label = "Mensonge probable"
+        color = "#dc2626"
     else:
-        gauge = 0.5 + (0.5 * strength)
+        label = "Mensonge extrême"
+        color = "#991b1b"
 
-        if gauge < 0.65:
-            label = "Mensonge possible"
-            color = "#f97316"
-        elif gauge < 0.85:
-            label = "Mensonge probable"
-            color = "#dc2626"
-        else:
-            label = "Mensonge extrême"
-            color = "#991b1b"
-
-    if gauge <= 0.5:
-        intensity = (0.5 - gauge) / 0.5
-    else:
-        intensity = (gauge - 0.5) / 0.5
+    intensity = abs(gauge - 0.5) * 2
 
     return {
         "gauge": round(gauge, 3),
@@ -1057,12 +1059,45 @@ class Claim:
     verifiability: float
     risk: float
     status: str
+    claim_types: List[str]
+    epistemic_note: str
+    short_adjustment: float
+    aristotelian_type: Optional[str]
+    subject_term: Optional[str]
+    predicate_term: Optional[str]
+    middle_term_candidate: Optional[str]
 
 
 SOURCE_CUES = [
     "selon", "affirme", "déclare", "rapport", "étude", "expert",
     "source", "dit", "écrit", "publié", "annonce", "confirme", "révèle",
 ]
+# -----------------------------
+# Marqueurs propositions aristotéliciennes
+# -----------------------------
+
+SYLLOGISTIC_MARKERS = {
+    "A": ["tous", "tout", "chaque"],
+    "E": ["aucun", "nul"],
+    "I": ["certains", "quelques", "plusieurs"],
+    "O": ["certains", "quelques"]
+}
+# -----------------------------
+# Normalisation pluriels irréguliers
+# -----------------------------
+
+IRREGULAR_NORMALIZATIONS = {
+    "animaux": "animal",
+    "chevaux": "cheval",
+    "travaux": "travail",
+    "journaux": "journal",
+    "médias": "média",
+    "reptiles": "reptile",
+    "serpents": "serpent",
+    "chiens": "chien",
+    "mammifères": "mammifère",
+    "hommes": "homme",
+}
 
 ABSOLUTIST_WORDS = [
     "toujours", "jamais", "absolument", "certain", "certaine",
@@ -1166,6 +1201,496 @@ def contains_term(text: str, term: str) -> bool:
     else:
         pattern = rf"\b{escaped}\b"
     return re.search(pattern, text.lower()) is not None
+
+
+# -----------------------------
+# Normalisation des termes
+# -----------------------------
+
+def normalize_term(term: Optional[str]) -> Optional[str]:
+    if not term:
+        return None
+
+    t = term.lower().strip()
+    t = re.sub(r"[^\wÀ-ÿ'\- ]", " ", t)
+    t = re.sub(r"\s+", " ", t).strip()
+
+    # enlever articles fréquents
+    t = re.sub(r"^(les|des|du|de la|de l|de|la|le|l|un|une)\s+", "", t)
+
+    words = t.split()
+    normalized_words = []
+
+    for w in words:
+        if w in IRREGULAR_NORMALIZATIONS:
+            w = IRREGULAR_NORMALIZATIONS[w]
+        elif len(w) > 4 and w.endswith("s"):
+            w = w[:-1]
+        normalized_words.append(w)
+
+    t = " ".join(normalized_words).strip()
+    return t if t else None
+
+# -----------------------------
+# Extraction sujet / prédicat
+# -----------------------------
+
+def extract_categorical_terms(sentence: str):
+    s = sentence.lower().strip()
+    s = re.sub(r"[^\wÀ-ÿ'\- ]", " ", s)
+    s = re.sub(r"\s+", " ", s).strip()
+
+    # enlever les marqueurs conclusifs en tête de phrase
+    s = re.sub(
+        r"^(donc|ainsi|par conséquent|il s'ensuit que|il s’ensuit que|cela montre que|cela prouve que)\s+",
+        "",
+        s
+    )
+
+    patterns = [
+        r"^(tous les|toutes les|tous|toutes|chaque)\s+(.+?)\s+sont\s+(.+)$",
+        r"^(aucun|nul)\s+(.+?)\s+n[’']?est\s+(.+)$",
+        r"^(aucun|nul)\s+(.+?)\s+ne\s+sont\s+pas\s+(.+)$",
+        r"^(certains|quelques|plusieurs)\s+(.+?)\s+sont\s+(.+)$",
+        r"^(certains|quelques|plusieurs)\s+(.+?)\s+ne\s+sont\s+pas\s+(.+)$",
+    ]
+
+    for pattern in patterns:
+        m = re.match(pattern, s)
+        if m:
+            subject = normalize_term(m.group(2))
+            predicate = normalize_term(m.group(3))
+            return subject, predicate
+
+    return None, None
+
+
+# -----------------------------
+# Détection proposition aristotélicienne
+# -----------------------------
+
+def detect_aristotelian_proposition(sentence: str) -> Optional[str]:
+    s = sentence.lower().strip()
+
+    # E : universelle négative
+    if any(contains_term(s, w) for w in SYLLOGISTIC_MARKERS["E"]):
+        return "E"
+
+    # O : particulière négative
+    if any(contains_term(s, w) for w in SYLLOGISTIC_MARKERS["O"]) and " pas " in f" {s} ":
+        return "O"
+
+    # I : particulière affirmative
+    if any(contains_term(s, w) for w in SYLLOGISTIC_MARKERS["I"]):
+        return "I"
+
+    # A : universelle affirmative
+    if any(contains_term(s, w) for w in SYLLOGISTIC_MARKERS["A"]) and " pas " not in f" {s} ":
+        return "A"
+
+    return None
+
+
+# -----------------------------
+# Détection syllogismes simples
+# -----------------------------
+
+def detect_syllogisms_from_claims(claims: List[Claim]) -> List[Dict]:
+    syllogisms = []
+
+    conclusion_markers = [
+        "donc",
+        "par conséquent",
+        "ainsi",
+        "il s'ensuit que",
+        "il s’ensuit que",
+        "cela montre que",
+        "cela prouve que"
+    ]
+
+    for i in range(len(claims) - 2):
+        c1 = claims[i]
+        c2 = claims[i + 1]
+        c3 = claims[i + 2]
+
+        c3_lower = c3.text.lower().strip()
+
+        has_conclusion_marker = any(
+            contains_term(c3_lower, marker) or c3_lower.startswith(marker + " ")
+            for marker in conclusion_markers
+        )
+
+        # On accepte aussi les triplets catégoriques même sans "donc"
+        if not has_conclusion_marker:
+            if not (c1.aristotelian_type and c2.aristotelian_type and c3.aristotelian_type):
+                continue
+
+        # Il faut au moins les deux prémisses bien extraites
+        if not all([
+            c1.subject_term, c1.predicate_term,
+            c2.subject_term, c2.predicate_term
+        ]):
+            continue
+
+        p1s = normalize_term(c1.subject_term)
+        p1p = normalize_term(c1.predicate_term)
+        p2s = normalize_term(c2.subject_term)
+        p2p = normalize_term(c2.predicate_term)
+        cs = normalize_term(c3.subject_term) if c3.subject_term else None
+        cp = normalize_term(c3.predicate_term) if c3.predicate_term else None
+
+        terms_p1 = {p1s, p1p}
+        terms_p2 = {p2s, p2p}
+        common_terms = {t for t in terms_p1.intersection(terms_p2) if t}
+
+        if not common_terms:
+            syllogisms.append({
+                "premise_1": c1.text,
+                "premise_2": c2.text,
+                "conclusion": c3.text,
+                "middle_term": None,
+                "figure": None,
+                "form": f"{c1.aristotelian_type or '-'}-{c2.aristotelian_type or '-'}-{c3.aristotelian_type or '-'}",
+                "status": "no_middle_term_detected"
+            })
+            continue
+
+        middle_term = sorted(common_terms, key=len, reverse=True)[0]
+
+        figure = None
+        if p1s == middle_term and p2p == middle_term:
+            figure = "Figure 1 probable"
+        elif p1p == middle_term and p2p == middle_term:
+            figure = "Figure 2 probable"
+        elif p1s == middle_term and p2s == middle_term:
+            figure = "Figure 3 probable"
+        elif p1p == middle_term and p2s == middle_term:
+            figure = "Figure 4 probable"
+
+        form = f"{c1.aristotelian_type or '-'}-{c2.aristotelian_type or '-'}-{c3.aristotelian_type or '-'}"
+
+        status = "possible_syllogism"
+        if form == "A-A-A" and figure == "Figure 1 probable":
+            status = "valid_like_barbara"
+        elif form == "E-A-E" and figure == "Figure 1 probable":
+            status = "valid_like_celarent"
+        elif form == "A-I-I" and figure == "Figure 1 probable":
+            status = "valid_like_darii"
+        elif form == "E-I-O" and figure == "Figure 1 probable":
+            status = "valid_like_ferio"
+
+        conclusion_terms = {cs, cp}
+        premise_extremes = {t for t in {p1s, p1p, p2s, p2p} if t != middle_term}
+
+        if not cs or not cp:
+            status = "weak_conclusion_link"
+        elif not conclusion_terms.intersection(premise_extremes):
+            status = "weak_conclusion_link"
+
+        syllogisms.append({
+            "premise_1": c1.text,
+            "premise_2": c2.text,
+            "conclusion": c3.text,
+            "middle_term": middle_term,
+            "figure": figure,
+            "form": form,
+            "status": status,
+            "p1_terms": {"subject": p1s, "predicate": p1p},
+            "p2_terms": {"subject": p2s, "predicate": p2p},
+            "c_terms": {"subject": cs, "predicate": cp},
+        })
+
+    return syllogisms
+
+# -----------------------------
+# Détection sophismes syllogistiques
+# -----------------------------
+
+def detect_syllogistic_fallacies(syllogisms: List[Dict]) -> List[Dict]:
+    fallacies = []
+
+    valid_statuses = {
+        "valid_like_barbara",
+        "valid_like_celarent",
+        "valid_like_darii",
+        "valid_like_ferio",
+    }
+
+    for s in syllogisms:
+        form = s.get("form", "")
+        figure = s.get("figure", "")
+        status = s.get("status", "")
+
+        # 1) Si le syllogisme est reconnu comme valide, aucun sophisme
+        if status in valid_statuses:
+            continue
+
+        # 2) Aucun terme moyen partagé
+        if status == "no_middle_term_detected":
+            fallacies.append({
+                "type": "missing_middle_term",
+                "description": "Le raisonnement ne partage aucun terme moyen entre les prémisses.",
+                "syllogism": s
+            })
+            continue
+
+        # 3) Conclusion mal reliée aux extrêmes
+        if status == "weak_conclusion_link":
+            fallacies.append({
+                "type": "weak_conclusion_link",
+                "description": "La conclusion ne reprend pas correctement les extrêmes des prémisses.",
+                "syllogism": s
+            })
+            continue
+
+        # 4) Toute structure syllogistique non reconnue comme valide
+        # doit, pour l’instant, être considérée comme sophistique ou invalide
+        fallacies.append({
+            "type": "invalid_or_unvalidated_form",
+            "description": f"Forme syllogistique non validée : {form} / {figure if figure else 'figure indéterminée'}.",
+            "syllogism": s
+        })
+
+    return fallacies
+
+
+# -----------------------------
+# Détection enthymèmes
+# -----------------------------
+
+def detect_enthymemes_from_claims(claims: List[Claim]) -> List[Dict]:
+    enthymemes = []
+
+    conclusion_markers = [
+        "donc",
+        "par conséquent",
+        "ainsi",
+        "il s'ensuit que",
+        "il s’ensuit que",
+        "cela montre que",
+        "cela prouve que"
+    ]
+
+    for i, c in enumerate(claims):
+        text_lower = c.text.lower().strip()
+
+        has_conclusion_marker = any(
+            contains_term(text_lower, marker) or text_lower.startswith(marker + " ")
+            for marker in conclusion_markers
+        )
+
+        if not has_conclusion_marker:
+            continue
+
+        context_before = claims[max(0, i - 2):i]
+
+        if len(context_before) == 0:
+            continue
+
+        explicit_premises = sum(
+            1 for x in context_before
+            if x.aristotelian_type or x.subject_term or x.predicate_term
+        )
+
+        # Si deux prémisses explicites précèdent déjà la conclusion,
+        # ce n’est probablement pas un enthymème
+        if explicit_premises >= 2:
+            continue
+
+        weak_logical_shape = (
+            c.aristotelian_type is not None
+            or c.subject_term is not None
+            or c.predicate_term is not None
+            or " doit " in f" {text_lower} "
+            or " doivent " in f" {text_lower} "
+            or " est " in f" {text_lower} "
+            or " sont " in f" {text_lower} "
+        )
+
+        if not weak_logical_shape:
+            continue
+
+        enthymemes.append({
+            "conclusion": c.text,
+            "form": c.aristotelian_type if c.aristotelian_type else "-",
+            "subject": c.subject_term if c.subject_term else "-",
+            "predicate": c.predicate_term if c.predicate_term else "-",
+            "context": [x.text for x in context_before],
+            "status": "possible_enthymeme",
+        })
+
+    return enthymemes
+
+def classify_claim_type(sentence: str) -> List[str]:
+    s = sentence.lower().strip()
+    claim_types = []
+
+    # normatif
+    normative_terms = [
+        "injuste", "immoral", "honteux", "scandaleux", "légitime",
+        "illégitime", "dangereux", "toxique", "acceptable", "inacceptable",
+        "raciste", "xénophobe", "fasciste", "complotiste"
+    ]
+    if any(contains_term(s, term) for term in normative_terms):
+        claim_types.append("normative")
+
+    # interprétatif
+    interpretative_terms = [
+        "révèle", "montre que", "signifie", "traduit", "témoigne de",
+        "indique que", "laisse penser", "semble montrer", "suggère que"
+    ]
+    if any(contains_term(s, term) for term in interpretative_terms):
+        claim_types.append("interpretative")
+
+    # testimonial
+    testimonial_patterns = [
+        r"\bje\b", r"\bj'ai\b", r"\bmon quartier\b", r"\bchez moi\b",
+        r"\bnous avons vu\b", r"\bj'ai vu\b", r"\bj'ai constaté\b"
+    ]
+    if any(re.search(p, s) for p in testimonial_patterns):
+        claim_types.append("testimonial")
+
+    # causal
+    causal_terms = [
+        "à cause de", "en raison de", "provoque", "entraîne",
+        "explique", "cause", "responsable de", "conduit à"
+    ]
+    if any(contains_term(s, term) for term in causal_terms):
+        claim_types.append("causal")
+
+    # prédictif
+    predictive_terms = [
+        "va être", "vont être", "sera", "seront", "d'ici", "bientôt",
+        "finira par", "dans les années à venir", "à l'avenir", "dans le futur"
+    ]
+    if any(contains_term(s, term) for term in predictive_terms):
+        claim_types.append("predictive")
+
+    # généralisant
+    generalizing_terms = [
+        "toujours",
+        "jamais",
+        "tout le monde",
+        "personne",
+        "aucun",
+        "tous les",
+        "toutes les"
+    ]
+    if any(contains_term(s, term) for term in generalizing_terms):
+        claim_types.append("generalizing")
+
+    # factuel quantifié
+    if re.search(r"\d+(?:[.,]\d+)?%?", s):
+        claim_types.append("quantitative")
+
+    # si rien
+    if not claim_types:
+        claim_types.append("factual_or_undetermined")
+
+    return unique_keep_order(claim_types)
+
+
+def compute_sentence_red_flags(sentence: str) -> List[str]:
+    s = sentence.lower()
+    flags = []
+
+    if any(contains_term(s, t) for t in ["toujours", "jamais", "tout le monde", "aucun"]):
+        flags.append("generalization")
+
+    if any(contains_term(s, t) for t in ["cela prouve que", "cela montre que", "à cause de", "donc forcément"]):
+        flags.append("false_causality")
+
+    if any(contains_term(s, t) for t in ["il est évident que", "sans aucun doute", "il est certain que"]):
+        flags.append("absolute_certainty")
+
+    if any(contains_term(s, t) for t in ["on nous cache", "ils veulent", "complot", "plan caché"]):
+        flags.append("hidden_intent")
+
+    if any(contains_term(s, t) for t in ["invasion", "submersion", "trahison", "ennemi du peuple"]):
+        flags.append("propaganda")
+
+    return unique_keep_order(flags)
+
+
+def small_claim_epistemic_adjustment(sentence: str, claim_types: List[str], sentence_red_flags: List[str], absolutism: int) -> tuple[float, str]:
+    words = len(sentence.split())
+
+    severe_flags = {
+        "generalization",
+        "false_causality",
+        "absolute_certainty",
+        "hidden_intent",
+        "propaganda",
+    }
+
+    if words > 18:
+        return 0.0, ""
+
+    if any(flag in severe_flags for flag in sentence_red_flags):
+        return 0.0, ""
+
+    if absolutism >= 2:
+        return 0.0, ""
+
+    if "normative" in claim_types:
+        return 2.0, "Jugement normatif : ne doit pas être pénalisé comme un fait brut."
+    if "interpretative" in claim_types:
+        return 1.5, "Affirmation interprétative : demande contexte et pluralité de lectures."
+    if "testimonial" in claim_types:
+        return 1.2, "Affirmation testimoniale : valeur vécue reconnue, sans portée générale automatique."
+
+    return 0.0, ""
+
+def detect_syllogisms(sentences: List[str]) -> List[Dict]:
+    syllogisms = []
+
+    conclusion_markers = [
+        "donc",
+        "par conséquent",
+        "ainsi",
+        "il s'ensuit que",
+        "cela montre que",
+        "cela prouve que"
+    ]
+
+    for i, s in enumerate(sentences):
+        s_lower = s.lower()
+
+        if any(contains_term(s_lower, marker) for marker in conclusion_markers):
+            context = sentences[max(0, i - 2): i + 1]
+
+            syllogisms.append({
+                "type": "inference_possible",
+                "conclusion": s,
+                "context": context
+            })
+
+    return syllogisms
+
+def compute_factual_sobriety_bonus(sentence: str, claim_types: List[str], risk: float, red_flags: List[str]):
+    words = len(sentence.split())
+
+    toxic_flags = {
+        "generalization",
+        "false_causality",
+        "absolute_certainty",
+        "hidden_intent",
+        "propaganda",
+    }
+
+    if words > 22:
+        return 0.0, ""
+
+    if any(flag in toxic_flags for flag in red_flags):
+        return 0.0, ""
+
+    if risk >= 7:
+        return 0.0, ""
+
+    if "quantitative" in claim_types or "factual_or_undetermined" in claim_types:
+        return 1.8, "Affirmation courte et sobre : peu de signaux rhétoriques ou manipulatoires."
+
+    return 0.0, ""
 
 # -----------------------------
 # Cohérence discursive / nouveaux modules
@@ -2036,7 +2561,7 @@ def compute_generalization(text: str):
 
     text_lower = text.lower()
 
-    hits = [t for t in GENERALIZATION_TERMS if t in text_lower]
+    hits = [t for t in GENERALIZATION_TERMS if contains_term(text_lower, t)]
 
     score = min(len(hits) * 2 / 10, 1.0)
 
@@ -2054,7 +2579,7 @@ def compute_abstract_enemy(text: str):
 
     text_lower = text.lower()
 
-    hits = [t for t in ABSTRACT_ENEMY_TERMS if t in text_lower]
+    hits = [t for t in ABSTRACT_ENEMY_TERMS if contains_term(text_lower, t)]
 
     score = min(len(hits) * 2.5 / 10, 1.0)
 
@@ -2072,7 +2597,7 @@ def compute_certainty(text: str):
 
     text_lower = text.lower()
 
-    hits = [t for t in CERTAINTY_TERMS if t in text_lower]
+    hits = [t for t in CERTAINTY_TERMS if contains_term(text_lower, t)]
 
     score = min(len(hits) * 2.5 / 10, 1.0)
 
@@ -2393,6 +2918,81 @@ def compute_narrative_overdetermination(text: str):
         "markers": hits,
         "interpretation": interpretation,
     }
+
+def compute_brain_indices(result: dict) -> dict:
+    def clamp01(x):
+        return max(0.0, min(1.0, x))
+
+    G = result["G"]
+    N = result["N"]
+    D = result["D"]
+    M = result["M"]
+    ME = result["ME"]
+
+    closure_raw = (D / (G + N)) if (G + N) > 0 else 2.0
+    closure_gauge = clamp01(closure_raw / 1.5)
+
+    IR = (
+        result["normative_score"] * 1.2 +
+        result["propaganda_score"] * 1.4 +
+        result["emotional_intensity_score"] * 1.2 +
+        result["certainty_score"] * 1.3 +
+        result["false_consensus_score"] * 1.1 +
+        result["binary_opposition_score"] * 1.1 +
+        result["threat_amplification_score"] * 1.3 +
+        result["vague_authority_score"] * 1.0
+    ) / 9.6
+
+    IL = (
+        result["logic_confusion_score"] * 1.4 +
+        result["causal_overreach_score"] * 1.3 +
+        result["factual_overinterpretation_score"] * 1.3 +
+        result["false_analogy_score"] * 1.1 +
+        result["internal_dissonance_score"] * 1.2 +
+        result["scientific_simulation_score"] * 1.0
+    ) / 7.3
+
+    IC = (
+        result["premise_score"] * 1.2 +
+        result["ideological_premise_score"] * 1.3 +
+        result["semantic_shift_score"] * 1.2 +
+        result["doxic_rigidity_score"] * 1.5 +
+        result["narrative_overdetermination_score"] * 1.4 +
+        closure_gauge * 1.6
+    ) / 8.2
+
+    strategic_index = clamp01(
+        (ME / 20) * 0.40 +
+        IR * 0.20 +
+        IL * 0.20 +
+        IC * 0.20
+    )
+
+    closure_index = clamp01(
+        IC * 0.50 +
+        (D / 10) * 0.30 +
+        (1 - min((G + N) / 20, 1.0)) * 0.20
+    )
+
+    if strategic_index < 0.30 and closure_index < 0.35 and M > 0:
+        profile = "Discours équilibré"
+    elif strategic_index < 0.45 and closure_index >= 0.35 and M <= 3:
+        profile = "Mécroyance probable"
+    elif strategic_index >= 0.45 and strategic_index < 0.70 and IR >= 0.45:
+        profile = "Manipulation rhétorique"
+    elif strategic_index >= 0.70 and IC >= 0.50 and IL >= 0.45:
+        profile = "Mensonge stratégique"
+    else:
+        profile = "Structure mixte ou ambiguë"
+
+    return {
+        "IR": round(IR, 3),
+        "IL": round(IL, 3),
+        "IC": round(IC, 3),
+        "strategic_index": round(strategic_index, 3),
+        "closure_index": round(closure_index, 3),
+        "brain_profile": profile,
+    }
     
 def analyze_claim(sentence: str) -> Claim:
     s = sentence.lower()
@@ -2408,15 +3008,20 @@ def analyze_claim(sentence: str) -> Claim:
     has_named_entity = bool(re.search(r"[A-Z][a-z]+ [A-Z][a-z]+|[A-Z]{2,}", sentence))
     has_source_cue = any(cue in s for cue in SOURCE_CUES)
 
-    absolutism = sum(1 for word in ABSOLUTIST_WORDS if word in s)
-    emotional_charge = sum(1 for word in EMOTIONAL_WORDS if word in s)
+    absolutism = sum(1 for word in ABSOLUTIST_WORDS if contains_term(s, word))
+    emotional_charge = sum(1 for word in EMOTIONAL_WORDS if contains_term(s, word))
+
+    claim_types = classify_claim_type(sentence)
+    sentence_red_flags = compute_sentence_red_flags(sentence)
+    aristotelian_type = detect_aristotelian_proposition(sentence)
+    subject_term, predicate_term = extract_categorical_terms(sentence)
 
     # Vérifiabilité brute
     v_score = clamp(
-        (has_number * 5) +
-        (has_date * 5) +
-        (has_named_entity * 5) +
-        (has_source_cue * 5),
+        (has_number * 3) +
+        (has_date * 4) +
+        (has_named_entity * 2.5) +
+        (has_source_cue * 3),
         0,
         20
     )
@@ -2447,7 +3052,34 @@ def analyze_claim(sentence: str) -> Claim:
         10
     )
 
-    v_score = clamp(v_score - normative_penalty, 0, 20)
+    # On ne pénalise plus de la même manière les énoncés
+    # normatifs / interprétatifs / testimoniaux
+    if not any(t in claim_types for t in ["normative", "interpretative", "testimonial"]):
+        v_score = clamp(v_score - normative_penalty, 0, 20)
+
+    # Correctif petites phrases non mensongères
+    short_adjustment, epistemic_note = small_claim_epistemic_adjustment(
+        sentence,
+        claim_types,
+        sentence_red_flags,
+        absolutism
+    )
+
+    # Bonus de sobriété factuelle
+    sobriety_bonus, sobriety_note = compute_factual_sobriety_bonus(
+        sentence,
+        claim_types,
+        r_score,
+        sentence_red_flags
+    )
+
+    total_adjustment = round(short_adjustment + sobriety_bonus, 2)
+    v_score = clamp(v_score + total_adjustment, 0, 20)
+
+    if epistemic_note and sobriety_note:
+        epistemic_note = epistemic_note + " " + sobriety_note
+    elif sobriety_note:
+        epistemic_note = sobriety_note
 
     if v_score < 5:
         status = T["very_fragile"]
@@ -2467,7 +3099,104 @@ def analyze_claim(sentence: str) -> Claim:
         verifiability=v_score,
         risk=r_score,
         status=status,
+        claim_types=claim_types,
+        epistemic_note=epistemic_note,
+        short_adjustment=total_adjustment,
+        aristotelian_type=aristotelian_type,
+        subject_term=subject_term,
+        predicate_term=predicate_term,
+        middle_term_candidate=None,
     )
+
+def compute_red_flag_penalties(metrics: dict) -> dict:
+    red_flags = []
+    credibility_penalty = 0.0
+    lie_boost = 0.0
+
+    def add_flag(name, cred, lie, reason):
+        nonlocal credibility_penalty, lie_boost
+        red_flags.append({
+            "name": name,
+            "cred_penalty": cred,
+            "lie_boost": lie,
+            "reason": reason,
+        })
+        credibility_penalty += cred
+        lie_boost += lie
+
+    if metrics["G"] < 2 and metrics["vague_authority_score"] >= 0.30:
+        add_flag(
+            "Autorité sans ancrage",
+            1.8,
+            0.8,
+            "Le texte invoque des experts ou études sans base documentaire suffisante."
+        )
+
+    if metrics["certainty_score"] >= 0.35 and metrics["doxic_rigidity_score"] >= 0.35:
+        add_flag(
+            "Certitude saturée",
+            1.6,
+            1.2,
+            "Le discours affirme plus qu’il ne démontre."
+        )
+
+    if metrics["causal_overreach_score"] >= 0.35 and metrics["factual_overinterpretation_score"] >= 0.35:
+        add_flag(
+            "Causalité surinterprétée",
+            1.8,
+            1.4,
+            "Des conclusions causales sont tirées trop vite."
+        )
+
+    if metrics["propaganda_score"] >= 0.40 and metrics["emotional_intensity_score"] >= 0.35:
+        add_flag(
+            "Pression émotionnelle orientée",
+            1.5,
+            1.5,
+            "La charge émotionnelle soutient une structure orientée."
+        )
+
+    if metrics["false_consensus_score"] >= 0.30 and metrics["binary_opposition_score"] >= 0.30:
+        add_flag(
+            "Polarisation artificielle",
+            1.2,
+            1.3,
+            "Le texte fabrique des camps et un consensus supposé."
+        )
+
+    if metrics["internal_dissonance_score"] >= 0.30:
+        add_flag(
+            "Contradiction interne",
+            2.0,
+            1.8,
+            "Le texte contient des tensions ou contradictions internes."
+        )
+
+    if metrics["semantic_shift_score"] >= 0.30 and metrics["ideological_premise_score"] >= 0.30:
+        add_flag(
+            "Recadrage idéologique",
+            1.4,
+            1.1,
+            "Le lexique oriente l’interprétation en amont de la preuve."
+        )
+
+    if (
+        metrics["vague_authority_score"] >= 0.30
+        and metrics["factual_overinterpretation_score"] >= 0.30
+        and metrics["certainty_score"] >= 0.20
+    ):
+        add_flag(
+            "Projection spectaculaire fragile",
+            2.2,
+            1.5,
+            "Le texte avance une projection forte à partir d’un ancrage documentaire insuffisant."
+        )
+
+    return {
+        "flags": red_flags,
+        "credibility_penalty": round(min(credibility_penalty, 8.0), 2),
+        "lie_boost": round(min(lie_boost, 6.0), 2),
+    }
 
 def analyze_article(text: str) -> Dict:
     words = text.split()
@@ -2478,8 +3207,8 @@ def analyze_article(text: str) -> Dict:
     citation_like = len(re.findall(r'"|\'|«|»', text))
     nuance_markers = len(re.findall(r"|".join(re.escape(c) for c in NUANCE_MARKERS), text.lower()))
 
-    G = clamp(source_markers * 1.5 + citation_like * 0.5, 0, 10)
-    N = clamp(nuance_markers * 2 + (article_length / 100), 0, 10)
+    G = clamp(source_markers * 1.1 + citation_like * 0.2, 0, 10)
+    N = clamp(nuance_markers * 1.4 + (article_length / 140), 0, 10)
 
     normative_analysis = detect_normative_charges(text)
     discursive_analysis = compute_discursive_coherence(text)
@@ -2507,19 +3236,117 @@ def analyze_article(text: str) -> Dict:
     doxic_rigidity_analysis = compute_doxic_rigidity(text)
     narrative_overdetermination_analysis = compute_narrative_overdetermination(text)
 
+    penalties = compute_red_flag_penalties({
+        "G": G,
+        "vague_authority_score": vague_authority_analysis["score"],
+        "certainty_score": certainty_analysis[0],
+        "doxic_rigidity_score": doxic_rigidity_analysis["score"],
+        "causal_overreach_score": causal_overreach_analysis["score"],
+        "factual_overinterpretation_score": factual_overinterpretation_analysis["score"],
+        "propaganda_score": propaganda_analysis["score"],
+        "emotional_intensity_score": emotional_intensity_analysis["score"],
+        "false_consensus_score": false_consensus_analysis[0],
+        "binary_opposition_score": binary_opposition_analysis[0],
+        "internal_dissonance_score": internal_dissonance_analysis["score"],
+        "semantic_shift_score": semantic_shift_analysis["score"],
+        "ideological_premise_score": ideological_premise_analysis["score"],
+    })
+
     certainty = len(re.findall(r"certain|absolument|prouvé|évident|incontestable", text.lower()))
     emotional = len(re.findall(r"|".join(re.escape(w) for w in EMOTIONAL_WORDS), text.lower()))
 
-    D = clamp(certainty * 2 + emotional * 1.5, 0, 10)
+    # -----------------------------
+    # Nouvelle Doxa (D) recalibrée
+    # -----------------------------
+    D_raw = (
+        certainty_analysis[0] * 0.30 +
+        doxic_rigidity_analysis["score"] * 0.30 +
+        normative_saturation_analysis["score"] * 0.15 +
+        emotional_intensity_analysis["score"] * 0.15 +
+        false_consensus_analysis[0] * 0.10
+    )
+
+    D = clamp(D_raw * 10, 0, 10)
+
+    # -----------------------------
+    # Indices dérivés
+    # -----------------------------
     M = round((G + N) - D, 1)
     V = clamp(G * 0.8 + N * 0.2, 0, 10)
-    R = clamp(D * 0.7 + (emotional * 1.2), 0, 10)
+    R = clamp(
+        (
+            D * 0.50 +
+            emotional_intensity_analysis["score"] * 10 * 0.25 +
+            propaganda_analysis["score"] * 10 * 0.25
+        ),
+        0,
+        10
+    )
     improved = round((G + N + V) - (D + R), 1)
 
+    # -----------------------------
+    # Syllogismes / inférences
+    # -----------------------------
+    syllogisms = detect_syllogisms(sentences)
+
+    # -----------------------------
+    # Claims
+    # -----------------------------
     claims = [analyze_claim(s) for s in sentences[:15]]
+    
+    syllogisms = detect_syllogisms_from_claims(claims)
+    enthymemes = detect_enthymemes_from_claims(claims)
+    
+    inference_patterns = detect_syllogisms(sentences)
+    
+    fallacies = detect_syllogistic_fallacies(syllogisms)
+
+    print("=== DEBUG CLAIMS ===")
+    for c in claims:
+        print({
+            "text": c.text,
+            "form": c.aristotelian_type,
+            "subject": c.subject_term,
+            "predicate": c.predicate_term
+        })
+
+    print("=== DEBUG SYLLOGISMS ===")
+    print(syllogisms)
+
+    print("=== DEBUG FALLACIES ===")
+    print(fallacies)
+
+    syllogism_signal = len(syllogisms)
+    enthymeme_signal = len(enthymemes)
+    fallacy_signal = len(fallacies)
+
+    syllogism_label = "Aucun signal" if syllogism_signal == 0 else (
+        "Signal faible" if syllogism_signal == 1 else
+        "Signal modéré" if syllogism_signal <= 3 else
+        "Signal fort"
+    )
+
+    enthymeme_label = "Aucun signal" if enthymeme_signal == 0 else (
+        "Signal faible" if enthymeme_signal == 1 else
+        "Signal modéré" if enthymeme_signal <= 3 else
+        "Signal fort"
+    )
+
+    fallacy_label = "Aucun signal" if fallacy_signal == 0 else (
+        "Signal faible" if fallacy_signal == 1 else
+        "Signal modéré" if fallacy_signal <= 3 else
+        "Signal fort"
+    )
+    
     avg_claim_verifiability = sum(c.verifiability for c in claims) / len(claims) if claims else 0
     avg_claim_risk = sum(c.risk for c in claims) / len(claims) if claims else 0
-    source_quality = clamp(source_markers * 3 - (emotional * 2), 0, 20)
+    source_quality = clamp(
+        source_markers * 2
+        - (emotional * 2)
+        - (vague_authority_analysis["score"] * 8),
+        0,
+        20
+    )
 
     red_flags = []
     if D > 8:
@@ -2533,21 +3360,16 @@ def analyze_article(text: str) -> Dict:
 
     hard_fact_score_raw = (
         (0.18 * G + 0.12 * N + 0.20 * V + 0.22 * source_quality + 0.18 * avg_claim_verifiability)
-        - (0.16 * D + 0.12 * R + 0.18 * avg_claim_risk + 0.9 * len(red_flags))
+        - (0.16 * D + 0.12 * R + 0.18 * avg_claim_risk + penalties["credibility_penalty"])
     )
     hard_fact_score = round(clamp(hard_fact_score_raw + 8, 0, 20), 1)
+    short_epistemic_bonus = 0.0
+    if claims:
+        short_epistemic_bonus = sum(c.short_adjustment for c in claims) / len(claims)
+        short_epistemic_bonus = min(short_epistemic_bonus, 1.5)
 
-    if hard_fact_score < 6:
-        verdict = T["low_credibility"]
-    elif hard_fact_score < 10:
-        verdict = T["prudent_credibility"]
-    elif hard_fact_score < 15:
-        verdict = T["rather_credible"]
-    else:
-        verdict = T["strong_credibility"]
+    hard_fact_score = round(clamp(hard_fact_score + short_epistemic_bonus, 0, 20), 1)
 
-    if short_form_analysis["is_short_form"]:
-        hard_fact_score = round(clamp(hard_fact_score - 1.5, 0, 20), 1)
     if hard_fact_score < 6:
         verdict = T["low_credibility"]
     elif hard_fact_score < 10:
@@ -2598,7 +3420,39 @@ def analyze_article(text: str) -> Dict:
         propaganda_analysis["score"] * 2.5
     )
 
-    ME = round((ME_base * L) + discursive_boost, 2)
+    ME = round((ME_base * L) + discursive_boost + penalties["lie_boost"], 2)
+
+    claims = [analyze_claim(sentence) for sentence in sentences[:15]]
+
+    # -----------------------------
+    # Calcul du cerveau global
+    # -----------------------------
+    brain = compute_brain_indices({
+        "G": G,
+        "N": N,
+        "D": D,
+        "M": M,
+        "ME": ME,
+        "normative_score": normative_analysis["score"],
+        "propaganda_score": propaganda_analysis["score"],
+        "emotional_intensity_score": emotional_intensity_analysis["score"],
+        "certainty_score": certainty_analysis[0],
+        "false_consensus_score": false_consensus_analysis[0],
+        "binary_opposition_score": binary_opposition_analysis[0],
+        "threat_amplification_score": threat_amplification_analysis[0],
+        "vague_authority_score": vague_authority_analysis["score"],
+        "logic_confusion_score": logic_confusion_analysis["score"],
+        "causal_overreach_score": causal_overreach_analysis["score"],
+        "factual_overinterpretation_score": factual_overinterpretation_analysis["score"],
+        "false_analogy_score": false_analogy_analysis["score"],
+        "internal_dissonance_score": internal_dissonance_analysis["score"],
+        "scientific_simulation_score": scientific_simulation_analysis["score"],
+        "premise_score": premise_analysis["score"],
+        "ideological_premise_score": ideological_premise_analysis["score"],
+        "semantic_shift_score": semantic_shift_analysis["score"],
+        "doxic_rigidity_score": doxic_rigidity_analysis["score"],
+        "narrative_overdetermination_score": narrative_overdetermination_analysis["score"],
+    })
 
     return {
         "words": len(words),
@@ -2677,10 +3531,6 @@ def analyze_article(text: str) -> Dict:
         "threat_amplification_interpretation": threat_amplification_analysis[1],
         "threat_amplification_markers": threat_amplification_analysis[2],
 
-                "ideological_premise_score": ideological_premise_analysis["score"],
-        "ideological_premise_markers": ideological_premise_analysis["markers"],
-        "ideological_premise_interpretation": ideological_premise_analysis["interpretation"],
-
         "false_analogy_score": false_analogy_analysis["score"],
         "false_analogy_markers": false_analogy_analysis["markers"],
         "false_analogy_interpretation": false_analogy_analysis["interpretation"],
@@ -2739,7 +3589,22 @@ def analyze_article(text: str) -> Dict:
         "strengths": strengths,
         "weaknesses": weaknesses,
         "claims": claims,
-        "red_flags": red_flags,
+        "inference_patterns": inference_patterns,
+        "syllogisms": syllogisms,
+        "enthymemes": enthymemes,
+        "fallacies": fallacies,
+
+        "syllogism_signal": syllogism_signal,
+        "syllogism_label": syllogism_label,
+        "enthymeme_signal": enthymeme_signal,
+        "enthymeme_label": enthymeme_label,
+        "fallacy_signal": fallacy_signal,
+        "fallacy_label": fallacy_label,
+
+        "red_flags": [flag["name"] for flag in penalties["flags"]],
+        "weighted_red_flags": penalties["flags"],
+        "credibility_penalty_total": penalties["credibility_penalty"],
+        "lie_boost_total": penalties["lie_boost"],
     }
 
 
@@ -3444,6 +4309,7 @@ if result:
     row6_col1, row6_col2, row6_col3 = st.columns(3)
     row7_col1, row7_col2, row7_col3 = st.columns(3)
     row8_col1, row8_col2, row8_col3 = st.columns(3)
+    row9_col1, row9_col2, row9_col3 = st.columns(3)
     
 
     # -----------------------------
@@ -4273,6 +5139,81 @@ if result:
             unsafe_allow_html=True
         )
         st.caption("Plus la certitude domine G + N, plus le texte se ferme.")
+
+        # -----------------------------
+    # 25) Syllogismes détectés
+    # -----------------------------
+    with row9_col1:
+        st.markdown("### Syllogismes détectés")
+        st.caption("Structures logiques explicites repérées dans le texte.")
+
+        value = min(result["syllogism_signal"] / 2, 1.0)
+
+        if result["syllogism_signal"] == 0:
+            label, color = "Aucun signal", "#16a34a"
+        elif result["syllogism_signal"] == 1:
+            label, color = "Signal faible", "#ca8a04"
+        elif result["syllogism_signal"] <= 3:
+            label, color = "Signal modéré", "#f97316"
+        else:
+            label, color = "Signal fort", "#dc2626"
+
+        render_custom_gauge(value, color)
+        st.markdown(
+            f"<b style='color:{color}'>{result['syllogism_label']}</b> — {result['syllogism_signal']} repéré(s)",
+            unsafe_allow_html=True
+        )
+        st.caption("Détection de prémisses et conclusion enchaînées.")
+
+    # -----------------------------
+    # 26) Enthymèmes détectés
+    # -----------------------------
+    with row9_col2:
+        st.markdown("### Enthymèmes détectés")
+        st.caption("Raisonnements incomplets ou implicites repérés dans le texte.")
+
+        value = min(result["enthymeme_signal"] / 4, 1.0)
+
+        if result["enthymeme_signal"] == 0:
+            label, color = "Aucun signal", "#16a34a"
+        elif result["enthymeme_signal"] == 1:
+            label, color = "Signal faible", "#ca8a04"
+        elif result["enthymeme_signal"] <= 3:
+            label, color = "Signal modéré", "#f97316"
+        else:
+            label, color = "Signal fort", "#dc2626"
+
+        render_custom_gauge(value, color)
+        st.markdown(
+            f"<b style='color:{color}'>{result['enthymeme_label']}</b> — {result['enthymeme_signal']} repéré(s)",
+            unsafe_allow_html=True
+        )
+        st.caption("Conclusion présente, prémisse partiellement implicite.")
+
+    # -----------------------------
+    # 27) Sophismes syllogistiques
+    # -----------------------------
+    with row9_col3:
+        st.markdown("### Sophismes syllogistiques")
+        st.caption("Failles formelles ou conclusions invalides dans les raisonnements.")
+
+        value = min(result["fallacy_signal"] / 2, 1.0)
+
+        if result["fallacy_signal"] == 0:
+            label, color = "Aucun signal", "#16a34a"
+        elif result["fallacy_signal"] == 1:
+            label, color = "Signal faible", "#ca8a04"
+        elif result["fallacy_signal"] <= 3:
+            label, color = "Signal modéré", "#f97316"
+        else:
+            label, color = "Signal fort", "#dc2626"
+
+        render_custom_gauge(value, color)
+        st.markdown(
+            f"<b style='color:{color}'>{result['fallacy_label']}</b> — {result['fallacy_signal']} repéré(s)",
+            unsafe_allow_html=True
+        )
+        st.caption("Terme moyen absent, forme invalide ou conclusion trop forte.")
                 
     with st.expander("Voir les manœuvres discursives détectées", expanded=False):
         if result["political_pattern_score"] == 0:
@@ -4365,9 +5306,15 @@ if result:
         [
             {
                 T["claim"]: c.text,
+                "Type": ", ".join(c.claim_types),
+                "Forme": c.aristotelian_type if c.aristotelian_type else "-",
+                "Sujet": c.subject_term if c.subject_term else "-",
+                "Prédicat": c.predicate_term if c.predicate_term else "-",
                 T["status"]: c.status,
                 f"{T['verifiability']} /20": c.verifiability,
                 f"{T['risk']} /20": c.risk,
+                "Ajustement": c.short_adjustment,
+                "Note épistémique": c.epistemic_note,
                 T["number"]: T["yes"] if c.has_number else T["no"],
                 T["date"]: T["yes"] if c.has_date else T["no"],
                 T["named_entity"]: T["yes"] if c.has_named_entity else T["no"],
@@ -4381,6 +5328,77 @@ if result:
         st.dataframe(claims_df, use_container_width=True, hide_index=True)
     else:
         st.info(T["paste_longer_text"])
+
+    st.divider()
+    st.subheader("Analyse syllogistique")
+
+    if result.get("syllogisms"):
+        for i, s in enumerate(result["syllogisms"], start=1):
+            with st.expander(f"Syllogisme potentiel {i}", expanded=False):
+                st.write(f"**Forme** : {s['form']}")
+                st.write(f"**Terme moyen** : {s['middle_term'] if s['middle_term'] else '-'}")
+                st.write(f"**Figure** : {s['figure'] if s['figure'] else '-'}")
+                st.write(f"**Statut** : {s['status']}")
+
+                st.write("**Prémisse 1**")
+                st.write(s["premise_1"])
+                if "p1_terms" in s:
+                    st.caption(f"Sujet : {s['p1_terms']['subject']} | Prédicat : {s['p1_terms']['predicate']}")
+
+                st.write("**Prémisse 2**")
+                st.write(s["premise_2"])
+                if "p2_terms" in s:
+                    st.caption(f"Sujet : {s['p2_terms']['subject']} | Prédicat : {s['p2_terms']['predicate']}")
+
+                st.write("**Conclusion**")
+                st.write(s["conclusion"])
+                if "c_terms" in s:
+                    st.caption(f"Sujet : {s['c_terms']['subject']} | Prédicat : {s['c_terms']['predicate']}")
+    else:
+        st.info("Aucun syllogisme détecté.")
+
+    st.divider()
+    st.subheader("Enthymèmes détectés")
+
+    if result.get("enthymemes"):
+        for i, e in enumerate(result["enthymemes"], start=1):
+            with st.expander(f"Enthymème potentiel {i}", expanded=False):
+                st.write(f"**Forme** : {e['form']}")
+                st.write(f"**Sujet** : {e['subject']}")
+                st.write(f"**Prédicat** : {e['predicate']}")
+                st.write(f"**Statut** : {e['status']}")
+
+                st.write("**Conclusion**")
+                st.write(e["conclusion"])
+
+                if e["context"]:
+                    st.write("**Contexte précédent**")
+                    for line in e["context"]:
+                        st.write(f"- {line}")
+    else:
+        st.info("Aucun enthymème détecté.")
+
+    st.divider()
+    st.subheader("Sophismes syllogistiques")
+
+    if result.get("fallacies"):
+        for i, f in enumerate(result["fallacies"], start=1):
+            with st.expander(f"Sophisme détecté {i}", expanded=False):
+                st.write(f"**Type** : {f['type']}")
+                st.write(f"**Description** : {f['description']}")
+
+                s = f["syllogism"]
+
+                st.write("**Prémisse 1**")
+                st.write(s["premise_1"])
+
+                st.write("**Prémisse 2**")
+                st.write(s["premise_2"])
+
+                st.write("**Conclusion**")
+                st.write(s["conclusion"])
+    else:
+        st.info("Aucun sophisme syllogistique détecté.")
 
     st.divider()
     st.subheader(T["ai_module"])
