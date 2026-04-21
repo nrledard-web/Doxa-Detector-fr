@@ -1,4 +1,4 @@
-import streamlit as st
+import streamlit as st 
 import json
 import re
 from datetime import datetime, timedelta
@@ -2919,6 +2919,227 @@ def compute_narrative_overdetermination(text: str):
         "interpretation": interpretation,
     }
 
+# -----------------------------
+# Sophismes aristotéliciens de base
+# -----------------------------
+PETITION_PATTERNS = [
+    "c'est vrai parce que",
+    "c'est vrai car",
+    "c'est la vérité",
+    "cela prouve que c'est vrai",
+    "c'est évident parce que c'est évident",
+]
+
+CAUSALITY_PATTERNS = [
+    "depuis que",
+    "à cause de",
+    "est responsable de",
+    "a provoqué",
+    "a causé",
+    "est la cause de",
+]
+
+GENERALIZATION_PATTERNS = [
+    "tous les",
+    "toujours",
+    "jamais",
+    "tout le monde",
+    "personne ne",
+]
+
+
+# -----------------------------
+# Sophismes supplémentaires
+# -----------------------------
+
+AD_HOMINEM_PATTERNS = [
+    "cet idiot",
+    "cet incapable",
+    "il est stupide",
+    "il est ridicule",
+    "on ne peut pas faire confiance à",
+]
+
+IGNORANCE_PATTERNS = [
+    "personne n'a prouvé que",
+    "on ne peut pas prouver que",
+    "il n'existe aucune preuve que",
+    "rien ne prouve que le contraire",
+]
+
+SLIPPERY_SLOPE_PATTERNS = [
+    "si on accepte",
+    "alors bientôt",
+    "cela mènera à",
+    "on finira par",
+]
+
+FEAR_APPEAL_PATTERNS = [
+    "danger",
+    "menace",
+    "catastrophe",
+    "désastre",
+    "nous allons tous subir",
+]
+
+FALSE_ANALOGY_STRONG_PATTERNS = [
+    "c'est comme",
+    "exactement comme",
+    "de la même manière que",
+    "tout comme",
+]
+
+VAGUE_AUTHORITY_PATTERNS = [
+    "les experts",
+    "les scientifiques disent",
+    "des études montrent",
+    "certains spécialistes",
+    "les chercheurs disent",
+]
+
+FALSE_DILEMMA_PATTERNS = [
+    "soit",
+    "il n'y a que deux choix",
+    "avec nous ou contre nous",
+    "vous devez choisir",
+]
+
+def detect_petition_principii(text: str):
+    text_lower = text.lower()
+    matches = [p for p in PETITION_PATTERNS if contains_term(text_lower, p) or p in text_lower]
+    return {
+        "score": min(len(matches) * 0.5, 1.0),
+        "matches": matches,
+        "interpretation": "Répétition circulaire d’une idée présentée comme preuve." if matches else "Aucune pétition de principe saillante détectée."
+    }
+
+def detect_false_causality_basic(text: str):
+    text_lower = text.lower()
+    matches = [p for p in CAUSALITY_PATTERNS if contains_term(text_lower, p) or p in text_lower]
+    return {
+        "score": min(len(matches) * 0.4, 1.0),
+        "matches": matches,
+        "interpretation": "Lien causal affirmé plus vite qu’il n’est démontré." if matches else "Aucune fausse causalité saillante détectée."
+    }
+
+def detect_hasty_generalization(text: str):
+    text_lower = text.lower()
+    matches = [p for p in GENERALIZATION_PATTERNS if contains_term(text_lower, p) or p in text_lower]
+    return {
+        "score": min(len(matches) * 0.3, 1.0),
+        "matches": matches,
+        "interpretation": "Passage abusif de quelques cas à une règle générale." if matches else "Aucune généralisation abusive saillante détectée."
+    }
+
+def detect_vague_authority_basic(text: str):
+    text_lower = text.lower()
+    matches = [p for p in VAGUE_AUTHORITY_PATTERNS if contains_term(text_lower, p) or p in text_lower]
+    return {
+        "score": min(len(matches) * 0.5, 1.0),
+        "matches": matches,
+        "interpretation": "Autorité invoquée sans source précise." if matches else "Aucune autorité vague saillante détectée."
+    }
+
+def detect_false_dilemma(text: str):
+    text_lower = text.lower()
+    matches = [p for p in FALSE_DILEMMA_PATTERNS if contains_term(text_lower, p) or p in text_lower]
+    return {
+        "score": min(len(matches) * 0.5, 1.0),
+        "matches": matches,
+        "interpretation": "Réduction artificielle du réel à deux options." if matches else "Aucun faux dilemme saillant détecté."
+    }
+
+def detect_ad_hominem(text: str):
+    text_lower = text.lower()
+    matches = [p for p in AD_HOMINEM_PATTERNS if p in text_lower]
+    return {
+        "score": min(len(matches) * 0.5, 1.0),
+        "matches": matches,
+        "interpretation": "Attaque contre la personne plutôt que contre l’argument." if matches else "Aucun ad hominem saillant détecté."
+    }
+
+
+def detect_argument_from_ignorance(text: str):
+    text_lower = text.lower()
+    matches = [p for p in IGNORANCE_PATTERNS if p in text_lower]
+    return {
+        "score": min(len(matches) * 0.5, 1.0),
+        "matches": matches,
+        "interpretation": "Conclusion tirée de l’absence de preuve." if matches else "Aucun argument d’ignorance détecté."
+    }
+
+
+def detect_slippery_slope(text: str):
+    text_lower = text.lower()
+    matches = [p for p in SLIPPERY_SLOPE_PATTERNS if p in text_lower]
+    return {
+        "score": min(len(matches) * 0.4, 1.0),
+        "matches": matches,
+        "interpretation": "Projection catastrophiste en chaîne." if matches else "Aucune pente glissante détectée."
+    }
+
+
+def detect_fear_appeal(text: str):
+    text_lower = text.lower()
+    matches = [p for p in FEAR_APPEAL_PATTERNS if p in text_lower]
+    return {
+        "score": min(len(matches) * 0.3, 1.0),
+        "matches": matches,
+        "interpretation": "Argument basé sur la peur plutôt que sur l’analyse." if matches else "Aucun appel à la peur détecté."
+    }
+
+
+def detect_false_analogy_strong(text: str):
+    text_lower = text.lower()
+    matches = [p for p in FALSE_ANALOGY_STRONG_PATTERNS if p in text_lower]
+    return {
+        "score": min(len(matches) * 0.4, 1.0),
+        "matches": matches,
+        "interpretation": "Comparaison trompeuse servant de raccourci argumentatif." if matches else "Aucune analogie trompeuse détectée."
+    }
+
+def detect_aristotelian_fallacies(text: str):
+    petition = detect_petition_principii(text)
+    false_causality = detect_false_causality_basic(text)
+    generalization = detect_hasty_generalization(text)
+    vague_authority = detect_vague_authority_basic(text)
+    false_dilemma = detect_false_dilemma(text)
+
+    ad_hominem = detect_ad_hominem(text)
+    ignorance = detect_argument_from_ignorance(text)
+    slippery_slope = detect_slippery_slope(text)
+    fear_appeal = detect_fear_appeal(text)
+    false_analogy_strong = detect_false_analogy_strong(text)
+
+    score = (
+        petition["score"]
+        + false_causality["score"]
+        + generalization["score"]
+        + vague_authority["score"]
+        + false_dilemma["score"]
+        + ad_hominem["score"]
+        + ignorance["score"]
+        + slippery_slope["score"]
+        + fear_appeal["score"]
+        + false_analogy_strong["score"]
+    ) / 10
+
+    return {
+        "score": round(score, 3),
+
+        "petition": petition,
+        "false_causality": false_causality,
+        "generalization": generalization,
+        "vague_authority": vague_authority,
+        "false_dilemma": false_dilemma,
+
+        "ad_hominem": ad_hominem,
+        "ignorance": ignorance,
+        "slippery_slope": slippery_slope,
+        "fear_appeal": fear_appeal,
+        "false_analogy_strong": false_analogy_strong,
+    }
+
 def compute_brain_indices(result: dict) -> dict:
     def clamp01(x):
         return max(0.0, min(1.0, x))
@@ -3214,6 +3435,7 @@ def analyze_article(text: str) -> Dict:
     discursive_analysis = compute_discursive_coherence(text)
     premise_analysis = compute_implicit_premises(text)
     logic_confusion_analysis = compute_logic_confusion(text)
+    aristotelian_fallacies = detect_aristotelian_fallacies(text)
     scientific_simulation_analysis = compute_scientific_simulation(text)
     propaganda_analysis = detect_propaganda_narrative(text)
     short_form_analysis = detect_short_form_mode(text)
@@ -3416,6 +3638,7 @@ def analyze_article(text: str) -> Dict:
         normative_analysis["score"] * 2.0 +
         premise_analysis["score"] * 1.5 +
         logic_confusion_analysis["score"] * 1.5 +
+        aristotelian_fallacies["score"] * 1.5 +
         scientific_simulation_analysis["score"] * 1.2 +
         propaganda_analysis["score"] * 2.5
     )
@@ -3446,6 +3669,27 @@ def analyze_article(text: str) -> Dict:
         "factual_overinterpretation_score": factual_overinterpretation_analysis["score"],
         "false_analogy_score": false_analogy_analysis["score"],
         "internal_dissonance_score": internal_dissonance_analysis["score"],
+        "aristotelian_fallacies_score": aristotelian_fallacies["score"],
+
+        "petition_score": aristotelian_fallacies["petition"]["score"],
+        "petition_markers": aristotelian_fallacies["petition"]["matches"],
+        "petition_interpretation": aristotelian_fallacies["petition"]["interpretation"],
+
+        "false_causality_basic_score": aristotelian_fallacies["false_causality"]["score"],
+        "false_causality_basic_markers": aristotelian_fallacies["false_causality"]["matches"],
+        "false_causality_basic_interpretation": aristotelian_fallacies["false_causality"]["interpretation"],
+
+        "hasty_generalization_score": aristotelian_fallacies["generalization"]["score"],
+        "hasty_generalization_markers": aristotelian_fallacies["generalization"]["matches"],
+        "hasty_generalization_interpretation": aristotelian_fallacies["generalization"]["interpretation"],
+
+        "vague_authority_basic_score": aristotelian_fallacies["vague_authority"]["score"],
+        "vague_authority_basic_markers": aristotelian_fallacies["vague_authority"]["matches"],
+        "vague_authority_basic_interpretation": aristotelian_fallacies["vague_authority"]["interpretation"],
+
+        "false_dilemma_score": aristotelian_fallacies["false_dilemma"]["score"],
+        "false_dilemma_markers": aristotelian_fallacies["false_dilemma"]["matches"],
+        "false_dilemma_interpretation": aristotelian_fallacies["false_dilemma"]["interpretation"],
         "scientific_simulation_score": scientific_simulation_analysis["score"],
         "premise_score": premise_analysis["score"],
         "ideological_premise_score": ideological_premise_analysis["score"],
@@ -3490,6 +3734,28 @@ def analyze_article(text: str) -> Dict:
         "logic_confusion_markers": logic_confusion_analysis["markers"],
         "logic_confusion_interpretation": logic_confusion_analysis["interpretation"],
         "logic_confusion_details": logic_confusion_analysis["details"],
+
+        "aristotelian_fallacies_score": aristotelian_fallacies["score"],
+
+        "petition_score": aristotelian_fallacies["petition"]["score"],
+        "petition_markers": aristotelian_fallacies["petition"]["matches"],
+        "petition_interpretation": aristotelian_fallacies["petition"]["interpretation"],
+
+        "false_causality_basic_score": aristotelian_fallacies["false_causality"]["score"],
+        "false_causality_basic_markers": aristotelian_fallacies["false_causality"]["matches"],
+        "false_causality_basic_interpretation": aristotelian_fallacies["false_causality"]["interpretation"],
+
+        "hasty_generalization_score": aristotelian_fallacies["generalization"]["score"],
+        "hasty_generalization_markers": aristotelian_fallacies["generalization"]["matches"],
+        "hasty_generalization_interpretation": aristotelian_fallacies["generalization"]["interpretation"],
+
+        "vague_authority_basic_score": aristotelian_fallacies["vague_authority"]["score"],
+        "vague_authority_basic_markers": aristotelian_fallacies["vague_authority"]["matches"],
+        "vague_authority_basic_interpretation": aristotelian_fallacies["vague_authority"]["interpretation"],
+
+        "false_dilemma_score": aristotelian_fallacies["false_dilemma"]["score"],
+        "false_dilemma_markers": aristotelian_fallacies["false_dilemma"]["matches"],
+        "false_dilemma_interpretation": aristotelian_fallacies["false_dilemma"]["interpretation"],
 
         "scientific_simulation_score": scientific_simulation_analysis["score"],
         "scientific_simulation_markers": scientific_simulation_analysis["markers"],
@@ -4310,6 +4576,8 @@ if result:
     row7_col1, row7_col2, row7_col3 = st.columns(3)
     row8_col1, row8_col2, row8_col3 = st.columns(3)
     row9_col1, row9_col2, row9_col3 = st.columns(3)
+    row10_col1, row10_col2, row10_col3 = st.columns(3)
+    row11_col1, row11_col2, row11_col3 = st.columns(3)
     
 
     # -----------------------------
@@ -5214,6 +5482,157 @@ if result:
             unsafe_allow_html=True
         )
         st.caption("Terme moyen absent, forme invalide ou conclusion trop forte.")
+
+        
+    with row10_col1:
+        st.markdown("### Pétition de principe")
+        st.caption("Conclusion répétée comme si elle constituait une preuve.")
+
+        value = result["petition_score"]
+
+        if value < 0.15:
+            label, color = "Faible", "#16a34a"
+        elif value < 0.35:
+            label, color = "Modérée", "#ca8a04"
+        elif value < 0.60:
+            label, color = "Élevée", "#f97316"
+        else:
+            label, color = "Très élevée", "#dc2626"
+
+        render_custom_gauge(value, color)
+        st.markdown(
+            f"<b style='color:{color}'>{label}</b> — {round(value*100,1)}%",
+            unsafe_allow_html=True
+        )
+        st.caption(result["petition_interpretation"])
+
+        with st.expander("Voir les marqueurs", expanded=False):
+            markers = result.get("petition_markers", [])
+            if not markers:
+                st.info("Aucune pétition de principe notable détectée.")
+            else:
+                for marker in markers:
+                    st.warning(marker)
+
+    with row10_col2:
+        st.markdown("### Fausse causalité (simple)")
+        st.caption("Lien causal affirmé sans démonstration suffisante.")
+
+        value = result["false_causality_basic_score"]
+
+        if value < 0.15:
+            label, color = "Faible", "#16a34a"
+        elif value < 0.35:
+            label, color = "Modérée", "#ca8a04"
+        elif value < 0.60:
+            label, color = "Élevée", "#f97316"
+        else:
+            label, color = "Très élevée", "#dc2626"
+
+        render_custom_gauge(value, color)
+        st.markdown(
+            f"<b style='color:{color}'>{label}</b> — {round(value*100,1)}%",
+            unsafe_allow_html=True
+        )
+        st.caption(result["false_causality_basic_interpretation"])
+
+        with st.expander("Voir les marqueurs", expanded=False):
+            markers = result.get("false_causality_basic_markers", [])
+            if not markers:
+                st.info("Aucune fausse causalité simple notable détectée.")
+            else:
+                for marker in markers:
+                    st.warning(marker)
+
+    with row10_col3:
+        st.markdown("### Généralisation abusive")
+        st.caption("Passage abusif de cas particuliers à une règle générale.")
+
+        value = result["hasty_generalization_score"]
+
+        if value < 0.15:
+            label, color = "Faible", "#16a34a"
+        elif value < 0.35:
+            label, color = "Modérée", "#ca8a04"
+        elif value < 0.60:
+            label, color = "Élevée", "#f97316"
+        else:
+            label, color = "Très élevée", "#dc2626"
+
+        render_custom_gauge(value, color)
+        st.markdown(
+            f"<b style='color:{color}'>{label}</b> — {round(value*100,1)}%",
+            unsafe_allow_html=True
+        )
+        st.caption(result["hasty_generalization_interpretation"])
+
+        with st.expander("Voir les marqueurs", expanded=False):
+            markers = result.get("hasty_generalization_markers", [])
+            if not markers:
+                st.info("Aucune généralisation abusive notable détectée.")
+            else:
+                for marker in markers:
+                    st.warning(marker)
+
+    with row11_col1:
+        st.markdown("### Autorité vague (simple)")
+        st.caption("Autorité invoquée sans source clairement traçable.")
+
+        value = result["vague_authority_basic_score"]
+
+        if value < 0.15:
+            label, color = "Faible", "#16a34a"
+        elif value < 0.35:
+            label, color = "Modérée", "#ca8a04"
+        elif value < 0.60:
+            label, color = "Élevée", "#f97316"
+        else:
+            label, color = "Très élevée", "#dc2626"
+
+        render_custom_gauge(value, color)
+        st.markdown(
+            f"<b style='color:{color}'>{label}</b> — {round(value*100,1)}%",
+            unsafe_allow_html=True
+        )
+        st.caption(result["vague_authority_basic_interpretation"])
+
+        with st.expander("Voir les marqueurs", expanded=False):
+            markers = result.get("vague_authority_basic_markers", [])
+            if not markers:
+                st.info("Aucune autorité vague simple notable détectée.")
+            else:
+                for marker in markers:
+                    st.warning(marker)
+
+    with row11_col2:
+        st.markdown("### Faux dilemme")
+        st.caption("Réduction artificielle du réel à deux options.")
+
+        value = result["false_dilemma_score"]
+
+        if value < 0.15:
+            label, color = "Faible", "#16a34a"
+        elif value < 0.35:
+            label, color = "Modérée", "#ca8a04"
+        elif value < 0.60:
+            label, color = "Élevée", "#f97316"
+        else:
+            label, color = "Très élevée", "#dc2626"
+
+        render_custom_gauge(value, color)
+        st.markdown(
+            f"<b style='color:{color}'>{label}</b> — {round(value*100,1)}%",
+            unsafe_allow_html=True
+        )
+        st.caption(result["false_dilemma_interpretation"])
+
+        with st.expander("Voir les marqueurs", expanded=False):
+            markers = result.get("false_dilemma_markers", [])
+            if not markers:
+                st.info("Aucun faux dilemme notable détecté.")
+            else:
+                for marker in markers:
+                    st.warning(marker)
                 
     with st.expander("Voir les manœuvres discursives détectées", expanded=False):
         if result["political_pattern_score"] == 0:
