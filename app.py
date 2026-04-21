@@ -3004,6 +3004,55 @@ FALSE_DILEMMA_PATTERNS = [
     "vous devez choisir",
 ]
 
+# -----------------------------
+# Sophismes axiologiques / idéologiques
+# -----------------------------
+
+NORMATIVE_QUALIFICATION_PATTERNS = [
+    "complotiste",
+    "raciste",
+    "xénophobe",
+    "extrémiste",
+    "antiscientifique",
+    "populiste",
+    "fasciste",
+    "réactionnaire",
+    "haineux",
+    "dangereux",
+]
+
+IDEOLOGICAL_PREMISE_PATTERNS = [
+    "il est évident que",
+    "il est clair que",
+    "tout le monde sait que",
+    "il va de soi que",
+    "il est largement admis que",
+]
+
+FALSE_CONSENSUS_STRONG_PATTERNS = [
+    "tout le monde sait que",
+    "tout le monde comprend que",
+    "personne ne peut nier que",
+    "il est évident pour tous que",
+    "chacun sait que",
+]
+
+ARGUMENT_FROM_NATURE_PATTERNS = [
+    "c'est naturel donc",
+    "contre-nature",
+    "contraire à la nature",
+    "naturellement",
+    "ce qui est naturel est",
+]
+
+DESCRIPTIVE_NORMATIVE_CONFUSION_PATTERNS = [
+    "donc il faut",
+    "donc nous devons",
+    "cela prouve qu'il faut",
+    "cela montre qu'il faut",
+    "par conséquent nous devons",
+]
+
 def detect_petition_principii(text: str):
     text_lower = text.lower()
     matches = [p for p in PETITION_PATTERNS if contains_term(text_lower, p) or p in text_lower]
@@ -3098,6 +3147,55 @@ def detect_false_analogy_strong(text: str):
         "interpretation": "Comparaison trompeuse servant de raccourci argumentatif." if matches else "Aucune analogie trompeuse détectée."
     }
 
+def detect_normative_qualification(text: str):
+    text_lower = text.lower()
+    matches = [p for p in NORMATIVE_QUALIFICATION_PATTERNS if contains_term(text_lower, p) or p in text_lower]
+    return {
+        "score": min(len(matches) * 0.35, 1.0),
+        "matches": matches,
+        "interpretation": "Des qualifications normatives servent de substitut à l’argumentation." if matches else "Aucune qualification normative déguisée détectée."
+    }
+
+
+def detect_ideological_premise(text: str):
+    text_lower = text.lower()
+    matches = [p for p in IDEOLOGICAL_PREMISE_PATTERNS if contains_term(text_lower, p) or p in text_lower]
+    return {
+        "score": min(len(matches) * 0.4, 1.0),
+        "matches": matches,
+        "interpretation": "Le raisonnement repose sur des prémisses idéologiques implicites." if matches else "Aucune prémisse idéologique implicite détectée."
+    }
+
+
+def detect_false_consensus_strong(text: str):
+    text_lower = text.lower()
+    matches = [p for p in FALSE_CONSENSUS_STRONG_PATTERNS if contains_term(text_lower, p) or p in text_lower]
+    return {
+        "score": min(len(matches) * 0.45, 1.0),
+        "matches": matches,
+        "interpretation": "Le texte met en scène un consensus supposé comme preuve." if matches else "Aucun faux consensus renforcé détecté."
+    }
+
+
+def detect_argument_from_nature(text: str):
+    text_lower = text.lower()
+    matches = [p for p in ARGUMENT_FROM_NATURE_PATTERNS if contains_term(text_lower, p) or p in text_lower]
+    return {
+        "score": min(len(matches) * 0.4, 1.0),
+        "matches": matches,
+        "interpretation": "Le caractère naturel ou contre-naturel est utilisé comme argument de vérité ou de valeur." if matches else "Aucun argument de nature détecté."
+    }
+
+
+def detect_descriptive_normative_confusion(text: str):
+    text_lower = text.lower()
+    matches = [p for p in DESCRIPTIVE_NORMATIVE_CONFUSION_PATTERNS if contains_term(text_lower, p) or p in text_lower]
+    return {
+        "score": min(len(matches) * 0.45, 1.0),
+        "matches": matches,
+        "interpretation": "Le texte glisse d’une description vers une injonction sans justification suffisante." if matches else "Aucune confusion descriptif / normatif détectée."
+    }
+
 def detect_aristotelian_fallacies(text: str):
     petition = detect_petition_principii(text)
     false_causality = detect_false_causality_basic(text)
@@ -3111,6 +3209,12 @@ def detect_aristotelian_fallacies(text: str):
     fear_appeal = detect_fear_appeal(text)
     false_analogy_strong = detect_false_analogy_strong(text)
 
+    normative_qualification = detect_normative_qualification(text)
+    ideological_premise = detect_ideological_premise(text)
+    false_consensus_strong = detect_false_consensus_strong(text)
+    argument_from_nature = detect_argument_from_nature(text)
+    descriptive_normative_confusion = detect_descriptive_normative_confusion(text)
+
     score = (
         petition["score"]
         + false_causality["score"]
@@ -3122,7 +3226,12 @@ def detect_aristotelian_fallacies(text: str):
         + slippery_slope["score"]
         + fear_appeal["score"]
         + false_analogy_strong["score"]
-    ) / 10
+        + normative_qualification["score"]
+        + ideological_premise["score"]
+        + false_consensus_strong["score"]
+        + argument_from_nature["score"]
+        + descriptive_normative_confusion["score"]
+    ) / 15
 
     return {
         "score": round(score, 3),
@@ -3138,8 +3247,13 @@ def detect_aristotelian_fallacies(text: str):
         "slippery_slope": slippery_slope,
         "fear_appeal": fear_appeal,
         "false_analogy_strong": false_analogy_strong,
-    }
 
+        "normative_qualification": normative_qualification,
+        "ideological_premise": ideological_premise,
+        "false_consensus_strong": false_consensus_strong,
+        "argument_from_nature": argument_from_nature,
+        "descriptive_normative_confusion": descriptive_normative_confusion,
+    }
 def compute_brain_indices(result: dict) -> dict:
     def clamp01(x):
         return max(0.0, min(1.0, x))
@@ -3756,6 +3870,26 @@ def analyze_article(text: str) -> Dict:
         "false_dilemma_score": aristotelian_fallacies["false_dilemma"]["score"],
         "false_dilemma_markers": aristotelian_fallacies["false_dilemma"]["matches"],
         "false_dilemma_interpretation": aristotelian_fallacies["false_dilemma"]["interpretation"],
+
+        "normative_qualification_score": aristotelian_fallacies["normative_qualification"]["score"],
+        "normative_qualification_markers": aristotelian_fallacies["normative_qualification"]["matches"],
+        "normative_qualification_interpretation": aristotelian_fallacies["normative_qualification"]["interpretation"],
+
+        "ideological_premise_sophism_score": aristotelian_fallacies["ideological_premise"]["score"],
+        "ideological_premise_sophism_markers": aristotelian_fallacies["ideological_premise"]["matches"],
+        "ideological_premise_sophism_interpretation": aristotelian_fallacies["ideological_premise"]["interpretation"],
+
+        "false_consensus_strong_score": aristotelian_fallacies["false_consensus_strong"]["score"],
+        "false_consensus_strong_markers": aristotelian_fallacies["false_consensus_strong"]["matches"],
+        "false_consensus_strong_interpretation": aristotelian_fallacies["false_consensus_strong"]["interpretation"],
+
+        "argument_from_nature_score": aristotelian_fallacies["argument_from_nature"]["score"],
+        "argument_from_nature_markers": aristotelian_fallacies["argument_from_nature"]["matches"],
+        "argument_from_nature_interpretation": aristotelian_fallacies["argument_from_nature"]["interpretation"],
+
+        "descriptive_normative_confusion_score": aristotelian_fallacies["descriptive_normative_confusion"]["score"],
+        "descriptive_normative_confusion_markers": aristotelian_fallacies["descriptive_normative_confusion"]["matches"],
+        "descriptive_normative_confusion_interpretation": aristotelian_fallacies["descriptive_normative_confusion"]["interpretation"],
 
         "scientific_simulation_score": scientific_simulation_analysis["score"],
         "scientific_simulation_markers": scientific_simulation_analysis["markers"],
@@ -4578,6 +4712,8 @@ if result:
     row9_col1, row9_col2, row9_col3 = st.columns(3)
     row10_col1, row10_col2, row10_col3 = st.columns(3)
     row11_col1, row11_col2, row11_col3 = st.columns(3)
+    row12_col1, row12_col2, row12_col3 = st.columns(3)
+    row13_col1, row13_col2, row13_col3 = st.columns(3)
     
 
     # -----------------------------
@@ -5630,6 +5766,156 @@ if result:
             markers = result.get("false_dilemma_markers", [])
             if not markers:
                 st.info("Aucun faux dilemme notable détecté.")
+            else:
+                for marker in markers:
+                    st.warning(marker)
+
+    with row12_col1:
+        st.markdown("### Qualification normative")
+        st.caption("Usage de jugements de valeur comme substitut d’argument.")
+
+        value = result["normative_qualification_score"]
+
+        if value < 0.15:
+            label, color = "Faible", "#16a34a"
+        elif value < 0.35:
+            label, color = "Modérée", "#ca8a04"
+        elif value < 0.60:
+            label, color = "Élevée", "#f97316"
+        else:
+            label, color = "Très élevée", "#dc2626"
+
+        render_custom_gauge(value, color)
+        st.markdown(
+            f"<b style='color:{color}'>{label}</b> — {round(value*100,1)}%",
+            unsafe_allow_html=True
+        )
+        st.caption(result["normative_qualification_interpretation"])
+
+        with st.expander("Voir les marqueurs", expanded=False):
+            markers = result.get("normative_qualification_markers", [])
+            if not markers:
+                st.info("Aucune qualification normative notable détectée.")
+            else:
+                for marker in markers:
+                    st.warning(marker)
+
+    with row12_col2:
+        st.markdown("### Prémisse idéologique implicite")
+        st.caption("Présupposé idéologique utilisé comme point de départ du raisonnement.")
+
+        value = result["ideological_premise_sophism_score"]
+
+        if value < 0.15:
+            label, color = "Faible", "#16a34a"
+        elif value < 0.35:
+            label, color = "Modérée", "#ca8a04"
+        elif value < 0.60:
+            label, color = "Élevée", "#f97316"
+        else:
+            label, color = "Très élevée", "#dc2626"
+
+        render_custom_gauge(value, color)
+        st.markdown(
+            f"<b style='color:{color}'>{label}</b> — {round(value*100,1)}%",
+            unsafe_allow_html=True
+        )
+        st.caption(result["ideological_premise_sophism_interpretation"])
+
+        with st.expander("Voir les marqueurs", expanded=False):
+            markers = result.get("ideological_premise_sophism_markers", [])
+            if not markers:
+                st.info("Aucune prémisse idéologique implicite notable détectée.")
+            else:
+                for marker in markers:
+                    st.warning(marker)
+
+    with row12_col3:
+        st.markdown("### Faux consensus renforcé")
+        st.caption("Simulation d’un accord collectif présenté comme preuve.")
+
+        value = result["false_consensus_strong_score"]
+
+        if value < 0.15:
+            label, color = "Faible", "#16a34a"
+        elif value < 0.35:
+            label, color = "Modérée", "#ca8a04"
+        elif value < 0.60:
+            label, color = "Élevée", "#f97316"
+        else:
+            label, color = "Très élevée", "#dc2626"
+
+        render_custom_gauge(value, color)
+        st.markdown(
+            f"<b style='color:{color}'>{label}</b> — {round(value*100,1)}%",
+            unsafe_allow_html=True
+        )
+        st.caption(result["false_consensus_strong_interpretation"])
+
+        with st.expander("Voir les marqueurs", expanded=False):
+            markers = result.get("false_consensus_strong_markers", [])
+            if not markers:
+                st.info("Aucun faux consensus renforcé notable détecté.")
+            else:
+                for marker in markers:
+                    st.warning(marker)
+
+    with row13_col1:
+        st.markdown("### Argument de nature")
+        st.caption("Le caractère naturel est utilisé comme argument de vérité ou de valeur.")
+
+        value = result["argument_from_nature_score"]
+
+        if value < 0.15:
+            label, color = "Faible", "#16a34a"
+        elif value < 0.35:
+            label, color = "Modérée", "#ca8a04"
+        elif value < 0.60:
+            label, color = "Élevée", "#f97316"
+        else:
+            label, color = "Très élevée", "#dc2626"
+
+        render_custom_gauge(value, color)
+        st.markdown(
+            f"<b style='color:{color}'>{label}</b> — {round(value*100,1)}%",
+            unsafe_allow_html=True
+        )
+        st.caption(result["argument_from_nature_interpretation"])
+
+        with st.expander("Voir les marqueurs", expanded=False):
+            markers = result.get("argument_from_nature_markers", [])
+            if not markers:
+                st.info("Aucun argument de nature notable détecté.")
+            else:
+                for marker in markers:
+                    st.warning(marker)
+
+    with row13_col2:
+        st.markdown("### Confusion descriptif / normatif")
+        st.caption("Glissement d’une description vers une injonction sans justification suffisante.")
+
+        value = result["descriptive_normative_confusion_score"]
+
+        if value < 0.15:
+            label, color = "Faible", "#16a34a"
+        elif value < 0.35:
+            label, color = "Modérée", "#ca8a04"
+        elif value < 0.60:
+            label, color = "Élevée", "#f97316"
+        else:
+            label, color = "Très élevée", "#dc2626"
+
+        render_custom_gauge(value, color)
+        st.markdown(
+            f"<b style='color:{color}'>{label}</b> — {round(value*100,1)}%",
+            unsafe_allow_html=True
+        )
+        st.caption(result["descriptive_normative_confusion_interpretation"])
+
+        with st.expander("Voir les marqueurs", expanded=False):
+            markers = result.get("descriptive_normative_confusion_markers", [])
+            if not markers:
+                st.info("Aucune confusion descriptif / normatif notable détectée.")
             else:
                 for marker in markers:
                     st.warning(marker)
