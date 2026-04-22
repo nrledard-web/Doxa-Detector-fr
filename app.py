@@ -14,6 +14,22 @@ import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d.art3d import Poly3DCollection
 
 # -----------------------------
+# Mots grammaticaux ignorés
+# -----------------------------
+STOPWORDS = {
+    "le","la","les","l","un","une","des",
+    "de","du","d","à","au","aux",
+    "et","ou","mais","donc","or","ni","car",
+    "est","sont","était","étaient","etre","être",
+    "a","ont","avait","avaient","avoir",
+    "dans","sur","sous","avec","sans","pour","par","chez",
+    "ce","cet","cette","ces","se","sa","son","ses",
+    "je","tu","il","elle","on","nous","vous","ils","elles",
+    "ne","n","pas","plus","moins","très","tres",
+    "y","en","que","qui","quoi","dont","où","ou"
+}
+
+# -----------------------------
 # Sources presse française
 # -----------------------------
 FRENCH_NEWS_DOMAINS = [
@@ -230,12 +246,32 @@ def plot_cognitive_triangle_3d(G: float, N: float, D: float):
     ax = fig.add_subplot(111, projection="3d")
 
     verts = [[G_pt, N_pt, D_pt]]
-    tri = Poly3DCollection(verts, alpha=0.18, edgecolor="black", linewidths=1.5)
+    tri = Poly3DCollection(
+        verts,
+        alpha=0.18,
+        edgecolor="black",
+        linewidths=1.5
+    )
     ax.add_collection3d(tri)
 
-    ax.plot([G_pt[0], N_pt[0]], [G_pt[1], N_pt[1]], [G_pt[2], N_pt[2]], linewidth=2)
-    ax.plot([N_pt[0], D_pt[0]], [N_pt[1], D_pt[1]], [N_pt[2], D_pt[2]], linewidth=2)
-    ax.plot([D_pt[0], G_pt[0]], [D_pt[1], G_pt[1]], [D_pt[2], G_pt[2]], linewidth=2)
+    ax.plot(
+        [G_pt[0], N_pt[0]],
+        [G_pt[1], N_pt[1]],
+        [G_pt[2], N_pt[2]],
+        linewidth=2
+    )
+    ax.plot(
+        [N_pt[0], D_pt[0]],
+        [N_pt[1], D_pt[1]],
+        [N_pt[2], D_pt[2]],
+        linewidth=2
+    )
+    ax.plot(
+        [D_pt[0], G_pt[0]],
+        [D_pt[1], G_pt[1]],
+        [D_pt[2], G_pt[2]],
+        linewidth=2
+    )
 
     ax.scatter(*G_pt, s=80)
     ax.scatter(*N_pt, s=80)
@@ -262,6 +298,45 @@ def plot_cognitive_triangle_3d(G: float, N: float, D: float):
     ax.set_zlabel("D — doxa")
     ax.set_title("Triangle cognitif 3D")
     ax.view_init(elev=24, azim=35)
+
+    # -----------------------------
+    # Zones cognitives dérivées
+    # -----------------------------
+    ax.text(
+        0.2, 1.0, 8.5,
+        "Mécroyance",
+        fontsize=10,
+        fontweight="bold"
+    )
+    ax.text(
+        0.2, 0.4, 7.8,
+        "Certitude > savoir + compréhension",
+        fontsize=8
+    )
+
+    ax.text(
+        7.0, 1.0, 5.8,
+        "Pseudo-savoir",
+        fontsize=10,
+        fontweight="bold"
+    )
+    ax.text(
+        7.0, 0.3, 5.0,
+        "Savoir accumulé,\nmais mal intégré",
+        fontsize=8
+    )
+
+    ax.text(
+        1.0, 7.0, 5.8,
+        "Intuition dogmatique",
+        fontsize=10,
+        fontweight="bold"
+    )
+    ax.text(
+        1.0, 6.2, 5.0,
+        "Conviction forte\nsans base de savoir",
+        fontsize=8
+    )
 
     return fig
 
@@ -3533,6 +3608,39 @@ def compute_red_flag_penalties(metrics: dict) -> dict:
         "lie_boost": round(min(lie_boost, 6.0), 2),
     }
 
+def compute_cognitive_drifts(G, N, D):
+    drift_mecroyance = max(0, D - (G + N))
+    drift_pseudo_savoir = max(0, (G + D) - N)
+    drift_intuition_dogmatique = max(0, (N + D) - G)
+
+    global_drift = round(
+        (drift_mecroyance + drift_pseudo_savoir + drift_intuition_dogmatique) / 3,
+        2
+    )
+
+    values = {
+        "mecroyance": round(drift_mecroyance, 2),
+        "pseudo_savoir": round(drift_pseudo_savoir, 2),
+        "intuition_dogmatique": round(drift_intuition_dogmatique, 2),
+    }
+
+    dominant = max(values, key=values.get)
+
+    if dominant == "mecroyance":
+        interpretation = "Dérive dominante : mécroyance."
+    elif dominant == "pseudo_savoir":
+        interpretation = "Dérive dominante : pseudo-savoir."
+    else:
+        interpretation = "Dérive dominante : intuition dogmatique."
+
+    return {
+        "drift_mecroyance": values["mecroyance"],
+        "drift_pseudo_savoir": values["pseudo_savoir"],
+        "drift_intuition_dogmatique": values["intuition_dogmatique"],
+        "global_cognitive_drift": global_drift,
+        "cognitive_drift_interpretation": interpretation,
+    }
+
 def analyze_article(text: str) -> Dict:
     words = text.split()
     sentences = [s.strip() for s in re.split(r"[.!?]+", text) if len(s.strip()) > 10]
@@ -3608,6 +3716,7 @@ def analyze_article(text: str) -> Dict:
     # Indices dérivés
     # -----------------------------
     M = round((G + N) - D, 1)
+    drifts = compute_cognitive_drifts(G, N, D)
     V = clamp(G * 0.8 + N * 0.2, 0, 10)
     R = clamp(
         (
@@ -4005,6 +4114,11 @@ def analyze_article(text: str) -> Dict:
         "weighted_red_flags": penalties["flags"],
         "credibility_penalty_total": penalties["credibility_penalty"],
         "lie_boost_total": penalties["lie_boost"],
+        "drift_mecroyance": drifts["drift_mecroyance"],
+        "drift_pseudo_savoir": drifts["drift_pseudo_savoir"],
+        "drift_intuition_dogmatique": drifts["drift_intuition_dogmatique"],
+        "global_cognitive_drift": drifts["global_cognitive_drift"],
+        "cognitive_drift_interpretation": drifts["cognitive_drift_interpretation"],
     }
 
 
@@ -4448,23 +4562,28 @@ st.caption(f"{T['text_source']} : {source_label}")
 if st.session_state.get("loaded_url"):
     st.caption(f"URL : {st.session_state.loaded_url}")
 
+# -----------------------------
+# Mode sémantique
+# -----------------------------
+if "semantic_mode" not in st.session_state:
+    st.session_state.semantic_mode = False
+
+st.markdown("### Analyse sémantique")
+st.caption("Active une lecture du sens des affirmations via un dictionnaire sémantique assisté par IA.")
+
+if st.button("Activer l’analyse sémantique", use_container_width=True):
+    st.session_state.semantic_mode = True
+
+if st.session_state.semantic_mode:
+    st.success("Analyse sémantique activée.")
+else:
+    st.info("Analyse sémantique inactive. La crédibilité globale reste partielle.")
+
 
 # -----------------------------
 # Analyse principale
 # -----------------------------
 if analyze_submitted:
-    STOPWORDS = {
-        "le", "la", "les", "l", "un", "une", "des",
-        "de", "du", "d", "à", "au", "aux",
-        "et", "ou", "mais", "donc", "or", "ni", "car",
-        "est", "sont", "était", "étaient", "etre", "être", "sera", "seront",
-        "a", "ont", "avait", "avaient", "avoir",
-        "dans", "sur", "sous", "avec", "sans", "pour", "par", "chez",
-        "ce", "cet", "cette", "ces", "se", "sa", "son", "ses",
-        "je", "tu", "il", "elle", "on", "nous", "vous", "ils", "elles",
-        "ne", "n", "pas", "plus", "moins", "très", "tres",
-        "y", "en", "que", "qui", "quoi", "dont", "où", "ou"
-    }
 
     words = re.findall(r"\b[\wà-ÿ'-]+\b", article.lower())
     semantic_words = [w for w in words if w not in STOPWORDS]
@@ -4473,10 +4592,15 @@ if analyze_submitted:
         st.session_state.last_result = None
         st.session_state.last_article = article
 
-        st.error("Analyse impossible")
+        st.warning("⚠️ Analyse impossible")
+        st.caption("Le texte est trop court pour permettre une analyse fiable.")
         st.info(
-            "Le moteur nécessite au moins trois mots porteurs de sens pour analyser une affirmation.\n"
-            "Le texte fourni est trop court ou insuffisamment structuré."
+            "DOXA Detector n’utilise pas de dictionnaire encyclopédique : "
+            "il analyse la structure des raisonnements "
+            "(logique, sources, contradictions, causalités, degré de certitude).\n\n"
+            "Pour lancer l’analyse, le texte doit contenir au moins trois mots "
+            "porteurs de sens formant une relation minimale.\n\n"
+            "Veuillez saisir une affirmation plus développée."
         )
         st.stop()
 
@@ -4487,30 +4611,56 @@ result = st.session_state.last_result
 article_for_analysis = st.session_state.last_article
 
 if result:
-    col1, col2, col3 = st.columns(3)
-    col1.metric(T["classic_score"], result["M"], help=T["help_classic_score"])
-    col2.metric(T["improved_score"], result["improved"], help=T["help_improved_score"])
-    col3.metric(T["hard_fact_score"], result["hard_fact_score"], help=T["help_hard_fact_score"])
+    # =============================
+    # Crédibilité globale
+    # =============================
+    st.subheader("Crédibilité globale")
 
-    score = result["hard_fact_score"]
-    if score <= 6:
-        couleur, etiquette, message = "🔴", T["fragile"], T["fragile_message"]
-    elif score <= 11:
-        couleur, etiquette, message = "🟠", T["doubtful"], T["doubtful_message"]
-    elif score <= 15:
-        couleur, etiquette, message = "🟡", T["plausible"], T["plausible_message"]
+    if st.session_state.get("semantic_mode", False):
+        semantic_score = result.get("semantic_score", None)
+
+        if semantic_score is not None:
+            credibility_score = round((result["hard_fact_score"] + semantic_score) / 2, 1)
+            st.progress(credibility_score / 20)
+            st.caption(f"Score : {credibility_score}/20 — Raisonnement + sémantique")
+        else:
+            st.info("Analyse sémantique activée, mais aucun score sémantique n’est encore calculé.")
     else:
-        couleur, etiquette, message = "🟢", T["robust"], T["robust_message"]
+        st.info("Crédibilité partielle : activez l’analyse sémantique pour compléter l’évaluation.")
+        st.caption("Crédibilité = raisonnement + sémantique.")
 
-    st.subheader(f"{couleur} {T['credibility_gauge']} : {etiquette}")
+    st.divider()
+
+    # =============================
+    # Résumé chiffré
+    # =============================
+    col1, col2, col3 = st.columns(3)
+    col1.metric("Indice classique", result["M"], help=T["help_classic_score"])
+    col2.metric("Indice ajusté", result["improved"], help=T["help_improved_score"])
+    col3.metric("Score de raisonnement", result["hard_fact_score"], help=T["help_hard_fact_score"])
+
+    # =============================
+    # Barre de raisonnement
+    # =============================
+    score = result["hard_fact_score"]
+
+    if score <= 6:
+        couleur, etiquette, message = "🔴", "Faible", "Le raisonnement reste peu développé ou peu étayé."
+    elif score <= 11:
+        couleur, etiquette, message = "🟠", "Médiocre", "Le texte contient quelques éléments de raisonnement, mais reste insuffisant."
+    elif score <= 15:
+        couleur, etiquette, message = "🟡", "Correct", "Le raisonnement est présent mais encore partiellement fragile."
+    else:
+        couleur, etiquette, message = "🟢", "Robuste", "Le raisonnement est solidement structuré."
+
+    st.subheader(f"{couleur} Barre de raisonnement : {etiquette}")
     st.progress(score / 20)
-    st.caption(f"{T['score']} : {score}/20 — {message}")
-    
-    if result.get("short_form_mode"):
-        st.info(f"{result['short_form_label']} — {result['short_form_interpretation']}")
-        
-    st.caption("Sur cette échelle, un texte véritablement crédible se situe généralement dans la zone robuste.")
+    st.caption(f"Score : {score}/20 — {message}")
+    st.caption("Augmentez votre raisonnement pour rendre la barre robuste.")
 
+    # =============================
+    # Diagnostic cognitif rapide
+    # =============================
     st.subheader("Diagnostic cognitif")
     life_score = round((result["hard_fact_score"] / 20) * 100, 1)
     mecroyance_bar = max(0.0, min(1.0, (result["M"] + 10) / 30))
@@ -4542,6 +4692,10 @@ if result:
     m8.metric("F", len(result["red_flags"]))
 
     st.divider()
+
+    # =============================
+    # Triangle cognitif
+    # =============================
     st.subheader("Triangle cognitif G-N-D")
     st.caption("Le texte est placé dans l’espace de la cognition : savoir articulé, compréhension intégrée, et certitude assertive.")
     fig_triangle = plot_cognitive_triangle_3d(result["G"], result["N"], result["D"])
@@ -4554,6 +4708,100 @@ if result:
     with col2:
         st.metric("Indice de mensonge (ME)", round(result["ME"], 2))
 
+    # =============================
+    # Nouvelles jauges : dérives cognitives
+    # =============================
+    st.subheader("Dérives cognitives")
+
+    dr1, dr2, dr3 = st.columns(3)
+
+    with dr1:
+        st.markdown("### Mécroyance")
+        st.caption("La certitude dépasse le savoir et la compréhension.")
+
+        value = min(result["drift_mecroyance"] / 10, 1.0)
+
+        if result["drift_mecroyance"] < 1:
+            label, color = "Faible", "#16a34a"
+        elif result["drift_mecroyance"] < 3:
+            label, color = "Modérée", "#ca8a04"
+        elif result["drift_mecroyance"] < 6:
+            label, color = "Élevée", "#f97316"
+        else:
+            label, color = "Très élevée", "#dc2626"
+
+        render_custom_gauge(value, color)
+        st.markdown(
+            f"<b style='color:{color}'>{label}</b> — {result['drift_mecroyance']}",
+            unsafe_allow_html=True
+        )
+
+    with dr2:
+        st.markdown("### Pseudo-savoir")
+        st.caption("Accumulation de savoirs mal intégrés ou mal compris.")
+
+        value = min(result["drift_pseudo_savoir"] / 10, 1.0)
+
+        if result["drift_pseudo_savoir"] < 1:
+            label, color = "Faible", "#16a34a"
+        elif result["drift_pseudo_savoir"] < 3:
+            label, color = "Modérée", "#ca8a04"
+        elif result["drift_pseudo_savoir"] < 6:
+            label, color = "Élevée", "#f97316"
+        else:
+            label, color = "Très élevée", "#dc2626"
+
+        render_custom_gauge(value, color)
+        st.markdown(
+            f"<b style='color:{color}'>{label}</b> — {result['drift_pseudo_savoir']}",
+            unsafe_allow_html=True
+        )
+
+    with dr3:
+        st.markdown("### Intuition dogmatique")
+        st.caption("Conviction forte sans base de savoir suffisante.")
+
+        value = min(result["drift_intuition_dogmatique"] / 10, 1.0)
+
+        if result["drift_intuition_dogmatique"] < 1:
+            label, color = "Faible", "#16a34a"
+        elif result["drift_intuition_dogmatique"] < 3:
+            label, color = "Modérée", "#ca8a04"
+        elif result["drift_intuition_dogmatique"] < 6:
+            label, color = "Élevée", "#f97316"
+        else:
+            label, color = "Très élevée", "#dc2626"
+
+        render_custom_gauge(value, color)
+        st.markdown(
+            f"<b style='color:{color}'>{label}</b> — {result['drift_intuition_dogmatique']}",
+            unsafe_allow_html=True
+        )
+
+    st.markdown("### Indice global de dérive cognitive")
+    st.caption("Synthèse des trois dérives cognitives.")
+
+    global_value = min(result["global_cognitive_drift"] / 10, 1.0)
+
+    if result["global_cognitive_drift"] < 1:
+        global_label, global_color = "Faible", "#16a34a"
+    elif result["global_cognitive_drift"] < 3:
+        global_label, global_color = "Modérée", "#ca8a04"
+    elif result["global_cognitive_drift"] < 6:
+        global_label, global_color = "Élevée", "#f97316"
+    else:
+        global_label, global_color = "Très élevée", "#dc2626"
+
+    render_custom_gauge(global_value, global_color)
+    st.markdown(
+        f"<b style='color:{global_color}'>{global_label}</b> — {result['global_cognitive_drift']}",
+        unsafe_allow_html=True
+    )
+    st.caption(result["cognitive_drift_interpretation"])
+
+    # =============================
+    # Suite du diagnostic
+    # =============================
     delta_mm = round(result["M"] - result["ME"], 2)
     st.caption(f"Écart cognitif (M − ME) : {delta_mm}")
 
