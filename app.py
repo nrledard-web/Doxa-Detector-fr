@@ -6684,4 +6684,4 @@ for i, (name, low, high) in enumerate(stages):
         else:
             st.info(name)
 
-st.caption("Lorsque G et N augmentent sans inflation de D, la cognition gagne en revisabilité.")
+st.caption("Lorsque G et N augmentent sans inflation de D, la cognition gagne en revisabilité.") 
