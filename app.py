@@ -4027,6 +4027,39 @@ def compute_cognitive_drifts(G, N, D):
         "cognitive_drift_interpretation": interpretation,
     }
 
+def classify_cognitive_regime(result):
+
+    M = result["M"]
+    ME = result["ME"]
+    rp = result["rhetorical_pressure"]
+    prop = result["propaganda_score"]
+
+    if ME > 2 and rp > 0.5:
+        regime = "Manipulation stratégique"
+
+    elif result["drift_pseudo_savoir"] > result["drift_mecroyance"]:
+        regime = "Pseudo-savoir"
+
+    else:
+        regime = "Mécroyance"
+
+    result["cognitive_regime"] = regime
+
+def classify_cognitive_regime(result: dict) -> dict:
+    M = result["M"]
+    ME = result["ME"]
+    rp = result["rhetorical_pressure"]
+
+    if ME > 2 and rp > 0.5:
+        regime = "Manipulation stratégique"
+    elif result["drift_pseudo_savoir"] > result["drift_mecroyance"]:
+        regime = "Pseudo-savoir"
+    else:
+        regime = "Mécroyance"
+
+    result["cognitive_regime"] = regime
+    return result
+
 def analyze_article(text: str) -> Dict:
     words = text.split()
     sentences = [s.strip() for s in re.split(r"[.!?]+", text) if len(s.strip()) > 10]
@@ -4289,23 +4322,18 @@ def analyze_article(text: str) -> Dict:
         "false_analogy_score": false_analogy_analysis["score"],
         "internal_dissonance_score": internal_dissonance_analysis["score"],
         "aristotelian_fallacies_score": aristotelian_fallacies["score"],
-
         "petition_score": aristotelian_fallacies["petition"]["score"],
         "petition_markers": aristotelian_fallacies["petition"]["matches"],
         "petition_interpretation": aristotelian_fallacies["petition"]["interpretation"],
-
         "false_causality_basic_score": aristotelian_fallacies["false_causality"]["score"],
         "false_causality_basic_markers": aristotelian_fallacies["false_causality"]["matches"],
         "false_causality_basic_interpretation": aristotelian_fallacies["false_causality"]["interpretation"],
-
         "hasty_generalization_score": aristotelian_fallacies["generalization"]["score"],
         "hasty_generalization_markers": aristotelian_fallacies["generalization"]["matches"],
         "hasty_generalization_interpretation": aristotelian_fallacies["generalization"]["interpretation"],
-
         "vague_authority_basic_score": aristotelian_fallacies["vague_authority"]["score"],
         "vague_authority_basic_markers": aristotelian_fallacies["vague_authority"]["matches"],
         "vague_authority_basic_interpretation": aristotelian_fallacies["vague_authority"]["interpretation"],
-
         "false_dilemma_score": aristotelian_fallacies["false_dilemma"]["score"],
         "false_dilemma_markers": aristotelian_fallacies["false_dilemma"]["matches"],
         "false_dilemma_interpretation": aristotelian_fallacies["false_dilemma"]["interpretation"],
@@ -4317,7 +4345,7 @@ def analyze_article(text: str) -> Dict:
         "narrative_overdetermination_score": narrative_overdetermination_analysis["score"],
     })
 
-    return {
+    result = {
         "words": len(words),
         "sentences": len(sentences),
         "G": G,
@@ -4331,7 +4359,7 @@ def analyze_article(text: str) -> Dict:
         "normative_terms": normative_analysis["normative_terms"],
         "normative_judgment_markers": normative_analysis["judgment_markers"],
         "normative_interpretation": normative_analysis["interpretation"],
-        
+
         "semantic_shift_score": semantic_shift_analysis["score"],
         "semantic_shift_markers": semantic_shift_analysis["markers"],
         "semantic_shift_interpretation": semantic_shift_analysis["interpretation"],
@@ -4412,6 +4440,7 @@ def analyze_article(text: str) -> Dict:
         "emotional_intensity_score": emotional_intensity_analysis["score"],
         "emotional_intensity_markers": emotional_intensity_analysis["markers"],
         "emotional_intensity_interpretation": emotional_intensity_analysis["interpretation"],
+
         "generalization_score": generalization_analysis[0],
         "generalization_interpretation": generalization_analysis[1],
         "generalization_markers": generalization_analysis[2],
@@ -4423,7 +4452,7 @@ def analyze_article(text: str) -> Dict:
         "certainty_score": certainty_analysis[0],
         "certainty_interpretation": certainty_analysis[1],
         "certainty_markers": certainty_analysis[2],
-        
+
         "false_consensus_score": false_consensus_analysis[0],
         "false_consensus_interpretation": false_consensus_analysis[1],
         "false_consensus_markers": false_consensus_analysis[2],
@@ -4471,7 +4500,7 @@ def analyze_article(text: str) -> Dict:
         "propaganda_certainty_terms": propaganda_analysis["certainty_terms"],
         "propaganda_emotional_terms": propaganda_analysis["emotional_terms"],
         "propaganda_interpretation": propaganda_analysis["interpretation"],
-        
+
         "victimization_score": victimization_analysis["score"],
         "victimization_markers": victimization_analysis["markers"],
         "victimization_interpretation": victimization_analysis["interpretation"],
@@ -4540,10 +4569,12 @@ def analyze_article(text: str) -> Dict:
         "drift_intuition_dogmatique": drifts["drift_intuition_dogmatique"],
         "global_cognitive_drift": drifts["global_cognitive_drift"],
         "cognitive_drift_interpretation": drifts["cognitive_drift_interpretation"],
-
-        "brain": brain,
     }
 
+    result["brain"] = brain
+    result = classify_cognitive_regime(result)
+
+    return result
 
 # -----------------------------
 # Corroboration
@@ -5084,24 +5115,20 @@ if result:
     # =============================
     # Résumé rapide
     # =============================
-
     mini1, mini2, mini3 = st.columns(3)
 
-    mini1.metric("Raisonnement", f"{result['hard_fact_score']}/20")
-    mini2.metric("M", round(result["M"], 2))
-    mini3.metric("ME", round(result["ME"], 2))
+    mini1.metric("M", round(result["M"], 2))
+    mini2.metric("ME", round(result["ME"], 2))
+    mini3.metric("Raisonnement", f"{result['hard_fact_score']}/20")
 
     with st.popover("🧠 Voir le résumé complet", use_container_width=True):
-
         st.markdown("### Résultats essentiels")
 
         st.metric("Barre de raisonnement", f"{result['hard_fact_score']}/20")
 
         col1, col2 = st.columns(2)
-
         with col1:
             st.metric("Indice M", round(result["M"], 2))
-
         with col2:
             st.metric("Indice ME", round(result["ME"], 2))
 
@@ -5110,53 +5137,49 @@ if result:
             result.get("cognitive_drift_interpretation", "—")
         )
 
+        st.metric(
+            "Régime cognitif",
+            result.get("cognitive_regime", "—")
+        )
+
+        brain = result.get("brain", {})
+
+        st.metric(
+            "Profil cognitif",
+            brain.get("brain_profile", "—")
+        )
+
+        colb1, colb2, colb3 = st.columns(3)
+        with colb1:
+            st.metric("IR", brain.get("IR", "—"))
+        with colb2:
+            st.metric("IL", brain.get("IL", "—"))
+        with colb3:
+            st.metric("IC", brain.get("IC", "—"))
+
+        colb4, colb5 = st.columns(2)
+        with colb4:
+            st.metric("Indice stratégique", brain.get("strategic_index", "—"))
+        with colb5:
+            st.metric("Indice de clôture", brain.get("closure_index", "—"))
+
     # -------------------------
     # Cerveau DOXA
     # -------------------------
+    brain = result.get("brain", {})
 
-    brain = result["brain"]
-
-    st.metric("Profil cognitif", brain["brain_profile"])
+    st.metric("Profil cognitif", brain.get("brain_profile", "—"))
 
     colb1, colb2, colb3 = st.columns(3)
 
     with colb1:
-        st.metric("IR", brain["IR"])
+        st.metric("IR", brain.get("IR", "—"))
 
     with colb2:
-        st.metric("IL", brain["IL"])
+        st.metric("IL", brain.get("IL", "—"))
 
     with colb3:
-        st.metric("IC", brain["IC"])
-
-    st.markdown("### Lecture synthétique")
-
-    if brain["brain_profile"] == "Discours équilibré":
-        st.success(
-            "Discours globalement équilibré, peu verrouillé et peu manipulatoire."
-        )
-
-    elif brain["brain_profile"] == "Mécroyance probable":
-        st.warning(
-            "Le discours semble sincère, mais structuré par une certitude qui dépasse partiellement la compréhension."
-        )
-
-    elif brain["brain_profile"] == "Manipulation rhétorique":
-        st.warning(
-            "Le texte présente plusieurs procédés destinés à orienter l’interprétation du lecteur."
-        )
-
-    elif brain["brain_profile"] == "Mensonge stratégique":
-        st.error(
-            "Le discours combine forte rhétorique, fermeture cognitive et instabilité logique."
-        )
-
-    else:
-        st.info(
-            "Le texte présente une structure cognitive mixte ou ambiguë."
-        )
-
-
+        st.metric("IC", brain.get("IC", "—"))
     # =============================
     # Diagnostic cognitif rapide
     # =============================
