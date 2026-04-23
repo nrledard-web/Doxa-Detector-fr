@@ -364,12 +364,30 @@ client = get_openai_client()
 # -----------------------------
 # Header
 # -----------------------------
-st.title("DOXA Detector")
+st.markdown(
+    """
+**DOXA Detector analyse la structure cognitive des discours grâce à un moteur analytique fondé sur des équations, des heuristiques linguistiques et des fonctions de calcul.**
+
+**Basé entièrement sur du calcul, le cœur du modèle repose sur l’équation cognitive : M = (G + N) − D.**
+
+**Dans la tradition logique inaugurée par Aristote — qui distinguait prémisses, raisonnements et sophismes — l’application examine les structures argumentatives présentes dans un texte.**
+
+**L’application identifie les différentes formes de sophismes et autres procédés de persuasion présents dans un texte sans avoir besoin de connaître la définition des mots ; celle-ci n’étant utilisée qu’à titre optionnel via une analyse sémantique complémentaire.**
+
+**Ces structures constituent souvent l’empreinte des biais du langage et permettent d’en révéler les mécanismes, aussi bien dans l’analyse des publications médiatiques que pour s’exercer à ne pas les reproduire.**
+
+**L’intelligence artificielle n’intervient que comme module optionnel d’assistance et d’interprétation.**
+"""
+)
+
+st.divider()
 
 with st.container(border=True):
-    st.subheader("Analyser la fiabilité d’un texte")
+
+    st.subheader("Analyser la solidité d’un texte")
+
     st.write(
-        "DOXA Detector aide à comprendre si un texte repose sur des faits solides "
+        "DOXA Detector aide à comprendre si un texte repose sur un raisonnement solide "
         "ou sur une rhétorique persuasive."
     )
 
@@ -385,7 +403,7 @@ with st.container(border=True):
 
     with col3:
         st.markdown("### 3️⃣ Comprendre")
-        st.write("Obtenez un score de crédibilité et une analyse des affirmations.")
+        st.write("Obtenez une barre de raisonnement et une analyse des affirmations.")
 
     st.caption(
         "Cet outil n’affirme pas si un texte est vrai ou faux : "
@@ -2686,11 +2704,18 @@ def compute_certainty(text: str):
     return score, interpretation, hits
 
 def compute_false_consensus(text: str):
+    if not text or not text.strip():
+        return 0.0, "Aucun faux consensus significatif détecté.", []
+
     text_lower = text.lower()
 
-    hits = [t for t in CONSENSUS_TERMS if contains_term(text_lower, t)]
+    base_hits = [t for t in CONSENSUS_TERMS if contains_term(text_lower, t)]
+    strong_hits = [t for t in FALSE_CONSENSUS_STRONG_PATTERNS if contains_term(text_lower, t) or t in text_lower]
 
-    score = min(len(hits) * 2.5 / 10, 1.0)
+    all_hits = unique_keep_order(base_hits + strong_hits)
+
+    raw_score = len(base_hits) * 0.22 + len(strong_hits) * 0.38
+    score = min(raw_score, 1.0)
 
     if score < 0.15:
         interpretation = "Aucun faux consensus significatif détecté."
@@ -2701,7 +2726,7 @@ def compute_false_consensus(text: str):
     else:
         interpretation = "Le texte s'appuie fortement sur un faux consensus rhétorique."
 
-    return score, interpretation, hits
+    return round(score, 3), interpretation, all_hits
 
 
 def compute_binary_opposition(text: str):
@@ -2816,8 +2841,29 @@ def compute_factual_overinterpretation(text: str):
         }
 
     text_lower = text.lower()
-    hits = [t for t in FACTUAL_OVERINTERPRETATION_TERMS if contains_term(text_lower, t)]
-    score = min(len(hits) * 2.5 / 10, 1.0)
+
+    hits = [
+        t for t in FACTUAL_OVERINTERPRETATION_TERMS
+        if contains_term(text_lower, t) or t in text_lower
+    ]
+
+    accelerator_terms = [
+        "donc forcément",
+        "cela confirme définitivement",
+        "cela démontre clairement",
+        "on voit bien que",
+        "la preuve absolue",
+    ]
+
+    accel_hits = [
+        t for t in accelerator_terms
+        if contains_term(text_lower, t) or t in text_lower
+    ]
+
+    all_hits = unique_keep_order(hits + accel_hits)
+
+    raw_score = len(hits) * 0.28 + len(accel_hits) * 0.20
+    score = min(raw_score, 1.0)
 
     if score < 0.15:
         interpretation = "Peu de surinterprétation factuelle détectée."
@@ -2830,7 +2876,7 @@ def compute_factual_overinterpretation(text: str):
 
     return {
         "score": round(score, 3),
-        "markers": hits,
+        "markers": all_hits,
         "interpretation": interpretation,
     }
 
@@ -3127,6 +3173,70 @@ DESCRIPTIVE_NORMATIVE_CONFUSION_PATTERNS = [
     "cela montre qu'il faut",
     "par conséquent nous devons",
 ]
+
+# -----------------------------
+# Cherry Picking / sélection biaisée
+# -----------------------------
+CHERRY_PICKING_PATTERNS = [
+    "une étude montre",
+    "une seule étude montre",
+    "un exemple prouve",
+    "ce cas prouve",
+    "ce seul cas montre",
+    "quelques cas montrent",
+    "certains cas prouvent",
+    "un témoignage prouve",
+    "cet exemple démontre",
+    "la preuve avec ce cas",
+]
+
+CHERRY_PICKING_OMISSION_MARKERS = [
+    "sans parler du reste",
+    "on oublie souvent que",
+    "personne ne mentionne",
+    "les médias cachent",
+    "on ne vous dit pas que",
+]
+
+def detect_cherry_picking(text: str):
+    if not text or not text.strip():
+        return {
+            "score": 0.0,
+            "matches": [],
+            "omission_markers": [],
+            "interpretation": "Aucune sélection biaisée saillante détectée."
+        }
+
+    text_lower = text.lower()
+
+    matches = [
+        p for p in CHERRY_PICKING_PATTERNS
+        if contains_term(text_lower, p) or p in text_lower
+    ]
+
+    omission_hits = [
+        p for p in CHERRY_PICKING_OMISSION_MARKERS
+        if contains_term(text_lower, p) or p in text_lower
+    ]
+
+    raw_score = len(matches) * 0.7 + len(omission_hits) * 0.4
+    score = min(raw_score, 1.0)
+
+    if score < 0.15:
+        interpretation = "Peu de sélection biaisée détectée."
+    elif score < 0.35:
+        interpretation = "Le texte semble s’appuyer sur quelques exemples isolés."
+    elif score < 0.60:
+        interpretation = "Le texte présente plusieurs indices de sélection partielle des faits."
+    else:
+        interpretation = "Le discours semble fortement structuré par une sélection biaisée des exemples ou des preuves."
+
+    return {
+        "score": round(score, 3),
+        "matches": matches,
+        "omission_markers": omission_hits,
+        "interpretation": interpretation,
+    }
 
 def detect_petition_principii(text: str):
     text_lower = text.lower()
@@ -3658,6 +3768,7 @@ def analyze_article(text: str) -> Dict:
     premise_analysis = compute_implicit_premises(text)
     logic_confusion_analysis = compute_logic_confusion(text)
     aristotelian_fallacies = detect_aristotelian_fallacies(text)
+    cherry_picking_analysis = detect_cherry_picking(text)
     scientific_simulation_analysis = compute_scientific_simulation(text)
     propaganda_analysis = detect_propaganda_narrative(text)
     short_form_analysis = detect_short_form_mode(text)
@@ -3857,14 +3968,19 @@ def analyze_article(text: str) -> Dict:
 
     ME_base = max(0, (2 * D) - (G + N))
 
-    discursive_boost = (
-        normative_analysis["score"] * 2.0 +
-        premise_analysis["score"] * 1.5 +
-        logic_confusion_analysis["score"] * 1.5 +
-        aristotelian_fallacies["score"] * 1.5 +
-        scientific_simulation_analysis["score"] * 1.2 +
-        propaganda_analysis["score"] * 2.5
-    )
+    ME_base = max(0, (2 * D) - (G + N))
+
+    discursive_boost = sum([
+        normative_analysis["score"] * 2.0,
+        premise_analysis["score"] * 1.5,
+        logic_confusion_analysis["score"] * 1.6,
+        aristotelian_fallacies["score"] * 2.0,
+        scientific_simulation_analysis["score"] * 1.2,
+        propaganda_analysis["score"] * 2.5,
+        cherry_picking_analysis["score"] * 1.6,
+        false_consensus_analysis[0] * 1.2,
+        factual_overinterpretation_analysis["score"] * 1.3
+    ])
 
     ME = round((ME_base * L) + discursive_boost + penalties["lie_boost"], 2)
 
@@ -4109,6 +4225,10 @@ def analyze_article(text: str) -> Dict:
         "enthymeme_label": enthymeme_label,
         "fallacy_signal": fallacy_signal,
         "fallacy_label": fallacy_label,
+        "cherry_picking_score": cherry_picking_analysis["score"],
+        "cherry_picking_markers": cherry_picking_analysis["matches"],
+        "cherry_picking_omission_markers": cherry_picking_analysis["omission_markers"],
+        "cherry_picking_interpretation": cherry_picking_analysis["interpretation"],
 
         "red_flags": [flag["name"] for flag in penalties["flags"]],
         "weighted_red_flags": penalties["flags"],
@@ -6194,7 +6314,46 @@ if result:
             else:
                 for marker in markers:
                     st.warning(marker)
-                
+
+    with row13_col3:
+        st.markdown("### Cherry Picking")
+        st.caption("Sélection biaisée d’exemples, de cas ou de preuves allant dans un seul sens.")
+
+        value = result["cherry_picking_score"]
+
+        if value < 0.15:
+            label, color = "Faible", "#16a34a"
+        elif value < 0.35:
+            label, color = "Modérée", "#ca8a04"
+        elif value < 0.60:
+            label, color = "Élevée", "#f97316"
+        else:
+            label, color = "Très élevée", "#dc2626"
+
+        render_custom_gauge(value, color)
+        st.markdown(
+            f"<b style='color:{color}'>{label}</b> — {round(value*100,1)}%",
+            unsafe_allow_html=True
+        )
+        st.caption(result["cherry_picking_interpretation"])
+
+        with st.expander("Voir les marqueurs", expanded=False):
+            markers = result.get("cherry_picking_markers", [])
+            omissions = result.get("cherry_picking_omission_markers", [])
+
+            if not markers and not omissions:
+                st.info("Aucune sélection biaisée notable détectée.")
+            else:
+                if markers:
+                    st.markdown("**Exemples isolés / preuves uniques**")
+                    for marker in markers:
+                        st.warning(marker)
+
+                if omissions:
+                    st.markdown("**Indices d’omission stratégique**")
+                    for marker in omissions:
+                        st.error(marker)
+
     with st.expander("Voir les manœuvres discursives détectées", expanded=False):
         if result["political_pattern_score"] == 0:
             st.info("Aucun marqueur rhétorique politique saillant détecté.")
