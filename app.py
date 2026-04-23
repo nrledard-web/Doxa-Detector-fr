@@ -3920,6 +3920,20 @@ def compute_red_flag_penalties(metrics: dict) -> dict:
         credibility_penalty += cred
         lie_boost += lie
 
+    # -----------------------------
+    # Pseudo-savoir élevé
+    # -----------------------------
+    pseudo_savoir = metrics.get("drift_pseudo_savoir", 0)
+
+    if pseudo_savoir > 5:
+        penalty = round((pseudo_savoir - 5) * 0.5, 2)
+        add_flag(
+            "Pseudo-savoir élevé",
+            penalty,
+            0.3,
+            "Accumulation de savoirs mal intégrés ou mal compris."
+        )
+
     if metrics["G"] < 2 and metrics["vague_authority_score"] >= 0.30:
         add_flag(
             "Autorité sans ancrage",
@@ -4060,6 +4074,62 @@ def classify_cognitive_regime(result: dict) -> dict:
     result["cognitive_regime"] = regime
     return result
 
+def compute_global_penalties(result: dict) -> dict:
+    """
+    Agrège les fragilités déjà détectées.
+    Ne modifie pas le noyau G-N-D-M.
+    """
+
+    red_flags_count = len(result.get("red_flags", []))
+
+    penalty = 0.0
+
+    # 1) Red flags généraux
+    penalty += min(red_flags_count * 0.25, 2.0)
+
+    # 2) Dérives discursives déjà calculées
+    penalty += result.get("normative_score", 0) * 0.8
+    penalty += result.get("premise_score", 0) * 1.0
+    penalty += result.get("propaganda_score", 0) * 1.2
+    penalty += result.get("logic_confusion_score", 0) * 1.0
+    penalty += result.get("scientific_simulation_score", 0) * 0.8
+
+    # 3) Sophismes simples
+    penalty += result.get("petition_score", 0) * 0.8
+    penalty += result.get("false_causality_basic_score", 0) * 0.9
+    penalty += result.get("hasty_generalization_score", 0) * 0.8
+    penalty += result.get("false_dilemma_score", 0) * 0.8
+
+    # 4) Verrouillage / manipulation
+    penalty += result.get("doxic_rigidity_score", 0) * 1.0
+    penalty += result.get("narrative_overdetermination_score", 0) * 0.9
+    penalty += result.get("moral_polarization_score", 0) * 0.8
+    penalty += result.get("strategic_simplification_score", 0) * 0.8
+    penalty += result.get("argument_asymmetry_score", 0) * 0.7
+
+    # Plafond pour éviter de casser artificiellement le score
+    penalty = round(min(penalty, 6.0), 2)
+
+    if penalty < 1:
+        label = "Faible"
+        interpretation = "Les fragilités détectées ne modifient que faiblement la crédibilité globale."
+    elif penalty < 2.5:
+        label = "Modérée"
+        interpretation = "Plusieurs fragilités discursives diminuent partiellement la confiance accordable au texte."
+    elif penalty < 4:
+        label = "Élevée"
+        interpretation = "Le texte accumule assez de signaux problématiques pour réduire nettement son score final."
+    else:
+        label = "Critique"
+        interpretation = "La structure discursive présente une forte accumulation de signaux de fermeture, de manipulation ou de raisonnement fragile."
+
+    return {
+        "penalty_index": penalty,
+        "penalty_label": label,
+        "penalty_interpretation": interpretation,
+        "red_flags_penalty_count": red_flags_count,
+    }
+
 def analyze_article(text: str) -> Dict:
     words = text.split()
     sentences = [s.strip() for s in re.split(r"[.!?]+", text) if len(s.strip()) > 10]
@@ -4106,22 +4176,6 @@ def analyze_article(text: str) -> Dict:
     frame_shift_analysis = compute_frame_shift(text)
     argument_asymmetry_analysis = compute_argument_asymmetry(text)
 
-    penalties = compute_red_flag_penalties({
-        "G": G,
-        "vague_authority_score": vague_authority_analysis["score"],
-        "certainty_score": certainty_analysis[0],
-        "doxic_rigidity_score": doxic_rigidity_analysis["score"],
-        "causal_overreach_score": causal_overreach_analysis["score"],
-        "factual_overinterpretation_score": factual_overinterpretation_analysis["score"],
-        "propaganda_score": propaganda_analysis["score"],
-        "emotional_intensity_score": emotional_intensity_analysis["score"],
-        "false_consensus_score": false_consensus_analysis[0],
-        "binary_opposition_score": binary_opposition_analysis[0],
-        "internal_dissonance_score": internal_dissonance_analysis["score"],
-        "semantic_shift_score": semantic_shift_analysis["score"],
-        "ideological_premise_score": ideological_premise_analysis["score"],
-    })
-
     certainty = len(re.findall(r"certain|absolument|prouvé|évident|incontestable", text.lower()))
     emotional = len(re.findall(r"|".join(re.escape(w) for w in EMOTIONAL_WORDS), text.lower()))
 
@@ -4143,7 +4197,26 @@ def analyze_article(text: str) -> Dict:
     # -----------------------------
     M = round((G + N) - D, 1)
     drifts = compute_cognitive_drifts(G, N, D)
+
+    penalties = compute_red_flag_penalties({
+        "G": G,
+        "certainty_score": certainty_analysis[0],
+        "vague_authority_score": vague_authority_analysis["score"],
+        "causal_overreach_score": causal_overreach_analysis["score"],
+        "factual_overinterpretation_score": factual_overinterpretation_analysis["score"],
+        "propaganda_score": propaganda_analysis["score"],
+        "emotional_intensity_score": emotional_intensity_analysis["score"],
+        "false_consensus_score": false_consensus_analysis[0],
+        "binary_opposition_score": binary_opposition_analysis[0],
+        "internal_dissonance_score": internal_dissonance_analysis["score"],
+        "semantic_shift_score": semantic_shift_analysis["score"],
+        "ideological_premise_score": ideological_premise_analysis["score"],
+        "doxic_rigidity_score": doxic_rigidity_analysis["score"],
+        "drift_pseudo_savoir": drifts["drift_pseudo_savoir"],
+    })
+
     V = clamp(G * 0.8 + N * 0.2, 0, 10)
+
     R = clamp(
         (
             D * 0.50 +
@@ -4153,6 +4226,7 @@ def analyze_article(text: str) -> Dict:
         0,
         10
     )
+
     improved = round((G + N + V) - (D + R), 1)
 
     # -----------------------------
@@ -4573,6 +4647,24 @@ def analyze_article(text: str) -> Dict:
 
     result["brain"] = brain
     result = classify_cognitive_regime(result)
+
+    # -----------------------------
+    # Pénalités finales
+    # -----------------------------
+    result["credibility_penalty"] = penalties["credibility_penalty"]
+    result["penalty_details"] = penalties
+    result["penalty_index"] = penalties["credibility_penalty"]
+
+    # hard_fact_score est déjà pénalisé plus haut
+    result["hard_fact_score_penalized"] = result["hard_fact_score"]
+
+    # improved n'était pas encore corrigé par ces pénalités
+    result["improved_penalized"] = round(
+        max(0, result["improved"] - penalties["credibility_penalty"]),
+        1
+    )
+
+    result["final_credibility_score"] = result["hard_fact_score_penalized"]
 
     return result
 
@@ -5113,36 +5205,89 @@ if result:
     st.caption("Augmentez votre raisonnement pour rendre la barre robuste.")
 
     # =============================
-    # Résumé rapide
+    # Pénalités appliquées
     # =============================
+    st.subheader("Pénalités appliquées")
+
+    colp1, colp2, colp3 = st.columns(3)
+
+    with colp1:
+        st.metric(
+            "Pénalité crédibilité",
+            result.get("credibility_penalty", 0)
+        )
+
+    with colp2:
+        st.metric(
+            "Boost mensonge",
+            result.get("lie_boost_total", 0)
+        )
+
+    with colp3:
+        st.metric(
+            "Score final",
+            f"{result.get('final_credibility_score', result['hard_fact_score'])}/20"
+        )
+
+    st.caption(
+        "Les pénalités corrigent le score lorsque le texte accumule des signaux "
+        "de fermeture cognitive, de manipulation ou de raisonnement fragile."
+        )
+
+    with colp3:
+        st.metric(
+            "Score final",
+            f"{result.get('final_credibility_score', result['hard_fact_score'])}/20"
+        )
+
+    st.caption(
+        "Les pénalités corrigent le score lorsque le texte accumule des signaux "
+        "de fermeture cognitive, de manipulation ou de raisonnement fragile."
+        )
+
+    with st.expander("Voir le détail des pénalités", expanded=False):
+        st.json(result.get("penalty_details", {}))
+
+# =============================
+# Résumé rapide
+# =============================
     mini1, mini2, mini3 = st.columns(3)
 
     mini1.metric("M", round(result["M"], 2))
     mini2.metric("ME", round(result["ME"], 2))
-    mini3.metric("Raisonnement", f"{result['hard_fact_score']}/20")
+    mini3.metric(
+        "Score final",
+        f"{result.get('final_credibility_score', result['hard_fact_score'])}/20"
+    )
 
     with st.popover("🧠 Voir le résumé complet", use_container_width=True):
+
         st.markdown("### Résultats essentiels")
 
-        st.metric("Barre de raisonnement", f"{result['hard_fact_score']}/20")
+        st.metric(
+            "Barre de raisonnement",
+            f"{result.get('final_credibility_score', result['hard_fact_score'])}/20"
+        )
 
         col1, col2 = st.columns(2)
+
         with col1:
             st.metric("Indice M", round(result["M"], 2))
+            st.metric(
+                "Dérive dominante",
+                result.get("cognitive_drift_interpretation", "—")
+            )
+
         with col2:
             st.metric("Indice ME", round(result["ME"], 2))
-
-        st.metric(
-            "Dérive dominante",
-            result.get("cognitive_drift_interpretation", "—")
-        )
-
-        st.metric(
-            "Régime cognitif",
-            result.get("cognitive_regime", "—")
-        )
+            st.metric(
+                "Régime cognitif",
+                result.get("cognitive_regime", "—")
+            )
 
         brain = result.get("brain", {})
+
+        st.markdown("### Profil cognitif")
 
         st.metric(
             "Profil cognitif",
@@ -5150,23 +5295,32 @@ if result:
         )
 
         colb1, colb2, colb3 = st.columns(3)
+
         with colb1:
             st.metric("IR", brain.get("IR", "—"))
+
         with colb2:
             st.metric("IL", brain.get("IL", "—"))
+
         with colb3:
             st.metric("IC", brain.get("IC", "—"))
 
         colb4, colb5 = st.columns(2)
-        with colb4:
-            st.metric("Indice stratégique", brain.get("strategic_index", "—"))
-        with colb5:
-            st.metric("Indice de clôture", brain.get("closure_index", "—"))
 
+        with colb4:
+            st.metric(
+                "Indice stratégique",
+                brain.get("strategic_index", "—")
+            )
+
+        with colb5:
+            st.metric(
+                "Indice de clôture",
+                brain.get("closure_index", "—")
+            )
     # -------------------------
     # Cerveau DOXA
     # -------------------------
-    brain = result.get("brain", {})
 
     st.metric("Profil cognitif", brain.get("brain_profile", "—"))
 
