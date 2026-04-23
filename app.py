@@ -2233,6 +2233,57 @@ GENERALIZATION_TERMS = [
     "tout le monde sait",
     "tout le monde voit"
 ]
+# =========================================================
+# MODULES DISCURSIFS COMPLÉMENTAIRES
+# =========================================================
+
+VICTIMIZATION_TERMS = [
+    "on veut nous faire taire",
+    "nous sommes censurés",
+    "on nous empêche de parler",
+    "ils veulent nous réduire au silence",
+    "nous sommes persécutés",
+]
+
+POLARIZATION_TERMS = [
+    "les bons contre les mauvais",
+    "le bien contre le mal",
+    "les patriotes contre les traîtres",
+    "les honnêtes gens contre les corrompus",
+]
+
+SIMPLIFICATION_TERMS = [
+    "la seule raison",
+    "la seule cause",
+    "tout vient de",
+    "il suffit de",
+    "tout s'explique par",
+]
+
+FRAME_SHIFT_TERMS = [
+    "la vraie question",
+    "le vrai problème",
+    "ce n'est pas la question",
+    "la question n'est pas là",
+]
+
+ATTACK_TERMS = [
+    "mensonge",
+    "manipulation",
+    "propagande",
+    "corrompu",
+    "absurde",
+    "ridicule",
+]
+
+ARGUMENT_TERMS = [
+    "car",
+    "donc",
+    "ainsi",
+    "puisque",
+    "en effet",
+    "par conséquent",
+]
 
 # -----------------------------
 # Ennemi abstrait
@@ -2728,13 +2779,15 @@ def compute_false_consensus(text: str):
 
     return round(score, 3), interpretation, all_hits
 
-
 def compute_binary_opposition(text: str):
+    if not text or not text.strip():
+        return 0.0, "Aucune opposition binaire significative détectée.", []
+
     text_lower = text.lower()
 
     hits = [t for t in BINARY_OPPOSITION_TERMS if contains_term(text_lower, t)]
 
-    score = min(len(hits) * 3 / 10, 1.0)
+    score = min(len(hits) * 0.30, 1.0)
 
     if score < 0.15:
         interpretation = "Aucune opposition binaire significative détectée."
@@ -2745,7 +2798,106 @@ def compute_binary_opposition(text: str):
     else:
         interpretation = "Discours fortement structuré en camps antagonistes."
 
-    return score, interpretation, hits
+    return round(score, 3), interpretation, hits
+
+# =========================================================
+# VICTIMISATION STRATÉGIQUE
+# =========================================================
+def compute_victimization(text: str):
+    if not text or not text.strip():
+        return {
+            "score": 0.0,
+            "markers": [],
+            "interpretation": "Aucune victimisation stratégique détectée."
+        }
+
+    text_lower = text.lower()
+    hits = [term for term in VICTIMIZATION_TERMS if contains_term(text_lower, term) or term in text_lower]
+    score = min(len(hits) * 0.30, 1.0)
+
+    if score < 0.15:
+        interpretation = "Peu de posture victimaire détectée."
+    elif score < 0.35:
+        interpretation = "Le texte suggère une posture de victimisation."
+    elif score < 0.60:
+        interpretation = "La victimisation structure partiellement le discours."
+    else:
+        interpretation = "Le discours repose fortement sur une posture victimaire."
+
+    return {
+        "score": round(score, 3),
+        "markers": hits,
+        "interpretation": interpretation,
+    }
+
+# =========================================================
+# FRAME SHIFT
+# =========================================================
+def compute_frame_shift(text: str):
+    if not text or not text.strip():
+        return {
+            "score": 0.0,
+            "markers": [],
+            "interpretation": "Aucun déplacement du cadre argumentatif détecté."
+        }
+
+    text_lower = text.lower()
+    hits = [term for term in FRAME_SHIFT_TERMS if contains_term(text_lower, term) or term in text_lower]
+    score = min(len(hits) * 0.35, 1.0)
+
+    if score < 0.15:
+        interpretation = "Peu de déplacement du cadre argumentatif."
+    elif score < 0.35:
+        interpretation = "Le texte contient quelques tentatives de déplacement du débat."
+    elif score < 0.60:
+        interpretation = "Le discours modifie régulièrement le cadre du débat."
+    else:
+        interpretation = "Le discours repose fortement sur un déplacement du cadre argumentatif."
+
+    return {
+        "score": round(score, 3),
+        "markers": hits,
+        "interpretation": interpretation,
+    }
+
+
+# =========================================================
+# ASYMÉTRIE ARGUMENTATIVE
+# =========================================================
+def compute_argument_asymmetry(text: str):
+    if not text or not text.strip():
+        return {
+            "score": 0.0,
+            "attack_count": 0,
+            "argument_count": 0,
+            "interpretation": "Aucune asymétrie argumentative détectée."
+        }
+
+    text_lower = text.lower()
+
+    attack_count = sum(text_lower.count(term) for term in ATTACK_TERMS)
+    argument_count = sum(text_lower.count(term) for term in ARGUMENT_TERMS)
+
+    if argument_count == 0:
+        score = min(attack_count * 0.25, 1.0)
+    else:
+        score = min((attack_count / argument_count) * 0.25, 1.0)
+
+    if score < 0.15:
+        interpretation = "Le texte reste globalement équilibré argumentativement."
+    elif score < 0.35:
+        interpretation = "L’argumentation montre une légère asymétrie."
+    elif score < 0.60:
+        interpretation = "Le discours privilégie l’attaque plutôt que la démonstration."
+    else:
+        interpretation = "Forte asymétrie argumentative : rhétorique d’attaque dominante."
+
+    return {
+        "score": round(score, 3),
+        "attack_count": attack_count,
+        "argument_count": argument_count,
+        "interpretation": interpretation,
+    }
 
 
 THREAT_AMPLIFICATION_TERMS = [
@@ -3033,6 +3185,130 @@ def compute_narrative_overdetermination(text: str):
         interpretation = "Le discours tend à ramener des faits multiples à un récit unique."
     else:
         interpretation = "Le texte repose fortement sur une narration totalisante."
+
+    return {
+        "score": round(score, 3),
+        "markers": hits,
+        "interpretation": interpretation,
+    }
+
+# -----------------------------
+# Victimisation stratégique
+# -----------------------------
+VICTIMIZATION_TERMS = [
+    "on veut nous faire taire",
+    "nous sommes censurés",
+    "on nous empêche de parler",
+    "ils veulent nous réduire au silence",
+    "nous sommes persécutés",
+    "on nous attaque parce que nous disons la vérité",
+    "ils nous diabolisent",
+    "on nous calomnie",
+]
+
+def compute_victimization(text: str):
+    if not text or not text.strip():
+        return {
+            "score": 0.0,
+            "markers": [],
+            "interpretation": "Aucune victimisation stratégique saillante détectée."
+        }
+
+    text_lower = text.lower()
+    hits = [t for t in VICTIMIZATION_TERMS if contains_term(text_lower, t) or t in text_lower]
+    score = min(len(hits) * 0.28, 1.0)
+
+    if score < 0.15:
+        interpretation = "Peu de victimisation stratégique détectée."
+    elif score < 0.35:
+        interpretation = "Le texte suggère une mise en scène légère de persécution."
+    elif score < 0.60:
+        interpretation = "Le texte mobilise nettement une posture victimaire."
+    else:
+        interpretation = "Le discours repose fortement sur une victimisation stratégique."
+
+    return {
+        "score": round(score, 3),
+        "markers": hits,
+        "interpretation": interpretation,
+    }
+
+
+# -----------------------------
+# Polarisation morale
+# -----------------------------
+MORAL_POLARIZATION_TERMS = [
+    "les bons contre les mauvais",
+    "le bien contre le mal",
+    "les patriotes contre les traîtres",
+    "les honnêtes gens contre les corrompus",
+    "les purs contre les corrompus",
+    "les justes contre les pervers",
+    "les innocents contre les coupables",
+]
+
+def compute_moral_polarization(text: str):
+    if not text or not text.strip():
+        return {
+            "score": 0.0,
+            "markers": [],
+            "interpretation": "Aucune polarisation morale saillante détectée."
+        }
+
+    text_lower = text.lower()
+    hits = [t for t in MORAL_POLARIZATION_TERMS if contains_term(text_lower, t) or t in text_lower]
+    score = min(len(hits) * 0.35, 1.0)
+
+    if score < 0.15:
+        interpretation = "Peu de polarisation morale détectée."
+    elif score < 0.35:
+        interpretation = "Le texte contient quelques oppositions morales simplifiées."
+    elif score < 0.60:
+        interpretation = "Le texte structure nettement le débat en camps moraux opposés."
+    else:
+        interpretation = "Le discours repose fortement sur une polarisation morale."
+
+    return {
+        "score": round(score, 3),
+        "markers": hits,
+        "interpretation": interpretation,
+    }
+
+
+# -----------------------------
+# Simplification stratégique
+# -----------------------------
+STRATEGIC_SIMPLIFICATION_TERMS = [
+    "la seule raison",
+    "la seule cause",
+    "tout vient de",
+    "il suffit de",
+    "tout s'explique par",
+    "uniquement à cause de",
+    "simplement parce que",
+    "c'est aussi simple que",
+]
+
+def compute_strategic_simplification(text: str):
+    if not text or not text.strip():
+        return {
+            "score": 0.0,
+            "markers": [],
+            "interpretation": "Aucune simplification stratégique saillante détectée."
+        }
+
+    text_lower = text.lower()
+    hits = [t for t in STRATEGIC_SIMPLIFICATION_TERMS if contains_term(text_lower, t) or t in text_lower]
+    score = min(len(hits) * 0.30, 1.0)
+
+    if score < 0.15:
+        interpretation = "Peu de simplification stratégique détectée."
+    elif score < 0.35:
+        interpretation = "Le texte contient quelques raccourcis explicatifs."
+    elif score < 0.60:
+        interpretation = "Le texte réduit plusieurs phénomènes complexes à des causes simples."
+    else:
+        interpretation = "Le discours repose fortement sur une simplification stratégique du réel."
 
     return {
         "score": round(score, 3),
@@ -3791,6 +4067,12 @@ def analyze_article(text: str) -> Dict:
     doxic_rigidity_analysis = compute_doxic_rigidity(text)
     narrative_overdetermination_analysis = compute_narrative_overdetermination(text)
 
+    victimization_analysis = compute_victimization(text)
+    moral_polarization_analysis = compute_moral_polarization(text)
+    strategic_simplification_analysis = compute_strategic_simplification(text)
+    frame_shift_analysis = compute_frame_shift(text)
+    argument_asymmetry_analysis = compute_argument_asymmetry(text)
+
     penalties = compute_red_flag_penalties({
         "G": G,
         "vague_authority_score": vague_authority_analysis["score"],
@@ -3965,8 +4247,6 @@ def analyze_article(text: str) -> Dict:
 
     political_pattern_score, political_results, matched_terms = detect_political_patterns(text)
     rhetorical_pressure = compute_rhetorical_pressure(political_results)
-
-    ME_base = max(0, (2 * D) - (G + N))
 
     ME_base = max(0, (2 * D) - (G + N))
 
@@ -4191,6 +4471,27 @@ def analyze_article(text: str) -> Dict:
         "propaganda_certainty_terms": propaganda_analysis["certainty_terms"],
         "propaganda_emotional_terms": propaganda_analysis["emotional_terms"],
         "propaganda_interpretation": propaganda_analysis["interpretation"],
+        
+        "victimization_score": victimization_analysis["score"],
+        "victimization_markers": victimization_analysis["markers"],
+        "victimization_interpretation": victimization_analysis["interpretation"],
+
+        "moral_polarization_score": moral_polarization_analysis["score"],
+        "moral_polarization_markers": moral_polarization_analysis["markers"],
+        "moral_polarization_interpretation": moral_polarization_analysis["interpretation"],
+
+        "strategic_simplification_score": strategic_simplification_analysis["score"],
+        "strategic_simplification_markers": strategic_simplification_analysis["markers"],
+        "strategic_simplification_interpretation": strategic_simplification_analysis["interpretation"],
+
+        "frame_shift_score": frame_shift_analysis["score"],
+        "frame_shift_markers": frame_shift_analysis["markers"],
+        "frame_shift_interpretation": frame_shift_analysis["interpretation"],
+
+        "argument_asymmetry_score": argument_asymmetry_analysis["score"],
+        "argument_attack_count": argument_asymmetry_analysis["attack_count"],
+        "argument_support_count": argument_asymmetry_analysis["argument_count"],
+        "argument_asymmetry_interpretation": argument_asymmetry_analysis["interpretation"],
 
         "linguistic_trigger_count": ling["trigger_count"],
         "linguistic_pressure_hits": ling["rhetorical_pressure"],
@@ -4239,6 +4540,8 @@ def analyze_article(text: str) -> Dict:
         "drift_intuition_dogmatique": drifts["drift_intuition_dogmatique"],
         "global_cognitive_drift": drifts["global_cognitive_drift"],
         "cognitive_drift_interpretation": drifts["cognitive_drift_interpretation"],
+
+        "brain": brain,
     }
 
 
@@ -4779,6 +5082,82 @@ if result:
     st.caption("Augmentez votre raisonnement pour rendre la barre robuste.")
 
     # =============================
+    # Résumé rapide
+    # =============================
+
+    mini1, mini2, mini3 = st.columns(3)
+
+    mini1.metric("Raisonnement", f"{result['hard_fact_score']}/20")
+    mini2.metric("M", round(result["M"], 2))
+    mini3.metric("ME", round(result["ME"], 2))
+
+    with st.popover("🧠 Voir le résumé complet", use_container_width=True):
+
+        st.markdown("### Résultats essentiels")
+
+        st.metric("Barre de raisonnement", f"{result['hard_fact_score']}/20")
+
+        col1, col2 = st.columns(2)
+
+        with col1:
+            st.metric("Indice M", round(result["M"], 2))
+
+        with col2:
+            st.metric("Indice ME", round(result["ME"], 2))
+
+        st.metric(
+            "Dérive dominante",
+            result.get("cognitive_drift_interpretation", "—")
+        )
+
+    # -------------------------
+    # Cerveau DOXA
+    # -------------------------
+
+    brain = result["brain"]
+
+    st.metric("Profil cognitif", brain["brain_profile"])
+
+    colb1, colb2, colb3 = st.columns(3)
+
+    with colb1:
+        st.metric("IR", brain["IR"])
+
+    with colb2:
+        st.metric("IL", brain["IL"])
+
+    with colb3:
+        st.metric("IC", brain["IC"])
+
+    st.markdown("### Lecture synthétique")
+
+    if brain["brain_profile"] == "Discours équilibré":
+        st.success(
+            "Discours globalement équilibré, peu verrouillé et peu manipulatoire."
+        )
+
+    elif brain["brain_profile"] == "Mécroyance probable":
+        st.warning(
+            "Le discours semble sincère, mais structuré par une certitude qui dépasse partiellement la compréhension."
+        )
+
+    elif brain["brain_profile"] == "Manipulation rhétorique":
+        st.warning(
+            "Le texte présente plusieurs procédés destinés à orienter l’interprétation du lecteur."
+        )
+
+    elif brain["brain_profile"] == "Mensonge stratégique":
+        st.error(
+            "Le discours combine forte rhétorique, fermeture cognitive et instabilité logique."
+        )
+
+    else:
+        st.info(
+            "Le texte présente une structure cognitive mixte ou ambiguë."
+        )
+
+
+    # =============================
     # Diagnostic cognitif rapide
     # =============================
     st.subheader("Diagnostic cognitif")
@@ -5084,16 +5463,15 @@ if result:
 
     st.divider()
     st.subheader("Cartographie discursive complémentaire")
+
     st.caption(
-        "Ces vingt-quatre jauges affinent l’analyse en distinguant les jugements de valeur, "
-        "les prémisses implicites, la narration propagandiste, la cohérence discursive, "
-        "les confusions logiques, la scientificité rhétorique, la fausse causalité, "
-        "l’autorité vague, la charge émotionnelle, la généralisation abusive, "
-        "l’ennemi abstrait, la certitude absolue, le faux consensus, l’opposition binaire, "
-        "l’amplification de menace, le glissement sémantique, les prémisses idéologiques, "
-        "la clôture cognitive, la fausse analogie, la surinterprétation factuelle, "
-        "la dissonance interne, la saturation normative, la rigidité doxique "
-        "et la surdétermination narrative."
+        "Cette cartographie regroupe les principaux mécanismes discursifs détectables "
+        "dans un texte : jugements de valeur, prémisses implicites, structures propagandistes, "
+        "confusions logiques, simulations scientifiques, biais narratifs et mécanismes de "
+        "fermeture cognitive.\n\n"
+        "Elle est complétée par une analyse logique des raisonnements "
+        "(syllogismes, enthymèmes et sophismes) ainsi que par des indicateurs "
+        "stratégiques permettant d’identifier certaines formes de manipulation argumentative."
     )
 
     row1_col1, row1_col2, row1_col3 = st.columns(3)
@@ -5109,6 +5487,8 @@ if result:
     row11_col1, row11_col2, row11_col3 = st.columns(3)
     row12_col1, row12_col2, row12_col3 = st.columns(3)
     row13_col1, row13_col2, row13_col3 = st.columns(3)
+    row14_col1, row14_col2, row14_col3 = st.columns(3)
+    row15_col1, row15_col2 = st.columns(2)
     
 
     # -----------------------------
@@ -6354,6 +6734,166 @@ if result:
                     for marker in omissions:
                         st.error(marker)
 
+        # -----------------------------
+    # 39) Victimisation stratégique
+    # -----------------------------
+    with row14_col1:
+        st.markdown("### Victimisation stratégique")
+        st.caption("Mise en scène d’une persécution ou d’un empêchement de dire.")
+
+        value = result["victimization_score"]
+
+        if value < 0.15:
+            label, color = "Faible", "#16a34a"
+        elif value < 0.35:
+            label, color = "Modérée", "#ca8a04"
+        elif value < 0.60:
+            label, color = "Élevée", "#f97316"
+        else:
+            label, color = "Très élevée", "#dc2626"
+
+        render_custom_gauge(value, color)
+        st.markdown(
+            f"<b style='color:{color}'>{label}</b> — {round(value*100,1)}%",
+            unsafe_allow_html=True
+        )
+        st.caption(result["victimization_interpretation"])
+
+        with st.expander("Voir les marqueurs", expanded=False):
+            markers = result.get("victimization_markers", [])
+            if not markers:
+                st.info("Aucune victimisation stratégique notable détectée.")
+            else:
+                for marker in markers:
+                    st.warning(marker)
+
+    # -----------------------------
+    # 40) Polarisation morale
+    # -----------------------------
+    with row14_col2:
+        st.markdown("### Polarisation morale")
+        st.caption("Découpage moral du réel en camps du bien et du mal.")
+
+        value = result["moral_polarization_score"]
+
+        if value < 0.15:
+            label, color = "Faible", "#16a34a"
+        elif value < 0.35:
+            label, color = "Modérée", "#ca8a04"
+        elif value < 0.60:
+            label, color = "Élevée", "#f97316"
+        else:
+            label, color = "Très élevée", "#dc2626"
+
+        render_custom_gauge(value, color)
+        st.markdown(
+            f"<b style='color:{color}'>{label}</b> — {round(value*100,1)}%",
+            unsafe_allow_html=True
+        )
+        st.caption(result["moral_polarization_interpretation"])
+
+        with st.expander("Voir les marqueurs", expanded=False):
+            markers = result.get("moral_polarization_markers", [])
+            if not markers:
+                st.info("Aucune polarisation morale notable détectée.")
+            else:
+                for marker in markers:
+                    st.warning(marker)
+
+    # -----------------------------
+    # 41) Simplification stratégique
+    # -----------------------------
+    with row14_col3:
+        st.markdown("### Simplification stratégique")
+        st.caption("Réduction d’une réalité complexe à une cause unique ou simple.")
+
+        value = result["strategic_simplification_score"]
+
+        if value < 0.15:
+            label, color = "Faible", "#16a34a"
+        elif value < 0.35:
+            label, color = "Modérée", "#ca8a04"
+        elif value < 0.60:
+            label, color = "Élevée", "#f97316"
+        else:
+            label, color = "Très élevée", "#dc2626"
+
+        render_custom_gauge(value, color)
+        st.markdown(
+            f"<b style='color:{color}'>{label}</b> — {round(value*100,1)}%",
+            unsafe_allow_html=True
+        )
+        st.caption(result["strategic_simplification_interpretation"])
+
+        with st.expander("Voir les marqueurs", expanded=False):
+            markers = result.get("strategic_simplification_markers", [])
+            if not markers:
+                st.info("Aucune simplification stratégique notable détectée.")
+            else:
+                for marker in markers:
+                    st.warning(marker)
+
+    # -----------------------------
+    # 42) Frame shift
+    # -----------------------------
+    with row15_col1:
+        st.markdown("### Frame shift")
+        st.caption("Déplacement du cadre du débat pour orienter l’interprétation.")
+
+        value = result["frame_shift_score"]
+
+        if value < 0.15:
+            label, color = "Faible", "#16a34a"
+        elif value < 0.35:
+            label, color = "Modérée", "#ca8a04"
+        elif value < 0.60:
+            label, color = "Élevée", "#f97316"
+        else:
+            label, color = "Très élevée", "#dc2626"
+
+        render_custom_gauge(value, color)
+        st.markdown(
+            f"<b style='color:{color}'>{label}</b> — {round(value*100,1)}%",
+            unsafe_allow_html=True
+        )
+        st.caption(result["frame_shift_interpretation"])
+
+        with st.expander("Voir les marqueurs", expanded=False):
+            markers = result.get("frame_shift_markers", [])
+            if not markers:
+                st.info("Aucun déplacement de cadre notable détecté.")
+            else:
+                for marker in markers:
+                    st.warning(marker)
+
+    # -----------------------------
+    # 43) Asymétrie argumentative
+    # -----------------------------
+    with row15_col2:
+        st.markdown("### Asymétrie argumentative")
+        st.caption("Le texte attaque davantage qu’il ne démontre.")
+
+        value = result["argument_asymmetry_score"]
+
+        if value < 0.15:
+            label, color = "Faible", "#16a34a"
+        elif value < 0.35:
+            label, color = "Modérée", "#ca8a04"
+        elif value < 0.60:
+            label, color = "Élevée", "#f97316"
+        else:
+            label, color = "Très élevée", "#dc2626"
+
+        render_custom_gauge(value, color)
+        st.markdown(
+            f"<b style='color:{color}'>{label}</b> — {round(value*100,1)}%",
+            unsafe_allow_html=True
+        )
+        st.caption(result["argument_asymmetry_interpretation"])
+        st.caption(
+            f"Attaques : {result['argument_attack_count']} | Appuis logiques : {result['argument_support_count']}"
+        )
+
     with st.expander("Voir les manœuvres discursives détectées", expanded=False):
         if result["political_pattern_score"] == 0:
             st.info("Aucun marqueur rhétorique politique saillant détecté.")
@@ -6684,4 +7224,4 @@ for i, (name, low, high) in enumerate(stages):
         else:
             st.info(name)
 
-st.caption("Lorsque G et N augmentent sans inflation de D, la cognition gagne en revisabilité.") 
+st.caption("Lorsque G et N augmentent sans inflation de D, la cognition gagne en revisabilité.")
