@@ -1295,6 +1295,73 @@ def contains_term(text: str, term: str) -> bool:
         pattern = rf"\b{escaped}\b"
     return re.search(pattern, text.lower()) is not None
 
+# -----------------------------
+# Détection page index / multi-liens
+# -----------------------------
+def detect_index_or_multilink_page(text: str, url: str = ""):
+    if not text or not text.strip():
+        return {
+            "is_index_page": False,
+            "score": 0.0,
+            "markers": [],
+            "interpretation": "Aucune structure de page index détectée."
+        }
+
+    t = text.lower()
+    lines = [l.strip() for l in text.splitlines() if l.strip()]
+    short_lines = [l for l in lines if len(l.split()) <= 9]
+
+    url_hits = re.findall(r"https?://|www\.|\.fr|\.com|\.org|\.gouv|\.eu", t)
+
+    index_markers = [
+        "voir aussi",
+        "articles liés",
+        "lire aussi",
+        "communiqués",
+        "actualités",
+        "toutes les actualités",
+        "point de situation",
+        "mise à jour",
+        "dossier",
+        "page suivante",
+        "archives",
+        "rubrique",
+        "accueil",
+        "sommaire",
+    ]
+
+    marker_hits = unique_keep_order(
+        [m for m in index_markers if contains_term(t, m)]
+    )
+
+    line_ratio = len(short_lines) / len(lines) if lines else 0
+    url_density = len(url_hits) / max(len(text.split()), 1)
+
+    raw_score = (
+        line_ratio * 0.45 +
+        min(url_density * 8, 0.35) +
+        min(len(marker_hits) * 0.08, 0.25)
+    )
+
+    score = min(raw_score, 1.0)
+
+    is_index_page = score >= 0.45 or (line_ratio > 0.65 and len(lines) >= 12)
+
+    if is_index_page:
+        interpretation = (
+            "Page de navigation ou page multi-liens détectée : le texte semble composé "
+            "principalement de titres, rubriques ou liens. L’analyse doit être prudente."
+        )
+    else:
+        interpretation = "Le texte ne semble pas être principalement une page index ou multi-liens."
+
+    return {
+        "is_index_page": is_index_page,
+        "score": round(score, 3),
+        "markers": marker_hits + url_hits[:10],
+        "interpretation": interpretation
+    }
+
 
 # -----------------------------
 # Normalisation des termes
@@ -3451,6 +3518,53 @@ DESCRIPTIVE_NORMATIVE_CONFUSION_PATTERNS = [
 ]
 
 # -----------------------------
+# Détection texte historique / chronologique
+# -----------------------------
+HISTORICAL_MARKERS = [
+    "en 1789", "en 1792", "en 1815", "en 1914", "en 1939",
+    "au xixe siècle", "au xxe siècle", "durant", "pendant",
+    "à cette époque", "le règne de", "la bataille de",
+    "la révolution", "l'empire", "la guerre", "le traité",
+    "chronologie", "événement", "date", "archives",
+    "historique", "contexte historique"
+]
+
+def detect_historical_text_mode(text: str):
+    if not text or not text.strip():
+        return {
+            "is_historical": False,
+            "score": 0.0,
+            "markers": [],
+            "interpretation": "Aucun régime historique détecté."
+        }
+
+    t = text.lower()
+
+    date_hits = re.findall(r"\b(?:1[0-9]{3}|20[0-9]{2})\b", t)
+    marker_hits = unique_keep_order(
+        [m for m in HISTORICAL_MARKERS if contains_term(t, m)]
+    )
+
+    raw_score = len(date_hits) * 0.6 + len(marker_hits) * 1.2
+    score = min(raw_score / 10, 1.0)
+
+    is_historical = score >= 0.35 or len(date_hits) >= 4
+
+    if not is_historical:
+        interpretation = "Le texte ne semble pas relever principalement d’un régime historique."
+    elif score < 0.60:
+        interpretation = "Le texte présente une structure partiellement historique ou chronologique."
+    else:
+        interpretation = "Le texte relève fortement d’un régime historique ou chronologique."
+
+    return {
+        "is_historical": is_historical,
+        "score": round(score, 3),
+        "markers": marker_hits + date_hits[:10],
+        "interpretation": interpretation
+    }
+
+# -----------------------------
 # Cherry Picking / sélection biaisée
 # -----------------------------
 CHERRY_PICKING_PATTERNS = [
@@ -4151,6 +4265,8 @@ def analyze_article(text: str) -> Dict:
     scientific_simulation_analysis = compute_scientific_simulation(text)
     propaganda_analysis = detect_propaganda_narrative(text)
     short_form_analysis = detect_short_form_mode(text)
+    historical_analysis = detect_historical_text_mode(text)
+    index_page_analysis = detect_index_or_multilink_page(text)
     causal_overreach_analysis = compute_causal_overreach(text)
     vague_authority_analysis = compute_vague_authority(text)
     emotional_intensity_analysis = compute_emotional_intensity(text)
@@ -4559,14 +4675,20 @@ def analyze_article(text: str) -> Dict:
         "doxic_rigidity_markers": doxic_rigidity_analysis["markers"],
         "doxic_rigidity_interpretation": doxic_rigidity_analysis["interpretation"],
 
-        "narrative_overdetermination_score": narrative_overdetermination_analysis["score"],
-        "narrative_overdetermination_markers": narrative_overdetermination_analysis["markers"],
-        "narrative_overdetermination_interpretation": narrative_overdetermination_analysis["interpretation"],
-
         "short_form_mode": short_form_analysis["is_short_form"],
         "short_form_label": short_form_analysis["label"],
         "short_form_interpretation": short_form_analysis["interpretation"],
         "word_count_precise": short_form_analysis["word_count"],
+
+        "historical_mode": historical_analysis["is_historical"],
+        "historical_score": historical_analysis["score"],
+        "historical_markers": historical_analysis["markers"],
+        "historical_interpretation": historical_analysis["interpretation"],
+
+        "index_page_mode": index_page_analysis["is_index_page"],
+        "index_page_score": index_page_analysis["score"],
+        "index_page_markers": index_page_analysis["markers"],
+        "index_page_interpretation": index_page_analysis["interpretation"],
 
         "propaganda_score": propaganda_analysis["score"],
         "propaganda_enemy_terms": propaganda_analysis["enemy_terms"],
@@ -4655,14 +4777,31 @@ def analyze_article(text: str) -> Dict:
     result["penalty_details"] = penalties
     result["penalty_index"] = penalties["credibility_penalty"]
 
-    # hard_fact_score est déjà pénalisé plus haut
     result["hard_fact_score_penalized"] = result["hard_fact_score"]
 
-    # improved n'était pas encore corrigé par ces pénalités
     result["improved_penalized"] = round(
         max(0, result["improved"] - penalties["credibility_penalty"]),
         1
     )
+
+    if result.get("historical_mode"):
+        result["hard_fact_score"] = max(result["hard_fact_score"], 10.0)
+        result["hard_fact_score_penalized"] = max(result["hard_fact_score_penalized"], 10.0)
+        result["final_credibility_note"] = (
+            "Régime historique détecté : le score est protégé contre une pénalisation "
+            "excessive liée aux énumérations chronologiques."
+        )
+
+    elif result.get("index_page_mode"):
+        result["hard_fact_score"] = max(result["hard_fact_score"], 9.0)
+        result["hard_fact_score_penalized"] = max(result["hard_fact_score_penalized"], 9.0)
+        result["final_credibility_note"] = (
+            "Page index détectée : le contenu semble composé majoritairement de titres "
+            "ou de liens. L'analyse de crédibilité est ajustée."
+        )
+
+    else:
+        result["final_credibility_note"] = ""
 
     result["final_credibility_score"] = result["hard_fact_score_penalized"]
 
