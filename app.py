@@ -910,13 +910,13 @@ def compute_propaganda_gauge(
 
     score = (
         0.30 * lie_gauge +
-        0.35 * rhetorical_pressure +
+        0.30 * rhetorical_pressure +
         0.20 * pattern_factor +
-        0.15 * closure_factor
+        0.10 * closure_factor +
+        0.10 * min(rhetorical_pressure * closure_factor, 1.0)
     )
 
     return min(max(score, 0.0), 1.0)
-
 
 def interpret_propaganda_gauge(value: float):
     """
@@ -4294,6 +4294,35 @@ def compute_mecroyance_penalties(result: dict) -> dict:
         "lie_boost": round(min(lie_boost, 2.0), 2),
     }
 
+def compute_deceptive_coherence(discursive_coherence, rhetorical_pressure, propaganda_score, hard_fact_score, text_length):
+    """
+    Détecte un discours cohérent mais fragile ou orienté.
+    """
+
+    deceptive = (
+        (discursive_coherence / 20) * 0.35
+        + rhetorical_pressure * 0.30
+        + propaganda_score * 0.20
+        + (1 - hard_fact_score / 20) * 0.10
+    )
+
+    # pénalité pour les textes très courts
+    length_factor = min(text_length / 300, 1)
+    deceptive = deceptive * length_factor
+
+    deceptive = max(0, min(deceptive, 1))
+
+    if deceptive < 0.25:
+        label = "Faible"
+    elif deceptive < 0.50:
+        label = "Modérée"
+    elif deceptive < 0.75:
+        label = "Élevée"
+    else:
+        label = "Très élevée"
+
+    return deceptive, label
+
 def analyze_article(text: str) -> Dict:
     words = text.split()
     sentences = [s.strip() for s in re.split(r"[.!?]+", text) if len(s.strip()) > 10]
@@ -4601,6 +4630,14 @@ def analyze_article(text: str) -> Dict:
         "narrative_overdetermination_score": narrative_overdetermination_analysis["score"],
     })
 
+    deceptive_coherence, deceptive_label = compute_deceptive_coherence(
+        discursive_analysis["score"] * 20,
+        rhetorical_pressure,
+        propaganda_analysis["score"],
+        hard_fact_score,
+        article_length
+    )
+
     result = {
         "words": len(words),
         "sentences": len(sentences),
@@ -4835,6 +4872,9 @@ def analyze_article(text: str) -> Dict:
         "lie_boost_total": total_lie_boost,
 
         "mecroyance_penalty_details": mecroyance_penalties,
+
+        "deceptive_coherence": deceptive_coherence,
+        "deceptive_coherence_label": deceptive_label,      
 
         "drift_mecroyance": drifts["drift_mecroyance"],
         "drift_pseudo_savoir": drifts["drift_pseudo_savoir"],
@@ -5809,6 +5849,33 @@ if result:
     )
 
     st.caption("Pression rhétorique faible ⟵⟶ Pression rhétorique forte")
+
+    st.divider()
+    st.subheader("Cohérence trompeuse")
+    st.caption(
+        "Cette jauge mesure si le texte paraît cohérent tout en restant fragile, orienté ou insuffisamment vérifiable."
+    )
+
+    value = result.get("deceptive_coherence", 0)
+    label = result.get("deceptive_coherence_label", "—")
+
+    if value < 0.25:
+        color = "#16a34a"
+    elif value < 0.50:
+        color = "#ca8a04"
+    elif value < 0.75:
+        color = "#f97316"
+    else:
+        color = "#dc2626"
+
+    render_custom_gauge(value, color)
+
+    st.markdown(
+        f"<b style='color:{color}'>{label}</b> — {round(value * 100, 1)}%",
+        unsafe_allow_html=True
+    )
+
+    st.caption("Cohérence apparente ⟵⟶ Cohérence trompeuse")
 
     st.divider()
     st.subheader("Jauge propagandiste")
