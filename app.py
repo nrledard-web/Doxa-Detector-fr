@@ -4244,6 +4244,56 @@ def compute_global_penalties(result: dict) -> dict:
         "red_flags_penalty_count": red_flags_count,
     }
 
+def compute_mecroyance_penalties(result: dict) -> dict:
+    penalty = 0.0
+    lie_boost = 0.0
+    flags = []
+
+    def add_flag(name, cred, lie, reason):
+        nonlocal penalty, lie_boost
+        flags.append({
+            "name": name,
+            "cred_penalty": cred,
+            "lie_boost": lie,
+            "reason": reason,
+        })
+        penalty += cred
+        lie_boost += lie
+
+    pseudo = result.get("drift_pseudo_savoir", 0)
+    intuition = result.get("drift_intuition_dogmatique", 0)
+    mecroyance = result.get("drift_mecroyance", 0)
+
+    if pseudo >= 3:
+        add_flag(
+            "Pseudo-savoir élevé",
+            min((pseudo - 2) * 0.35, 2.0),
+            0.4,
+            "Le texte accumule des éléments de savoir insuffisamment intégrés."
+        )
+
+    if intuition >= 3:
+        add_flag(
+            "Intuition dogmatique élevée",
+            min((intuition - 2) * 0.30, 1.8),
+            0.3,
+            "Le texte présente une conviction forte avec base documentaire limitée."
+        )
+
+    if mecroyance >= 3:
+        add_flag(
+            "Mécroyance structurelle",
+            min((mecroyance - 2) * 0.40, 2.2),
+            0.5,
+            "La certitude dépasse le savoir articulé et la compréhension intégrée."
+        )
+
+    return {
+        "flags": flags,
+        "credibility_penalty": round(min(penalty, 4.0), 2),
+        "lie_boost": round(min(lie_boost, 2.0), 2),
+    }
+
 def analyze_article(text: str) -> Dict:
     words = text.split()
     sentences = [s.strip() for s in re.split(r"[.!?]+", text) if len(s.strip()) > 10]
@@ -4419,9 +4469,25 @@ def analyze_article(text: str) -> Dict:
     if article_length < 50:
         red_flags.append("Format indigent")
 
+    mecroyance_penalties = compute_mecroyance_penalties({
+        "drift_mecroyance": drifts["drift_mecroyance"],
+        "drift_pseudo_savoir": drifts["drift_pseudo_savoir"],
+        "drift_intuition_dogmatique": drifts["drift_intuition_dogmatique"],
+    })
+
+    total_credibility_penalty = (
+        penalties["credibility_penalty"]
+        + mecroyance_penalties["credibility_penalty"]
+    )
+
+    total_lie_boost = (
+        penalties["lie_boost"]
+        + mecroyance_penalties["lie_boost"]
+    )
+
     hard_fact_score_raw = (
         (0.18 * G + 0.12 * N + 0.20 * V + 0.22 * source_quality + 0.18 * avg_claim_verifiability)
-        - (0.16 * D + 0.12 * R + 0.18 * avg_claim_risk + penalties["credibility_penalty"])
+        - (0.16 * D + 0.12 * R + 0.18 * avg_claim_risk + total_credibility_penalty)
     )
     hard_fact_score = round(clamp(hard_fact_score_raw + 8, 0, 20), 1)
     short_epistemic_bonus = 0.0
@@ -4485,7 +4551,7 @@ def analyze_article(text: str) -> Dict:
         factual_overinterpretation_analysis["score"] * 1.3
     ])
 
-    ME = round((ME_base * L) + discursive_boost + penalties["lie_boost"], 2)
+    ME = round((ME_base * L) + discursive_boost + total_lie_boost, 2)
 
     claims = [analyze_claim(sentence) for sentence in sentences[:15]]
 
@@ -4760,10 +4826,16 @@ def analyze_article(text: str) -> Dict:
         "cherry_picking_omission_markers": cherry_picking_analysis["omission_markers"],
         "cherry_picking_interpretation": cherry_picking_analysis["interpretation"],
 
-        "red_flags": [flag["name"] for flag in penalties["flags"]],
-        "weighted_red_flags": penalties["flags"],
-        "credibility_penalty_total": penalties["credibility_penalty"],
-        "lie_boost_total": penalties["lie_boost"],
+        "red_flags": [flag["name"] for flag in penalties["flags"]]
+        + [flag["name"] for flag in mecroyance_penalties["flags"]],
+
+        "weighted_red_flags": penalties["flags"] + mecroyance_penalties["flags"],
+
+        "credibility_penalty_total": total_credibility_penalty,
+        "lie_boost_total": total_lie_boost,
+
+        "mecroyance_penalty_details": mecroyance_penalties,
+
         "drift_mecroyance": drifts["drift_mecroyance"],
         "drift_pseudo_savoir": drifts["drift_pseudo_savoir"],
         "drift_intuition_dogmatique": drifts["drift_intuition_dogmatique"],
@@ -4777,9 +4849,12 @@ def analyze_article(text: str) -> Dict:
     # -----------------------------
     # Pénalités finales
     # -----------------------------
-    result["credibility_penalty"] = penalties["credibility_penalty"]
-    result["penalty_details"] = penalties
-    result["penalty_index"] = penalties["credibility_penalty"]
+    result["credibility_penalty"] = total_credibility_penalty
+    result["penalty_details"] = {
+        "red_flag_penalties": penalties,
+        "mecroyance_penalties": mecroyance_penalties,
+    }
+    result["penalty_index"] = total_credibility_penalty
 
     result["hard_fact_score_penalized"] = result["hard_fact_score"]
 
