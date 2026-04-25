@@ -5,3 +5,4 @@ ddgs
 newspaper3k
 matplotlib
 lxml_html_clean
+openai>=1.0.0
