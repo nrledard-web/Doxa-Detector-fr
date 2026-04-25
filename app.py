@@ -4294,20 +4294,26 @@ def compute_mecroyance_penalties(result: dict) -> dict:
         "lie_boost": round(min(lie_boost, 2.0), 2),
     }
 
-def compute_deceptive_coherence(discursive_coherence, rhetorical_pressure, propaganda_score, hard_fact_score, text_length):
+def compute_deceptive_coherence(G, N, D, rhetorical_pressure, propaganda_score, hard_fact_score, text_length):
     """
     Détecte un discours cohérent mais fragile ou orienté.
     """
 
+    # cohérence apparente
+    apparent_coherence = min((N + G) / 20, 1)
+
+    # fragilité cognitive
+    fragility = min((D / 10) + (1 - hard_fact_score / 20), 1)
+
     deceptive = (
-        (discursive_coherence / 20) * 0.35
-        + rhetorical_pressure * 0.30
-        + propaganda_score * 0.20
-        + (1 - hard_fact_score / 20) * 0.10
+        0.35 * apparent_coherence
+        + 0.30 * rhetorical_pressure
+        + 0.20 * propaganda_score
+        + 0.15 * fragility
     )
 
-    # pénalité pour les textes très courts
-    length_factor = min(text_length / 300, 1)
+    # pénalité textes courts
+    length_factor = min(text_length / 250, 1)
     deceptive = deceptive * length_factor
 
     deceptive = max(0, min(deceptive, 1))
@@ -4526,6 +4532,28 @@ def analyze_article(text: str) -> Dict:
 
     hard_fact_score = round(clamp(hard_fact_score + short_epistemic_bonus, 0, 20), 1)
 
+    political_pattern_score, political_results, matched_terms = detect_political_patterns(text)
+    rhetorical_pressure = compute_rhetorical_pressure(political_results)
+
+    # -----------------------------
+    # Cohérence trompeuse
+    # -----------------------------
+    deceptive_coherence, deceptive_label = compute_deceptive_coherence(
+        G,
+        N,
+        D,
+        rhetorical_pressure,
+        propaganda_analysis["score"],
+        hard_fact_score,
+        article_length
+    )
+
+    # pénalité cohérence trompeuse
+    hard_fact_score = round(
+        max(0, hard_fact_score - (deceptive_coherence * 3)),
+        1
+    )
+
     if hard_fact_score < 6:
         verdict = T["low_credibility"]
     elif hard_fact_score < 10:
@@ -4562,9 +4590,6 @@ def analyze_article(text: str) -> Dict:
 
     ling = compute_linguistic_suspicion(text)
     L = ling["L"]
-
-    political_pattern_score, political_results, matched_terms = detect_political_patterns(text)
-    rhetorical_pressure = compute_rhetorical_pressure(political_results)
 
     ME_base = max(0, (2 * D) - (G + N))
 
@@ -4631,13 +4656,30 @@ def analyze_article(text: str) -> Dict:
     })
 
     deceptive_coherence, deceptive_label = compute_deceptive_coherence(
-        discursive_analysis["score"] * 20,
+        G,
+        N,
+        D,
         rhetorical_pressure,
         propaganda_analysis["score"],
         hard_fact_score,
         article_length
     )
+    deceptive_penalty = round(deceptive_coherence * 3.0, 2)
 
+    final_credibility_score = round(
+        max(0, hard_fact_score - deceptive_penalty),
+        1
+    )
+
+    if final_credibility_score < 6:
+        final_verdict = T["low_credibility"]
+    elif final_credibility_score < 10:
+        final_verdict = T["prudent_credibility"]
+    elif final_credibility_score < 15:
+        final_verdict = T["rather_credible"]
+    else:
+        final_verdict = T["strong_credibility"]
+        
     result = {
         "words": len(words),
         "sentences": len(sentences),
@@ -4841,6 +4883,9 @@ def analyze_article(text: str) -> Dict:
         "source_quality": source_quality,
         "avg_claim_risk": avg_claim_risk,
         "avg_claim_verifiability": avg_claim_verifiability,
+        "deceptive_penalty": deceptive_penalty,
+        "final_credibility_score": final_credibility_score,
+        "final_verdict": final_verdict,
         "hard_fact_score": hard_fact_score,
         "verdict": verdict,
         "profil_solidite": verdict,
@@ -5345,7 +5390,31 @@ with st.container(border=True):
             st.success("Texte dicté reçu.")
             st.rerun()
     else:
-        st.info("Microphone indisponible sur cette version.")
+        st.info("Microphone classique indisponible sur cette version.")
+
+    st.markdown("#### 🎙️ Entrée vocale mobile")
+    
+    st.caption("📱 Compatible smartphone / iPhone")
+
+    client = OpenAI(api_key=st.secrets["OPENAI_API_KEY"])
+
+    audio = st.audio_input("Dicter un texte à analyser", key="audio_mobile")
+
+    if audio:
+        st.audio(audio)
+
+        with st.spinner("Transcription en cours..."):
+            transcript = client.audio.transcriptions.create(
+                model="gpt-4o-mini-transcribe",
+                file=("audio.wav", audio)
+            )
+
+        text_transcribed = transcript.text
+
+        st.session_state.article = text_transcribed
+        st.session_state.article_source = "voice"
+        st.success("Texte transcrit et chargé dans la zone d’analyse.")
+        st.rerun()
 
     with st.form("article_form"):
         article = st.text_area(
@@ -5496,11 +5565,6 @@ if result:
         st.metric(
             "Score final",
             f"{result.get('final_credibility_score', result['hard_fact_score'])}/20"
-        )
-
-    st.caption(
-        "Les pénalités corrigent le score lorsque le texte accumule des signaux "
-        "de fermeture cognitive, de manipulation ou de raisonnement fragile."
         )
 
     with st.expander("Voir le détail des pénalités", expanded=False):
