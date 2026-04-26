@@ -5485,7 +5485,7 @@ with st.container(border=True):
 # -----------------------------
 # Mode débat
 # -----------------------------
-if mode != "Analyse simple":
+if analyze_submitted and mode != "Analyse simple":
 
     if "debate_turns" not in st.session_state:
         st.session_state["debate_turns"] = []
