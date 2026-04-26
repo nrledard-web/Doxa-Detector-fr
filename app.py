@@ -4160,24 +4160,6 @@ def compute_cognitive_drifts(G, N, D):
         "cognitive_drift_interpretation": interpretation,
     }
 
-def classify_cognitive_regime(result):
-
-    M = result["M"]
-    ME = result["ME"]
-    rp = result["rhetorical_pressure"]
-    prop = result["propaganda_score"]
-
-    if ME > 2 and rp > 0.5:
-        regime = "Manipulation stratégique"
-
-    elif result["drift_pseudo_savoir"] > result["drift_mecroyance"]:
-        regime = "Pseudo-savoir"
-
-    else:
-        regime = "Mécroyance"
-
-    result["cognitive_regime"] = regime
-
 def classify_cognitive_regime(result: dict) -> dict:
     M = result["M"]
     ME = result["ME"]
@@ -4553,17 +4535,30 @@ def analyze_article(text: str) -> Dict:
         article_length
     )
 
-    # pénalité cohérence trompeuse
-    hard_fact_score = round(
-        max(0, hard_fact_score - (deceptive_coherence * 3)),
+    # -----------------------------
+    # Score final fusion des jauges
+    # -----------------------------
+    HFS = hard_fact_score / 20
+
+    OC = max(0.0, (G + N) / (G + N + D)) if (G + N + D) > 0 else 0.0
+
+    discursive_pressure = min(
+        1.0,
+        propaganda_analysis["score"] + rhetorical_pressure
+    )
+
+    ID = max(0.1, 1 - discursive_pressure)
+
+    final_credibility_score = round(
+        20 * HFS * OC * ID,
         1
     )
 
-    if hard_fact_score < 6:
+    if final_credibility_score < 6:
         verdict = T["low_credibility"]
-    elif hard_fact_score < 10:
+    elif final_credibility_score < 10:
         verdict = T["prudent_credibility"]
-    elif hard_fact_score < 15:
+    elif final_credibility_score < 15:
         verdict = T["rather_credible"]
     else:
         verdict = T["strong_credibility"]
@@ -4659,31 +4654,6 @@ def analyze_article(text: str) -> Dict:
         "doxic_rigidity_score": doxic_rigidity_analysis["score"],
         "narrative_overdetermination_score": narrative_overdetermination_analysis["score"],
     })
-
-    deceptive_coherence, deceptive_label = compute_deceptive_coherence(
-        G,
-        N,
-        D,
-        rhetorical_pressure,
-        propaganda_analysis["score"],
-        hard_fact_score,
-        article_length
-    )
-    deceptive_penalty = round(deceptive_coherence * 3.0, 2)
-
-    final_credibility_score = round(
-        max(0, hard_fact_score - deceptive_penalty),
-        1
-    )
-
-    if final_credibility_score < 6:
-        final_verdict = T["low_credibility"]
-    elif final_credibility_score < 10:
-        final_verdict = T["prudent_credibility"]
-    elif final_credibility_score < 15:
-        final_verdict = T["rather_credible"]
-    else:
-        final_verdict = T["strong_credibility"]
         
     result = {
         "words": len(words),
@@ -4888,9 +4858,14 @@ def analyze_article(text: str) -> Dict:
         "source_quality": source_quality,
         "avg_claim_risk": avg_claim_risk,
         "avg_claim_verifiability": avg_claim_verifiability,
-        "deceptive_penalty": deceptive_penalty,
+        "HFS": HFS,
+        "OC": OC,
+        "ID": ID,
+        "discursive_pressure": discursive_pressure,
+        "deceptive_coherence": deceptive_coherence,
+        "deceptive_coherence_label": deceptive_label,
         "final_credibility_score": final_credibility_score,
-        "final_verdict": final_verdict,
+        "final_verdict": verdict,
         "hard_fact_score": hard_fact_score,
         "verdict": verdict,
         "profil_solidite": verdict,
@@ -4946,7 +4921,7 @@ def analyze_article(text: str) -> Dict:
     }
     result["penalty_index"] = total_credibility_penalty
 
-    result["hard_fact_score_penalized"] = result["hard_fact_score"]
+    result["hard_fact_score_penalized"] = result["final_credibility_score"]
 
     result["improved_penalized"] = round(
         max(0, result["improved"] - penalties["credibility_penalty"]),
@@ -4971,8 +4946,6 @@ def analyze_article(text: str) -> Dict:
 
     else:
         result["final_credibility_note"] = ""
-
-    result["final_credibility_score"] = result["hard_fact_score_penalized"]
 
     return result
 
@@ -5622,7 +5595,7 @@ if result:
         semantic_score = result.get("semantic_score", None)
 
         if semantic_score is not None:
-            credibility_score = round((result["hard_fact_score"] + semantic_score) / 2, 1)
+            credibility_score = round((result.get("final_credibility_score", result["hard_fact_score"]) + semantic_score) / 2, 1)
             st.progress(credibility_score / 20)
             st.caption(f"Score : {credibility_score}/20 — Raisonnement + sémantique")
         else:
@@ -5647,18 +5620,37 @@ if result:
     score = result["hard_fact_score"]
 
     if score <= 6:
-        couleur, etiquette, message = "🔴", "Faible", "Le raisonnement reste peu développé ou peu étayé."
+        couleur_r, etiquette_r, message_r = "🔴", "Faible", "Le raisonnement reste peu développé ou peu étayé."
     elif score <= 11:
-        couleur, etiquette, message = "🟠", "Médiocre", "Le texte contient quelques éléments de raisonnement, mais reste insuffisant."
+        couleur_r, etiquette_r, message_r = "🟠", "Médiocre", "Le texte contient quelques éléments de raisonnement, mais reste insuffisant."
     elif score <= 15:
-        couleur, etiquette, message = "🟡", "Correct", "Le raisonnement est présent mais encore partiellement fragile."
+        couleur_r, etiquette_r, message_r = "🟡", "Correct", "Le raisonnement est présent mais encore partiellement fragile."
     else:
-        couleur, etiquette, message = "🟢", "Robuste", "Le raisonnement est solidement structuré."
+        couleur_r, etiquette_r, message_r = "🟢", "Robuste", "Le raisonnement est solidement structuré."
 
-    st.subheader(f"{couleur} Barre de raisonnement : {etiquette}")
+    st.subheader(f"{couleur_r} Barre de raisonnement : {etiquette_r}")
     st.progress(score / 20)
-    st.caption(f"Score : {score}/20 — {message}")
+    st.caption(f"Score : {score}/20 — {message_r}")
     st.caption("Augmentez votre raisonnement pour rendre la barre robuste.")
+
+
+    # =============================
+    # Barre de crédibilité finale
+    # =============================
+    final_score = result.get("final_credibility_score", score)
+
+    if final_score <= 6:
+        couleur_c, etiquette_c, message_c = "🔴", "Faible", "La crédibilité globale est fortement réduite par les signaux discursifs."
+    elif final_score <= 11:
+        couleur_c, etiquette_c, message_c = "🟠", "Prudente", "Le texte reste plausible mais plusieurs signaux invitent à la prudence."
+    elif final_score <= 15:
+        couleur_c, etiquette_c, message_c = "🟡", "Correcte", "La crédibilité globale reste partiellement solide."
+    else:
+        couleur_c, etiquette_c, message_c = "🟢", "Robuste", "La crédibilité globale apparaît solide."
+
+    st.subheader(f"{couleur_c} Crédibilité finale : {etiquette_c}")
+    st.progress(final_score / 20)
+    st.caption(f"Score final : {final_score}/20 — Analyse combinée des jauges cognitives et discursives.")
 
     # =============================
     # Pénalités appliquées
@@ -5802,7 +5794,7 @@ if result:
         st.progress(mecroyance_bar)
         st.caption(f"M = {result['M']}")
 
-    st.subheader(f"{T['verdict']} : {result['verdict']}")
+    st.subheader(f"{T['verdict']} : {result['final_verdict']}")
     st.subheader(T["summary"])
 
     m1, m2 = st.columns(2)
