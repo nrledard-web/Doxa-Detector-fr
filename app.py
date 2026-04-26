@@ -896,6 +896,33 @@ def interpret_rhetorical_pressure(value: float):
         return "Élevée", "#f97316"
     else:
         return "Très élevée", "#dc2626"
+
+def compute_cognitive_gravity(result):
+    """
+    Gravité cognitive globale du discours.
+    0 = faible
+    1 = maximale
+    """
+
+    lie = min(1, max(0, result.get("lie_gauge", 0)))
+    rhetoric = min(1, max(0, result.get("rhetorical_pressure", 0)))
+    propaganda = min(1, max(0, result.get("propaganda_score", 0) / 10))
+    dissonance = min(1, max(0, result.get("factual_dissonance", 0)))
+    closure = min(1, max(0, result.get("cognitive_closure", 0) / 10))
+
+    hard_fact_inverse = 1 - min(1, max(0, result.get("hard_fact_score", 0) / 20))
+
+    gravity = (
+        lie * 0.25 +
+        rhetoric * 0.20 +
+        propaganda * 0.20 +
+        dissonance * 0.20 +
+        closure * 0.10 +
+        hard_fact_inverse * 0.05
+    )
+
+    return round(min(1, max(0, gravity)), 3)
+        
 def compute_propaganda_gauge(
     lie_gauge: float,
     rhetorical_pressure: float,
@@ -4175,6 +4202,27 @@ def classify_cognitive_regime(result: dict) -> dict:
     result["cognitive_regime"] = regime
     return result
 
+
+def compute_cognitive_gravity(result):
+    lie = min(1, max(0, result.get("lie_gauge", 0)))
+    rhetoric = min(1, max(0, result.get("rhetorical_pressure", 0)))
+    propaganda = min(1, max(0, result.get("propaganda_score", 0) / 10))
+    dissonance = min(1, max(0, result.get("factual_dissonance", 0)))
+    closure = min(1, max(0, result.get("cognitive_closure", 0) / 10))
+
+    hard_fact_inverse = 1 - min(1, max(0, result.get("hard_fact_score", 0) / 20))
+
+    gravity = (
+        lie * 0.25 +
+        rhetoric * 0.20 +
+        propaganda * 0.20 +
+        dissonance * 0.20 +
+        closure * 0.10 +
+        hard_fact_inverse * 0.05
+    )
+
+    return round(min(1, max(0, gravity)), 3)
+
 def compute_global_penalties(result: dict) -> dict:
     """
     Agrège les fragilités déjà détectées.
@@ -4229,6 +4277,56 @@ def compute_global_penalties(result: dict) -> dict:
         "penalty_label": label,
         "penalty_interpretation": interpretation,
         "red_flags_penalty_count": red_flags_count,
+    }
+
+def compute_doxa_brain(result: dict) -> dict:
+    """
+    Synthèse finale du cerveau DOXA.
+    Agrège la gravité, la stabilité et le régime cognitif.
+    """
+
+    gravity = result.get("cognitive_gravity", 0)
+    stability = round(1 - gravity, 3)
+
+    M = result.get("M", 0)
+    ME = result.get("ME", 0)
+    hard_fact = result.get("hard_fact_score", 0)
+    regime = result.get("cognitive_regime", "Non classé")
+
+    if gravity < 0.20:
+        brain_state = "Stable"
+        verdict = "Discours globalement stable"
+        advice = "Le discours présente peu de signaux de dérive cognitive."
+    elif gravity < 0.40:
+        brain_state = "Sous tension"
+        verdict = "Discours légèrement fragilisé"
+        advice = "Quelques tensions existent : vérifier les sources et les prémisses."
+    elif gravity < 0.60:
+        brain_state = "Instable"
+        verdict = "Discours cognitivement instable"
+        advice = "La cohérence doit être recoupée avec les faits et les sources."
+    elif gravity < 0.80:
+        brain_state = "Critique"
+        verdict = "Discours fortement problématique"
+        advice = "Accumulation de signaux rhétoriques, factuels ou cognitifs préoccupants."
+    else:
+        brain_state = "Alerte maximale"
+        verdict = "Discours à très forte gravité cognitive"
+        advice = "Forte convergence de fermeture, manipulation ou désalignement cognitif."
+
+    return {
+        "brain_state": brain_state,
+        "brain_verdict": verdict,
+        "brain_advice": advice,
+        "cognitive_stability": stability,
+        "dominant_regime": regime,
+        "brain_summary": (
+            f"État : {brain_state} | "
+            f"Stabilité : {stability:.2f} | "
+            f"Gravité : {gravity:.2f} | "
+            f"Régime dominant : {regime} | "
+            f"M={M:.2f}, ME={ME:.2f}, Factuel={hard_fact:.1f}/20"
+        )
     }
 
 def compute_mecroyance_penalties(result: dict) -> dict:
@@ -5058,6 +5156,9 @@ def analyze_article(text: str) -> Dict:
     else:
         result["final_credibility_note"] = ""
 
+    result["cognitive_gravity"] = compute_cognitive_gravity(result)
+    result["doxa_brain"] = compute_doxa_brain(result)
+
     return result
 
 # -----------------------------
@@ -5879,6 +5980,43 @@ if result:
     col1.metric("Indice classique", result["M"], help=T["help_classic_score"])
     col2.metric("Indice ajusté", result["improved"], help=T["help_improved_score"])
     col3.metric("Score de raisonnement", result["hard_fact_score"], help=T["help_hard_fact_score"])
+
+    # =============================
+    # Gravité cognitive globale
+    # =============================
+    gravity = result.get("cognitive_gravity", 0)
+
+    st.markdown("### Gravité cognitive globale")
+    st.progress(gravity)
+
+    if gravity < 0.2:
+        st.caption("Gravité faible — discours globalement sain.")
+    elif gravity < 0.4:
+        st.caption("Gravité modérée — quelques tensions cognitives.")
+    elif gravity < 0.6:
+        st.caption("Gravité élevée — dérive discursive notable.")
+    elif gravity < 0.8:
+        st.caption("Gravité très élevée — structure discursive problématique.")
+    else:
+        st.caption("Gravité critique — convergence de manipulation ou désalignement cognitif.")
+
+    # =============================
+    # Cerveau DOXA
+    # =============================
+    brain = result.get("doxa_brain", {})
+
+    st.markdown("### Cerveau DOXA")
+
+    st.metric(
+        "Stabilité cognitive",
+        f"{brain.get('cognitive_stability', 0):.2f}"
+    )
+
+    st.caption(brain.get("brain_verdict", "Diagnostic indisponible."))
+    st.info(brain.get("brain_advice", ""))
+
+    with st.expander("Résumé du cerveau DOXA"):
+        st.write(brain.get("brain_summary", "Aucun résumé disponible."))
 
     # =============================
     # Barre de raisonnement
