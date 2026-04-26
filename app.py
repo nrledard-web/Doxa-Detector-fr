@@ -5526,9 +5526,9 @@ with st.container(border=True):
                         st.success("Texte transcrit et chargé dans la zone d’analyse.")
                         st.info("Texte prêt. Cliquez sur Analyser pour lancer l’analyse.")
                     else:
-                        st.session_state["debate_text_input"] = text_transcribed
-                        st.success("Texte transcrit et chargé dans l’intervention du débat.")
-                        st.info("Texte prêt. Cliquez sur Analyser pour ajouter ce tour au débat.")
+                        st.session_state["pending_debate_transcription"] = text_transcribed
+                        st.success("Transcription prête.")
+                        st.info("Validez la transcription ci-dessous pour l’ajouter au débat.")
                         st.rerun()
 
                 except Exception as e:
@@ -5538,6 +5538,42 @@ with st.container(border=True):
     if st.session_state.get("clear_debate_text_next_run"):
         st.session_state["debate_text_input"] = ""
         st.session_state["clear_debate_text_next_run"] = False
+
+    # -----------------------------
+    # Validation transcription débat
+    # -----------------------------
+    if mode == "Débat dynamique" and st.session_state.get("pending_debate_transcription"):
+
+        st.markdown("### Transcription à valider")
+
+        edited_transcription = st.text_area(
+            "Corrigez si nécessaire avant validation",
+            value=st.session_state["pending_debate_transcription"],
+            key="pending_debate_transcription_editor",
+            height=160
+        )
+
+        col_val, col_cancel = st.columns(2)
+
+        with col_val:
+            if st.button("✅ Valider cette intervention", use_container_width=True):
+                turns = st.session_state.get("debate_turns", [])
+                turns.append({
+                    "speaker": st.session_state.get("pending_speaker", "Participant A"),
+                    "text": edited_transcription.strip()
+                })
+                st.session_state["debate_turns"] = turns
+
+                st.session_state["pending_debate_transcription"] = ""
+                st.session_state["pending_debate_transcription_editor"] = ""
+                st.success("Intervention ajoutée au débat.")
+                st.rerun()
+
+        with col_cancel:
+            if st.button("❌ Annuler la transcription", use_container_width=True):
+                st.session_state["pending_debate_transcription"] = ""
+                st.session_state["pending_debate_transcription_editor"] = ""
+                st.rerun()
 
     with st.form("article_form"):
 
@@ -5555,7 +5591,8 @@ with st.container(border=True):
 
             speaker = st.selectbox(
                 "Participant",
-                ["Participant A", "Participant B"]
+                ["Participant A", "Participant B"],
+                key="pending_speaker"
             )
 
             debate_text = st.text_area(
