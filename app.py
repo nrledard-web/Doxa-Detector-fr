@@ -5623,6 +5623,7 @@ if analyze_submitted and mode == "Débat dynamique":
 
         st.session_state["pending_debate_transcription"] = debate_text.strip()
         st.session_state["pending_speaker"] = speaker
+        st.session_state["pending_editor_version"] += 1
 
         st.info("Intervention prête à vérifier.")
         st.rerun()
