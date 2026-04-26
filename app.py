@@ -4283,27 +4283,23 @@ def compute_mecroyance_penalties(result: dict) -> dict:
 
 def compute_deceptive_coherence(G, N, D, rhetorical_pressure, propaganda_score, hard_fact_score, text_length):
     """
-    Détecte un discours cohérent mais fragile ou orienté.
+    Détecte un texte apparemment cohérent mais fragile ou orienté.
     """
 
-    # cohérence apparente
-    apparent_coherence = min((N + G) / 20, 1)
-
-    # fragilité cognitive
+    coherence = min((G + N) / 20, 1)
     fragility = min((D / 10) + (1 - hard_fact_score / 20), 1)
 
     deceptive = (
-        0.35 * apparent_coherence
-        + 0.30 * rhetorical_pressure
-        + 0.20 * propaganda_score
-        + 0.15 * fragility
+        0.35 * coherence +
+        0.25 * rhetorical_pressure +
+        0.25 * propaganda_score +
+        0.15 * fragility
     )
 
-    # pénalité textes courts
     length_factor = min(text_length / 250, 1)
-    deceptive = deceptive * length_factor
+    deceptive *= length_factor
 
-    deceptive = max(0, min(deceptive, 1))
+    deceptive = min(max(round(deceptive, 3), 0), 1)
 
     if deceptive < 0.25:
         label = "Faible"
@@ -4315,6 +4311,121 @@ def compute_deceptive_coherence(G, N, D, rhetorical_pressure, propaganda_score, 
         label = "Très élevée"
 
     return deceptive, label
+    
+# =========================================================
+# 🎨 Étalonnage visuel unifié des jauges — version corrigée
+# =========================================================
+
+def normalize_display_value(value: float) -> float:
+    """Ramène une valeur 0–1 ou 0–20 vers 0–1."""
+    if value is None:
+        return 0.0
+    return value / 20 if value > 1 else value
+
+
+def color_scale_risk(value: float) -> tuple[str, str]:
+    """
+    Pour les jauges de risque :
+    propagande, clôture, dérive, mensonge, pression rhétorique.
+    Plus c'est haut, plus c'est mauvais.
+    """
+    v = normalize_display_value(value)
+
+    if v < 0.25:
+        return "#16a34a", "🟢 Faible"
+    elif v < 0.50:
+        return "#84cc16", "🟡 Modéré"
+    elif v < 0.75:
+        return "#f97316", "🟠 Élevé"
+    else:
+        return "#dc2626", "🔴 Critique"
+
+
+def color_scale_quality(value: float) -> tuple[str, str]:
+    """
+    Pour les scores de qualité :
+    Hard Fact Score, crédibilité finale, raisonnement.
+    Plus c'est haut, meilleur c'est.
+    """
+    v = normalize_display_value(value)
+
+    if v < 0.25:
+        return "#dc2626", "🔴 Faible"
+    elif v < 0.50:
+        return "#f97316", "🟠 Fragile"
+    elif v < 0.75:
+        return "#ca8a04", "🟡 Correct"
+    else:
+        return "#16a34a", "🟢 Robuste"
+
+
+def interpret_generic_risk_gauge(label: str, value: float) -> str:
+    v = normalize_display_value(value)
+    color, level = color_scale_risk(v)
+    return f"<b style='color:{color}'>{label}</b> — {level} ({round(v * 100, 1)}%)"
+
+
+def interpret_generic_quality_gauge(label: str, value: float) -> str:
+    v = normalize_display_value(value)
+    color, level = color_scale_quality(v)
+    return f"<b style='color:{color}'>{label}</b> — {level} ({round(v * 100, 1)}%)"
+
+
+# -----------------------------
+# Barre de raisonnement
+# -----------------------------
+def interpret_reasoning_bar(score: float):
+    v = normalize_display_value(score)
+    color, label = color_scale_quality(v)
+
+    if v < 0.25:
+        msg = "Raisonnement très faible ou incohérent."
+    elif v < 0.50:
+        msg = "Raisonnement partiellement structuré, encore fragile."
+    elif v < 0.75:
+        msg = "Raisonnement globalement cohérent, mais vérifiabilité moyenne."
+    else:
+        msg = "Raisonnement robuste. Vérifiez maintenant la solidité des sources et des prémisses."
+
+    return color, label, msg
+
+
+# -----------------------------
+# Crédibilité finale
+# -----------------------------
+def interpret_final_credibility(score: float):
+    v = normalize_display_value(score)
+    color, label = color_scale_quality(v)
+
+    if v < 0.25:
+        msg = "Crédibilité faible : discours fragile, peu vérifiable ou fortement orienté."
+    elif v < 0.50:
+        msg = "Crédibilité prudente : plusieurs signaux de fragilité détectés."
+    elif v < 0.75:
+        msg = "Crédibilité correcte : ancrage factuel présent mais incomplet."
+    else:
+        msg = "Crédibilité robuste : base factuelle et argumentative solide."
+
+    return color, label, msg
+
+
+# -----------------------------
+# Dérive cognitive
+# -----------------------------
+def interpret_cognitive_drift(value: float):
+    v = normalize_display_value(value)
+    color, label = color_scale_risk(v)
+
+    if v < 0.25:
+        msg = "Stabilité cognitive élevée."
+    elif v < 0.50:
+        msg = "Certaines dérives perceptibles."
+    elif v < 0.75:
+        msg = "Tendance nette à la mécroyance ou au biais confirmatoire."
+    else:
+        msg = "Dérive cognitive forte : fermeture sur ses propres certitudes."
+
+    return color, label, msg
 
 def analyze_article(text: str) -> Dict:
     words = text.split()
@@ -5662,7 +5773,7 @@ if result:
     st.subheader(f"{couleur_r} Barre de raisonnement : {etiquette_r}")
     st.progress(score / 20)
     st.caption(f"Score : {score}/20 — {message_r}")
-    st.caption("Augmentez votre raisonnement pour rendre la barre robuste.")
+    st.caption("Cette jauge mesure la structure du raisonnement. La crédibilité dépend aussi de la qualité des sources et de la vérifiabilité des affirmations.")
 
 
     # =============================
@@ -5670,18 +5781,11 @@ if result:
     # =============================
     final_score = result.get("final_credibility_score", score)
 
-    if final_score <= 6:
-        couleur_c, etiquette_c, message_c = "🔴", "Faible", "La crédibilité globale est fortement réduite par les signaux discursifs."
-    elif final_score <= 11:
-        couleur_c, etiquette_c, message_c = "🟠", "Prudente", "Le texte reste plausible mais plusieurs signaux invitent à la prudence."
-    elif final_score <= 15:
-        couleur_c, etiquette_c, message_c = "🟡", "Correcte", "La crédibilité globale reste partiellement solide."
-    else:
-        couleur_c, etiquette_c, message_c = "🟢", "Robuste", "La crédibilité globale apparaît solide."
+    couleur_c, etiquette_c, message_c = interpret_final_credibility(final_score)
 
     st.subheader(f"{couleur_c} Crédibilité finale : {etiquette_c}")
     st.progress(final_score / 20)
-    st.caption(f"Score final : {final_score}/20 — Analyse combinée des jauges cognitives et discursives.")
+    st.caption(f"Score final : {final_score}/20 — {message_c}")
 
     # =============================
     # Pénalités appliquées
