@@ -5481,6 +5481,18 @@ if "pending_editor_version" not in st.session_state:
     st.session_state["pending_editor_version"] = 0
 
 
+# =====================================================
+# SÉLECTEUR PARTICIPANT AVANT MICRO
+# =====================================================
+if mode == "Débat dynamique":
+    st.session_state["debate_speaker_choice"] = st.radio(
+        "Participant pour la prochaine intervention",
+        ["Participant A", "Participant B"],
+        horizontal=True,
+        key="debate_speaker_radio"
+    )
+
+
 # -----------------------------
 # Zone d’analyse
 # -----------------------------
@@ -5513,12 +5525,15 @@ with st.container(border=True):
             else:
                 st.session_state["pending_debate_transcription"] = spoken_text
                 st.session_state["pending_speaker"] = st.session_state.get(
-                    "speaker_select",
+                    "debate_speaker_choice",
                     "Participant A"
                 )
+                st.session_state["pending_editor_version"] += 1
+
                 st.success("Transcription prête.")
                 st.info("Validez la transcription ci-dessous pour l’ajouter au débat.")
                 st.rerun()
+
     else:
         st.caption("🎙️ Dictée vocale classique indisponible dans cette version.")
 
@@ -5559,9 +5574,11 @@ with st.container(border=True):
                     else:
                         st.session_state["pending_debate_transcription"] = text_transcribed
                         st.session_state["pending_speaker"] = st.session_state.get(
-                            "speaker_select",
+                            "debate_speaker_choice",
                             "Participant A"
                         )
+                        st.session_state["pending_editor_version"] += 1
+
                         st.success("Transcription prête.")
                         st.info("Validez la transcription ci-dessous pour l’ajouter au débat.")
                         st.rerun()
@@ -5595,11 +5612,9 @@ with st.form("article_form"):
 
     else:
 
-        speaker = st.selectbox(
-            "Participant",
-            ["Participant A", "Participant B"],
-            key="speaker_select"
-        )
+        speaker = st.session_state.get("debate_speaker_choice", "Participant A")
+
+        st.info(f"Participant sélectionné : {speaker}")
 
         debate_text = st.text_area(
             "Intervention du tour",
@@ -5642,7 +5657,7 @@ if mode == "Débat dynamique" and st.session_state.get("pending_debate_transcrip
     edited_transcription = st.text_area(
         "Corrigez si nécessaire avant validation",
         value=st.session_state["pending_debate_transcription"],
-        key="pending_debate_transcription_editor",
+        key=f"pending_debate_transcription_editor_{st.session_state['pending_editor_version']}",
         height=160
     )
 
