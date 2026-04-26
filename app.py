@@ -5461,7 +5461,11 @@ mode = st.radio(
     horizontal=True,
     key="mode"
 )
-
+# -----------------------------
+# Initialisation robuste du mode débat
+# -----------------------------
+if "debate_turns" not in st.session_state:
+    st.session_state["debate_turns"] = []
 
 # -----------------------------
 # Zone d’analyse
@@ -5514,6 +5518,7 @@ with st.container(border=True):
                         )
 
                     text_transcribed = transcript.text
+                    st.session_state["speech_to_text_result"] = text_transcribed
 
                     if mode == "Analyse simple":
                         st.session_state.article = text_transcribed
