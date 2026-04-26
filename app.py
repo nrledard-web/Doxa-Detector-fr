@@ -5461,11 +5461,22 @@ mode = st.radio(
     horizontal=True,
     key="mode"
 )
-# -----------------------------
-# Initialisation robuste du mode débat
-# -----------------------------
+# =====================================================
+# INITIALISATION ROBUSTE
+# =====================================================
+
 if "debate_turns" not in st.session_state:
     st.session_state["debate_turns"] = []
+
+if "pending_debate_transcription" not in st.session_state:
+    st.session_state["pending_debate_transcription"] = ""
+
+if "pending_speaker" not in st.session_state:
+    st.session_state["pending_speaker"] = "Participant A"
+
+if "clear_debate_text_next_run" not in st.session_state:
+    st.session_state["clear_debate_text_next_run"] = False
+
 
 # -----------------------------
 # Zone d’analyse
@@ -5477,6 +5488,9 @@ st.markdown("### Zone d’analyse")
 with st.container(border=True):
     st.caption("Collez un texte, chargez une URL, ou dictez directement.")
 
+    # =============================
+    # Dictée vocale classique
+    # =============================
     if MICRO_AVAILABLE:
         spoken_text = speech_to_text(
             language="fr",
@@ -5488,14 +5502,26 @@ with st.container(border=True):
         )
 
         if spoken_text:
-            st.session_state.article = spoken_text
-            st.session_state.article_source = "voice"
-            st.success("Texte dicté reçu.")
-            st.rerun()
+            if mode == "Analyse simple":
+                st.session_state.article = spoken_text
+                st.session_state.article_source = "voice"
+                st.success("Texte dicté reçu.")
+                st.rerun()
+            else:
+                st.session_state["pending_debate_transcription"] = spoken_text
+                st.session_state["pending_speaker"] = st.session_state.get(
+                    "speaker_select",
+                    "Participant A"
+                )
+                st.success("Transcription prête.")
+                st.info("Validez la transcription ci-dessous pour l’ajouter au débat.")
+                st.rerun()
     else:
-        st.caption("🎙️ Dictée vocale du mode débat indisponible dans cette version.")
+        st.caption("🎙️ Dictée vocale classique indisponible dans cette version.")
 
-    # 🎙️ MICRO MOBILE
+    # =============================
+    # Dictée vocale mobile
+    # =============================
     st.markdown("#### 🎙️ Entrée vocale mobile")
     st.caption("📱 Compatible smartphone / iPhone")
 
@@ -5506,7 +5532,9 @@ with st.container(border=True):
 
         if st.button("Transcrire l’audio", use_container_width=True):
             if client is None:
-                st.warning("Transcription vocale indisponible : clé OpenAI absente ou module OpenAI non installé.")
+                st.warning(
+                    "Transcription vocale indisponible : clé OpenAI absente ou module OpenAI non installé."
+                )
             else:
                 try:
                     with st.spinner("Transcription en cours..."):
@@ -5527,6 +5555,10 @@ with st.container(border=True):
                         st.info("Texte prêt. Cliquez sur Analyser pour lancer l’analyse.")
                     else:
                         st.session_state["pending_debate_transcription"] = text_transcribed
+                        st.session_state["pending_speaker"] = st.session_state.get(
+                            "speaker_select",
+                            "Participant A"
+                        )
                         st.success("Transcription prête.")
                         st.info("Validez la transcription ci-dessous pour l’ajouter au débat.")
                         st.rerun()
@@ -5534,118 +5566,148 @@ with st.container(border=True):
                 except Exception as e:
                     st.error(f"Erreur de transcription : {e}")
 
-    # nettoyage du champ débat si demandé
-    if st.session_state.get("clear_debate_text_next_run"):
-        st.session_state["debate_text_input"] = ""
-        st.session_state["clear_debate_text_next_run"] = False
 
-    # -----------------------------
-    # Validation transcription débat
-    # -----------------------------
-    if mode == "Débat dynamique" and st.session_state.get("pending_debate_transcription"):
+# =====================================================
+# NETTOYAGE DU CHAMP DÉBAT SI DEMANDÉ
+# =====================================================
+if st.session_state.get("clear_debate_text_next_run"):
+    st.session_state["debate_text_input"] = ""
+    st.session_state["clear_debate_text_next_run"] = False
 
-        st.markdown("### Transcription à valider")
 
-        edited_transcription = st.text_area(
-            "Corrigez si nécessaire avant validation",
-            value=st.session_state["pending_debate_transcription"],
-            key="pending_debate_transcription_editor",
-            height=160
+# =====================================================
+# FORMULAIRE PRINCIPAL
+# =====================================================
+with st.form("article_form"):
+
+    if mode == "Analyse simple":
+
+        article = st.text_area(
+            T["paste"],
+            key="article",
+            height=220,
+            label_visibility="collapsed",
+            placeholder=T["paste"]
         )
 
-        col_val, col_cancel = st.columns(2)
+    else:
 
-        with col_val:
-            if st.button("✅ Valider cette intervention", use_container_width=True):
-                turns = st.session_state.get("debate_turns", [])
-                turns.append({
+        speaker = st.selectbox(
+            "Participant",
+            ["Participant A", "Participant B"],
+            key="speaker_select"
+        )
+
+        debate_text = st.text_area(
+            "Intervention du tour",
+            key="debate_text_input",
+            height=180,
+            placeholder="Ajoutez l’intervention du participant..."
+        )
+
+    analyze_submitted = st.form_submit_button(
+        T["analyze"],
+        use_container_width=True
+    )
+
+
+# =====================================================
+# MODE DÉBAT — TEXTE ÉCRIT MIS EN ATTENTE
+# =====================================================
+if analyze_submitted and mode == "Débat dynamique":
+
+    if debate_text.strip():
+
+        st.session_state["pending_debate_transcription"] = debate_text.strip()
+        st.session_state["pending_speaker"] = speaker
+
+        st.info("Intervention prête à vérifier.")
+        st.rerun()
+
+    else:
+        st.warning("Ajoutez une intervention avant de valider.")
+
+
+# =====================================================
+# VALIDATION TRANSCRIPTION DÉBAT
+# =====================================================
+if mode == "Débat dynamique" and st.session_state.get("pending_debate_transcription"):
+
+    st.markdown("### Transcription à valider")
+
+    edited_transcription = st.text_area(
+        "Corrigez si nécessaire avant validation",
+        value=st.session_state["pending_debate_transcription"],
+        key="pending_debate_transcription_editor",
+        height=160
+    )
+
+    col_val, col_cancel = st.columns(2)
+
+    with col_val:
+        if st.button("✅ Valider cette intervention", use_container_width=True):
+
+            if edited_transcription.strip():
+
+                st.session_state["debate_turns"].append({
                     "speaker": st.session_state.get("pending_speaker", "Participant A"),
                     "text": edited_transcription.strip()
                 })
-                st.session_state["debate_turns"] = turns
 
                 st.session_state["pending_debate_transcription"] = ""
-                st.session_state["pending_debate_transcription_editor"] = ""
+                st.session_state["pending_speaker"] = "Participant A"
+                st.session_state["clear_debate_text_next_run"] = True
+
                 st.success("Intervention ajoutée au débat.")
                 st.rerun()
 
-        with col_cancel:
-            if st.button("❌ Annuler la transcription", use_container_width=True):
-                st.session_state["pending_debate_transcription"] = ""
-                st.session_state["pending_debate_transcription_editor"] = ""
-                st.rerun()
+            else:
+                st.warning("La transcription est vide.")
 
-    with st.form("article_form"):
+    with col_cancel:
+        if st.button("❌ Annuler", use_container_width=True):
 
-        if mode == "Analyse simple":
-
-            article = st.text_area(
-                T["paste"],
-                key="article",
-                height=220,
-                label_visibility="collapsed",
-                placeholder=T["paste"]
-            )
-
-        else:
-
-            speaker = st.selectbox(
-                "Participant",
-                ["Participant A", "Participant B"],
-                key="pending_speaker"
-            )
-
-            debate_text = st.text_area(
-                "Intervention du tour",
-                key="debate_text_input",
-                height=180,
-                placeholder="Ajoutez l’intervention du participant..."
-            )
-
-        analyze_submitted = st.form_submit_button(
-            T["analyze"],
-            use_container_width=True
-        )
-
-
-# -----------------------------
-# Mode débat
-# -----------------------------
-if analyze_submitted and mode != "Analyse simple":
-
-    if "debate_turns" not in st.session_state:
-        st.session_state["debate_turns"] = []
-
-    if analyze_submitted:
-
-        if debate_text.strip():
-
-            st.session_state["debate_turns"].append({
-                "speaker": speaker,
-                "text": debate_text.strip()
-            })
-
+            st.session_state["pending_debate_transcription"] = ""
+            st.session_state["pending_speaker"] = "Participant A"
             st.session_state["clear_debate_text_next_run"] = True
-            st.success("Tour ajouté au débat.")
+
             st.rerun()
 
-        else:
-            st.warning("Ajoutez une intervention avant de valider.")
 
-    if st.button("Réinitialiser le débat", use_container_width=True):
+# =====================================================
+# HISTORIQUE COMPLET DU DÉBAT
+# =====================================================
+if mode == "Débat dynamique" and st.session_state.get("debate_turns"):
 
-        st.session_state["debate_turns"] = []
-        st.session_state["clear_debate_text_next_run"] = True
-        st.rerun()
+    st.markdown("### Historique du débat")
 
-    if st.session_state["debate_turns"]:
+    for i, turn in enumerate(st.session_state["debate_turns"], start=1):
 
-        st.subheader("Historique du débat")
-
-        for i, turn in enumerate(st.session_state["debate_turns"], start=1):
-
+        with st.container(border=True):
             st.markdown(f"**Tour {i} — {turn['speaker']}**")
             st.write(turn["text"])
+
+
+# =====================================================
+# BOUTON RÉINITIALISER LE DÉBAT
+# =====================================================
+if mode == "Débat dynamique" and st.session_state.get("debate_turns"):
+
+    if st.button("🧹 Réinitialiser le débat", use_container_width=True):
+
+        st.session_state["debate_turns"] = []
+        st.session_state["pending_debate_transcription"] = ""
+        st.session_state["pending_speaker"] = "Participant A"
+        st.session_state["clear_debate_text_next_run"] = True
+
+        st.rerun()
+
+# -----------------------------
+# Mode débat — analyse complète
+# -----------------------------
+if mode == "Débat dynamique":
+
+    if st.session_state.get("debate_turns"):
 
         if st.button("Analyser tout le débat", use_container_width=True):
 
@@ -5690,6 +5752,7 @@ if analyze_submitted and mode != "Analyse simple":
             )
 
     st.stop()
+    
 # -----------------------------
 # Mode sémantique
 # -----------------------------
