@@ -5405,7 +5405,7 @@ with st.container(border=True):
             st.success("Texte dicté reçu.")
             st.rerun()
     else:
-        st.info("Microphone classique indisponible sur cette version.")
+        st.caption("🎙️ Dictée vocale du mode débat indisponible dans cette version.")
 
     # 🎙️ MICRO MOBILE
     st.markdown("#### 🎙️ Entrée vocale mobile")
