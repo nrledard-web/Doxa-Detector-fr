@@ -5477,6 +5477,9 @@ if "pending_speaker" not in st.session_state:
 if "clear_debate_text_next_run" not in st.session_state:
     st.session_state["clear_debate_text_next_run"] = False
 
+if "pending_editor_version" not in st.session_state:
+    st.session_state["pending_editor_version"] = 0
+
 
 # -----------------------------
 # Zone d’analyse
