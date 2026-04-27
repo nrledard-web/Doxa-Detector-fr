@@ -1,6 +1,7 @@
 import streamlit as st 
 import json
 import re
+import urllib.parse
 from datetime import datetime, timedelta
 from dataclasses import dataclass
 from typing import Dict, List, Optional
@@ -1004,6 +1005,35 @@ def interpret_closure_gauge(value: float):
     else:
         return "Clôture critique", "#dc2626", "Le texte semble fortement verrouillé par sa propre structure."
 
+def generate_share_block(result):
+
+    credibility = result.get("hard_fact_score", 0)
+    gravity = result.get("cognitive_gravity", 0)
+
+    brain = result.get("doxa_brain", {})
+    stability = brain.get("cognitive_stability", 0)
+    regime = brain.get("dominant_regime", "")
+    verdict = brain.get("brain_verdict", "")
+
+    summary = f"""
+Analyse DOXA Detector
+
+Crédibilité : {credibility}/20
+Gravité cognitive : {gravity}
+Stabilité cognitive : {stability}
+
+Régime dominant : {regime}
+
+Verdict :
+{verdict}
+
+Analyse réalisée avec DOXA Detector
+M = (G + N) − D
+"""
+
+    encoded = urllib.parse.quote(summary)
+
+    return summary, encoded
 
 def render_custom_gauge(value: float, color: str):
     value = max(0.0, min(1.0, value))
@@ -1033,7 +1063,37 @@ def extract_article_from_url(url: str) -> str:
         article = Article(url)
         article.download()
         article.parse()
-        return article.text
+
+        if article.text and len(article.text.strip()) > 300:
+            return article.text.strip()
+
+    except Exception:
+        pass
+
+    # Fallback HTML simple
+    try:
+        headers = {
+            "User-Agent": "Mozilla/5.0"
+        }
+
+        response = requests.get(url, headers=headers, timeout=10)
+
+        if response.status_code != 200:
+            return ""
+
+        html = response.text
+
+        # Nettoyage basique
+        html = re.sub(r"<script.*?</script>", " ", html, flags=re.DOTALL)
+        html = re.sub(r"<style.*?</style>", " ", html, flags=re.DOTALL)
+        html = re.sub(r"<[^>]+>", " ", html)
+        html = re.sub(r"\s+", " ", html).strip()
+
+        if len(html) > 300:
+            return html[:8000]
+
+        return ""
+
     except Exception:
         return ""
 
@@ -5531,6 +5591,35 @@ if st.session_state.get("multi_results"):
 elif st.session_state.get("last_keyword"):
     st.warning(T["no_exploitable_articles_found"])
 
+# =============================
+# Sources réseaux sociaux
+# =============================
+st.markdown("### Analyser une publication publique")
+
+social_url = st.text_input(
+    "Lien X, LinkedIn, Medium, ou autre page publique",
+    key="social_url_input"
+)
+
+if st.button("📥 Charger depuis un réseau social", use_container_width=True):
+    if social_url.strip():
+        texte_social = extract_article_from_url(social_url)
+
+        if texte_social:
+            st.session_state.article = texte_social
+            st.session_state.article_source = "social_url"
+            st.session_state.loaded_url = social_url
+            st.success("Publication chargée dans la zone d’analyse.")
+            st.rerun()
+        else:
+            st.warning(
+                "Impossible de récupérer automatiquement le texte. "
+                "Ce réseau social bloque probablement l’accès. "
+                "Copiez-collez le texte du post ou du commentaire dans la zone d’analyse."
+            )
+    else:
+        st.warning("Collez d’abord un lien de publication.")
+
 
 # -----------------------------
 # Chargement URL
@@ -6017,6 +6106,22 @@ if result:
 
     with st.expander("Résumé du cerveau DOXA"):
         st.write(brain.get("brain_summary", "Aucun résumé disponible."))
+
+    # =============================
+    # Partage des résultats
+    # =============================
+
+    st.markdown("### Partager l’analyse")
+
+    summary, encoded = generate_share_block(result)
+
+    st.code(summary)
+
+    st.link_button(
+        "📧 Envoyer par email",
+        f"mailto:?subject=Analyse DOXA Detector&body={encoded}",
+        use_container_width=True
+    )
 
     # =============================
     # Barre de raisonnement
