@@ -514,16 +514,16 @@ with st.container(border=True):
     with col3:
         st.markdown("### 3️⃣ Comprendre les résultats")
         st.write(
-            "L’analyse produit plusieurs indicateurs : score de raisonnement, "
+            "L’analyse produit plusieurs indicateurs : solidité argumentative, "
             "mécroyance, tension cognitive, pression rhétorique, propagande, "
             "gravité cognitive et diagnostic du cerveau DOXA."
         )
 
-    st.caption(
-        "Les résultats peuvent être partagés ou exportés, notamment par email. "
-        "DOXA Detector ne détermine pas si un texte est vrai ou faux : "
-        "il aide à comprendre la structure cognitive et argumentative d’un discours."
-    )
+        st.info(
+            "La solidité argumentative n’est pas le verdict final : "
+            "elle mesure seulement la structure du raisonnement. "
+            "L’indice de crédibilité global est calculé après l’analyse complète."
+        )
 
 # =============================
 # Philosophie derrière l'IRM
@@ -4636,6 +4636,46 @@ def compute_deceptive_coherence(G, N, D, rhetorical_pressure, propaganda_score, 
         label = "Très élevée"
 
     return deceptive, label
+
+# -------------------------------------------------
+# Pénalité des jauges affichées
+# -------------------------------------------------
+
+def compute_display_gauge_penalty(result: dict) -> float:
+
+    gauges = {
+        "normative_score": 0.6,
+        "premise_score": 0.7,
+        "logic_confusion_score": 0.9,
+        "aristotelian_fallacies_score": 1.0,
+        "scientific_simulation_score": 0.8,
+        "cherry_picking_score": 1.0,
+        "false_analogy_score": 0.7,
+        "normative_saturation_score": 0.8,
+        "narrative_overdetermination_score": 0.7,
+        "victimization_score": 0.6,
+        "moral_polarization_score": 0.7,
+        "strategic_simplification_score": 0.8,
+        "frame_shift_score": 0.6,
+        "argument_asymmetry_score": 0.7,
+        "deceptive_coherence": 1.2,
+    }
+
+    penalty = 0.0
+
+    for key, weight in gauges.items():
+
+        value = result.get(key, 0)
+
+        if value is None:
+            continue
+
+        v = normalize_display_value(value)
+
+        if v >= 0.25:
+            penalty += v * weight
+
+    return round(min(penalty, 5.0), 2)
     
 # =========================================================
 # 🎨 Étalonnage visuel unifié des jauges — version corrigée
@@ -4728,6 +4768,7 @@ def interpret_final_credibility(score: float):
         return "🟡", "Plausible", "Crédibilité correcte : ancrage factuel présent mais incomplet."
     else:
         return "🟢", "Robuste", "Crédibilité robuste : base factuelle et argumentative solide."
+
 
 # -----------------------------
 # Dérive cognitive
@@ -5343,6 +5384,23 @@ def analyze_article(text: str) -> Dict:
     result = classify_cognitive_regime(result)
 
     # -----------------------------
+    # Pénalité des jauges affichées
+    # -----------------------------
+    display_gauge_penalty = compute_display_gauge_penalty(result)
+
+    result["display_gauge_penalty"] = display_gauge_penalty
+
+    result["credibility_penalty"] = round(
+        result.get("credibility_penalty", 0) + display_gauge_penalty,
+        2
+    )
+
+    result["final_credibility_score"] = round(
+        max(0, result["final_credibility_score"] - display_gauge_penalty),
+        1
+    )
+
+    # -----------------------------
     # Pénalités finales
     # -----------------------------
     result["credibility_penalty"] = total_credibility_penalty
@@ -5714,9 +5772,24 @@ if st.session_state.get("multi_results"):
     df_plot = df_multi.copy()
     df_plot["Article"] = [f"{T['article_label']} {i+1}" for i in range(len(df_plot))]
     st.bar_chart(df_plot.set_index("Article")["Hard Fact Score"])
+
+    st.markdown("### Analyse des articles trouvés (phase de recherche)")
+
+    st.error(
+        "⚠️ IMPORTANT — Les scores et verdicts affichés dans ce tableau concernent "
+        "uniquement la recherche d’articles et la solidité argumentative des textes. "
+        "Ils ne représentent PAS l’indice final de crédibilité du discours analysé."
+    )
+
+    st.caption(
+        "Ces résultats servent seulement à comparer les articles trouvés. "
+        "Le verdict global de crédibilité est calculé plus loin après "
+        "l’analyse complète du texte."
+    )
+
     st.dataframe(df_multi, use_container_width=True, hide_index=True)
 
-    st.markdown("### Actions sur les articles trouvés")
+    st.markdown("### Examiner les articles trouvés")
 
     for i, row in df_multi.reset_index(drop=True).iterrows():
         with st.container(border=True):
@@ -5733,7 +5806,9 @@ if st.session_state.get("multi_results"):
             else:
                 color, label = "🟢", "Robuste"
 
-            st.markdown(f"**{color} Score de crédibilité : {score:.1f}/20 — {label}**")
+            st.markdown(
+                f"**{color} Score de crédibilité de l’article : {score:.1f}/20 — {label}**"
+            )            
             st.progress(score / 20)
 
             col1, col2 = st.columns(2)
@@ -5764,23 +5839,50 @@ social_url = st.text_input(
 )
 
 if st.button("📥 Charger depuis un réseau social", use_container_width=True):
+
     if social_url.strip():
-        texte_social = extract_article_from_url(social_url)
+
+        texte_social = extract_article_from_url(social_url.strip())
 
         if texte_social:
             st.session_state.article = texte_social
             st.session_state.article_source = "social_url"
-            st.session_state.loaded_url = social_url
-            st.success("Publication chargée dans la zone d’analyse.")
+            st.session_state.loaded_url = social_url.strip()
+            st.session_state.loaded_article_title = "Publication publique"
+            st.session_state.article_loaded_from_search = True
+
+            st.success("Publication chargée. Vous pouvez l’analyser juste ici.")
             st.rerun()
+
         else:
             st.warning(
                 "Impossible de récupérer automatiquement le texte. "
                 "Ce réseau social bloque probablement l’accès. "
                 "Copiez-collez le texte du post ou du commentaire dans la zone d’analyse."
             )
+
     else:
         st.warning("Collez d’abord un lien de publication.")
+
+if st.session_state.get("article_loaded_from_search") and st.session_state.get("article_source") == "social_url":
+
+    st.markdown("### 📰 Texte chargé")
+    st.success("Le texte est prêt à être analysé.")
+
+    with st.expander("Voir le texte chargé", expanded=True):
+        st.text_area(
+            "Texte extrait",
+            value=st.session_state.get("article", ""),
+            height=260,
+            disabled=True,
+            key="social_article_preview"
+        )
+
+    if st.button("🔎 Analyser ce texte maintenant", use_container_width=True):
+        st.session_state.last_result = analyze_article(st.session_state.article)
+        st.session_state.last_article = st.session_state.article
+        st.session_state.article_loaded_from_search = False
+        st.rerun()
 
 # -----------------------------
 # Chargement URL
@@ -6298,11 +6400,14 @@ if result:
     else:
         couleur_r, etiquette_r, message_r = "🟢", "Robuste", "Le raisonnement est solidement structuré."
 
-    st.subheader(f"{couleur_r} Barre de raisonnement : {etiquette_r}")
+    st.subheader(f"{couleur_r} Solidité argumentative : {etiquette_r}")
     st.progress(score / 20)
     st.caption(f"Score : {score}/20 — {message_r}")
-    st.caption("Cette jauge mesure la structure du raisonnement. La crédibilité dépend aussi de la qualité des sources et de la vérifiabilité des affirmations.")
-
+    st.caption(
+        "Cette jauge mesure la solidité argumentative du texte : structure du raisonnement, "
+        "cohérence logique et présence d’éléments vérifiables. "
+        "La crédibilité globale dépend aussi de la qualité des sources et de la vérifiabilité des affirmations."
+    )
 
     # =============================
     # Barre de crédibilité finale
