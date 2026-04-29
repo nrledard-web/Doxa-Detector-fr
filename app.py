@@ -5742,91 +5742,127 @@ if use_sample:
 # -----------------------------
 # Analyse multi-articles
 # -----------------------------
-st.subheader(T["topic_section"])
-keyword = st.text_input(T["topic"], placeholder=T["topic_placeholder"])
+if not st.session_state.get("direct_search_result_mode"):
 
-if st.button(T["analyze_topic"], key="analyze_topic"):
-    if keyword.strip():
-        st.info(T["searching"])
-        st.session_state.multi_results = analyze_multiple_articles(keyword.strip(), max_results=10)
-        st.session_state.last_keyword = keyword.strip()
-    else:
-        st.session_state.multi_results = []
-        st.warning(T["enter_keyword_first"])
+    st.subheader(T["topic_section"])
+    keyword = st.text_input(T["topic"], placeholder=T["topic_placeholder"])
 
-if st.session_state.get("multi_results"):
-    df_multi = pd.DataFrame(st.session_state.multi_results).sort_values("Hard Fact Score", ascending=False)
+    if st.button(T["analyze_topic"], key="analyze_topic"):
+        if keyword.strip():
+            st.info(T["searching"])
+            st.session_state.multi_results = analyze_multiple_articles(keyword.strip(), max_results=10)
+            st.session_state.last_keyword = keyword.strip()
+        else:
+            st.session_state.multi_results = []
+            st.warning(T["enter_keyword_first"])
 
-    st.success(f"{len(df_multi)} {T['articles_analyzed']}")
+    if st.session_state.get("multi_results"):
+        df_multi = pd.DataFrame(st.session_state.multi_results).sort_values("Hard Fact Score", ascending=False)
 
-    c1, c2 = st.columns(2)
-    c1.metric(T["analyzed_articles"], len(df_multi))
-    c2.metric(T["avg_hard_fact"], round(df_multi["Hard Fact Score"].mean(), 1))
-    st.metric(T["avg_classic_score"], round(df_multi["Score classique"].mean(), 1))
+        st.success(f"{len(df_multi)} {T['articles_analyzed']}")
 
-    ecart_type_hf = df_multi["Hard Fact Score"].std()
-    indice_doxa = "high" if ecart_type_hf < 1.5 else ("medium" if ecart_type_hf < 3 else "low")
-    st.metric(T["topic_doxa_index"], T[indice_doxa])
+        c1, c2 = st.columns(2)
+        c1.metric(T["analyzed_articles"], len(df_multi))
+        c2.metric(T["avg_hard_fact"], round(df_multi["Hard Fact Score"].mean(), 1))
+        st.metric(T["avg_classic_score"], round(df_multi["Score classique"].mean(), 1))
 
-    st.subheader(T["credibility_score_dispersion"])
-    df_plot = df_multi.copy()
-    df_plot["Article"] = [f"{T['article_label']} {i+1}" for i in range(len(df_plot))]
-    st.bar_chart(df_plot.set_index("Article")["Hard Fact Score"])
+        ecart_type_hf = df_multi["Hard Fact Score"].std()
+        indice_doxa = "high" if ecart_type_hf < 1.5 else ("medium" if ecart_type_hf < 3 else "low")
+        st.metric(T["topic_doxa_index"], T[indice_doxa])
 
-    st.markdown("### Analyse des articles trouvés (phase de recherche)")
+        st.subheader(T["credibility_score_dispersion"])
+        df_plot = df_multi.copy()
+        df_plot["Article"] = [f"{T['article_label']} {i+1}" for i in range(len(df_plot))]
+        st.bar_chart(df_plot.set_index("Article")["Hard Fact Score"])
 
-    st.error(
-        "⚠️ IMPORTANT — Les scores et verdicts affichés dans ce tableau concernent "
-        "uniquement la recherche d’articles et la solidité argumentative des textes. "
-        "Ils ne représentent PAS l’indice final de crédibilité du discours analysé."
-    )
+        st.markdown("### Analyse des articles trouvés (phase de recherche)")
 
-    st.caption(
-        "Ces résultats servent seulement à comparer les articles trouvés. "
-        "Le verdict global de crédibilité est calculé plus loin après "
-        "l’analyse complète du texte."
-    )
+        st.error(
+            "⚠️ IMPORTANT — Les scores et verdicts affichés dans ce tableau concernent "
+            "uniquement la recherche d’articles et la solidité argumentative des textes. "
+            "Ils ne représentent PAS l’indice final de crédibilité du discours analysé."
+        )
 
-    st.dataframe(df_multi, use_container_width=True, hide_index=True)
+        st.caption(
+            "Ces résultats servent seulement à comparer les articles trouvés. "
+            "Le verdict global de crédibilité est calculé plus loin après "
+            "l’analyse complète du texte."
+        )
 
-    st.markdown("### Examiner les articles trouvés")
+        st.dataframe(df_multi, use_container_width=True, hide_index=True)
 
-    for i, row in df_multi.reset_index(drop=True).iterrows():
-        with st.container(border=True):
-            st.markdown(f"### {row['Titre']}")
-            st.caption(f"{row['Source']}")
+        st.markdown("### Examiner les articles trouvés")
 
-            score = row["Hard Fact Score"]
-            if score <= 6:
-                color, label = "🔴", "Fragile"
-            elif score <= 11:
-                color, label = "🟠", "Douteux"
-            elif score <= 15:
-                color, label = "🟡", "Plausible"
-            else:
-                color, label = "🟢", "Robuste"
+        for i, row in df_multi.reset_index(drop=True).iterrows():
+            with st.container(border=True):
 
-            st.markdown(
-                f"**{color} Score de crédibilité de l’article : {score:.1f}/20 — {label}**"
-            )            
-            st.progress(score / 20)
+                st.markdown(f"### {row['Titre']}")
+                st.caption(f"{row['Source']}")
 
-            col1, col2 = st.columns(2)
-            with col1:
-                st.link_button("🌐 Ouvrir l'article", row["URL"], use_container_width=True)
-            with col2:
-                if st.button(f"📥 Charger pour analyse", key=f"load_article_{i}"):
-                    loaded_text = fetch_text_for_textarea(row["URL"])
-                    if loaded_text:
-                        st.session_state.article = loaded_text
-                        st.session_state.article_source = "url"
-                        st.session_state.loaded_url = row["URL"]
-                        st.success("Article chargé dans la zone de texte.")
+                score = row["Hard Fact Score"]
+                if score <= 6:
+                    color, label = "🔴", "Fragile"
+                elif score <= 11:
+                    color, label = "🟠", "Douteux"
+                elif score <= 15:
+                    color, label = "🟡", "Plausible"
+                else:
+                    color, label = "🟢", "Robuste"
+
+                st.markdown(
+                    f"**{color} Score de crédibilité de l’article : {score:.1f}/20 — {label}**"
+                )
+                st.progress(score / 20)
+
+                col1, col2 = st.columns(2)
+
+                with col1:
+                    st.link_button("🌐 Ouvrir l'article", row["URL"], use_container_width=True)
+
+                with col2:
+                    if st.button("📥 Charger pour analyse", key=f"load_article_{i}", use_container_width=True):
+
+                        loaded_text = fetch_text_for_textarea(row["URL"])
+
+                        if loaded_text:
+                            st.session_state.article = loaded_text
+                            st.session_state.article_source = "search"
+                            st.session_state.loaded_url = row["URL"]
+                            st.session_state.loaded_article_title = row["Titre"]
+                            st.session_state.loaded_article_index = i
+
+                            st.success("Article chargé.")
+                            st.rerun()
+                        else:
+                            st.warning("Impossible d'extraire le texte.")
+
+                if (
+                    st.session_state.get("article_source") == "search"
+                    and st.session_state.get("loaded_article_index") == i
+                ):
+                    st.markdown("### 📰 Article chargé ici")
+                    st.success("Vous pouvez l’analyser directement depuis cette carte.")
+
+                    with st.expander("Voir le texte chargé", expanded=True):
+                        st.text_area(
+                            "Texte extrait",
+                            value=st.session_state.get("article", ""),
+                            height=260,
+                            disabled=True,
+                            key=f"article_preview_search_{i}"
+                        )
+
+                    if st.button("🔎 Analyser cet article maintenant", key=f"analyze_loaded_{i}", use_container_width=True):
+                        st.session_state.last_result = analyze_article(st.session_state.article)
+                        st.session_state.last_article = st.session_state.article
+
+                        st.session_state.direct_search_result_mode = True
+                        st.session_state.selected_article_index = i
+
                         st.rerun()
-                    else:
-                        st.warning("Impossible d'extraire le texte.")
-elif st.session_state.get("last_keyword"):
-    st.warning(T["no_exploitable_articles_found"])
+
+    elif st.session_state.get("last_keyword"):
+        st.warning(T["no_exploitable_articles_found"])
 
 # =============================
 # Sources réseaux sociaux
@@ -5906,14 +5942,34 @@ if load_url_submitted:
     else:
         st.warning(T["paste_url_first"])
 
-st.markdown("## Mode d’analyse")
+# =============================
+# Mode résultat direct depuis recherche
+# =============================
+if st.session_state.get("direct_search_result_mode"):
 
-mode = st.radio(
-    "Choisissez le mode",
-    ["Analyse simple", "Débat dynamique"],
-    horizontal=True,
-    key="mode"
-)
+    st.info("Article analysé depuis la recherche. Affichage direct du résultat.")
+
+    if st.button("↩️ Revenir au mode normal", key="back_to_normal_mode", use_container_width=True):
+        st.session_state.direct_search_result_mode = False
+        st.session_state.selected_article_index = None
+        st.rerun()
+
+    result = st.session_state.last_result
+    article_for_analysis = st.session_state.last_article
+
+    mode = "Analyse simple"
+    analyze_submitted = False
+
+else:
+
+    st.markdown("## Mode d’analyse")
+
+    mode = st.radio(
+        "Choisissez le mode",
+        ["Analyse simple", "Débat dynamique"],
+        horizontal=True,
+        key="mode"
+    )
 # =====================================================
 # INITIALISATION ROBUSTE
 # =====================================================
@@ -5937,7 +5993,7 @@ if "pending_editor_version" not in st.session_state:
 # =====================================================
 # SÉLECTEUR PARTICIPANT AVANT MICRO
 # =====================================================
-if mode == "Débat dynamique":
+if not st.session_state.get("direct_search_result_mode") and mode == "Débat dynamique":
     st.session_state["debate_speaker_choice"] = st.radio(
         "Participant pour la prochaine intervention",
         ["Participant A", "Participant B"],
@@ -5945,141 +6001,165 @@ if mode == "Débat dynamique":
         key="debate_speaker_radio"
     )
 
+if st.session_state.get("direct_search_result_mode"):
+    st.markdown("### Analyse sémantique")
+    st.caption("Active une lecture du sens des affirmations via un dictionnaire sémantique assisté par IA.")
 
-# -----------------------------
-# Zone d’analyse
-# -----------------------------
-previous_article = st.session_state.article
+    if st.button(
+        "Activer l’analyse sémantique",
+        key="semantic_direct",
+        use_container_width=True
+    ):
+        st.session_state.semantic_mode = True
+        st.rerun()
 
-st.markdown("### Zone d’analyse")
-
-with st.container(border=True):
-    st.caption("Collez un texte, chargez une URL, ou dictez directement.")
-
-    # =============================
-    # Dictée vocale classique
-    # =============================
-    if MICRO_AVAILABLE:
-        spoken_text = speech_to_text(
-            language="fr",
-            start_prompt="🎙️ Dicter",
-            stop_prompt="⏹️ Stop",
-            just_once=True,
-            use_container_width=True,
-            key="speech_to_text_article"
-        )
-
-        if spoken_text:
-            if mode == "Analyse simple":
-                st.session_state.article = spoken_text
-                st.session_state.article_source = "voice"
-                st.success("Texte dicté reçu.")
-                st.rerun()
-            else:
-                st.session_state["pending_debate_transcription"] = spoken_text
-                st.session_state["pending_speaker"] = st.session_state.get(
-                    "debate_speaker_choice",
-                    "Participant A"
-                )
-                st.session_state["pending_editor_version"] += 1
-
-                st.success("Transcription prête.")
-                st.info("Validez la transcription ci-dessous pour l’ajouter au débat.")
-                st.rerun()
-
+    if st.session_state.get("semantic_mode", False):
+        st.success("Analyse sémantique activée.")
     else:
-        st.caption("🎙️ Dictée vocale classique indisponible dans cette version.")
+        st.info("Analyse sémantique inactive. La crédibilité globale reste partielle.")
 
-    # =============================
-    # Dictée vocale mobile
-    # =============================
-    st.markdown("#### 🎙️ Entrée vocale mobile")
-    st.caption("📱 Compatible smartphone / iPhone")
+if not st.session_state.get("direct_search_result_mode"):
 
-    audio = st.audio_input("Dicter un texte à analyser", key="audio_mobile")
+    # -----------------------------
+    # Zone d’analyse
+    # -----------------------------
+    previous_article = st.session_state.article
 
-    if audio:
-        st.audio(audio)
+    st.markdown("### Zone d’analyse")
 
-        if st.button("Transcrire l’audio", use_container_width=True):
-            if client is None:
-                st.warning(
-                    "Transcription vocale indisponible : clé OpenAI absente ou module OpenAI non installé."
-                )
-            else:
-                try:
-                    with st.spinner("Transcription en cours..."):
-                        audio_bytes = audio.getvalue()
+    with st.container(border=True):
 
-                        transcript = client.audio.transcriptions.create(
-                            model="gpt-4o-mini-transcribe",
-                            file=("audio.wav", audio_bytes, "audio/wav")
-                        )
+        st.caption("Collez un texte, chargez une URL, ou dictez directement.")
 
-                    text_transcribed = transcript.text
-                    st.session_state["speech_to_text_result"] = text_transcribed
+        # =============================
+        # Dictée vocale classique
+        # =============================
+        if MICRO_AVAILABLE:
+            spoken_text = speech_to_text(
+                language="fr",
+                start_prompt="🎙️ Dicter",
+                stop_prompt="⏹️ Stop",
+                just_once=True,
+                use_container_width=True,
+                key="speech_to_text_article"
+            )
 
-                    if mode == "Analyse simple":
-                        st.session_state.article = text_transcribed
-                        st.session_state.article_source = "voice"
-                        st.success("Texte transcrit et chargé dans la zone d’analyse.")
-                        st.info("Texte prêt. Cliquez sur Analyser pour lancer l’analyse.")
-                    else:
-                        st.session_state["pending_debate_transcription"] = text_transcribed
-                        st.session_state["pending_speaker"] = st.session_state.get(
-                            "debate_speaker_choice",
-                            "Participant A"
-                        )
-                        st.session_state["pending_editor_version"] += 1
+            if spoken_text:
 
-                        st.success("Transcription prête.")
-                        st.info("Validez la transcription ci-dessous pour l’ajouter au débat.")
-                        st.rerun()
+                if mode == "Analyse simple":
+                    st.session_state.article = spoken_text
+                    st.session_state.article_source = "voice"
+                    st.success("Texte dicté reçu.")
+                    st.rerun()
 
-                except Exception as e:
-                    st.error(f"Erreur de transcription : {e}")
+                else:
+                    st.session_state["pending_debate_transcription"] = spoken_text
+                    st.session_state["pending_speaker"] = st.session_state.get(
+                        "debate_speaker_choice",
+                        "Participant A"
+                    )
+                    st.session_state["pending_editor_version"] += 1
+
+                    st.success("Transcription prête.")
+                    st.info("Validez la transcription ci-dessous pour l’ajouter au débat.")
+                    st.rerun()
+
+        else:
+            st.caption("🎙️ Dictée vocale classique indisponible dans cette version.")
+
+        # =============================
+        # Dictée vocale mobile
+        # =============================
+        st.markdown("#### 🎙️ Entrée vocale mobile")
+        st.caption("📱 Compatible smartphone / iPhone")
+
+        audio = st.audio_input("Dicter un texte à analyser", key="audio_mobile")
+
+        if audio:
+            st.audio(audio)
+
+            if st.button("Transcrire l’audio", use_container_width=True):
+                if client is None:
+                    st.warning(
+                        "Transcription vocale indisponible : clé OpenAI absente ou module OpenAI non installé."
+                    )
+                else:
+                    try:
+                        with st.spinner("Transcription en cours..."):
+                            audio_bytes = audio.getvalue()
+
+                            transcript = client.audio.transcriptions.create(
+                                model="gpt-4o-mini-transcribe",
+                                file=("audio.wav", audio_bytes, "audio/wav")
+                            )
+
+                        text_transcribed = transcript.text
+                        st.session_state["speech_to_text_result"] = text_transcribed
+
+                        if mode == "Analyse simple":
+                            st.session_state.article = text_transcribed
+                            st.session_state.article_source = "voice"
+                            st.success("Texte transcrit et chargé dans la zone d’analyse.")
+                            st.info("Texte prêt. Cliquez sur Analyser pour lancer l’analyse.")
+                        else:
+                            st.session_state["pending_debate_transcription"] = text_transcribed
+                            st.session_state["pending_speaker"] = st.session_state.get(
+                                "debate_speaker_choice",
+                                "Participant A"
+                            )
+                            st.session_state["pending_editor_version"] += 1
+
+                            st.success("Transcription prête.")
+                            st.info("Validez la transcription ci-dessous pour l’ajouter au débat.")
+                            st.rerun()
+
+                    except Exception as e:
+                        st.error(f"Erreur de transcription : {e}")
 
 
 # =====================================================
 # NETTOYAGE DU CHAMP DÉBAT SI DEMANDÉ
 # =====================================================
-if st.session_state.get("clear_debate_text_next_run"):
-    st.session_state["debate_text_input"] = ""
-    st.session_state["clear_debate_text_next_run"] = False
+if not st.session_state.get("direct_search_result_mode"):
+    if st.session_state.get("clear_debate_text_next_run"):
+        st.session_state["debate_text_input"] = ""
+        st.session_state["clear_debate_text_next_run"] = False
 
 
 # =====================================================
 # FORMULAIRE PRINCIPAL
 # =====================================================
-with st.form("article_form"):
+if not st.session_state.get("direct_search_result_mode"):
 
-    if mode == "Analyse simple":
+    with st.form("article_form"):
 
-        article = st.text_area(
-            T["paste"],
-            key="article",
-            height=220,
-            label_visibility="collapsed",
-            placeholder=T["paste"]
+        if mode == "Analyse simple":
+
+            article = st.text_area(
+                T["paste"],
+                key="article",
+                height=220,
+                label_visibility="collapsed",
+                placeholder=T["paste"]
+            )
+
+        else:
+
+            speaker = st.session_state.get("debate_speaker_choice", "Participant A")
+
+            st.info(f"Participant sélectionné : {speaker}")
+
+            debate_text = st.text_area(
+                "Intervention du tour",
+                key="debate_text_input",
+                height=180,
+                placeholder="Ajoutez l’intervention du participant..."
+            )
+
+        analyze_submitted = st.form_submit_button(
+            T["analyze"],
+            use_container_width=True
         )
-
-    else:
-
-        speaker = st.session_state.get("debate_speaker_choice", "Participant A")
-
-        st.info(f"Participant sélectionné : {speaker}")
-
-        debate_text = st.text_area(
-            "Intervention du tour",
-            key="debate_text_input",
-            height=180,
-            placeholder="Ajoutez l’intervention du participant..."
-        )
-
-    analyze_submitted = st.form_submit_button(
-        T["analyze"],
-        use_container_width=True
-    )
 
 
 # =====================================================
@@ -6234,7 +6314,11 @@ if "semantic_mode" not in st.session_state:
 st.markdown("### Analyse sémantique")
 st.caption("Active une lecture du sens des affirmations via un dictionnaire sémantique assisté par IA.")
 
-if st.button("Activer l’analyse sémantique", use_container_width=True):
+if st.button(
+    "Activer l’analyse sémantique",
+    key="semantic_normal",
+    use_container_width=True
+):
     st.session_state.semantic_mode = True
 
 if st.session_state.semantic_mode:
