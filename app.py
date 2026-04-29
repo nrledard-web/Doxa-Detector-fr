@@ -942,6 +942,45 @@ MORALISATION_DISCOURS = [
     "justice requires",
     "we cannot remain indifferent"
 ]
+ABSOLUTE_PREDICTION_MARKERS = [
+    "il est certain que",
+    "il est absolument certain",
+    "il est évident que",
+    "il est inévitable",
+    "c'est inévitable",
+    "cela va provoquer",
+    "cela va entraîner",
+    "cela va conduire",
+    "nous allons vers",
+    "nous allons assister à",
+    "va nécessairement",
+    "finira par",
+]
+THREAT_AMPLIFICATION_MARKERS = [
+    "crise majeure",
+    "crise sociale majeure",
+    "catastrophe",
+    "effondrement",
+    "danger imminent",
+    "grave menace",
+    "menace existentielle",
+    "chaos",
+    "désastre",
+    "urgence absolue",
+    "avant qu'il ne soit trop tard",
+    "si rien n'est fait",
+]
+STRONG_CERTAINTY_MARKERS = [
+    "il est absolument certain",
+    "il ne fait aucun doute",
+    "sans aucun doute",
+    "il est évident que",
+    "il est incontestable",
+    "cela prouve que",
+    "preuve irréfutable",
+    "personne ne peut nier",
+    "de toute évidence",
+]
 def detect_political_patterns(text: str):
     """
     Détecte des manœuvres discursives politiques ou rhétoriques
@@ -1093,7 +1132,7 @@ def interpret_propaganda_gauge(value: float):
     elif value < 0.80:
         return "Élevé", "#f97316", "Le discours semble fortement orienté et cherche à imposer un cadrage interprétatif."
     else:
-        return "Très élevé", "#dc2626", "Le texte présente une structure fortement propagandiste ou de verrouillage idéologique."       
+        return "Très élevé", "#dc2626", "Le texte présente une structure fortement propagandiste ou de verrouillage idéologique."
 
 def interpret_discursive_profile(
     lie_gauge: float,
@@ -2725,6 +2764,34 @@ JUDGMENT_MARKERS = [
     "assimilé à", "associé à", "accusé de",
 ]
 
+NARRATIVE_PRESSURE_MARKERS = [
+    "il est évident", "il est certain", "sans aucun doute",
+    "il ne fait aucun doute", "il faut agir", "immédiatement",
+    "avant qu'il ne soit trop tard", "crise majeure",
+    "catastrophe", "effondrement", "menace", "danger",
+    "la seule solution", "la seule conclusion", "nous allons vers"
+]
+
+CONCLUSION_MARKERS = [
+    "donc", "ainsi", "par conséquent", "cela prouve",
+    "la conclusion est", "il s'ensuit", "c'est pourquoi"
+]
+
+REASON_MARKERS = [
+    "car", "parce que", "puisque", "en raison de",
+    "étant donné", "du fait que", "cela s'explique"
+]
+
+NUANCE_MARKERS = [
+    "cependant", "toutefois", "néanmoins", "pourtant",
+    "en revanche", "il faut nuancer", "cela dépend",
+    "dans certains cas", "certains estiment", "d'autres pensent"
+]
+
+ASSERTION_MARKERS = [
+    "est", "sont", "doit", "doivent", "va", "vont",
+    "toujours", "jamais", "aucun", "tous", "personne"
+]
 
 def detect_normative_charges(text: str):
     if not text or not text.strip():
@@ -4788,6 +4855,188 @@ def interpret_cognitive_drift(value: float):
 
     return color, label, msg
 
+def count_marker_occurrences(text, markers):
+    t = text.lower()
+    return sum(t.count(marker.lower()) for marker in markers)
+
+
+def normalize_score(value, max_value=10):
+    if max_value <= 0:
+        return 0
+    return round(min(value / max_value, 1), 3)
+
+
+def label_level(score):
+    if score < 0.25:
+        return "Faible"
+    elif score < 0.50:
+        return "Modérée"
+    elif score < 0.75:
+        return "Élevée"
+    else:
+        return "Très élevée"
+
+
+def compute_narrative_pressure(text):
+    sentences = max(len(re.split(r"[.!?]+", text)), 1)
+    markers = count_marker_occurrences(text, NARRATIVE_PRESSURE_MARKERS)
+
+    score = min((markers / sentences) * 2.5, 1)
+
+    return {
+        "score": round(score, 3),
+        "label": label_level(score),
+        "markers": markers,
+        "interpretation": "Le texte exerce une pression vers une conclusion." if score >= 0.4 else "Pression narrative limitée."
+    }
+
+
+def compute_logical_jump(text):
+    conclusions = count_marker_occurrences(text, CONCLUSION_MARKERS)
+    reasons = count_marker_occurrences(text, REASON_MARKERS)
+
+    raw = max(conclusions - reasons, 0)
+    score = min(raw / max(conclusions, 1), 1)
+
+    return {
+        "score": round(score, 3),
+        "label": label_level(score),
+        "conclusions": conclusions,
+        "reasons": reasons,
+        "interpretation": "Conclusion possiblement insuffisamment démontrée." if score >= 0.4 else "Enchaînement logique relativement progressif."
+    }
+
+
+def compute_argument_asymmetry(text):
+    assertions = count_marker_occurrences(text, ASSERTION_MARKERS)
+    nuances = count_marker_occurrences(text, NUANCE_MARKERS)
+
+    raw = assertions / max(nuances + 1, 1)
+    score = min(raw / 8, 1)
+
+    return {
+        "score": round(score, 3),
+        "label": label_level(score),
+        "assertions": assertions,
+        "nuances": nuances,
+        "interpretation": "Le discours paraît unilatéral ou peu révisable." if score >= 0.4 else "Présence suffisante de nuances ou d'équilibre."
+    }
+
+
+def compute_argument_density(text):
+    words = re.findall(r"\b[\wÀ-ÿ'-]+\b", text.lower())
+    word_count = max(len(words), 1)
+
+    reason_markers = count_marker_occurrences(text, REASON_MARKERS)
+    conclusion_markers = count_marker_occurrences(text, CONCLUSION_MARKERS)
+    nuance_markers = count_marker_occurrences(text, NUANCE_MARKERS)
+
+    argumentative_units = reason_markers + conclusion_markers + nuance_markers
+    score = min((argumentative_units / word_count) * 35, 1)
+
+    return {
+        "score": round(score, 3),
+        "label": label_level(score),
+        "units": argumentative_units,
+        "interpretation": "Le texte contient une vraie densité argumentative." if score >= 0.4 else "Le texte affirme davantage qu'il n'argumente."
+    }
+
+def compute_structural_diagnosis(
+    narrative_pressure,
+    logical_jump,
+    argument_asymmetry,
+    argument_density
+):
+    pressure = narrative_pressure["score"]
+    jump = logical_jump["score"]
+    asymmetry = argument_asymmetry["score"]
+    density = argument_density["score"]
+
+    risk = (
+        pressure * 0.30 +
+        jump * 0.30 +
+        asymmetry * 0.25 +
+        (1 - density) * 0.15
+    )
+
+    if risk < 0.25:
+        label = "Structure argumentative stable"
+        interpretation = "Le texte présente une structure argumentative relativement équilibrée."
+    elif risk < 0.50:
+        label = "Structure partiellement orientée"
+        interpretation = "Le texte présente quelques signaux d’orientation ou de raccourci argumentatif."
+    elif risk < 0.75:
+        label = "Structure argumentative fragile"
+        interpretation = "Le texte combine plusieurs signaux de pression, d’asymétrie ou de conclusion rapide."
+    else:
+        label = "Structure fortement verrouillante"
+        interpretation = "Le texte pousse fortement vers une conclusion avec peu de contrepoids argumentatif."
+
+    return {
+        "score": round(risk, 3),
+        "label": label,
+        "interpretation": interpretation,
+        "profile": {
+            "pressure": pressure,
+            "logical_jump": jump,
+            "asymmetry": asymmetry,
+            "density": density
+        }
+}
+
+def compute_absolute_prediction(text):
+    sentences = max(len([s for s in re.split(r"[.!?]+", text) if s.strip()]), 1)
+    markers = count_marker_occurrences(text, ABSOLUTE_PREDICTION_MARKERS)
+
+    score = min((markers / sentences) * 2.5, 1)
+
+    return {
+        "score": round(score, 3),
+        "label": label_level(score),
+        "markers": markers,
+        "interpretation": (
+            "Le texte formule des prédictions présentées comme certaines."
+            if score >= 0.4
+            else "Peu de prédictions affirmées comme inévitables."
+        )
+    }
+
+
+def compute_threat_amplification_advanced(text):
+    sentences = max(len([s for s in re.split(r"[.!?]+", text) if s.strip()]), 1)
+    markers = count_marker_occurrences(text, THREAT_AMPLIFICATION_MARKERS)
+
+    score = min((markers / sentences) * 2.8, 1)
+
+    return {
+        "score": round(score, 3),
+        "label": label_level(score),
+        "markers": markers,
+        "interpretation": (
+            "Le texte amplifie fortement une menace ou un danger."
+            if score >= 0.4
+            else "Peu d’amplification explicite de menace."
+        )
+    }
+
+
+def compute_strong_certainty(text):
+    sentences = max(len([s for s in re.split(r"[.!?]+", text) if s.strip()]), 1)
+    markers = count_marker_occurrences(text, STRONG_CERTAINTY_MARKERS)
+
+    score = min((markers / sentences) * 3.0, 1)
+
+    return {
+        "score": round(score, 3),
+        "label": label_level(score),
+        "markers": markers,
+        "interpretation": (
+            "Le texte emploie une certitude forte ou verrouillante."
+            if score >= 0.4
+            else "Peu de certitude forte composée détectée."
+        )
+    }
+
 def analyze_article(text: str) -> Dict:
     words = text.split()
     sentences = [s.strip() for s in re.split(r"[.!?]+", text) if len(s.strip()) > 10]
@@ -4834,7 +5083,18 @@ def analyze_article(text: str) -> Dict:
     moral_polarization_analysis = compute_moral_polarization(text)
     strategic_simplification_analysis = compute_strategic_simplification(text)
     frame_shift_analysis = compute_frame_shift(text)
+
+    absolute_prediction_analysis = compute_absolute_prediction(text)
+    threat_amplification_advanced_analysis = compute_threat_amplification_advanced(text)
+    strong_certainty_analysis = compute_strong_certainty(text)
+
+    # -----------------------------
+    # Jauges structurelles avancées
+    # -----------------------------
+    narrative_pressure_analysis = compute_narrative_pressure(text)
+    logical_jump_analysis = compute_logical_jump(text)
     argument_asymmetry_analysis = compute_argument_asymmetry(text)
+    argument_density_analysis = compute_argument_density(text)
 
     certainty = len(re.findall(r"certain|absolument|prouvé|évident|incontestable", text.lower()))
     emotional = len(re.findall(r"|".join(re.escape(w) for w in EMOTIONAL_WORDS), text.lower()))
@@ -5310,9 +5570,38 @@ def analyze_article(text: str) -> Dict:
         "frame_shift_interpretation": frame_shift_analysis["interpretation"],
 
         "argument_asymmetry_score": argument_asymmetry_analysis["score"],
-        "argument_attack_count": argument_asymmetry_analysis["attack_count"],
-        "argument_support_count": argument_asymmetry_analysis["argument_count"],
+        "argument_attack_count": argument_asymmetry_analysis.get("attack_count", 0), 
+        "argument_support_count": argument_asymmetry_analysis.get("support_count", argument_asymmetry_analysis.get("nuances", 0)),
         "argument_asymmetry_interpretation": argument_asymmetry_analysis["interpretation"],
+       
+        "argument_asymmetry_label": argument_asymmetry_analysis["label"],
+        "argument_assertions_count": argument_asymmetry_analysis["assertions"],
+        "argument_nuances_count": argument_asymmetry_analysis["nuances"],
+        "argument_counterweight_count": argument_asymmetry_analysis.get("counterweight_count", 0),
+
+        "narrative_pressure_score": narrative_pressure_analysis["score"],
+        "narrative_pressure_label": narrative_pressure_analysis["label"],
+        "narrative_pressure_interpretation": narrative_pressure_analysis["interpretation"],
+
+        "logical_jump_score": logical_jump_analysis["score"],
+        "logical_jump_label": logical_jump_analysis["label"],
+        "logical_jump_interpretation": logical_jump_analysis["interpretation"],
+
+        "argument_density_score": argument_density_analysis["score"],
+        "argument_density_label": argument_density_analysis["label"],
+        "argument_density_interpretation": argument_density_analysis["interpretation"],
+
+        "absolute_prediction_score": absolute_prediction_analysis["score"],
+        "absolute_prediction_label": absolute_prediction_analysis["label"],
+        "absolute_prediction_interpretation": absolute_prediction_analysis["interpretation"],
+
+        "threat_amplification_advanced_score": threat_amplification_advanced_analysis["score"],
+        "threat_amplification_advanced_label": threat_amplification_advanced_analysis["label"],
+        "threat_amplification_advanced_interpretation": threat_amplification_advanced_analysis["interpretation"],
+
+        "strong_certainty_score": strong_certainty_analysis["score"],
+        "strong_certainty_label": strong_certainty_analysis["label"],
+        "strong_certainty_interpretation": strong_certainty_analysis["interpretation"],
 
         "linguistic_trigger_count": ling["trigger_count"],
         "linguistic_pressure_hits": ling["rhetorical_pressure"],
@@ -6374,6 +6663,70 @@ if result:
     st.caption(f"Score analogique : {base_score}/20")
 
     st.divider()
+
+# =============================
+# Jauges structurelles avancées
+# =============================
+
+result = st.session_state.last_result
+article_for_analysis = st.session_state.last_article
+
+if isinstance(result, dict):
+
+    st.subheader("Jauges structurelles avancées")
+
+    gauges = [
+        (
+            "Pression narrative",
+            result.get("narrative_pressure_score", 0),
+            result.get("narrative_pressure_label", "Non calculée"),
+            result.get("narrative_pressure_interpretation", "")
+        ),
+        (
+            "Saut logique",
+            result.get("logical_jump_score", 0),
+            result.get("logical_jump_label", "Non calculée"),
+            result.get("logical_jump_interpretation", "")
+        ),
+        (
+            "Asymétrie argumentative",
+            result.get("argument_asymmetry_score", 0),
+            result.get("argument_asymmetry_label", "Non calculée"),
+            result.get("argument_asymmetry_interpretation", "")
+        ),
+        (
+            "Densité argumentative",
+            result.get("argument_density_score", 0),
+            result.get("argument_density_label", "Non calculée"),
+            result.get("argument_density_interpretation", "")
+        ),
+        (
+            "Prédiction absolue",
+            result.get("absolute_prediction_score", 0),
+            result.get("absolute_prediction_label", "Non calculée"),
+            result.get("absolute_prediction_interpretation", "")
+        ),
+        (
+            "Amplification de menace",
+            result.get("threat_amplification_advanced_score", 0),
+            result.get("threat_amplification_advanced_label", "Non calculée"),
+            result.get("threat_amplification_advanced_interpretation", "")
+        ),
+        (
+            "Certitude forte composée",
+            result.get("strong_certainty_score", 0),
+            result.get("strong_certainty_label", "Non calculée"),
+            result.get("strong_certainty_interpretation", "")
+        ),
+    ]
+
+    for title, score, label, interpretation in gauges:
+        st.markdown(f"**{title}**")
+        st.progress(score)
+        st.caption(f"{label} — {round(score * 100, 1)}%")
+        if interpretation:
+            st.write(interpretation)
+        st.divider()
 
     # =============================
     # Analyse sémantique du discours
