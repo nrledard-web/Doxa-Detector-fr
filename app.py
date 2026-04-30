@@ -538,7 +538,7 @@ with st.container(border=True):
 # Philosophie derrière l'IRM
 # =============================
 
-st.markdown("### 🧠 La philosophie derrière l’IRM")
+st.markdown("### 🧠 La philosophie (notion fondatrice et découverte majeure derrière l’IRM")
 
 st.caption(
     "La notion de mécroyance et le modèle cognitif utilisé par DOXA Detector "
