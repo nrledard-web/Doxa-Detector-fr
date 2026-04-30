@@ -1372,6 +1372,27 @@ def search_articles_by_keyword(keyword: str, max_results: int = 10) -> List[Dict
 
                 seen_urls.add(url)
 
+                # Filtre domaines parasites / peu exploitables
+                blocked_domains = [
+                    "salonbeige.fr",
+                    "lesalonbeige.fr",
+                ]
+
+                if any(domain in url.lower() for domain in blocked_domains):
+                    continue
+
+                text = fetch_text_for_textarea(url)
+
+                if not text or len(text.strip()) < 500:
+                    continue
+
+                web_noise = detect_web_noise(text)
+
+                if web_noise["is_noise"]:
+                    continue
+
+                analysis = analyze_article(text)
+
                 articles.append({
                     "title": title,
                     "url": url,
@@ -5943,7 +5964,19 @@ def analyze_multiple_articles(keyword: str, max_results: int = 10) -> List[Dict]
 def fetch_text_for_textarea(url: str) -> str:
     try:
         text = extract_article_from_url(url)
-        return (text or "").strip()
+        text = (text or "").strip()
+
+        if not text:
+            return ""
+
+        # filtre page parasite
+        noise = detect_web_noise(text)
+
+        if noise["is_noise"]:
+            return ""
+
+        return text
+
     except Exception:
         return ""
 
@@ -6034,6 +6067,49 @@ def detect_discourse_type(result):
         "Le texte ne présente pas assez d’indices dominants pour être classé clairement."
     )
 
+# =====================================================
+# DÉTECTION PAGE WEB PARASITE
+# =====================================================
+
+def detect_web_noise(text):
+    t = text.lower()
+
+    noise_markers = [
+        "accueil", "blogs", "vidéos", "contact", "à propos",
+        "se connecter", "s'inscrire", "mot de passe oublié",
+        "publier une réponse", "annuler votre réponse",
+        "catégories", "recherche", "faire un don",
+        "cookies", "politique de confidentialité",
+        "google analytics", "centre de confidentialité",
+        "dernières petites annonces", "articles liés",
+        "partager cet article", "imprimer ou envoyer",
+        "voir toutes les annonces", "proposer une annonce",
+        "liste des événements", "proposer un événement"
+    ]
+
+    hits = sum(1 for marker in noise_markers if marker in t)
+
+    words = re.findall(r"\b[\wà-ÿ'-]+\b", t)
+    total_words = len(words)
+
+    sentences = re.split(r"[.!?]+", text)
+
+    real_sentences = [
+        s.strip() for s in sentences
+        if len(s.strip().split()) >= 8
+    ]
+
+    return {
+        "hits": hits,
+        "total_words": total_words,
+        "real_sentences": len(real_sentences),
+
+        # condition améliorée
+        "is_noise": hits >= 6 and (
+            len(real_sentences) < 8
+            or hits / max(total_words,1) > 0.02
+        )
+    }
 # -----------------------------
 # Réglages
 # -----------------------------
@@ -6087,40 +6163,23 @@ if not st.session_state.get("direct_search_result_mode"):
             st.session_state.multi_results = []
             st.warning(T["enter_keyword_first"])
 
+    if st.button("🔄 Réinitialiser la recherche", use_container_width=True):
+        st.session_state.multi_results = []
+        st.session_state.last_keyword = ""
+        st.cache_data.clear()
+        st.rerun()
+
     if st.session_state.get("multi_results"):
         df_multi = pd.DataFrame(st.session_state.multi_results).sort_values("Hard Fact Score", ascending=False)
 
         st.success(f"{len(df_multi)} {T['articles_analyzed']}")
 
-        c1, c2 = st.columns(2)
-        c1.metric(T["analyzed_articles"], len(df_multi))
-        c2.metric(T["avg_hard_fact"], round(df_multi["Hard Fact Score"].mean(), 1))
-        st.metric(T["avg_classic_score"], round(df_multi["Score classique"].mean(), 1))
-
-        ecart_type_hf = df_multi["Hard Fact Score"].std()
-        indice_doxa = "high" if ecart_type_hf < 1.5 else ("medium" if ecart_type_hf < 3 else "low")
-        st.metric(T["topic_doxa_index"], T[indice_doxa])
-
-        st.subheader(T["credibility_score_dispersion"])
-        df_plot = df_multi.copy()
-        df_plot["Article"] = [f"{T['article_label']} {i+1}" for i in range(len(df_plot))]
-        st.bar_chart(df_plot.set_index("Article")["Hard Fact Score"])
-
-        st.markdown("### Analyse des articles trouvés (phase de recherche)")
-
-        st.error(
-            "⚠️ IMPORTANT — Les scores et verdicts affichés dans ce tableau concernent "
-            "uniquement la recherche d’articles et la solidité argumentative des textes. "
-            "Ils ne représentent PAS l’indice final de crédibilité du discours analysé."
-        )
-
         st.caption(
-            "Ces résultats servent seulement à comparer les articles trouvés. "
-            "Le verdict global de crédibilité est calculé plus loin après "
-            "l’analyse complète du texte."
+            "🔎 Recherche automatique de sources basée sur la formule cognitive M = (G + N) − D."
         )
 
-        st.dataframe(df_multi, use_container_width=True, hide_index=True)
+        if False:
+            st.dataframe(df_multi, use_container_width=True, hide_index=True)
 
         st.markdown("### Examiner les articles trouvés")
 
@@ -6130,21 +6189,6 @@ if not st.session_state.get("direct_search_result_mode"):
                 st.markdown(f"### {row['Titre']}")
                 st.caption(f"{row['Source']}")
 
-                score = row["Hard Fact Score"]
-                if score <= 6:
-                    color, label = "🔴", "Fragile"
-                elif score <= 11:
-                    color, label = "🟠", "Douteux"
-                elif score <= 15:
-                    color, label = "🟡", "Plausible"
-                else:
-                    color, label = "🟢", "Robuste"
-
-                st.markdown(
-                    f"**{color} Score de crédibilité de l’article : {score:.1f}/20 — {label}**"
-                )
-                st.progress(score / 20)
-
                 col1, col2 = st.columns(2)
 
                 with col1:
@@ -6152,45 +6196,22 @@ if not st.session_state.get("direct_search_result_mode"):
 
                 with col2:
                     if st.button("📥 Charger pour analyse", key=f"load_article_{i}", use_container_width=True):
-
+                
                         loaded_text = fetch_text_for_textarea(row["URL"])
-
-                        if loaded_text:
+                
+                        if loaded_text and not detect_web_noise(loaded_text)["is_noise"]:
+                
                             st.session_state.article = loaded_text
                             st.session_state.article_source = "search"
                             st.session_state.loaded_url = row["URL"]
                             st.session_state.loaded_article_title = row["Titre"]
                             st.session_state.loaded_article_index = i
-
+                
                             st.success("Article chargé.")
                             st.rerun()
+                
                         else:
-                            st.warning("Impossible d'extraire le texte.")
-
-                if (
-                    st.session_state.get("article_source") == "search"
-                    and st.session_state.get("loaded_article_index") == i
-                ):
-                    st.markdown("### 📰 Article chargé ici")
-                    st.success("Vous pouvez l’analyser directement depuis cette carte.")
-
-                    with st.expander("Voir le texte chargé", expanded=True):
-                        st.text_area(
-                            "Texte extrait",
-                            value=st.session_state.get("article", ""),
-                            height=260,
-                            disabled=True,
-                            key=f"article_preview_search_{i}"
-                        )
-
-                    if st.button("🔎 Analyser cet article maintenant", key=f"analyze_loaded_{i}", use_container_width=True):
-                        st.session_state.last_result = analyze_article(st.session_state.article)
-                        st.session_state.last_article = st.session_state.article
-
-                        st.session_state.direct_search_result_mode = True
-                        st.session_state.selected_article_index = i
-
-                        st.rerun()
+                            st.warning("Impossible d'extraire un vrai corps d’article exploitable.")
 
     elif st.session_state.get("last_keyword"):
         st.warning(T["no_exploitable_articles_found"])
@@ -6680,6 +6701,32 @@ if analyze_submitted:
             "porteurs de sens formant une relation minimale.\n\n"
             "Veuillez saisir une affirmation plus développée."
         )
+        st.stop()
+
+    # =====================================================
+    # Vérification : page web parasite
+    # =====================================================
+
+    web_noise = detect_web_noise(article)
+
+    if web_noise["is_noise"]:
+        st.session_state.last_result = None
+        st.session_state.last_article = article
+
+        st.warning("⚠️ Analyse bloquée")
+        st.caption("Le contenu chargé ressemble à une page de navigation ou un menu de site.")
+        st.caption(
+            f"Détection technique : {web_noise['hits']} marqueurs web, "
+            f"{web_noise['real_sentences']} phrases réelles détectées."
+        )
+
+        st.info(
+            "DOXA Detector a détecté trop d’éléments techniques : "
+            "menus, catégories, cookies, annonces ou blocs de navigation.\n\n"
+            "Pour éviter une fausse bonne note, l’analyse est interrompue.\n\n"
+            "Veuillez coller uniquement le corps de l’article."
+        )
+
         st.stop()
 
     st.session_state.last_result = analyze_article(article)
