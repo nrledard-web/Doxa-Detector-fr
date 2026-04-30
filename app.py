@@ -519,11 +519,6 @@ with st.container(border=True):
             "gravité cognitive et diagnostic du cerveau DOXA."
         )
 
-        st.info(
-            "La solidité argumentative n’est pas le verdict final : "
-            "elle mesure seulement la structure du raisonnement. "
-            "L’indice de crédibilité global est calculé après l’analyse complète."
-        )
 
 # =============================
 # Philosophie derrière l'IRM
