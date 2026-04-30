@@ -4704,6 +4704,54 @@ def compute_deceptive_coherence(G, N, D, rhetorical_pressure, propaganda_score, 
 
     return deceptive, label
 
+# =========================================================
+# 🎨 Étalonnage visuel unifié des jauges
+# =========================================================
+
+def normalize_display_value(value: float) -> float:
+    """Ramène une valeur 0–1 ou 0–20 vers 0–1."""
+    if value is None:
+        return 0.0
+    return value / 20 if value > 1 else value
+
+
+def color_scale_risk(value: float) -> tuple[str, str]:
+    v = normalize_display_value(value)
+
+    if v < 0.25:
+        return "#16a34a", "🟢 Faible"
+    elif v < 0.50:
+        return "#84cc16", "🟡 Modéré"
+    elif v < 0.75:
+        return "#f97316", "🟠 Élevé"
+    else:
+        return "#dc2626", "🔴 Critique"
+
+
+def color_scale_quality(value: float) -> tuple[str, str]:
+    v = normalize_display_value(value)
+
+    if v < 0.25:
+        return "#dc2626", "🔴 Faible"
+    elif v < 0.50:
+        return "#f97316", "🟠 Fragile"
+    elif v < 0.75:
+        return "#ca8a04", "🟡 Correct"
+    else:
+        return "#16a34a", "🟢 Robuste"
+
+
+def interpret_generic_risk_gauge(label: str, value: float) -> str:
+    v = normalize_display_value(value)
+    color, level = color_scale_risk(v)
+    return f"<b style='color:{color}'>{label}</b> — {level} ({round(v * 100, 1)}%)"
+
+
+def interpret_generic_quality_gauge(label: str, value: float) -> str:
+    v = normalize_display_value(value)
+    color, level = color_scale_quality(v)
+    return f"<b style='color:{color}'>{label}</b> — {level} ({round(v * 100, 1)}%)"
+
 # -------------------------------------------------
 # Pénalité des jauges affichées
 # -------------------------------------------------
@@ -4743,99 +4791,6 @@ def compute_display_gauge_penalty(result: dict) -> float:
             penalty += v * weight
 
     return round(min(penalty, 5.0), 2)
-    
-# =========================================================
-# 🎨 Étalonnage visuel unifié des jauges — version corrigée
-# =========================================================
-
-def normalize_display_value(value: float) -> float:
-    """Ramène une valeur 0–1 ou 0–20 vers 0–1."""
-    if value is None:
-        return 0.0
-    return value / 20 if value > 1 else value
-
-
-def color_scale_risk(value: float) -> tuple[str, str]:
-    """
-    Pour les jauges de risque :
-    propagande, clôture, dérive, mensonge, pression rhétorique.
-    Plus c'est haut, plus c'est mauvais.
-    """
-    v = normalize_display_value(value)
-
-    if v < 0.25:
-        return "#16a34a", "🟢 Faible"
-    elif v < 0.50:
-        return "#84cc16", "🟡 Modéré"
-    elif v < 0.75:
-        return "#f97316", "🟠 Élevé"
-    else:
-        return "#dc2626", "🔴 Critique"
-
-
-def color_scale_quality(value: float) -> tuple[str, str]:
-    """
-    Pour les scores de qualité :
-    Hard Fact Score, crédibilité finale, raisonnement.
-    Plus c'est haut, meilleur c'est.
-    """
-    v = normalize_display_value(value)
-
-    if v < 0.25:
-        return "#dc2626", "🔴 Faible"
-    elif v < 0.50:
-        return "#f97316", "🟠 Fragile"
-    elif v < 0.75:
-        return "#ca8a04", "🟡 Correct"
-    else:
-        return "#16a34a", "🟢 Robuste"
-
-
-def interpret_generic_risk_gauge(label: str, value: float) -> str:
-    v = normalize_display_value(value)
-    color, level = color_scale_risk(v)
-    return f"<b style='color:{color}'>{label}</b> — {level} ({round(v * 100, 1)}%)"
-
-
-def interpret_generic_quality_gauge(label: str, value: float) -> str:
-    v = normalize_display_value(value)
-    color, level = color_scale_quality(v)
-    return f"<b style='color:{color}'>{label}</b> — {level} ({round(v * 100, 1)}%)"
-
-
-# -----------------------------
-# Barre de raisonnement
-# -----------------------------
-def interpret_reasoning_bar(score: float):
-    v = normalize_display_value(score)
-    color, label = color_scale_quality(v)
-
-    if v < 0.25:
-        msg = "Raisonnement très faible ou incohérent."
-    elif v < 0.50:
-        msg = "Raisonnement partiellement structuré, encore fragile."
-    elif v < 0.75:
-        msg = "Raisonnement globalement cohérent, mais vérifiabilité moyenne."
-    else:
-        msg = "Raisonnement robuste. Vérifiez maintenant la solidité des sources et des prémisses."
-
-    return color, label, msg
-
-
-# -----------------------------
-# Crédibilité finale
-# -----------------------------
-def interpret_final_credibility(score: float):
-
-    if score <= 6:
-        return "🔴", "Fragile", "Crédibilité faible : discours fragile, peu vérifiable ou fortement orienté."
-    elif score <= 11:
-        return "🟠", "Douteux", "Crédibilité prudente : plusieurs signaux de fragilité détectés."
-    elif score <= 15:
-        return "🟡", "Plausible", "Crédibilité correcte : ancrage factuel présent mais incomplet."
-    else:
-        return "🟢", "Robuste", "Crédibilité robuste : base factuelle et argumentative solide."
-
 
 # -----------------------------
 # Dérive cognitive
@@ -5992,6 +5947,93 @@ def fetch_text_for_textarea(url: str) -> str:
     except Exception:
         return ""
 
+# =====================================================
+# AIDE DE LECTURE DES JAUGES
+# =====================================================
+def show_gauge_help():
+    with st.expander("📘 Comment lire les jauges", expanded=False):
+        st.markdown("""
+Chaque jauge mesure un mécanisme du discours : raisonnement, pression rhétorique, biais argumentatifs ou degré de certitude.
+
+Les jauges n’indiquent pas si un texte est vrai ou faux, mais **la solidité de sa structure cognitive**.
+
+- 🟢 **Vert** → structure saine ou raisonnement solide
+- 🟠 **Orange** → fragilité, raisonnement incomplet ou insuffisamment démontré
+- 🔴 **Rouge** → dérive cognitive importante ou manipulation possible
+
+**Les textes les plus solides sont ceux qui allument le moins de jauges, ou qui restent majoritairement dans le vert.**
+
+---
+
+### Poids des jauges
+
+Toutes les jauges n’ont pas la même influence sur le résultat final.
+
+Certaines jauges structurelles ont un **coefficient plus élevé**, car elles signalent des problèmes fondamentaux dans le raisonnement.
+
+**Une petite jauge avec un coefficient élevé peut peser autant qu’une grande jauge secondaire.**
+
+Le score final dépend donc **à la fois de l’intensité des jauges et de leur poids dans l’analyse.**
+
+---
+
+### Important
+
+Un texte peut être **cohérent sans être démonstratif**.
+
+Les discours philosophiques, moraux ou spéculatifs obtiennent souvent des scores intermédiaires, car ils reposent davantage sur des idées générales que sur des faits vérifiables.
+""")
+
+
+# =====================================================
+# TYPE DE DISCOURS DÉTECTÉ
+# =====================================================
+def detect_discourse_type(result):
+    G = result.get("G", 0)
+    N = result.get("N", 0)
+    D = result.get("D", 0)
+    V = result.get("V", 0)
+
+    rhetorical_pressure = result.get("rhetorical_pressure", 0)
+    propaganda = result.get("propaganda_score", 0)
+    closure = result.get("cognitive_closure", 0)
+    final_score = result.get("final_credibility_score", result.get("hard_fact_score", 0))
+
+    if propaganda >= 0.6 or rhetorical_pressure >= 0.7 or closure >= 0.7:
+        return (
+            "Discours propagandiste",
+            "Forte pression rhétorique, simplification narrative ou fermeture cognitive."
+        )
+
+    if rhetorical_pressure >= 0.4 or D >= 7:
+        return (
+            "Discours polémique",
+            "Argumentation orientée, certitude élevée ou pression rhétorique notable."
+        )
+
+    if G >= 6 and V >= 6 and final_score >= 13:
+        return (
+            "Discours factuel",
+            "Raisonnement appuyé sur des éléments vérifiables, des sources ou des faits identifiables."
+        )
+
+    if N >= 7 and G < 4 and V < 5 and rhetorical_pressure < 0.3:
+        return (
+            "Discours spéculatif / philosophique",
+            "Réflexion conceptuelle cohérente, mais reposant surtout sur des idées générales plutôt que sur des éléments vérifiables."
+        )
+
+    if N >= 6 and rhetorical_pressure < 0.4:
+        return (
+            "Discours analytique",
+            "Raisonnement structuré, mais avec une vérifiabilité ou une démonstration encore partielle."
+        )
+
+    return (
+        "Discours indéterminé",
+        "Le texte ne présente pas assez d’indices dominants pour être classé clairement."
+    )
+
 # -----------------------------
 # Réglages
 # -----------------------------
@@ -6651,326 +6693,331 @@ if result:
     # =============================
     # Analyse analogique du raisonnement
     # =============================
-
+    
     st.subheader("Analyse analogique du raisonnement")
     st.caption(
         "Analyse analogique du raisonnement à partir des structures du langage afin d’estimer la solidité épistémique du discours."
     )
-
+    
     base_score = result.get("final_credibility_score", result["hard_fact_score"])
-
+    
     st.progress(base_score / 20)
-    st.caption(f"Score analogique : {base_score}/20")
-
+    st.caption(f"Score analogique : {round(base_score,1)}/20")
+    
+    st.divider()
+    show_gauge_help()
+    
+    disc_type, disc_explanation = detect_discourse_type(result)
+    
+    st.markdown("### Type de discours détecté")
+    st.info(f"**{disc_type}** — {disc_explanation}")
+    
     st.divider()
 
 # =============================
 # Jauges structurelles avancées
 # =============================
 
-result = st.session_state.last_result
-article_for_analysis = st.session_state.last_article
+result = st.session_state.get("last_result")
+article_for_analysis = st.session_state.get("last_article", "")
 
-if isinstance(result, dict):
+if not result:
+    st.info(T["paste_text_or_load_url"])
+    st.stop()
 
-    st.subheader("Jauges structurelles avancées")
+st.subheader("Jauges structurelles avancées")
 
-    gauges = [
-        (
-            "Pression narrative",
-            result.get("narrative_pressure_score", 0),
-            result.get("narrative_pressure_label", "Non calculée"),
-            result.get("narrative_pressure_interpretation", "")
-        ),
-        (
-            "Saut logique",
-            result.get("logical_jump_score", 0),
-            result.get("logical_jump_label", "Non calculée"),
-            result.get("logical_jump_interpretation", "")
-        ),
-        (
-            "Asymétrie argumentative",
-            result.get("argument_asymmetry_score", 0),
-            result.get("argument_asymmetry_label", "Non calculée"),
-            result.get("argument_asymmetry_interpretation", "")
-        ),
-        (
-            "Densité argumentative",
-            result.get("argument_density_score", 0),
-            result.get("argument_density_label", "Non calculée"),
-            result.get("argument_density_interpretation", "")
-        ),
-        (
-            "Prédiction absolue",
-            result.get("absolute_prediction_score", 0),
-            result.get("absolute_prediction_label", "Non calculée"),
-            result.get("absolute_prediction_interpretation", "")
-        ),
-        (
-            "Amplification de menace",
-            result.get("threat_amplification_advanced_score", 0),
-            result.get("threat_amplification_advanced_label", "Non calculée"),
-            result.get("threat_amplification_advanced_interpretation", "")
-        ),
-        (
-            "Certitude forte composée",
-            result.get("strong_certainty_score", 0),
-            result.get("strong_certainty_label", "Non calculée"),
-            result.get("strong_certainty_interpretation", "")
-        ),
-    ]
+gauges = [
+    (
+        "Pression narrative",
+        result.get("narrative_pressure_score", 0),
+        result.get("narrative_pressure_label", "Non calculée"),
+        result.get("narrative_pressure_interpretation", "")
+    ),
+    (
+        "Saut logique",
+        result.get("logical_jump_score", 0),
+        result.get("logical_jump_label", "Non calculée"),
+        result.get("logical_jump_interpretation", "")
+    ),
+    (
+        "Asymétrie argumentative",
+        result.get("argument_asymmetry_score", 0),
+        result.get("argument_asymmetry_label", "Non calculée"),
+        result.get("argument_asymmetry_interpretation", "")
+    ),
+    (
+        "Densité argumentative",
+        result.get("argument_density_score", 0),
+        result.get("argument_density_label", "Non calculée"),
+        result.get("argument_density_interpretation", "")
+    ),
+    (
+        "Prédiction absolue",
+        result.get("absolute_prediction_score", 0),
+        result.get("absolute_prediction_label", "Non calculée"),
+        result.get("absolute_prediction_interpretation", "")
+    ),
+    (
+        "Amplification de menace",
+        result.get("threat_amplification_advanced_score", 0),
+        result.get("threat_amplification_advanced_label", "Non calculée"),
+        result.get("threat_amplification_advanced_interpretation", "")
+    ),
+    (
+        "Certitude forte composée",
+        result.get("strong_certainty_score", 0),
+        result.get("strong_certainty_label", "Non calculée"),
+        result.get("strong_certainty_interpretation", "")
+    ),
+]
 
-    for title, score, label, interpretation in gauges:
-        st.markdown(f"**{title}**")
-        st.progress(score)
-        st.caption(f"{label} — {round(score * 100, 1)}%")
-        if interpretation:
-            st.write(interpretation)
-        st.divider()
-
-    # =============================
-    # Analyse sémantique du discours
-    # =============================
-
-    st.subheader("Analyse sémantique du discours")
-    st.caption(
-        "Analyse la cohérence du sens et la stabilité conceptuelle du discours afin d’affiner l’évaluation épistémique."
-    )
-
-    semantic_score = result.get("semantic_score", None)
-
-    if st.session_state.get("semantic_mode", False):
-
-        if semantic_score is not None:
-
-            st.progress(semantic_score / 20)
-            st.caption(f"Score sémantique : {semantic_score}/20")
-
-            delta = round(semantic_score - base_score, 1)
-
-            st.metric(
-                "Influence sémantique sur l’évaluation épistémique",
-                f"{delta:+}/20"
-            )
-
-        else:
-            st.info("Analyse sémantique activée, mais aucun score n’est encore calculé.")
-
-    else:
-        st.info("Activez l’analyse sémantique pour calculer cette jauge.")
-
+for title, score, label, interpretation in gauges:
+    st.markdown(f"**{title}**")
+    st.progress(score)
+    st.caption(f"{label} — {round(score * 100, 1)}%")
+    if interpretation:
+        st.write(interpretation)
     st.divider()
 
-    # =============================
-    # Résumé chiffré
-    # =============================
+# =============================
+# Analyse sémantique du discours
+# =============================
 
-    col1, col2, col3 = st.columns(3)
-    col1.metric("Indice classique", result["M"], help=T["help_classic_score"])
-    col2.metric("Indice ajusté", result["improved"], help=T["help_improved_score"])
-    col3.metric("Score de raisonnement", result["hard_fact_score"], help=T["help_hard_fact_score"])
+st.subheader("Analyse sémantique du discours")
+st.caption(
+    "Analyse la cohérence du sens et la stabilité conceptuelle du discours afin d’affiner l’évaluation épistémique."
+)
 
-    # =============================
-    # Gravité cognitive globale
-    # =============================
-    gravity = result.get("cognitive_gravity", 0)
+semantic_score = result.get("semantic_score", None)
 
-    st.markdown("### Gravité cognitive globale")
-    st.progress(gravity)
+if st.session_state.get("semantic_mode", False):
 
-    if gravity < 0.2:
-        st.caption("Gravité faible — discours globalement sain.")
-    elif gravity < 0.4:
-        st.caption("Gravité modérée — quelques tensions cognitives.")
-    elif gravity < 0.6:
-        st.caption("Gravité élevée — dérive discursive notable.")
-    elif gravity < 0.8:
-        st.caption("Gravité très élevée — structure discursive problématique.")
+    if semantic_score is not None:
+
+        st.progress(semantic_score / 20)
+        st.caption(f"Score sémantique : {semantic_score}/20")
+
+        delta = round(semantic_score - base_score, 1)
+
+        st.metric(
+            "Influence sémantique sur l’évaluation épistémique",
+            f"{delta:+}/20"
+        )
+
     else:
-        st.caption("Gravité critique — convergence de manipulation ou désalignement cognitif.")
+        st.info("Analyse sémantique activée, mais aucun score n’est encore calculé.")
 
-    # =============================
-    # Cerveau DOXA
-    # =============================
-    brain = result.get("doxa_brain", {})
+else:
+    st.info("Activez l’analyse sémantique pour calculer cette jauge.")
 
-    st.markdown("### Cerveau DOXA")
+st.divider()
 
+# =============================
+# Résumé chiffré
+# =============================
+
+col1, col2, col3 = st.columns(3)
+col1.metric("Indice classique", result["M"], help=T["help_classic_score"])
+col2.metric("Indice ajusté", result["improved"], help=T["help_improved_score"])
+col3.metric("Score de raisonnement", result["hard_fact_score"], help=T["help_hard_fact_score"])
+
+# =============================
+# Gravité cognitive globale
+# =============================
+gravity = result.get("cognitive_gravity", 0)
+
+st.markdown("### Gravité cognitive globale")
+st.progress(gravity)
+
+if gravity < 0.2:
+    st.caption("Gravité faible — discours globalement sain.")
+elif gravity < 0.4:
+    st.caption("Gravité modérée — quelques tensions cognitives.")
+elif gravity < 0.6:
+    st.caption("Gravité élevée — dérive discursive notable.")
+elif gravity < 0.8:
+    st.caption("Gravité très élevée — structure discursive problématique.")
+else:
+    st.caption("Gravité critique — convergence de manipulation ou désalignement cognitif.")
+
+# =============================
+# Cerveau DOXA
+# =============================
+brain = result.get("doxa_brain", {})
+
+st.markdown("### Cerveau DOXA")
+
+st.metric(
+    "Stabilité cognitive",
+    f"{brain.get('cognitive_stability', 0):.2f}"
+)
+
+st.caption(brain.get("brain_verdict", "Diagnostic indisponible."))
+st.info(brain.get("brain_advice", ""))
+
+with st.expander("Résumé du cerveau DOXA"):
+    st.write(brain.get("brain_summary", "Aucun résumé disponible."))
+
+# =============================
+# Partage des résultats
+# =============================
+
+st.markdown("### Partager l’analyse")
+
+summary, encoded = generate_share_block(result)
+
+st.code(summary)
+
+st.link_button(
+    "📧 Envoyer par email",
+    f"mailto:?subject=Analyse DOXA Detector&body={encoded}",
+    use_container_width=True
+)
+
+# =============================
+# Barre de raisonnement
+# =============================
+score = result.get("hard_fact_score", 0)
+
+if score < 6:
+    couleur_r = "🔴"
+    etiquette_r = "Très fragile"
+    message_r = "Le texte présente peu d’éléments de raisonnement structurés."
+elif score < 9:
+    couleur_r = "🟠"
+    etiquette_r = "Fragile"
+    message_r = "Le raisonnement existe, mais reste incomplet ou insuffisamment construit."
+elif score < 13:
+    couleur_r = "🟡"
+    etiquette_r = "Modérée"
+    message_r = "Le texte présente une structure de raisonnement cohérente, mais plusieurs affirmations restent conceptuelles ou insuffisamment démontrées."
+elif score < 16:
+    couleur_r = "🟢"
+    etiquette_r = "Solide"
+    message_r = "Le raisonnement est structuré et globalement cohérent."
+else:
+    couleur_r = "🟢"
+    etiquette_r = "Très solide"
+    message_r = "Le texte présente un raisonnement robuste, structuré et bien soutenu."
+
+st.subheader(f"{couleur_r} Solidité argumentative : {etiquette_r}")
+st.progress(min(score / 20, 1))
+st.caption(f"Score : {round(score, 1)}/20 — {message_r}")
+st.caption(
+    "Cette jauge mesure la solidité argumentative du texte : structure du raisonnement, "
+    "cohérence logique et présence d’éléments vérifiables. "
+    "La crédibilité globale dépend aussi de la qualité des sources et de la vérifiabilité des affirmations."
+)
+
+# =============================
+# Barre de crédibilité finale
+# =============================
+final_score = result.get("final_credibility_score", score)
+
+if final_score < 6:
+    couleur_c = "🔴"
+    etiquette_c = "Très fragile"
+    message_c = "Le texte présente de fortes fragilités structurelles ou vérifiables."
+elif final_score < 9:
+    couleur_c = "🟠"
+    etiquette_c = "Fragile"
+    message_c = "Le texte contient plusieurs fragilités importantes."
+elif final_score < 13:
+    couleur_c = "🟡"
+    etiquette_c = "Prudente"
+    message_c = "Le raisonnement est présent, mais certaines affirmations reposent davantage sur des idées générales que sur des éléments vérifiables."
+elif final_score < 16:
+    couleur_c = "🟢"
+    etiquette_c = "Solide"
+    message_c = "Le texte présente une crédibilité globale correcte, avec peu de signaux problématiques."
+else:
+    couleur_c = "🟢"
+    etiquette_c = "Très solide"
+    message_c = "Le texte présente une structure cognitive robuste et peu de signaux de fragilité."
+
+st.subheader(f"{couleur_c} Crédibilité finale : {etiquette_c}")
+st.progress(min(final_score / 20, 1))
+st.caption(f"Score final : {round(final_score, 1)}/20 — {message_c}")
+
+# =============================
+# Pénalités appliquées
+# =============================
+st.subheader("Pénalités appliquées")
+
+colp1, colp2, colp3 = st.columns(3)
+
+with colp1:
     st.metric(
-        "Stabilité cognitive",
-        f"{brain.get('cognitive_stability', 0):.2f}"
+        "Pénalité crédibilité",
+        result.get("credibility_penalty", 0)
     )
 
-    st.caption(brain.get("brain_verdict", "Diagnostic indisponible."))
-    st.info(brain.get("brain_advice", ""))
-
-    with st.expander("Résumé du cerveau DOXA"):
-        st.write(brain.get("brain_summary", "Aucun résumé disponible."))
-
-    # =============================
-    # Partage des résultats
-    # =============================
-
-    st.markdown("### Partager l’analyse")
-
-    summary, encoded = generate_share_block(result)
-
-    st.code(summary)
-
-    st.link_button(
-        "📧 Envoyer par email",
-        f"mailto:?subject=Analyse DOXA Detector&body={encoded}",
-        use_container_width=True
+with colp2:
+    st.metric(
+        "Boost mensonge",
+        result.get("lie_boost_total", 0)
     )
 
-    # =============================
-    # Barre de raisonnement
-    # =============================
-    score = result["hard_fact_score"]
-
-    if score <= 6:
-        couleur_r, etiquette_r, message_r = "🔴", "Faible", "Le raisonnement reste peu développé ou peu étayé."
-    elif score <= 11:
-        couleur_r, etiquette_r, message_r = "🟠", "Médiocre", "Le texte contient quelques éléments de raisonnement, mais reste insuffisant."
-    elif score <= 15:
-        couleur_r, etiquette_r, message_r = "🟡", "Correct", "Le raisonnement est présent mais encore partiellement fragile."
-    else:
-        couleur_r, etiquette_r, message_r = "🟢", "Robuste", "Le raisonnement est solidement structuré."
-
-    st.subheader(f"{couleur_r} Solidité argumentative : {etiquette_r}")
-    st.progress(score / 20)
-    st.caption(f"Score : {score}/20 — {message_r}")
-    st.caption(
-        "Cette jauge mesure la solidité argumentative du texte : structure du raisonnement, "
-        "cohérence logique et présence d’éléments vérifiables. "
-        "La crédibilité globale dépend aussi de la qualité des sources et de la vérifiabilité des affirmations."
-    )
-
-    # =============================
-    # Barre de crédibilité finale
-    # =============================
-    final_score = result.get("final_credibility_score", score)
-
-    couleur_c, etiquette_c, message_c = interpret_final_credibility(final_score)
-
-    st.subheader(f"{couleur_c} Crédibilité finale : {etiquette_c}")
-    st.progress(final_score / 20)
-    st.caption(f"Score final : {final_score}/20 — {message_c}")
-
-    # =============================
-    # Pénalités appliquées
-    # =============================
-    st.subheader("Pénalités appliquées")
-
-    colp1, colp2, colp3 = st.columns(3)
-
-    with colp1:
-        st.metric(
-            "Pénalité crédibilité",
-            result.get("credibility_penalty", 0)
-        )
-
-    with colp2:
-        st.metric(
-            "Boost mensonge",
-            result.get("lie_boost_total", 0)
-        )
-
-    with colp3:
-        st.metric(
-            "Score final",
-            f"{result.get('final_credibility_score', result['hard_fact_score'])}/20"
-        )
-
-    st.caption(
-        "Les pénalités corrigent le score lorsque le texte accumule des signaux "
-        "de fermeture cognitive, de manipulation ou de raisonnement fragile."
-        )
-
-    with colp3:
-        st.metric(
-            "Score final",
-            f"{result.get('final_credibility_score', result['hard_fact_score'])}/20"
-        )
-
-    with st.expander("Voir le détail des pénalités", expanded=False):
-        st.json(result.get("penalty_details", {}))
-
-# =============================
-# Résumé rapide
-# =============================
-    mini1, mini2, mini3 = st.columns(3)
-
-    mini1.metric("M", round(result["M"], 2))
-    mini2.metric("ME", round(result["ME"], 2))
-    mini3.metric(
+with colp3:
+    st.metric(
         "Score final",
         f"{result.get('final_credibility_score', result['hard_fact_score'])}/20"
     )
 
-    with st.popover("🧠 Voir le résumé complet", use_container_width=True):
+st.caption(
+    "Les pénalités corrigent le score lorsque le texte accumule des signaux "
+    "de fermeture cognitive, de manipulation ou de raisonnement fragile."
+)
 
-        st.markdown("### Résultats essentiels")
+with st.expander("Voir le détail des pénalités", expanded=False):
+    st.json(result.get("penalty_details", {}))
 
+# =============================
+# Résumé rapide
+# =============================
+mini1, mini2, mini3 = st.columns(3)
+
+mini1.metric("M", round(result["M"], 2))
+mini2.metric("ME", round(result["ME"], 2))
+mini3.metric(
+    "Score final",
+    f"{result.get('final_credibility_score', result['hard_fact_score'])}/20"
+)
+
+with st.popover("🧠 Voir le résumé complet", use_container_width=True):
+
+    st.markdown("### Résultats essentiels")
+
+    st.metric(
+        "Barre de raisonnement",
+        f"{result.get('final_credibility_score', result['hard_fact_score'])}/20"
+    )
+
+    col1, col2 = st.columns(2)
+
+    with col1:
+        st.metric("Indice M", round(result["M"], 2))
         st.metric(
-            "Barre de raisonnement",
-            f"{result.get('final_credibility_score', result['hard_fact_score'])}/20"
+            "Dérive dominante",
+            result.get("cognitive_drift_interpretation", "—")
         )
 
-        col1, col2 = st.columns(2)
-
-        with col1:
-            st.metric("Indice M", round(result["M"], 2))
-            st.metric(
-                "Dérive dominante",
-                result.get("cognitive_drift_interpretation", "—")
-            )
-
-        with col2:
-            st.metric("Indice ME", round(result["ME"], 2))
-            st.metric(
-                "Régime cognitif",
-                result.get("cognitive_regime", "—")
-            )
-
-        brain = result.get("brain", {})
-
-        st.markdown("### Profil cognitif")
-
+    with col2:
+        st.metric("Indice ME", round(result["ME"], 2))
         st.metric(
-            "Profil cognitif",
-            brain.get("brain_profile", "—")
+            "Régime cognitif",
+            result.get("cognitive_regime", "—")
         )
 
-        colb1, colb2, colb3 = st.columns(3)
+    brain = result.get("doxa_brain", {})
 
-        with colb1:
-            st.metric("IR", brain.get("IR", "—"))
+    st.markdown("### Profil cognitif")
 
-        with colb2:
-            st.metric("IL", brain.get("IL", "—"))
-
-        with colb3:
-            st.metric("IC", brain.get("IC", "—"))
-
-        colb4, colb5 = st.columns(2)
-
-        with colb4:
-            st.metric(
-                "Indice stratégique",
-                brain.get("strategic_index", "—")
-            )
-
-        with colb5:
-            st.metric(
-                "Indice de clôture",
-                brain.get("closure_index", "—")
-            )
-    # -------------------------
-    # Cerveau DOXA
-    # -------------------------
-
-    st.metric("Profil cognitif", brain.get("brain_profile", "—"))
+    st.metric(
+        "Profil cognitif",
+        brain.get("brain_profile", "—")
+    )
 
     colb1, colb2, colb3 = st.columns(3)
 
@@ -6982,6 +7029,21 @@ if isinstance(result, dict):
 
     with colb3:
         st.metric("IC", brain.get("IC", "—"))
+
+    colb4, colb5 = st.columns(2)
+
+    with colb4:
+        st.metric(
+            "Indice stratégique",
+            brain.get("strategic_index", "—")
+        )
+
+    with colb5:
+        st.metric(
+            "Indice de clôture",
+            brain.get("closure_index", "—")
+        )
+
     # =============================
     # Diagnostic cognitif rapide
     # =============================
@@ -6999,7 +7061,8 @@ if isinstance(result, dict):
         st.progress(mecroyance_bar)
         st.caption(f"M = {result['M']}")
 
-    st.subheader(f"{T['verdict']} : {result['final_verdict']}")
+    st.subheader(f"{T['verdict']} : {couleur_c} Crédibilité finale — {etiquette_c}")
+    st.caption(f"Score final : {round(final_score, 1)}/20 — {message_c}")
     st.subheader(T["summary"])
 
     m1, m2 = st.columns(2)
@@ -9009,8 +9072,6 @@ La certitude parait plus forte que les preuves disponibles, mais les signaux ne 
                         st.warning(T["no_strong_sources_found"])
         else:
             st.info(T["no_corroboration_found"])
-else:
-    st.info(T["paste_text_or_load_url"])
 
 # -----------------------------
 # Méthode
