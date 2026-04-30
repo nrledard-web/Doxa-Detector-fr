@@ -6157,13 +6157,6 @@ with st.expander(T["settings"], expanded=False):
     use_sample = st.button(T["load_example"])
     show_method = st.toggle(T["show_method"], value=True)
     st.divider()
-    st.subheader(T["hard_fact_score_scale"])
-    st.markdown(
-        f"- **0–5** : {T['scale_0_5']}\n"
-        f"- **6–9** : {T['scale_6_9']}\n"
-        f"- **10–14** : {T['scale_10_14']}\n"
-        f"- **15–20** : {T['scale_15_20']}"
-    )
 
 if "article" not in st.session_state:
     st.session_state.article = SAMPLE_ARTICLE
