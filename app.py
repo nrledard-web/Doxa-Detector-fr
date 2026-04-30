@@ -19,6 +19,20 @@ try:
 except Exception:
     client = None
 
+st.markdown("""
+<style>
+
+div[data-testid="stMetricValue"] {
+    font-size: 36px !important;
+}
+
+div[data-testid="stMetricLabel"] {
+    font-size: 20px !important;
+}
+
+</style>
+""", unsafe_allow_html=True)
+
 # -----------------------------
 # Mots grammaticaux ignorés
 # -----------------------------
@@ -1720,7 +1734,41 @@ def detect_index_or_multilink_page(text: str, url: str = ""):
         "markers": marker_hits + url_hits[:10],
         "interpretation": interpretation
     }
+    
+# -----------------------------
+# Filtre anti-pages non articles
+# -----------------------------
+BAD_ARTICLE_DOMAINS = [
+    "depositphotos", "shutterstock", "gettyimages", "istockphoto",
+    "alamy", "dreamstime", "adobestock", "123rf", "pinterest",
+    "facebook", "instagram", "youtube", "tiktok",
+]
 
+BAD_ARTICLE_WORDS = [
+    "images libres de droit",
+    "photos libres de droit",
+    "stock photo",
+    "royalty free",
+    "banque d'images",
+    "current page requires javascript",
+    "javascript",
+    "connexion",
+    "créez un compte",
+    "tarifs",
+    "vidéos",
+    "musique et sons",
+]
+
+def is_bad_article_candidate(url: str = "", title: str = "", snippet: str = "") -> bool:
+    raw = f"{url} {title} {snippet}".lower()
+
+    if any(domain in raw for domain in BAD_ARTICLE_DOMAINS):
+        return True
+
+    if any(word in raw for word in BAD_ARTICLE_WORDS):
+        return True
+
+    return False
 
 # -----------------------------
 # Normalisation des termes
@@ -5876,15 +5924,19 @@ def corroborate_claims(text: str, max_claims: int = 5, max_results_per_claim: in
         with DDGS() as ddgs:
             for claim in claims:
                 query = build_search_query_from_claim(claim)
+    
                 search_results = list(ddgs.text(query, max_results=max_results_per_claim * 5))
+    
                 filtered = []
                 for r in search_results:
                     url = r.get("href", "")
                     title = r.get("title", "")
                     body = r.get("body", "")
                     combined_text = f"{title} {body}"
+    
                     if any(domain in url for domain in trusted_domains):
                         match_score = score_match_between_claim_and_result(claim, combined_text)
+    
                         filtered.append(
                             {
                                 "title": title,
@@ -5893,8 +5945,15 @@ def corroborate_claims(text: str, max_claims: int = 5, max_results_per_claim: in
                                 "match_score": match_score,
                             }
                         )
-                filtered = sorted(filtered, key=lambda x: x["match_score"]["score"], reverse=True)[:max_results_per_claim]
+    
+                filtered = sorted(
+                    filtered,
+                    key=lambda x: x["match_score"]["score"],
+                    reverse=True
+                )[:max_results_per_claim]
+    
                 verdict = classify_corroboration(filtered)
+    
                 corroboration_results.append(
                     {
                         "claim": claim,
@@ -5903,9 +5962,10 @@ def corroborate_claims(text: str, max_claims: int = 5, max_results_per_claim: in
                         "verdict": verdict,
                     }
                 )
+    
     except Exception as e:
         st.warning(f"Erreur de corroboration : {e}")
-
+    
     return corroboration_results
 
 
@@ -6026,36 +6086,38 @@ def fetch_text_for_textarea(url: str) -> str:
 def show_gauge_help():
     with st.expander("📘 Comment lire les jauges", expanded=False):
         st.markdown("""
-Chaque jauge mesure un mécanisme du discours : raisonnement, pression rhétorique, biais argumentatifs ou degré de certitude.
-
-Les jauges n’indiquent pas si un texte est vrai ou faux, mais **la solidité de sa structure cognitive**.
-
-- 🟢 **Vert** → structure saine ou raisonnement solide
-- 🟠 **Orange** → fragilité, raisonnement incomplet ou insuffisamment démontré
-- 🔴 **Rouge** → dérive cognitive importante ou manipulation possible
-
-**Les textes les plus solides sont ceux qui allument le moins de jauges, ou qui restent majoritairement dans le vert.**
-
----
-
-### Poids des jauges
-
-Toutes les jauges n’ont pas la même influence sur le résultat final.
-
-Certaines jauges structurelles ont un **coefficient plus élevé**, car elles signalent des problèmes fondamentaux dans le raisonnement.
-
-**Une petite jauge avec un coefficient élevé peut peser autant qu’une grande jauge secondaire.**
-
-Le score final dépend donc **à la fois de l’intensité des jauges et de leur poids dans l’analyse.**
-
----
-
-### Important
-
-Un texte peut être **cohérent sans être démonstratif**.
-
-Les discours philosophiques, moraux ou spéculatifs obtiennent souvent des scores intermédiaires, car ils reposent davantage sur des idées générales que sur des faits vérifiables.
-""")
+    Chaque jauge mesure un mécanisme du discours : raisonnement, pression rhétorique, biais argumentatifs ou degré de certitude.
+    
+    Les jauges n’indiquent pas si un texte est vrai ou faux, mais **la solidité de sa structure cognitive**.
+    
+    - 🟢 **Vert** → structure saine ou raisonnement solide
+    - 🟡 **Jaune** → vigilance modérée ou raisonnement partiellement fragile
+    - 🟠 **Orange** → fragilité importante, raisonnement incomplet ou insuffisamment démontré
+    - 🔴 **Rouge** → dérive cognitive importante ou manipulation possible
+    - 🟤 **Marron clair** → mécanisme d’analyse cognitive (pression rhétorique, dérive argumentative, tension mécroyance/mensonge)
+    
+    **Les textes les plus solides sont ceux qui allument le moins de jauges, ou qui restent majoritairement dans le vert.**
+    
+    ---
+    
+    ### Poids des jauges
+    
+    Toutes les jauges n’ont pas la même influence sur le résultat final.
+    
+    Certaines jauges structurelles ont un **coefficient plus élevé**, car elles signalent des problèmes fondamentaux dans le raisonnement.
+    
+    **Une petite jauge avec un coefficient élevé peut peser autant qu’une grande jauge secondaire.**
+    
+    Le score final dépend donc **à la fois de l’intensité des jauges et de leur poids dans l’analyse.**
+    
+    ---
+    
+    ### Important
+    
+    Un texte peut être **cohérent sans être démonstratif**.
+    
+    Les discours philosophiques, moraux ou spéculatifs obtiennent souvent des scores intermédiaires, car ils reposent davantage sur **des idées générales que sur des faits vérifiables**.
+    """)
 
 
 # =====================================================
@@ -6673,27 +6735,6 @@ if mode == "Débat dynamique":
             )
 
     st.stop()
-    
-# -----------------------------
-# Mode sémantique
-# -----------------------------
-if "semantic_mode" not in st.session_state:
-    st.session_state.semantic_mode = False
-
-st.markdown("### Analyse sémantique")
-st.caption("Active une lecture du sens des affirmations via un dictionnaire sémantique assisté par IA.")
-
-if st.button(
-    "Activer l’analyse sémantique",
-    key="semantic_normal",
-    use_container_width=True
-):
-    st.session_state.semantic_mode = True
-
-if st.session_state.semantic_mode:
-    st.success("Analyse sémantique activée.")
-else:
-    st.info("Analyse sémantique inactive. La crédibilité globale reste partielle.")
 
 
 # -----------------------------
@@ -7004,109 +7045,98 @@ st.link_button(
     use_container_width=True
 )
 
-# =============================
-# Pénalités appliquées
-# =============================
-st.subheader("Pénalités appliquées")
+# -----------------------------
+# Mode sémantique
+# -----------------------------
+if "semantic_mode" not in st.session_state:
+    st.session_state.semantic_mode = False
 
-colp1, colp2, colp3 = st.columns(3)
-
-with colp1:
-    st.metric(
-        "Pénalité crédibilité",
-        result.get("credibility_penalty", 0)
-    )
-
-with colp2:
-    st.metric(
-        "Boost mensonge",
-        result.get("lie_boost_total", 0)
-    )
-
-with colp3:
-    st.metric(
-        "Score final",
-        f"{result.get('final_credibility_score', result['hard_fact_score'])}/20"
-    )
-
+st.markdown("### Analyse sémantique")
 st.caption(
-    "Les pénalités corrigent le score lorsque le texte accumule des signaux "
-    "de fermeture cognitive, de manipulation ou de raisonnement fragile."
+    "Cette analyse sémantique sert à corroborer les jauges ayant déclenché des pénalités. "
+    "Elle vérifie si le sens réel des affirmations confirme les signaux détectés "
+    "par l’analyse analogique du langage."
 )
 
-with st.expander("Voir le détail des pénalités", expanded=False):
-    st.json(result.get("penalty_details", {}))
+if st.button(
+    "Activer l’analyse sémantique",
+    key="semantic_normal",
+    use_container_width=True
+):
+    st.session_state.semantic_mode = True
 
-# =============================
-# Résumé rapide
-# =============================
-mini1, mini2, mini3 = st.columns(3)
-
-mini1.metric("M", round(result["M"], 2))
-mini2.metric("ME", round(result["ME"], 2))
-mini3.metric(
-    "Score final",
-    f"{result.get('final_credibility_score', result['hard_fact_score'])}/20"
+if st.session_state.semantic_mode:
+    st.success("Analyse sémantique activée.")
+else:
+    st.info(
+    "Analyse sémantique inactive. Les pénalités reposent uniquement "
+    "sur l’analyse analogique du discours."
 )
 
-with st.popover("🧠 Voir le résumé complet", use_container_width=True):
+sp1, col_center, sp2 = st.columns([2,3,2])
 
-    st.markdown("### Résultats essentiels")
+with col_center:
+
+    st.markdown("### 🧠 Modules d’analyse DOXA")
+
+    with st.expander("🧠 Voir le résumé complet", expanded=False):
+
+        # =============================
+        # Pénalités appliquées
+        # =============================
+
+        st.markdown("### Pénalités appliquées")
+
+        colp1, colp2, colp3 = st.columns(3)
+
+        with colp1:
+            st.metric(
+                "Pénalité crédibilité",
+                round(result.get("credibility_penalty_total", 0), 2)
+            )
+
+        with colp2:
+            st.metric(
+                "Boost mensonge",
+                round(result.get("lie_boost_total", 0), 2)
+            )
+
+        with colp3:
+            st.metric(
+                "Score final",
+                f"{result.get('final_credibility_score', result['hard_fact_score'])}/20"
+            )
+
+        st.caption(
+            "Les pénalités corrigent le score lorsque le texte accumule des signaux "
+            "de fermeture cognitive, de manipulation ou de raisonnement fragile."
+        )
+
+        with st.expander("Voir le détail des pénalités"):
+            st.write(result.get("weighted_red_flags", []))
+
+        st.divider()
+
+        # =============================
+        # Résultats essentiels
+        # =============================
+
+    st.markdown(
+        """
+        <div style="font-size:20px; line-height:1.7;">
+        <b>Résultats essentiels</b>
+        </div>
+        """,
+        unsafe_allow_html=True
+    )
 
     st.metric(
         "Barre de raisonnement",
         f"{result.get('final_credibility_score', result['hard_fact_score'])}/20"
     )
 
-    col1, col2 = st.columns(2)
+    st.divider()
 
-    with col1:
-        st.metric("Indice M", round(result["M"], 2))
-        st.metric(
-            "Dérive dominante",
-            result.get("cognitive_drift_interpretation", "—")
-        )
-
-    with col2:
-        st.metric("Indice ME", round(result["ME"], 2))
-        st.metric(
-            "Régime cognitif",
-            result.get("cognitive_regime", "—")
-        )
-
-    brain = result.get("doxa_brain", {})
-
-    st.markdown("### Profil cognitif")
-
-    st.metric(
-        "Profil cognitif",
-        brain.get("brain_profile", "—")
-    )
-
-    colb1, colb2, colb3 = st.columns(3)
-
-    with colb1:
-        st.metric("IR", brain.get("IR", "—"))
-
-    with colb2:
-        st.metric("IL", brain.get("IL", "—"))
-
-    with colb3:
-        st.metric("IC", brain.get("IC", "—"))
-
-    colb4, colb5 = st.columns(2)
-
-    with colb4:
-        st.metric(
-            "Indice stratégique",
-            brain.get("strategic_index", "—")
-        )
-
-    with colb5:
-        st.metric(
-            "Indice de clôture",
-            brain.get("closure_index", "—")
-        )
 
     # =============================
     # Diagnostic cognitif rapide
