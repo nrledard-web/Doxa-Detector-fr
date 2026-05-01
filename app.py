@@ -5475,6 +5475,34 @@ def analyze_article(text: str) -> Dict:
         "doxic_rigidity_score": doxic_rigidity_analysis["score"],
         "narrative_overdetermination_score": narrative_overdetermination_analysis["score"],
     })
+    # -----------------------------
+    # Score analogique du raisonnement
+    # -----------------------------
+    logical_connectors = len(re.findall(
+        r"\b(car|donc|ainsi|cependant|pourtant|puisque|par conséquent|en effet|toutefois|néanmoins|or|mais|donc)\b",
+        text.lower()
+    ))
+
+    sentence_count = max(1, len(sentences))
+
+    connector_ratio = logical_connectors / sentence_count
+
+    contradiction_signals = len(re.findall(
+        r"\b(toujours.*sauf|jamais.*mais|certain.*pourtant|évident.*cependant|impossible.*mais)\b",
+        text.lower()
+    ))
+
+    analogical_reasoning_score = (
+        5
+        + logical_connectors * 1.8
+        + min(sentence_count, 8) * 0.35
+        - contradiction_signals * 4
+    )
+
+    analogical_reasoning_score = round(
+        clamp(analogical_reasoning_score, 0, 20),
+        1
+    )
         
     result = {
         "words": len(words),
@@ -5717,6 +5745,7 @@ def analyze_article(text: str) -> Dict:
         "final_credibility_score": final_credibility_score,
         "final_verdict": verdict,
         "hard_fact_score": hard_fact_score,
+        "analogical_reasoning_score": analogical_reasoning_score,
         "verdict": verdict,
         "profil_solidite": verdict,
         "strengths": strengths,
@@ -6104,46 +6133,6 @@ def fetch_text_for_textarea(url: str) -> str:
 
     except Exception:
         return ""
-
-# =====================================================
-# AIDE DE LECTURE DES JAUGES
-# =====================================================
-def show_gauge_help():
-    with st.expander("📘 Comment lire les jauges", expanded=False):
-        st.markdown("""
-    Chaque jauge mesure un mécanisme du discours : raisonnement, pression rhétorique, biais argumentatifs ou degré de certitude.
-    
-    Les jauges n’indiquent pas si un texte est vrai ou faux, mais **la solidité de sa structure cognitive**.
-    
-    - 🟢 **Vert** → structure saine ou raisonnement solide
-    - 🟡 **Jaune** → vigilance modérée ou raisonnement partiellement fragile
-    - 🟠 **Orange** → fragilité importante, raisonnement incomplet ou insuffisamment démontré
-    - 🔴 **Rouge** → dérive cognitive importante ou manipulation possible
-    - 🟤 **Marron clair** → mécanisme d’analyse cognitive (pression rhétorique, dérive argumentative, tension mécroyance/mensonge)
-    
-    **Les textes les plus solides sont ceux qui allument le moins de jauges, ou qui restent majoritairement dans le vert.**
-    
-    ---
-    
-    ### Poids des jauges
-    
-    Toutes les jauges n’ont pas la même influence sur le résultat final.
-    
-    Certaines jauges structurelles ont un **coefficient plus élevé**, car elles signalent des problèmes fondamentaux dans le raisonnement.
-    
-    **Une petite jauge avec un coefficient élevé peut peser autant qu’une grande jauge secondaire.**
-    
-    Le score final dépend donc **à la fois de l’intensité des jauges et de leur poids dans l’analyse.**
-    
-    ---
-    
-    ### Important
-    
-    Un texte peut être **cohérent sans être démonstratif**.
-    
-    Les discours philosophiques, moraux ou spéculatifs obtiennent souvent des scores intermédiaires, car ils reposent davantage sur **des idées générales que sur des faits vérifiables**.
-    """)
-
 
 # =====================================================
 # TYPE DE DISCOURS DÉTECTÉ
@@ -6820,6 +6809,126 @@ article_for_analysis = st.session_state.last_article
 
 if result:
 
+    # =====================================================
+    # AIDE DE LECTURE DES JAUGES
+    # =====================================================
+    
+    def show_gauge_help():
+        with st.expander("📘 Comment lire les jauges", expanded=False):
+            st.markdown("""
+        Chaque jauge mesure un mécanisme du discours : raisonnement, pression rhétorique, biais argumentatifs ou degré de certitude.
+        
+        Les jauges n’indiquent pas si un texte est vrai ou faux, mais **la solidité de sa structure cognitive**.
+        
+        - 🟢 **Vert** → structure saine ou raisonnement solide
+        - 🟡 **Jaune** → vigilance modérée ou raisonnement partiellement fragile
+        - 🟠 **Orange** → fragilité importante, raisonnement incomplet ou insuffisamment démontré
+        - 🔴 **Rouge** → dérive cognitive importante ou manipulation possible
+        - 🟤 **Marron clair** → mécanisme d’analyse cognitive (pression rhétorique, dérive argumentative, tension mécroyance/mensonge)
+        
+        **Les textes les plus solides sont ceux qui allument le moins de jauges, ou qui restent majoritairement dans le vert.**
+        
+        ---
+        
+        ### Poids des jauges
+        
+        Toutes les jauges n’ont pas la même influence sur le résultat final.
+        
+        Certaines jauges structurelles ont un **coefficient plus élevé**, car elles signalent des problèmes fondamentaux dans le raisonnement.
+        
+        **Une petite jauge avec un coefficient élevé peut peser autant qu’une grande jauge secondaire.**
+        
+        Le score final dépend donc **à la fois de l’intensité des jauges et de leur poids dans l’analyse.**
+        
+        ---
+        
+        ### Important
+        
+        Un texte peut être **cohérent sans être démonstratif**.
+        
+        Les discours philosophiques, moraux ou spéculatifs obtiennent souvent des scores intermédiaires, car ils reposent davantage sur **des idées générales que sur des faits vérifiables**.
+        """)
+            
+    show_gauge_help()
+    st.divider()
+
+    # =============================
+    # Analyse analogique du raisonnement
+    # =============================
+    
+    st.subheader("Analyse analogique du raisonnement")
+    
+    with st.popover("ℹ️ Formule / explication"):
+        st.markdown("""
+    ### Jauge analogique du raisonnement
+    
+    Cette jauge analyse la **cohérence linguistique du raisonnement**.
+    
+    Elle s’appuie sur plusieurs signaux du langage :
+    
+    - présence de connecteurs logiques (donc, car, cependant, etc.)
+    - structure argumentative des phrases
+    - détection de contradictions internes
+    
+    ### Formule heuristique
+    
+    score = 10 + (ratio_connecteurs × 8) − (contradictions × 2)
+    
+    avec :
+    
+    ratio_connecteurs = connecteurs logiques / nombre de phrases
+    
+    ### Interprétation
+    
+    - un texte structuré avec des connecteurs logiques obtient un score plus élevé
+    - un texte contenant des contradictions internes voit son score diminuer
+    - cette jauge **n’évalue pas la vérité**, seulement la **cohérence apparente du raisonnement**
+    """)
+    
+    st.caption(
+        "Analyse analogique du raisonnement à partir des structures du langage afin d’estimer la solidité épistémique du discours."
+    )
+    
+    base_score = result.get("analogical_reasoning_score", result.get("hard_fact_score", 0))
+    
+    if base_score < 6:
+        score_icon = "🔴"
+        score_label = "Très fragile"
+        score_color = "#dc2626"
+    elif base_score < 9:
+        score_icon = "🟠"
+        score_label = "Fragile"
+        score_color = "#f97316"
+    elif base_score < 13:
+        score_icon = "🟡"
+        score_label = "Modérée"
+        score_color = "#ca8a04"
+    elif base_score < 16:
+        score_icon = "🟢"
+        score_label = "Solide"
+        score_color = "#84cc16"
+    else:
+        score_icon = "🟢"
+        score_label = "Très solide"
+        score_color = "#16a34a"
+    
+    st.progress(base_score / 20)
+    
+    st.markdown(
+        f"<b style='color:{score_color}'>Score analogique : {score_icon} {round(base_score,1)}/20 — {score_label}</b>",
+        unsafe_allow_html=True
+    )
+    
+    st.divider()
+    
+    disc_type, disc_explanation = detect_discourse_type(result)
+    
+    st.markdown("### Type de discours détecté")
+    st.info(f"**{disc_type}** — {disc_explanation}")
+    
+    st.divider()
+
+
     # =============================
     # Barre de raisonnement
     # =============================
@@ -6885,54 +6994,14 @@ if result:
     st.progress(min(final_score / 20, 1))
     st.caption(f"Score final : {round(final_score, 1)}/20 — {message_c}")
 
-    # =============================
-    # Analyse analogique du raisonnement
-    # =============================
-    
-    st.subheader("Analyse analogique du raisonnement")
-    st.caption(
-        "Analyse analogique du raisonnement à partir des structures du langage afin d’estimer la solidité épistémique du discours."
-    )
-    
-    base_score = result.get("final_credibility_score", result["hard_fact_score"])
-    
-    if base_score < 6:
-        score_icon = "🔴"
-        score_label = "Très fragile"
-        score_color = "#dc2626"
-    elif base_score < 9:
-        score_icon = "🟠"
-        score_label = "Fragile"
-        score_color = "#f97316"
-    elif base_score < 13:
-        score_icon = "🟡"
-        score_label = "Modérée"
-        score_color = "#ca8a04"
-    elif base_score < 16:
-        score_icon = "🟢"
-        score_label = "Solide"
-        score_color = "#84cc16"
-    else:
-        score_icon = "🟢"
-        score_label = "Très solide"
-        score_color = "#16a34a"
-    
-    st.progress(base_score / 20)
-    
     st.markdown(
-        f"<b style='color:{score_color}'>Score analogique : {score_icon} {round(base_score,1)}/20 — {score_label}</b>",
-        unsafe_allow_html=True
-    )
-    
-    st.divider()
-    show_gauge_help()
-    
-    disc_type, disc_explanation = detect_discourse_type(result)
-    
-    st.markdown("### Type de discours détecté")
-    st.info(f"**{disc_type}** — {disc_explanation}")
-    
-    st.divider()
+    """
+    <hr style="border:2px solid #999; margin:40px 0;">
+    <h3 style="text-align:center;">Jauges structurelles avancées</h3>
+    <hr style="border:2px solid #999; margin:40px 0;">
+    """,
+    unsafe_allow_html=True
+)
 
 # =============================
 # Jauges structurelles avancées
