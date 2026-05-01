@@ -6230,9 +6230,34 @@ def detect_web_noise(text):
 # Réglages
 # -----------------------------
 with st.expander(T["settings"], expanded=False):
-    use_sample = st.button(T["load_example"])
-    show_method = st.toggle(T["show_method"], value=True)
+    use_sample = st.button(
+        T["load_example"],
+        key="settings_load_example"
+    )
+
+    show_method = st.toggle(
+        T["show_method"],
+        value=True,
+        key="settings_show_method"
+    )
+
     st.divider()
+
+    st.markdown("""
+### Principe de sélection des articles
+
+Le système ne classe pas les articles uniquement par popularité ou par mots-clés.  
+Il privilégie les textes dont la **structure argumentative active l’analyse cognitive**.
+
+**🟠 Textes fortement affirmatifs**  
+Les discours très affirmatifs ou rhétoriquement chargés déclenchent davantage de signaux analytiques.
+
+**🟢 Textes factuels et prudents**  
+Les textes prudents et factuels produisent généralement peu de signaux cognitifs.
+
+**⚙️ Filtrage automatique**  
+Si **10 textes fortement affirmatifs** sont déjà détectés, les articles plus neutres peuvent ne pas apparaître dans l’analyse.
+""")
 
 if "article" not in st.session_state:
     st.session_state.article = SAMPLE_ARTICLE
@@ -6932,6 +6957,7 @@ if result:
     # =============================
     # Barre de raisonnement
     # =============================
+    
     score = result.get("hard_fact_score", 0)
     
     if score < 6:
@@ -6956,6 +6982,26 @@ if result:
         message_r = "Le texte présente un raisonnement robuste, structuré et bien soutenu."
     
     st.subheader(f"{couleur_r} Solidité argumentative : {etiquette_r}")
+    with st.popover("ℹ️ Formule / explication"):
+        st.markdown("""
+    Cette jauge évalue la **solidité argumentative du texte**.
+    
+    ### Formule heuristique
+    
+    score_argumentatif = (G × 0.6) + (N × 0.4)
+    
+    avec :
+    
+    G = gnōsis (éléments factuels : sources, chiffres, références)
+    
+    N = nous (cohérence logique et structure argumentative)
+    
+    ### Interprétation
+    
+    0-6 : raisonnement faible  
+    7-13 : raisonnement partiel  
+    14-20 : raisonnement robuste
+    """)
     st.progress(min(score / 20, 1))
     st.caption(f"Score : {round(score, 1)}/20 — {message_r}")
     st.caption(
