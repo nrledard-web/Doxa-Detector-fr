@@ -6255,6 +6255,9 @@ Les discours très affirmatifs ou rhétoriquement chargés déclenchent davantag
 
 **⚙️ Filtrage automatique**  
 **Si 10 textes fortement affirmatifs sont déjà détectés, les articles plus neutres peuvent ne pas apparaître dans l’analyse.
+
+**⬇️ Important**
+**Lorsque vous effectuez le chargement d’un article, descendez jusqu’au bloc “Texte chargé” afin de lancer l’analyse.
 """)
 
 if "article" not in st.session_state:
