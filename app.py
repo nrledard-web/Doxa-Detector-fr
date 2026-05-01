@@ -6248,7 +6248,7 @@ with st.expander(T["settings"], expanded=False):
 M = (G + N) − D
 
 ⚠️ Le système ne classe pas les articles uniquement par popularité ou par mots-clés.
-Il privilégie les textes dont la structure argumentative active l’analyse cognitive**.
+Il privilégie les textes dont la structure argumentative active l’analyse cognitive.
 
 **Textes fortement affirmatifs**  
 Les discours très affirmatifs ou rhétoriquement chargés déclenchent davantage de signaux analytiques.
