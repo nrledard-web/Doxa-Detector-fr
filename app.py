@@ -555,7 +555,10 @@ st.link_button(
     use_container_width=True
 )
 
-st.divider()
+st.markdown(
+    "<div style='border-top:1px solid #e6e6e6;margin:22px 0'></div>",
+    unsafe_allow_html=True
+)
 
 
 # -----------------------------
