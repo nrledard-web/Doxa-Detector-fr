@@ -7146,9 +7146,9 @@ for title, score, label, interpretation in gauges:
     if interpretation:
         st.write(interpretation)
 
-    st.markdown("""
+st.markdown("""
 <div style="text-align:center; margin:25px 0; color:#888;">
-──── 🧠 ────
+────────── ✦ ──────────
 </div>
 """, unsafe_allow_html=True)
 
@@ -7183,7 +7183,11 @@ if st.session_state.get("semantic_mode", False):
 else:
     st.info("Activez l’analyse sémantique pour calculer cette jauge.")
 
-st.divider()
+st.markdown("""
+<div style="text-align:center; margin:25px 0; color:#888;">
+──── 🧠 ────
+</div>
+""", unsafe_allow_html=True)
 
 # =============================
 # Gravité cognitive globale
