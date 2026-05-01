@@ -6886,7 +6886,11 @@ if result:
         """)
             
     show_gauge_help()
-    st.divider()
+    st.markdown("""
+<div style="text-align:center; margin:25px 0; color:#888;">
+────────── ✦ ──────────
+</div>
+""", unsafe_allow_html=True)
 
     # =============================
     # Analyse analogique du raisonnement
