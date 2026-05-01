@@ -6959,14 +6959,22 @@ if result:
         unsafe_allow_html=True
     )
     
-    st.divider()
+    st.markdown("""
+<div style="text-align:center; margin:25px 0; color:#888;">
+────────── ✦ ──────────
+</div>
+""", unsafe_allow_html=True)
     
     disc_type, disc_explanation = detect_discourse_type(result)
     
     st.markdown("### Type de discours détecté")
     st.info(f"**{disc_type}** — {disc_explanation}")
     
-    st.divider()
+    st.markdown("""
+<div style="text-align:center; margin:25px 0; color:#888;">
+────────── ✦ ──────────
+</div>
+""", unsafe_allow_html=True)
 
 
     # =============================
