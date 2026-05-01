@@ -7146,7 +7146,11 @@ for title, score, label, interpretation in gauges:
     if interpretation:
         st.write(interpretation)
 
-    st.divider()
+    st.markdown("""
+<div style="text-align:center; margin:25px 0; color:#888;">
+──── 🧠 ────
+</div>
+""", unsafe_allow_html=True)
 
 # =============================
 # Analyse sémantique du discours
