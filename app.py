@@ -6247,7 +6247,11 @@ with st.expander("⚙️ Réglages et méthode de recherche", expanded=False):
         key="settings_show_method"
     )
 
-    st.divider()
+    st.markdown("""
+<div style="text-align:center; margin:25px 0; color:#888;">
+────────── ✦ ──────────
+</div>
+""", unsafe_allow_html=True)
 
     st.markdown("""
 ### Principe de sélection des articles — basé sur la formule :
