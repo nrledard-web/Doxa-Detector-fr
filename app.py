@@ -7113,15 +7113,6 @@ else:
 st.divider()
 
 # =============================
-# Résumé chiffré
-# =============================
-
-col1, col2, col3 = st.columns(3)
-col1.metric("Indice classique", result["M"], help=T["help_classic_score"])
-col2.metric("Indice ajusté", result["improved"], help=T["help_improved_score"])
-col3.metric("Score de raisonnement", result["hard_fact_score"], help=T["help_hard_fact_score"])
-
-# =============================
 # Gravité cognitive globale
 # =============================
 gravity = result.get("cognitive_gravity", 0)
@@ -7157,6 +7148,10 @@ st.info(brain.get("brain_advice", ""))
 
 with st.expander("Résumé du cerveau DOXA"):
     st.write(brain.get("brain_summary", "Aucun résumé disponible."))
+    col1, col2, col3 = st.columns(3)
+    col1.metric("Indice classique", result["M"], help=T["help_classic_score"])
+    col2.metric("Indice ajusté", result["improved"], help=T["help_improved_score"])
+    col3.metric("Score de raisonnement", result["hard_fact_score"], help=T["help_hard_fact_score"])
 
 # =============================
 # Partage des résultats
@@ -7216,6 +7211,11 @@ with col_center:
 
         st.markdown("### Pénalités appliquées")
 
+        # =============================
+        # Résumé chiffré
+        # =============================
+        
+
         colp1, colp2, colp3 = st.columns(3)
 
         with colp1:
@@ -7257,11 +7257,6 @@ with col_center:
         </div>
         """,
         unsafe_allow_html=True
-    )
-
-    st.metric(
-        "Barre de raisonnement",
-        f"{result.get('final_credibility_score', result['hard_fact_score'])}/20"
     )
 
     st.divider()
