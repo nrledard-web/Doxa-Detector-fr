@@ -7013,12 +7013,36 @@ else:
     message_r = "Le texte présente un raisonnement robuste, structuré et bien soutenu."
 
 st.subheader(f"{couleur_r} Solidité argumentative : {etiquette_r}")
+# Barre épaisse colorée
+st.markdown(f"""
+<div style="width:100%; margin-top:10px; margin-bottom:10px;">
+    <div style="
+        width:100%;
+        height:26px;
+        background:#e5e7eb;
+        border-radius:12px;
+        overflow:hidden;
+        border:1px solid #cbd5e1;
+    ">
+        <div style="
+            width:{min(score / 20, 1) * 100}%;
+            height:100%;
+            background:{color_r};
+            transition:width 0.4s ease;
+        "></div>
+    </div>
+</div>
+""", unsafe_allow_html=True)
 st.caption(
     "Cette jauge mesure la solidité argumentative du texte : structure du raisonnement, "
     "cohérence logique et présence d’éléments vérifiables. "
     "La crédibilité globale dépend aussi de la qualité des sources et de la vérifiabilité des affirmations."
 )
-
+st.markdown(
+    f"<b style='color:{color_r}'>{etiquette_r}</b> — Score : {round(score, 1)}/20",
+    unsafe_allow_html=True
+)
+st.caption(message_r)
 with st.popover("ℹ️ Formule / explication"):
     st.markdown(f"""
 ### Solidité argumentative — {etiquette_r}
@@ -7056,33 +7080,6 @@ N = nous
 7–13 : raisonnement partiel  
 14–20 : raisonnement robuste
 """)
-
-# Barre épaisse colorée
-st.markdown(f"""
-<div style="width:100%; margin-top:10px; margin-bottom:10px;">
-    <div style="
-        width:100%;
-        height:26px;
-        background:#e5e7eb;
-        border-radius:12px;
-        overflow:hidden;
-        border:1px solid #cbd5e1;
-    ">
-        <div style="
-            width:{min(score / 20, 1) * 100}%;
-            height:100%;
-            background:{color_r};
-            transition:width 0.4s ease;
-        "></div>
-    </div>
-</div>
-""", unsafe_allow_html=True)
-
-st.markdown(
-    f"<b style='color:{color_r}'>{etiquette_r}</b> — Score : {round(score, 1)}/20",
-    unsafe_allow_html=True
-)
-st.caption(message_r)
 st.markdown("""
 <div style="text-align:center; margin:25px 0; color:#888;">
 ────────── ✦ ──────────
@@ -7516,11 +7513,11 @@ with st.popover("ℹ️ Formule / explication"):
     </div>
     """, unsafe_allow_html=True)
     
-    st.markdown("""
-    <div style="text-align:center; margin:25px 0; color:#888;">
-    ────────── ✦ ──────────
-    </div>
-    """, unsafe_allow_html=True)
+st.markdown("""
+<div style="text-align:center; margin:25px 0; color:#888;">
+────────── ✦ ──────────
+</div>
+""", unsafe_allow_html=True)
 
 # =============================
 # Analyse sémantique du discours
