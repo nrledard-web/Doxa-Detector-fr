@@ -6895,85 +6895,144 @@ if result:
 </div>
 """, unsafe_allow_html=True)
 
-    # =============================
-    # Analyse analogique du raisonnement
-    # =============================
-    
-    st.subheader("Analyse analogique du raisonnement")
-    
-    with st.popover("ℹ️ Formule / explication"):
-        st.markdown("""
-    ### Jauge analogique du raisonnement
-    
-    Cette jauge analyse la **cohérence linguistique du raisonnement**.
-    
-    Elle s’appuie sur plusieurs signaux du langage :
-    
-    - présence de connecteurs logiques (donc, car, cependant, etc.)
-    - structure argumentative des phrases
-    - détection de contradictions internes
-    
-    ### Formule heuristique
-    
-    score = 10 + (ratio_connecteurs × 8) − (contradictions × 2)
-    
-    avec :
-    
-    ratio_connecteurs = connecteurs logiques / nombre de phrases
-    
-    ### Interprétation
-    
-    - un texte structuré avec des connecteurs logiques obtient un score plus élevé
-    - un texte contenant des contradictions internes voit son score diminuer
-    - cette jauge **n’évalue pas la vérité**, seulement la **cohérence apparente du raisonnement**
-    """)
-    
-    st.caption(
-        "Analyse analogique du raisonnement à partir des structures du langage afin d’estimer la solidité épistémique du discours."
-    )
-    
-    base_score = result.get("analogical_reasoning_score", result.get("hard_fact_score", 0))
-    
-    if base_score < 6:
-        score_icon = "🔴"
-        score_label = "Très fragile"
-        score_color = "#dc2626"
-    elif base_score < 9:
-        score_icon = "🟠"
-        score_label = "Fragile"
-        score_color = "#f97316"
-    elif base_score < 13:
-        score_icon = "🟡"
-        score_label = "Modérée"
-        score_color = "#ca8a04"
-    elif base_score < 16:
-        score_icon = "🟢"
-        score_label = "Solide"
-        score_color = "#84cc16"
-    else:
-        score_icon = "🟢"
-        score_label = "Très solide"
-        score_color = "#16a34a"
-    
-    st.progress(base_score / 20)
-    
-    st.markdown(
-        f"<b style='color:{score_color}'>Score analogique : {score_icon} {round(base_score,1)}/20 — {score_label}</b>",
-        unsafe_allow_html=True
-    )
-    
-    st.markdown("""
+# =============================
+# Analyse analogique du raisonnement
+# =============================
+
+st.subheader("Analyse analogique du raisonnement")
+
+st.caption(
+    "Analyse analogique du raisonnement à partir des structures du langage afin d’estimer la solidité épistémique du discours."
+)
+
+base_score = result.get("final_credibility_score", result.get("hard_fact_score", 0))
+
+# Couleurs et verdict
+if base_score < 6:
+    score_icon = "🔴"
+    score_color = "#dc2626"
+    score_label = "Faible"
+elif base_score < 9:
+    score_icon = "🟠"
+    score_color = "#f97316"
+    score_label = "Fragile"
+elif base_score < 13:
+    score_icon = "🟡"
+    score_color = "#facc15"
+    score_label = "Modérée"
+elif base_score < 16:
+    score_icon = "🟢"
+    score_color = "#22c55e"
+    score_label = "Solide"
+else:
+    score_icon = "🟢"
+    score_color = "#15803d"
+    score_label = "Très solide"
+
+# Barre épaisse colorée
+st.markdown(f"""
+<div style="width:100%; margin-top:10px; margin-bottom:10px;">
+    <div style="
+        width:100%;
+        height:26px;
+        background:#e5e7eb;
+        border-radius:12px;
+        overflow:hidden;
+        border:1px solid #cbd5e1;
+    ">
+        <div style="
+            width:{min(base_score / 20, 1) * 100}%;
+            height:100%;
+            background:{score_color};
+            transition:width 0.4s ease;
+        "></div>
+    </div>
+</div>
+""", unsafe_allow_html=True)
+
+st.markdown(
+    f"<b style='color:{score_color}'>Score analogique : {score_icon} {round(base_score,1)}/20 — {score_label}</b>",
+    unsafe_allow_html=True
+)
+
+if base_score < 6:
+    analogique_message = "Le raisonnement paraît faible : les enchaînements logiques sont insuffisants ou trop fragmentaires."
+elif base_score < 9:
+    analogique_message = "Le raisonnement est fragile : une structure existe, mais elle reste incomplète ou peu démonstrative."
+elif base_score < 13:
+    analogique_message = "Le raisonnement est modéré : la structure logique est présente, mais plusieurs liens restent partiels ou insuffisamment soutenus."
+elif base_score < 16:
+    analogique_message = "Le raisonnement est solide : les idées s’enchaînent de manière globalement cohérente."
+else:
+    analogique_message = "Le raisonnement est très solide : le discours présente une progression claire, cohérente et bien structurée."
+
+st.caption(analogique_message)
+
+# Popover explicatif
+with st.popover("ℹ️ Formule / explication"):
+    st.markdown(f"""
+### Analyse analogique du raisonnement
+
+Cette jauge analyse la **cohérence linguistique du raisonnement**.
+
+Elle ne mesure pas la vérité des affirmations mais la **structure logique apparente du discours**.
+
+---
+
+### Résultats de cette analyse
+
+Score analogique : **{round(base_score,1)}/20**
+
+Verdict : **{score_label}**
+
+---
+
+### Signaux analysés
+
+La jauge s’appuie sur plusieurs indices linguistiques :
+
+- présence de connecteurs logiques (donc, car, cependant…)
+- structure argumentative des phrases
+- continuité logique du raisonnement
+- détection de contradictions internes
+
+---
+
+### Formule heuristique
+
+`score = 10 + (ratio_connecteurs × 8) − (contradictions × 2)`
+
+avec :
+
+`ratio_connecteurs = connecteurs logiques / nombre de phrases`
+
+---
+
+### Interprétation
+
+0–6 : raisonnement faible  
+7–13 : raisonnement partiel  
+14–20 : raisonnement robuste
+
+---
+
+### Lecture du résultat
+
+Un score de **{round(base_score,1)}/20** indique un raisonnement **{score_label.lower()}**.
+""")
+
+st.markdown("""
 <div style="text-align:center; margin:25px 0; color:#888;">
 ────────── ✦ ──────────
 </div>
 """, unsafe_allow_html=True)
     
-    disc_type, disc_explanation = detect_discourse_type(result)
+disc_type, disc_explanation = detect_discourse_type(result)
+
+st.markdown("### Type de discours détecté")
+st.info(f"**{disc_type}** — {disc_explanation}")
     
-    st.markdown("### Type de discours détecté")
-    st.info(f"**{disc_type}** — {disc_explanation}")
-    
-    st.markdown("""
+st.markdown("""
 <div style="text-align:center; margin:25px 0; color:#888;">
 ────────── ✦ ──────────
 </div>
@@ -7014,6 +7073,11 @@ else:
 
 st.subheader(f"{couleur_r} Solidité argumentative : {etiquette_r}")
 # Barre épaisse colorée
+st.caption(
+    "Cette jauge mesure la solidité argumentative du texte : structure du raisonnement, "
+    "cohérence logique et présence d’éléments vérifiables. "
+    "La crédibilité globale dépend aussi de la qualité des sources et de la vérifiabilité des affirmations."
+)
 st.markdown(f"""
 <div style="width:100%; margin-top:10px; margin-bottom:10px;">
     <div style="
@@ -7033,11 +7097,7 @@ st.markdown(f"""
     </div>
 </div>
 """, unsafe_allow_html=True)
-st.caption(
-    "Cette jauge mesure la solidité argumentative du texte : structure du raisonnement, "
-    "cohérence logique et présence d’éléments vérifiables. "
-    "La crédibilité globale dépend aussi de la qualité des sources et de la vérifiabilité des affirmations."
-)
+
 st.markdown(
     f"<b style='color:{color_r}'>{etiquette_r}</b> — Score : {round(score, 1)}/20",
     unsafe_allow_html=True
@@ -7382,6 +7442,12 @@ else:
         message_c = "Le texte présente une structure cognitive robuste et peu de signaux de fragilité."
     
 st.subheader(f"{couleur_c} Crédibilité finale : {etiquette_c}")
+
+st.caption(
+    "Cette jauge synthétise la crédibilité globale du texte en combinant "
+    "la solidité factuelle, l’équilibre cognitif entre savoir et certitude, "
+    "et la pression discursive détectée dans le langage."
+)
 
 st.markdown(f"""
 <div style="width:100%; margin-top:10px; margin-bottom:10px;">
