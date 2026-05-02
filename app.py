@@ -6980,183 +6980,299 @@ if result:
 """, unsafe_allow_html=True)
 
 
-    # =============================
-    # Barre de raisonnement
-    # =============================
-    
-    score = result.get("hard_fact_score", 0)
-    
-    if score < 6:
-        couleur_r = "🔴"
-        etiquette_r = "Très fragile"
-        message_r = "Le texte présente peu d’éléments de raisonnement structurés."
-    elif score < 9:
-        couleur_r = "🟠"
-        etiquette_r = "Fragile"
-        message_r = "Le raisonnement existe, mais reste incomplet ou insuffisamment construit."
-    elif score < 13:
-        couleur_r = "🟡"
-        etiquette_r = "Modérée"
-        message_r = "Le texte présente une structure de raisonnement cohérente, mais plusieurs affirmations restent conceptuelles ou insuffisamment démontrées."
-    elif score < 16:
-        couleur_r = "🟢"
-        etiquette_r = "Solide"
-        message_r = "Le raisonnement est structuré et globalement cohérent."
-    else:
-        couleur_r = "🟢"
-        etiquette_r = "Très solide"
-        message_r = "Le texte présente un raisonnement robuste, structuré et bien soutenu."
-    
-    st.subheader(f"{couleur_r} Solidité argumentative : {etiquette_r}")
-    with st.popover("ℹ️ Formule / explication"):
-        st.markdown("""
-    Cette jauge évalue la **solidité argumentative du texte**.
-    
-    ### Formule heuristique
-    
-    score_argumentatif = (G × 0.6) + (N × 0.4)
-    
-    avec :
-    
-    G = gnōsis (éléments factuels : sources, chiffres, références)
-    
-    N = nous (cohérence logique et structure argumentative)
-    
-    ### Interprétation
-    
-    0-6 : raisonnement faible  
-    7-13 : raisonnement partiel  
-    14-20 : raisonnement robuste
-    """)
-    st.progress(min(score / 20, 1))
-    st.caption(f"Score : {round(score, 1)}/20 — {message_r}")
-    st.caption(
-        "Cette jauge mesure la solidité argumentative du texte : structure du raisonnement, "
-        "cohérence logique et présence d’éléments vérifiables. "
-        "La crédibilité globale dépend aussi de la qualité des sources et de la vérifiabilité des affirmations."
-    )
-    st.markdown("""
-        <div style="text-align:center; margin:25px 0; color:#888;">
-        ────────── ✦ ──────────
-        </div>
-        """, unsafe_allow_html=True)
-
-    st.subheader("Barre de Mécroyance")
-    lie_result = compute_lie_gauge(result["M"], result["ME"])
-    
-    gauge_value = lie_result["gauge"]
-    gauge_label = lie_result["label"]
-    gauge_color = lie_result["color"]
-    ME_gauge = lie_result["ME"]
-    gauge_intensity = lie_result["intensity"]
-    
-    M_val = result.get("M", 0)
-    ME_val = result.get("ME", 0)
-    
-    m_norm = max(0.0, min(1.0, (M_val + 10) / 30))
-    me_norm = max(0.0, min(1.0, ME_val / 20))
-    delta_lie = me_norm - (1 - m_norm)
-    gauge_calc = max(0.0, min(1.0, 0.5 + (delta_lie * 0.8)))
-
-    st.markdown(f"""
-    <div style="width:100%; margin-top:10px; margin-bottom:10px;">
-        <div style="
-            width:100%;
-            height:26px;
-            background:#e5e7eb;
-            border-radius:12px;
-            overflow:hidden;
-            border:1px solid #cbd5e1;
-        ">
-            <div style="
-                width:{gauge_value*100}%;
-                height:100%;
-                background:{gauge_color};
-                transition:width 0.4s ease;
-            "></div>
-        </div>
-    </div>
-    """, unsafe_allow_html=True)
-
-    st.markdown(
-        f"<b style='color:{gauge_color}'>{gauge_label}</b> — intensité : {round(gauge_intensity*100,1)}%",
-        unsafe_allow_html=True
-    )
-
-    st.caption("Erreur sincère ⟵⟶ Manipulation probable")
-
 # =============================
-# Tension cognitive
+# Barre de raisonnement
 # =============================
 
-st.write("Tension cognitive (mécroyance vs mensonge)")
-st.caption(
-    "Cette jauge indique si le discours relève plutôt d’une erreur sincère "
-    "(mécroyance) ou d’une possible manipulation. "
-    "Plus la jauge progresse, plus la structure du texte se rapproche du mensonge."
-)
+score = result.get("hard_fact_score", 0)
 
-with st.popover("ℹ️ Formule / résultats"):
+if score < 6:
+    couleur_r = "🔴"
+    color_r = "#dc2626"
+    etiquette_r = "Très fragile"
+    message_r = "Le texte présente peu d’éléments de raisonnement structurés."
+elif score < 9:
+    couleur_r = "🟠"
+    color_r = "#f97316"
+    etiquette_r = "Fragile"
+    message_r = "Le raisonnement existe, mais reste incomplet ou insuffisamment construit."
+elif score < 13:
+    couleur_r = "🟡"
+    color_r = "#facc15"
+    etiquette_r = "Modérée"
+    message_r = "Le texte présente une structure de raisonnement cohérente, mais plusieurs affirmations restent conceptuelles ou insuffisamment démontrées."
+elif score < 16:
+    couleur_r = "🟢"
+    color_r = "#16a34a"
+    etiquette_r = "Solide"
+    message_r = "Le raisonnement est structuré et globalement cohérent."
+else:
+    couleur_r = "🟢"
+    color_r = "#15803d"
+    etiquette_r = "Très solide"
+    message_r = "Le texte présente un raisonnement robuste, structuré et bien soutenu."
+
+st.subheader(f"{couleur_r} Solidité argumentative : {etiquette_r}")
+
+with st.popover("ℹ️ Formule / explication"):
     st.markdown(f"""
-### Jauge mécroyance / mensonge
+### Solidité argumentative — {etiquette_r}
 
-Cette jauge situe le discours sur un axe allant de la **mécroyance** au **mensonge stratégique**.
+Cette jauge évalue la **solidité argumentative du texte**.
 
 ---
 
 ### Résultats de cette analyse
 
-M — mécroyance : **{round(M_val, 2)}**
+Score argumentatif : **{round(score, 1)}/20**
 
-ME — mendacité : **{round(ME_val, 2)}**
+G — gnōsis : **{round(result.get("G", 0), 2)}**
 
-M normalisé : **{round(m_norm, 3)}**
+N — nous : **{round(result.get("N", 0), 2)}**
 
-ME normalisé : **{round(me_norm, 3)}**
-
-Delta : **{round(delta_lie, 3)}**
-
-Position sur la jauge : **{round(gauge_calc, 3)}**
-
-Intensité : **{round(gauge_intensity * 100, 1)}%**
-
-Verdict : **{gauge_label}**
-
----
-
-### Normalisation
-
-`m_norm = (M + 10) / 30`
-
-`me_norm = ME / 20`
+Verdict : **{etiquette_r}**
 
 ---
 
 ### Formule heuristique
 
-`delta = me_norm − (1 − m_norm)`
+`score_argumentatif = (G × 0.6) + (N × 0.4)`
 
-`gauge = 0.5 + (delta × 0.8)`
+avec :
 
-La valeur finale est bornée entre **0** et **1**.
+G = gnōsis  
+N = nous
 
 ---
 
 ### Interprétation
 
-0.00 – 0.20 : mécroyance forte  
-0.20 – 0.40 : mécroyance modérée  
-0.40 – 0.60 : zone ambiguë  
-0.60 – 0.80 : mensonge probable  
-0.80 – 1.00 : mensonge extrême
+0–6 : raisonnement faible  
+7–13 : raisonnement partiel  
+14–20 : raisonnement robuste
+""")
+
+# Barre épaisse colorée
+st.markdown(f"""
+<div style="width:100%; margin-top:10px; margin-bottom:10px;">
+    <div style="
+        width:100%;
+        height:26px;
+        background:#e5e7eb;
+        border-radius:12px;
+        overflow:hidden;
+        border:1px solid #cbd5e1;
+    ">
+        <div style="
+            width:{min(score / 20, 1) * 100}%;
+            height:100%;
+            background:{color_r};
+            transition:width 0.4s ease;
+        "></div>
+    </div>
+</div>
+""", unsafe_allow_html=True)
+
+st.markdown(
+    f"<b style='color:{color_r}'>{etiquette_r}</b> — Score : {round(score, 1)}/20",
+    unsafe_allow_html=True
+)
+
+st.caption(message_r)
+
+st.caption(
+    "Cette jauge mesure la solidité argumentative du texte : structure du raisonnement, "
+    "cohérence logique et présence d’éléments vérifiables. "
+    "La crédibilité globale dépend aussi de la qualité des sources et de la vérifiabilité des affirmations."
+)
+
+st.markdown("""
+<div style="text-align:center; margin:25px 0; color:#888;">
+────────── ✦ ──────────
+</div>
+""", unsafe_allow_html=True)
+
+# =============================
+# Calculs mécroyance / mensonge
+# =============================
+
+lie_result = compute_lie_gauge(result["M"], result["ME"])
+
+gauge_value = lie_result["gauge"]
+gauge_label = lie_result["label"]
+gauge_color = lie_result["color"]
+gauge_intensity = lie_result["intensity"]
+
+M_val = result.get("M", 0)
+ME_val = result.get("ME", 0)
+
+m_norm = max(0.0, min(1.0, (M_val + 10) / 30))
+me_norm = max(0.0, min(1.0, ME_val / 20))
+delta_lie = me_norm - (1 - m_norm)
+gauge_calc = max(0.0, min(1.0, 0.5 + (delta_lie * 0.8)))
+
+if gauge_color == "#a16207":
+    emoji = "🟤"
+elif gauge_color == "#ca8a04":
+    emoji = "🟡"
+elif gauge_color == "#f59e0b":
+    emoji = "🟠"
+elif gauge_color == "#dc2626":
+    emoji = "🔴"
+else:
+    emoji = "⚪"
+
+st.subheader(f"{emoji} Tension cognitive : {gauge_label}")
+st.caption(
+    "Cette jauge indique si le discours relève plutôt d’une erreur sincère "
+    "(mécroyance) ou d’une possible manipulation. "
+    "Plus la jauge progresse, plus la structure du texte se rapproche du mensonge."
+)
+# Barre visuelle de la jauge
+st.markdown(f"""
+<div style="width:100%; margin-top:10px; margin-bottom:10px;">
+    <div style="
+        width:100%;
+        height:26px;
+        background:#e5e7eb;
+        border-radius:12px;
+        overflow:hidden;
+        border:1px solid #cbd5e1;
+    ">
+        <div style="
+            width:{gauge_value*100}%;
+            height:100%;
+            background:{gauge_color};
+            transition:width 0.4s ease;
+        "></div>
+    </div>
+</div>
+""", unsafe_allow_html=True)
+
+st.markdown(
+    f"<b style='color:{gauge_color}'>{gauge_label}</b> — intensité : {round(gauge_intensity*100,1)}%",
+    unsafe_allow_html=True
+)
+
+st.caption("Erreur sincère ⟵⟶ Manipulation probable")
+
+with st.popover("ℹ️ Formule / résultats"):
+
+    st.subheader(f"Verdict : {gauge_label}")
+    st.caption(
+        f"Position : {round(gauge_calc, 3)} / 1 — "
+        f"Intensité : {round(gauge_intensity * 100, 1)}%"
+    )
+
+    st.subheader("Résumé de l’analyse")
+
+    m1, m2 = st.columns(2)
+    m1.metric("M — mécroyance", round(M_val, 2))
+    m2.metric("ME — mendacité", round(ME_val, 2))
+
+    m3, m4 = st.columns(2)
+    m3.metric("M normalisé", round(m_norm, 3))
+    m4.metric("ME normalisé", round(me_norm, 3))
+
+    m5, m6 = st.columns(2)
+    m5.metric("Delta cognitif", round(delta_lie, 3))
+    m6.metric("Position jauge", round(gauge_calc, 3))
+
+    m7, m8 = st.columns(2)
+    m7.metric("Intensité", f"{round(gauge_intensity * 100, 1)}%")
+    m8.metric("Verdict", gauge_label)
+
+    st.markdown(f"""
+Cette jauge situe le discours sur un axe allant de la **mécroyance** au **mensonge stratégique**.
+
+Elle compare deux indices cognitifs :
+
+- **M** : indice de mécroyance
+- **ME** : indice de mendacité
 
 ---
 
-### Lecture simple
+### 1️⃣ Indice de mécroyance
 
-Plus **M** domine **ME**, plus le texte relève d’une erreur sincère ou d’un désalignement cognitif.
+`M = (G + N) − D`
 
-Plus **ME** domine **M**, plus le texte se rapproche d’une possible manipulation stratégique.
+avec :
+
+G = gnōsis  
+N = nous  
+D = doxa
+
+Dans cette analyse :
+
+`M = {round(M_val, 2)}`
+
+---
+
+### 2️⃣ Indice de mensonge stratégique
+
+`ME = 2D − (G + N)`
+
+Dans cette analyse :
+
+`ME = {round(ME_val, 2)}`
+
+---
+
+### 3️⃣ Normalisation des indices
+
+`m_norm = (M + 10) / 30`
+
+`me_norm = ME / 20`
+
+Dans cette analyse :
+
+`m_norm ≈ {round(m_norm, 3)}`
+
+`me_norm ≈ {round(me_norm, 3)}`
+
+---
+
+### 4️⃣ Calcul de la tension cognitive
+
+`delta = me_norm − (1 − m_norm)`
+
+Dans cette analyse :
+
+`delta ≈ {round(delta_lie, 3)}`
+
+---
+
+### 5️⃣ Formule heuristique principale
+
+`gauge = 0.5 + (delta × 0.8)`
+
+La valeur finale est bornée entre **0** et **1**.
+
+Position observée :
+
+`gauge = {round(gauge_calc, 3)} / 1`
+
+---
+
+### Interprétation de la jauge
+
+0.00–0.20 : mécroyance forte  
+0.20–0.40 : mécroyance modérée  
+0.40–0.60 : zone ambiguë  
+0.60–0.80 : mensonge probable  
+0.80–1.00 : mensonge extrême
+
+---
+
+### Lecture du résultat
+
+Plus **M domine ME**, plus le texte relève d’une erreur sincère ou d’un désalignement cognitif.
+
+Plus **ME domine M**, plus le texte se rapproche d’une manipulation stratégique.
+
+Dans cette analyse, la jauge indique :
+
+**{gauge_label}**
 """)
 
 # =============================
