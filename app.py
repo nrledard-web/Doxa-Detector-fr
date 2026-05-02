@@ -6994,13 +6994,62 @@ Verdict : **{score_label}**
 ---
 
 ### Signaux analysés
+Contrairement au fact-checking, elle n’évalue pas directement la vérité des affirmations.  
+Elle examine la **structure du discours** et la manière dont les idées sont reliées entre elles.
 
 La jauge s’appuie sur plusieurs indices linguistiques :
 
-- présence de connecteurs logiques (donc, car, cependant…)
+- présence de connecteurs logiques
 - structure argumentative des phrases
 - continuité logique du raisonnement
 - détection de contradictions internes
+
+#### 1️⃣ Connecteurs logiques
+
+L’algorithme détecte les mots qui structurent le raisonnement :
+
+- donc
+- car
+- puisque
+- cependant
+- pourtant
+- ainsi
+- en effet
+
+Ces connecteurs signalent souvent une relation logique entre deux propositions :  
+**cause, conséquence, opposition ou justification**.
+
+Un discours qui utilise ces connecteurs de manière cohérente présente généralement une structure argumentative plus explicite.
+
+#### 2️⃣ Structure argumentative des phrases
+
+Le système examine si les phrases suivent des formes argumentatives classiques :
+
+- affirmation → justification
+- prémisse → conclusion
+- observation → interprétation
+
+Ces structures indiquent qu’un raisonnement est **articulé et développé**, plutôt qu’une simple succession d’opinions.
+
+#### 3️⃣ Continuité logique du raisonnement
+
+L’analyse observe si les idées se suivent de manière progressive :
+
+- une idée introduit la suivante
+- les phrases restent dans le même cadre logique
+- les conclusions découlent des propositions précédentes
+
+Un raisonnement continu et cohérent augmente la **solidité argumentative** du texte.
+
+#### 4️⃣ Détection de contradictions internes
+
+Le moteur recherche aussi des signaux de rupture logique :
+
+- affirmations incompatibles dans le même texte
+- revirements implicites
+- enchaînements contradictoires
+
+Ces incohérences diminuent le score car elles fragilisent la structure du raisonnement.
 
 ---
 
@@ -7671,20 +7720,191 @@ st.markdown("""
 # Gravité cognitive globale
 # =============================
 gravity = result.get("cognitive_gravity", 0)
-
-st.markdown("### Gravité cognitive globale")
-st.progress(gravity)
+gravity_pct = round(gravity * 100, 1)
 
 if gravity < 0.2:
-    st.caption("Gravité faible — discours globalement sain.")
+    gravity_label = "Faible"
+    gravity_color = "#16a34a"
+    gravity_text = "Discours globalement sain."
 elif gravity < 0.4:
-    st.caption("Gravité modérée — quelques tensions cognitives.")
+    gravity_label = "Modérée"
+    gravity_color = "#ca8a04"
+    gravity_text = "Quelques tensions cognitives."
 elif gravity < 0.6:
-    st.caption("Gravité élevée — dérive discursive notable.")
+    gravity_label = "Élevée"
+    gravity_color = "#f97316"
+    gravity_text = "Dérive discursive notable."
 elif gravity < 0.8:
-    st.caption("Gravité très élevée — structure discursive problématique.")
+    gravity_label = "Très élevée"
+    gravity_color = "#dc2626"
+    gravity_text = "Structure discursive problématique."
 else:
-    st.caption("Gravité critique — convergence de manipulation ou désalignement cognitif.")
+    gravity_label = "Critique"
+    gravity_color = "#7f1d1d"
+    gravity_text = "Convergence de manipulation ou désalignement cognitif."
+
+st.markdown("### Gravité cognitive globale")
+
+render_custom_gauge(gravity, gravity_color)
+
+st.markdown(
+    f"""
+<div style='
+border:1px solid {gravity_color};
+border-radius:12px;
+padding:12px;
+margin-top:8px;
+background-color:rgba(255,255,255,0.03);
+'>
+<b style='color:{gravity_color};'>
+Gravité {gravity_label} — {gravity_pct}%
+</b><br>
+{gravity_text}
+</div>
+""",
+    unsafe_allow_html=True
+)
+
+with st.popover("ℹ️ Comprendre cette jauge"):
+    st.markdown(f"""
+### Gravité cognitive globale
+
+Cette jauge estime le **niveau global de dérive cognitive** du discours.
+
+Elle ne mesure pas directement si le texte est vrai ou faux.  
+Elle mesure si sa structure présente des signes de **déséquilibre cognitif**, de fermeture argumentative, de pression discursive ou de fragilité logique.
+
+#### Résultat de cette analyse
+
+**Gravité cognitive : {gravity_pct}%**
+
+**Verdict : {gravity_label}**
+
+### Signaux pris en compte
+
+La jauge synthétise plusieurs dimensions du moteur analytique.
+
+---
+
+### 1️⃣ Niveau 1 — le noyau cognitif
+
+**M = (G + N) − D**
+
+Ce noyau mesure l’**équilibre cognitif du discours**.
+
+- **G — gnōsis** : savoir explicite
+- **N — nous** : compréhension et cohérence
+- **D — doxa** : certitude
+
+---
+
+### 2️⃣ Niveau 2 — les dérivés du noyau
+
+**Indice de mécroyance**
+
+M = (G + N) − D
+
+**Indice de mendacité**
+
+ME = 2D − (G + N)
+
+Ces indices mesurent :
+
+- désalignement cognitif
+- certitude excessive
+
+---
+
+### 3️⃣ Niveau 3 — analyse linguistique
+
+#### Pression discursive
+
+Basée sur des marqueurs comme :
+
+- dramatisation
+- certitude absolue
+- autorité vague
+- ennemi abstrait
+
+#### Solidité argumentative
+
+Basée sur :
+
+- connecteurs logiques
+- contradictions
+- structure argumentative
+
+#### Red flags
+
+Détection de procédés rhétoriques :
+
+- sophismes
+- généralisation
+- naturalisation
+- victimisation
+
+---
+
+### 4️⃣ Niveau 4 — synthèse cognitive
+
+Tous ces indicateurs alimentent la **stabilité cognitive**.
+
+On peut la résumer ainsi :
+
+`stabilité ≈ équilibre cognitif − pression discursive − red flags + solidité argumentative`
+
+Ce n’est pas une formule exacte mais un **principe d’agrégation**.
+
+---
+
+### 5️⃣ Niveau 5 — gravité cognitive
+
+Enfin :
+
+`gravité = 1 − stabilité`
+
+Donc :
+
+| stabilité | gravité |
+|----------|--------|
+| forte | faible |
+| moyenne | modérée |
+| faible | élevée |
+
+---
+
+### 6️⃣ Signification de la gravité
+
+La **gravité cognitive** représente :
+
+> le niveau global de dérive du raisonnement détecté dans le discours.
+
+Elle combine :
+
+- mécanique cognitive
+- structure argumentative
+- pression rhétorique
+- signaux de manipulation
+
+#### Formule heuristique
+
+```python
+gravité = 1 - stabilité_cognitive
+
+#### Interprétation
+
+0–20% : gravité faible  
+20–40% : gravité modérée  
+40–60% : gravité élevée  
+60–80% : gravité très élevée  
+80–100% : gravité critique
+
+#### Résultat
+
+Gravité : **{gravity_pct}%**  
+Verdict : **{gravity_label}**
+""")
+
 
 # =============================
 # Cerveau DOXA
