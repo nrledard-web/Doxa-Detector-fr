@@ -7032,12 +7032,132 @@ if result:
         "cohérence logique et présence d’éléments vérifiables. "
         "La crédibilité globale dépend aussi de la qualité des sources et de la vérifiabilité des affirmations."
     )
+
+    # =============================
+    # Suite du diagnostic
+    # =============================
+    delta_mm = round(result["M"] - result["ME"], 2)
+    st.caption(f"Écart cognitif (M − ME) : {delta_mm}")
+
+    if result["M"] > result["ME"] + 1:
+        dominant_pattern = "Structure dominante : mécroyance"
+    elif result["ME"] > result["M"] + 1:
+        dominant_pattern = "Structure dominante : mensonge stratégique"
+    else:
+        dominant_pattern = "Structure dominante : mixte ou ambiguë"
+
+    st.subheader("Structure cognitive dominante")
+    st.write(dominant_pattern)
+
+    if result["ME"] > result["M"] and result["ME"] > 0:
+        cognitive_type = "Mensonge stratégique possible"
+    elif result["M"] < 0:
+        cognitive_type = "Forte mécroyance / clôture cognitive"
+    else:
+        cognitive_type = "Cognition probablement sincère mais désalignée"
+
+    st.subheader("Interprétation cognitive")
+    st.write(cognitive_type)
+
+    if result["M"] - result["ME"] > 3:
+        diagnosis = "Structure de mécroyance forte"
+    elif result["M"] > result["ME"]:
+        diagnosis = "Structure de mécroyance modérée"
+    elif abs(result["M"] - result["ME"]) <= 1:
+        diagnosis = "Structure cognitive ambiguë"
+    else:
+        diagnosis = "Tromperie stratégique possible"
+
+    st.subheader("Diagnostic cognitif")
+    st.write(diagnosis)
+
+    lie_result = compute_lie_gauge(result["M"], result["ME"])
+
+    gauge_value = lie_result["gauge"]
+    gauge_label = lie_result["label"]
+    gauge_color = lie_result["color"]
+    ME_gauge = lie_result["ME"]
+    gauge_intensity = lie_result["intensity"]
+
+    st.write("Tension cognitive (mécroyance vs mensonge)")
+    st.caption(
+        "Cette jauge indique si le discours relève plutôt d’une erreur sincère "
+        "(mécroyance) ou d’une possible manipulation. "
+        "Plus la jauge progresse, plus la structure du texte se rapproche du mensonge."
+    )
+
+    st.markdown(f"""
+    <div style="width:100%; margin-top:10px; margin-bottom:10px;">
+        <div style="
+            width:100%;
+            height:26px;
+            background:#e5e7eb;
+            border-radius:12px;
+            overflow:hidden;
+            border:1px solid #cbd5e1;
+        ">
+            <div style="
+                width:{gauge_value*100}%;
+                height:100%;
+                background:{gauge_color};
+                transition:width 0.4s ease;
+            "></div>
+        </div>
+    </div>
+    """, unsafe_allow_html=True)
+
+    st.markdown(
+        f"<b style='color:{gauge_color}'>{gauge_label}</b> — intensité : {round(gauge_intensity*100,1)}%",
+        unsafe_allow_html=True
+    )
+
+    st.caption("Erreur sincère ⟵⟶ Manipulation probable")
+
+    # Explication automatique de la jauge mensonge
+    if gauge_value >= 0.70:
+        st.warning("### Pourquoi cette jauge indique une manipulation probable ?")
+
+        st.markdown("""
+La jauge monte fortement parce que le texte presente une combinaison de signaux :
+
+- une certitude tres elevee
+- un niveau de preuves insuffisant face a cette certitude
+- une pression rhetorique importante
+- des affirmations difficiles a verifier
+- des formulations pouvant orienter le lecteur plutot que d'eclairer le raisonnement
+""")
+
+        st.markdown("#### Facteurs detectes")
+
+        st.write(f"- Mecroyance M : {result['M']}")
+        st.write(f"- Mensonge strategique ME : {result['ME']}")
+        st.write(f"- Certitude D : {result['D']}")
+        st.write(f"- Savoir G : {result['G']}")
+        st.write(f"- Comprehension N : {result['N']}")
+        st.write(f"- Pression rhetorique : {round(result['rhetorical_pressure'] * 100, 1)}%")
+        st.write(f"- Red flags detectes : {len(result.get('red_flags', []))}")
+
+    elif gauge_value >= 0.45:
+        st.info("### Pourquoi cette jauge s'allume ?")
+
+        st.markdown("""
+Le texte contient une tension entre mecroyance et manipulation.
+
+La certitude parait plus forte que les preuves disponibles, mais les signaux ne suffisent pas encore a conclure a une manipulation nette.
+""")
+
+    else:
+        st.caption(
+            "La jauge reste basse : le texte releve plutot d'une erreur sincere "
+            "ou d'un desalignement cognitif."
+        )
     
+
     # =============================
     # Barre de crédibilité finale
     # =============================
     final_score = result.get("final_credibility_score", score)
-    
+
     if final_score < 6:
         couleur_c = "🔴"
         etiquette_c = "Très fragile"
@@ -7063,94 +7183,114 @@ if result:
     st.progress(min(final_score / 20, 1))
     st.caption(f"Score final : {round(final_score, 1)}/20 — {message_c}")
 
-    st.markdown(
-    """
-    <hr style="border:2px solid #999; margin:40px 0;">
-    <h3 style="text-align:center;">Jauges structurelles avancées</h3>
-    <hr style="border:2px solid #999; margin:40px 0;">
-    """,
-    unsafe_allow_html=True
-)
+    with st.popover("ℹ️ Formule / explication"):
 
-# =============================
-# Jauges structurelles avancées
-# =============================
+        st.subheader(f"{T['verdict']} : {couleur_c} Crédibilité finale — {etiquette_c}")
+        st.caption(f"Score final : {round(final_score, 1)}/20 — {message_c}")
+        st.subheader(T["summary"])
 
-result = st.session_state.get("last_result")
-article_for_analysis = st.session_state.get("last_article", "")
+        m1, m2 = st.columns(2)
+        m1.metric("HFS", round(result["hard_fact_score"], 1))
+        m2.metric("G — gnōsis", round(result["G"], 2))
+        
+        m3, m4 = st.columns(2)
+        m3.metric("N — nous", round(result["N"], 2))
+        m4.metric("D — doxa", round(result["D"], 2))
+        
+        m5, m6 = st.columns(2)
+        m5.metric("Pression discursive", round(result.get("discursive_pressure", 0), 2))
+        m6.metric("ID", round(result.get("ID", 0), 2))
+        
+        m7, m8 = st.columns(2)
+        m7.metric("Pénalité jauges", round(result.get("display_gauge_penalty", 0), 2))
+        m8.metric("Score final", round(final_score, 1))
+        
+        st.markdown(f"""
+        Cette jauge synthétise la **crédibilité globale du texte**.
+        
+        Elle combine trois dimensions :
+        
+        - la solidité factuelle du texte  
+        - l’équilibre cognitif entre connaissance, compréhension et certitude  
+        - la pression discursive détectée dans le langage  
+        
+        ---
+        
+        ### 1️⃣ Solidité factuelle
+        
+        `HFS = hard_fact_score / 20`
+        
+        Dans cette analyse :
+        
+        `HFS = {round(result["hard_fact_score"], 1)} / 20`
+        
+        ---
+        
+        ### 2️⃣ Calibration cognitive
+        
+        `OC = (G + N) / (G + N + D)`
+        
+        avec :
+        
+        G = gnōsis  
+        N = nous  
+        D = doxa  
+        
+        Dans cette analyse :
+        
+        `OC = ({round(result["G"],2)} + {round(result["N"],2)}) / ({round(result["G"],2)} + {round(result["N"],2)} + {round(result["D"],2)})`
+        
+        `OC ≈ {round((result["G"] + result["N"]) / max((result["G"] + result["N"] + result["D"]), 1), 2)}`
+        
+        ---
+        
+        ### 3️⃣ Indice de pression discursive
+        
+        `ID = 1 − pression_discursive`
+        
+        avec :
+        
+        `pression_discursive = propagande + pression_rhétorique`
+        
+        Plus la pression discursive est forte, plus le score final diminue.
+        
+        ---
+        
+        ### 4️⃣ Formule heuristique principale
+        
+        `score_initial = 20 × HFS × OC × ID`
+        
+        ---
+        
+        ### 5️⃣ Ajustement final
+        
+        `score_final = score_initial − pénalité_jauges`
+        
+        Score final observé :
+        
+        `score_final = {round(final_score, 1)} / 20`
+        
+        ---
+        
+        ### Interprétation du score final
+        
+        0–5 : crédibilité très fragile  
+        6–9 : crédibilité fragile  
+        10–14 : crédibilité prudente  
+        15–20 : crédibilité robuste
+        """)
 
-if not result:
-    st.info(T["paste_text_or_load_url"])
-    st.stop()
-
-st.subheader("Jauges structurelles avancées")
-
-gauges = [
-    (
-        "Pression narrative",
-        result.get("narrative_pressure_score", 0),
-        result.get("narrative_pressure_label", "Non calculée"),
-        result.get("narrative_pressure_interpretation", "")
-    ),
-    (
-        "Saut logique",
-        result.get("logical_jump_score", 0),
-        result.get("logical_jump_label", "Non calculée"),
-        result.get("logical_jump_interpretation", "")
-    ),
-    (
-        "Asymétrie argumentative",
-        result.get("argument_asymmetry_score", 0),
-        result.get("argument_asymmetry_label", "Non calculée"),
-        result.get("argument_asymmetry_interpretation", "")
-    ),
-    (
-        "Densité argumentative",
-        result.get("argument_density_score", 0),
-        result.get("argument_density_label", "Non calculée"),
-        result.get("argument_density_interpretation", "")
-    ),
-    (
-        "Prédiction absolue",
-        result.get("absolute_prediction_score", 0),
-        result.get("absolute_prediction_label", "Non calculée"),
-        result.get("absolute_prediction_interpretation", "")
-    ),
-    (
-        "Amplification de menace",
-        result.get("threat_amplification_advanced_score", 0),
-        result.get("threat_amplification_advanced_label", "Non calculée"),
-        result.get("threat_amplification_advanced_interpretation", "")
-    ),
-    (
-        "Certitude forte composée",
-        result.get("strong_certainty_score", 0),
-        result.get("strong_certainty_label", "Non calculée"),
-        result.get("strong_certainty_interpretation", "")
-    ),
-]
-
-for title, score, label, interpretation in gauges:
-
-    if title == "Densité argumentative":
-        title_html = interpret_generic_quality_gauge(title, score)
-    elif title in ["Cohérence trompeuse", "Jauge propagandiste"]:
-        title_html = interpret_warning_risk_gauge(title, score)
-    else:
-        title_html = interpret_generic_risk_gauge(title, score)
-
-    st.markdown(title_html, unsafe_allow_html=True)
-    st.progress(score)
-    st.caption(f"{label} — {round(score * 100, 1)}%")
-
-    if interpretation:
-        st.write(interpretation)
-
-st.markdown("""
-<div style="text-align:center; margin:25px 0; color:#888;">
-────────── ✦ ──────────
-</div>
-""", unsafe_allow_html=True)
+    st.markdown("""
+    <div style="text-align:center; margin:25px 0; color:#bbb;">
+    ✦ ✦ ✦
+    </div>
+    """, unsafe_allow_html=True)
+    
+    st.markdown("""
+    <div style="text-align:center; margin:25px 0; color:#888;">
+    ────────── ✦ ──────────
+    </div>
+    """, unsafe_allow_html=True)
 
 # =============================
 # Analyse sémantique du discours
@@ -7280,7 +7420,7 @@ with col_center:
 
     st.markdown("### 🧠 Modules d’analyse DOXA")
 
-    with st.expander("🧠 Voir le résumé complet", expanded=False):
+    with st.expander("🧠 Voir le résumé complet des pénalités", expanded=False):
 
         # =============================
         # Pénalités appliquées
@@ -7321,57 +7461,17 @@ with col_center:
         with st.expander("Voir le détail des pénalités"):
             st.write(result.get("weighted_red_flags", []))
 
-        st.divider()
-
-        # =============================
-        # Résultats essentiels
-        # =============================
-
-    st.markdown(
-        """
-        <div style="font-size:20px; line-height:1.7;">
-        <b>Résultats essentiels</b>
-        </div>
-        """,
-        unsafe_allow_html=True
-    )
 
     st.divider()
 
-
-    # =============================
-    # Diagnostic cognitif rapide
-    # =============================
     st.subheader("Diagnostic cognitif")
     life_score = round((result["hard_fact_score"] / 20) * 100, 1)
     mecroyance_bar = max(0.0, min(1.0, (result["M"] + 10) / 30))
 
-    col1, col2 = st.columns(2)
     with col1:
         st.write("Vitalité cognitive")
         st.progress(life_score / 100)
         st.caption(f"{life_score}%")
-    with col2:
-        st.write("Indice de mécroyance")
-        st.progress(mecroyance_bar)
-        st.caption(f"M = {result['M']}")
-
-    st.subheader(f"{T['verdict']} : {couleur_c} Crédibilité finale — {etiquette_c}")
-    st.caption(f"Score final : {round(final_score, 1)}/20 — {message_c}")
-    st.subheader(T["summary"])
-
-    m1, m2 = st.columns(2)
-    m1.metric("G — gnōsis", result["G"])
-    m2.metric("N — nous", result["N"])
-    m3, m4 = st.columns(2)
-    m3.metric("D — doxa", result["D"])
-    m4.metric("V — vérifiabilité", result["V"])
-    m5, m6 = st.columns(2)
-    m5.metric("QS", result["source_quality"])
-    m6.metric("RC", round(result["avg_claim_risk"], 1))
-    m7, m8 = st.columns(2)
-    m7.metric("VC", round(result["avg_claim_verifiability"], 1))
-    m8.metric("F", len(result["red_flags"]))
 
     st.divider()
 
@@ -7395,30 +7495,10 @@ with col_center:
     # =============================
     st.subheader("Dérives cognitives")
 
-    dr1, dr2, dr3 = st.columns(3)
+    dr1, dr2, = st.columns(2)
 
     with dr1:
-        st.markdown("### Mécroyance")
-        st.caption("La certitude dépasse le savoir et la compréhension.")
 
-        value = min(result["drift_mecroyance"] / 10, 1.0)
-
-        if result["drift_mecroyance"] < 1:
-            label, color = "Faible", "#16a34a"
-        elif result["drift_mecroyance"] < 3:
-            label, color = "Modérée", "#ca8a04"
-        elif result["drift_mecroyance"] < 6:
-            label, color = "Élevée", "#f97316"
-        else:
-            label, color = "Très élevée", "#dc2626"
-
-        render_custom_gauge(value, color)
-        st.markdown(
-            f"<b style='color:{color}'>{label}</b> — {result['drift_mecroyance']}",
-            unsafe_allow_html=True
-        )
-
-    with dr2:
         st.markdown("### Pseudo-savoir")
         st.caption("Accumulation de savoirs mal intégrés ou mal compris.")
 
@@ -7439,7 +7519,7 @@ with col_center:
             unsafe_allow_html=True
         )
 
-    with dr3:
+    with dr2:
         st.markdown("### Intuition dogmatique")
         st.caption("Conviction forte sans base de savoir suffisante.")
 
@@ -7480,125 +7560,6 @@ with col_center:
         unsafe_allow_html=True
     )
     st.caption(result["cognitive_drift_interpretation"])
-
-    # =============================
-    # Suite du diagnostic
-    # =============================
-    delta_mm = round(result["M"] - result["ME"], 2)
-    st.caption(f"Écart cognitif (M − ME) : {delta_mm}")
-
-    if result["M"] > result["ME"] + 1:
-        dominant_pattern = "Structure dominante : mécroyance"
-    elif result["ME"] > result["M"] + 1:
-        dominant_pattern = "Structure dominante : mensonge stratégique"
-    else:
-        dominant_pattern = "Structure dominante : mixte ou ambiguë"
-
-    st.subheader("Structure cognitive dominante")
-    st.write(dominant_pattern)
-
-    if result["ME"] > result["M"] and result["ME"] > 0:
-        cognitive_type = "Mensonge stratégique possible"
-    elif result["M"] < 0:
-        cognitive_type = "Forte mécroyance / clôture cognitive"
-    else:
-        cognitive_type = "Cognition probablement sincère mais désalignée"
-
-    st.subheader("Interprétation cognitive")
-    st.write(cognitive_type)
-
-    if result["M"] - result["ME"] > 3:
-        diagnosis = "Structure de mécroyance forte"
-    elif result["M"] > result["ME"]:
-        diagnosis = "Structure de mécroyance modérée"
-    elif abs(result["M"] - result["ME"]) <= 1:
-        diagnosis = "Structure cognitive ambiguë"
-    else:
-        diagnosis = "Tromperie stratégique possible"
-
-    st.subheader("Diagnostic cognitif")
-    st.write(diagnosis)
-
-    lie_result = compute_lie_gauge(result["M"], result["ME"])
-
-    gauge_value = lie_result["gauge"]
-    gauge_label = lie_result["label"]
-    gauge_color = lie_result["color"]
-    ME_gauge = lie_result["ME"]
-    gauge_intensity = lie_result["intensity"]
-
-    st.write("Tension cognitive (mécroyance vs mensonge)")
-    st.caption(
-        "Cette jauge indique si le discours relève plutôt d’une erreur sincère "
-        "(mécroyance) ou d’une possible manipulation. "
-        "Plus la jauge progresse, plus la structure du texte se rapproche du mensonge."
-    )
-
-    st.markdown(f"""
-    <div style="width:100%; margin-top:10px; margin-bottom:10px;">
-        <div style="
-            width:100%;
-            height:26px;
-            background:#e5e7eb;
-            border-radius:12px;
-            overflow:hidden;
-            border:1px solid #cbd5e1;
-        ">
-            <div style="
-                width:{gauge_value*100}%;
-                height:100%;
-                background:{gauge_color};
-                transition:width 0.4s ease;
-            "></div>
-        </div>
-    </div>
-    """, unsafe_allow_html=True)
-
-    st.markdown(
-        f"<b style='color:{gauge_color}'>{gauge_label}</b> — intensité : {round(gauge_intensity*100,1)}%",
-        unsafe_allow_html=True
-    )
-
-    st.caption("Erreur sincère ⟵⟶ Manipulation probable")
-
-    # Explication automatique de la jauge mensonge
-    if gauge_value >= 0.70:
-        st.warning("### Pourquoi cette jauge indique une manipulation probable ?")
-
-        st.markdown("""
-La jauge monte fortement parce que le texte presente une combinaison de signaux :
-
-- une certitude tres elevee
-- un niveau de preuves insuffisant face a cette certitude
-- une pression rhetorique importante
-- des affirmations difficiles a verifier
-- des formulations pouvant orienter le lecteur plutot que d'eclairer le raisonnement
-""")
-
-        st.markdown("#### Facteurs detectes")
-
-        st.write(f"- Mecroyance M : {result['M']}")
-        st.write(f"- Mensonge strategique ME : {result['ME']}")
-        st.write(f"- Certitude D : {result['D']}")
-        st.write(f"- Savoir G : {result['G']}")
-        st.write(f"- Comprehension N : {result['N']}")
-        st.write(f"- Pression rhetorique : {round(result['rhetorical_pressure'] * 100, 1)}%")
-        st.write(f"- Red flags detectes : {len(result.get('red_flags', []))}")
-
-    elif gauge_value >= 0.45:
-        st.info("### Pourquoi cette jauge s'allume ?")
-
-        st.markdown("""
-Le texte contient une tension entre mecroyance et manipulation.
-
-La certitude parait plus forte que les preuves disponibles, mais les signaux ne suffisent pas encore a conclure a une manipulation nette.
-""")
-
-    else:
-        st.caption(
-            "La jauge reste basse : le texte releve plutot d'une erreur sincere "
-            "ou d'un desalignement cognitif."
-        )
 
     st.divider()
 
@@ -8568,6 +8529,56 @@ La certitude parait plus forte que les preuves disponibles, mais les signaux ne 
             unsafe_allow_html=True
         )
         st.caption("Plus la certitude domine G + N, plus le texte se ferme.")
+
+    # =============================
+    # Jauges structurelles avancées
+    # =============================
+    
+    result = st.session_state.get("last_result")
+    article_for_analysis = st.session_state.get("last_article", "")
+    
+    if not result:
+        st.info(T["paste_text_or_load_url"])
+        st.stop()
+    
+    st.subheader("Jauges structurelles avancées")
+    
+    gauges = [
+        (
+            "Saut logique",
+            result.get("logical_jump_score", 0),
+            result.get("logical_jump_label", "Non calculée"),
+            result.get("logical_jump_interpretation", "")
+        ),
+        (
+            "Densité argumentative",
+            result.get("argument_density_score", 0),
+            result.get("argument_density_label", "Non calculée"),
+            result.get("argument_density_interpretation", "")
+        ),
+        (
+            "Certitude forte composée",
+            result.get("strong_certainty_score", 0),
+            result.get("strong_certainty_label", "Non calculée"),
+            result.get("strong_certainty_interpretation", "")
+        ),
+    ]
+    
+    for title, score, label, interpretation in gauges:
+    
+        if title == "Densité argumentative":
+            title_html = interpret_generic_quality_gauge(title, score)
+        elif title in ["Cohérence trompeuse", "Jauge propagandiste"]:
+            title_html = interpret_warning_risk_gauge(title, score)
+        else:
+            title_html = interpret_generic_risk_gauge(title, score)
+    
+        st.markdown(title_html, unsafe_allow_html=True)
+        st.progress(score)
+        st.caption(f"{label} — {round(score * 100, 1)}%")
+    
+        if interpretation:
+            st.write(interpretation)
 
     # -----------------------------
     # 25) Syllogismes détectés
