@@ -4573,14 +4573,25 @@ def compute_red_flag_penalties(metrics: dict) -> dict:
     }
 
 def compute_cognitive_drifts(G, N, D):
-    drift_mecroyance = max(0, D - (G + N))
+    M = (G + N) - D
+
+    drift_mecroyance = max(0, -M)
     drift_pseudo_savoir = max(0, (G + D) - N)
     drift_intuition_dogmatique = max(0, (N + D) - G)
 
-    global_drift = round(
-        (drift_mecroyance + drift_pseudo_savoir + drift_intuition_dogmatique) / 3,
-        2
+    dominant_value = max(
+        drift_mecroyance,
+        drift_pseudo_savoir,
+        drift_intuition_dogmatique
     )
+
+    average_value = (
+        drift_mecroyance +
+        drift_pseudo_savoir +
+        drift_intuition_dogmatique
+    ) / 3
+
+    global_drift = round(dominant_value * 0.6 + average_value * 0.4, 2)
 
     values = {
         "mecroyance": round(drift_mecroyance, 2),
@@ -8262,123 +8273,436 @@ with col_center:
     st.pyplot(fig_triangle, use_container_width=True)
 
     # =============================
-    # Nouvelles jauges : dérives cognitives
+    # 🧠 1. DÉRIVES COGNITIVES FONDAMENTALES
     # =============================
-    st.subheader("Dérives cognitives")
+    st.subheader("🧠 Dérives cognitives fondamentales")
+    st.caption("Dérives internes du raisonnement liées à l’équilibre entre connaissance (G), compréhension (N) et certitude (D).")
+    
 
-    dr1, dr2, = st.columns(2)
+    # -----------------------------
+    # Pseudo-savoir
+    # -----------------------------
+    st.markdown("### Pseudo-savoir")
+    st.caption("Accumulation de savoirs mal intégrés ou mal compris.")
 
-    with dr1:
+    value = min(result["drift_pseudo_savoir"] / 10, 1.0)
 
-        st.markdown("### Pseudo-savoir")
-        st.caption("Accumulation de savoirs mal intégrés ou mal compris.")
-
-        value = min(result["drift_pseudo_savoir"] / 10, 1.0)
-
-        if result["drift_pseudo_savoir"] < 1:
-            label, color = "Faible", "#16a34a"
-        elif result["drift_pseudo_savoir"] < 3:
-            label, color = "Modérée", "#ca8a04"
-        elif result["drift_pseudo_savoir"] < 6:
-            label, color = "Élevée", "#f97316"
-        else:
-            label, color = "Très élevée", "#dc2626"
-
-        render_custom_gauge(value, color)
-        st.markdown(
-            f"<b style='color:{color}'>{label}</b> — {result['drift_pseudo_savoir']}",
-            unsafe_allow_html=True
-        )
-
-    with dr2:
-        st.markdown("### Intuition dogmatique")
-        st.caption("Conviction forte sans base de savoir suffisante.")
-
-        value = min(result["drift_intuition_dogmatique"] / 10, 1.0)
-
-        if result["drift_intuition_dogmatique"] < 1:
-            label, color = "Faible", "#16a34a"
-        elif result["drift_intuition_dogmatique"] < 3:
-            label, color = "Modérée", "#ca8a04"
-        elif result["drift_intuition_dogmatique"] < 6:
-            label, color = "Élevée", "#f97316"
-        else:
-            label, color = "Très élevée", "#dc2626"
-
-        render_custom_gauge(value, color)
-        st.markdown(
-            f"<b style='color:{color}'>{label}</b> — {result['drift_intuition_dogmatique']}",
-            unsafe_allow_html=True
-        )
-
-    st.markdown("### Indice global de dérive cognitive")
-    st.caption("Synthèse des trois dérives cognitives.")
-
-    global_value = min(result["global_cognitive_drift"] / 10, 1.0)
-
-    if result["global_cognitive_drift"] < 1:
-        global_label, global_color = "Faible", "#16a34a"
-    elif result["global_cognitive_drift"] < 3:
-        global_label, global_color = "Modérée", "#ca8a04"
-    elif result["global_cognitive_drift"] < 6:
-        global_label, global_color = "Élevée", "#f97316"
+    if result["drift_pseudo_savoir"] < 1:
+        label, color = "Faible", "#16a34a"
+    elif result["drift_pseudo_savoir"] < 3:
+        label, color = "Modérée", "#ca8a04"
+    elif result["drift_pseudo_savoir"] < 6:
+        label, color = "Élevée", "#f97316"
     else:
-        global_label, global_color = "Très élevée", "#dc2626"
+        label, color = "Très élevée", "#dc2626"
 
-    render_custom_gauge(global_value, global_color)
+    render_custom_gauge(value, color)
+
     st.markdown(
-        f"<b style='color:{global_color}'>{global_label}</b> — {result['global_cognitive_drift']}",
+        f"<b style='color:{color}'>{label}</b> — {result['drift_pseudo_savoir']}",
         unsafe_allow_html=True
     )
-    st.caption(result["cognitive_drift_interpretation"])
+
+    with st.popover("ℹ️ Comprendre cette jauge"):
+        st.markdown("### Pseudo-savoir")
+
+        st.write(
+            "Cette jauge mesure un déséquilibre où le texte accumule du savoir apparent "
+            "ou des éléments de connaissance, mais sans compréhension suffisamment intégrée."
+        )
+
+        st.markdown("**Formule utilisée**")
+        st.code("Pseudo-savoir = max(0, (G + D) - N)")
+
+        st.markdown("**Avec les valeurs actuelles**")
+        st.write(
+            f"G = {result['G']:.2f} | "
+            f"D = {result['D']:.2f} | "
+            f"N = {result['N']:.2f}"
+        )
+
+        st.code(
+            f"max(0, ({result['G']:.2f} + {result['D']:.2f}) - {result['N']:.2f}) "
+            f"= {result['drift_pseudo_savoir']:.2f}"
+        )
+
+        st.markdown("**Interprétation**")
+        st.write(
+            "Plus ce score est élevé, plus le texte donne une impression de savoir "
+            "sans que ce savoir soit suffisamment digéré, relié ou compris."
+        )
+
+        st.markdown("**Normalisation graphique**")
+        st.code("value = min(drift_pseudo_savoir / 10, 1.0)")
+    
+    st.divider()
+
+    # -----------------------------
+    # Intuition dogmatique
+    # -----------------------------
+    st.markdown("### Intuition dogmatique")
+    st.caption("Conviction forte sans base de savoir suffisante.")
+
+    value = min(result["drift_intuition_dogmatique"] / 10, 1.0)
+
+    if result["drift_intuition_dogmatique"] < 1:
+        label, color = "Faible", "#16a34a"
+    elif result["drift_intuition_dogmatique"] < 3:
+        label, color = "Modérée", "#ca8a04"
+    elif result["drift_intuition_dogmatique"] < 6:
+        label, color = "Élevée", "#f97316"
+    else:
+        label, color = "Très élevée", "#dc2626"
+
+    render_custom_gauge(value, color)
+
+    st.markdown(
+        f"<b style='color:{color}'>{label}</b> — {result['drift_intuition_dogmatique']}",
+        unsafe_allow_html=True
+    )
+
+    with st.popover("ℹ️ Comprendre cette jauge"):
+        st.markdown("### Intuition dogmatique")
+
+        st.write(
+            "Cette jauge mesure un déséquilibre où l’intuition ou la compréhension apparente "
+            "s’allie à une certitude forte, mais sans base de savoir suffisamment articulée."
+        )
+
+        st.markdown("**Formule utilisée**")
+        st.code("Intuition dogmatique = max(0, (N + D) - G)")
+
+        st.markdown("**Avec les valeurs actuelles**")
+        st.write(
+            f"N = {result['N']:.2f} | "
+            f"D = {result['D']:.2f} | "
+            f"G = {result['G']:.2f}"
+        )
+
+        st.code(
+            f"max(0, ({result['N']:.2f} + {result['D']:.2f}) - {result['G']:.2f}) "
+            f"= {result['drift_intuition_dogmatique']:.2f}"
+        )
+
+        st.markdown("**Interprétation**")
+        st.write(
+            "Plus ce score est élevé, plus le texte semble reposer sur une intuition affirmée "
+            "ou une compréhension subjective, mais insuffisamment soutenue par des éléments de savoir."
+        )
+
+        st.markdown("**Normalisation graphique**")
+        st.code("value = min(drift_intuition_dogmatique / 10, 1.0)")
+
 
     st.divider()
 
+    # -----------------------------
+    # Fermeture cognitive
+    # -----------------------------
+    st.markdown("### Fermeture cognitive")
+    st.caption("Excès de certitude par rapport au savoir et à la compréhension.")
+
+    value = min(result["drift_mecroyance"] / 10, 1.0)
+
+    if result["drift_mecroyance"] < 1:
+        label, color = "Faible", "#16a34a"
+    elif result["drift_mecroyance"] < 3:
+        label, color = "Modérée", "#ca8a04"
+    elif result["drift_mecroyance"] < 6:
+        label, color = "Élevée", "#f97316"
+    else:
+        label, color = "Très élevée", "#dc2626"
+
+    render_custom_gauge(value, color)
+
+    st.markdown(
+        f"<b style='color:{color}'>{label}</b> — {result['drift_mecroyance']}",
+        unsafe_allow_html=True
+    )
+
+    with st.popover("ℹ️ Comprendre cette jauge"):
+        st.markdown("### Fermeture cognitive")
+
+        st.write(
+            "Cette jauge mesure un déséquilibre où la certitude affirmée dépasse "
+            "le savoir articulé et la compréhension intégrée."
+        )
+
+        st.markdown("**Formule utilisée**")
+        st.code("Fermeture cognitive = max(0, D - (G + N))")
+
+        st.markdown("**Avec les valeurs actuelles**")
+        st.write(
+            f"D = {result['D']:.2f} | "
+            f"G = {result['G']:.2f} | "
+            f"N = {result['N']:.2f}"
+        )
+
+        st.code(
+            f"max(0, {result['D']:.2f} - ({result['G']:.2f} + {result['N']:.2f})) "
+            f"= {result['drift_mecroyance']:.2f}"
+        )
+
+        st.markdown("**Interprétation**")
+        st.write(
+            "Plus ce score est élevé, plus le texte affirme avec certitude alors que "
+            "les bases de savoir et de compréhension restent insuffisantes."
+        )
+
+        st.markdown("**Normalisation graphique**")
+        st.code("value = min(drift_mecroyance / 10, 1.0)")
+
+    st.divider()
+
+    # -----------------------------
+    # Indice global de dérive cognitive
+    # -----------------------------
+    st.markdown("### Indice global de dérive cognitive")
+    st.caption("Synthèse des trois dérives cognitives.")
+    
+    global_score = result["global_cognitive_drift"]
+    global_value = min(global_score / 10, 1.0)
+    
+    if global_score < 1:
+        global_label, global_color = "Faible", "#16a34a"
+    elif global_score < 3:
+        global_label, global_color = "Modérée", "#ca8a04"
+    elif global_score < 6:
+        global_label, global_color = "Élevée", "#f97316"
+    else:
+        global_label, global_color = "Très élevée", "#dc2626"
+    
+    render_custom_gauge(global_value, global_color)
+    
+    st.markdown(
+        f"<b style='color:{global_color}'>{global_label}</b> — {global_score}",
+        unsafe_allow_html=True
+    )
+    
+    st.caption(result["cognitive_drift_interpretation"])
+    
+    
+    with st.popover("ℹ️ Comprendre cette jauge", use_container_width=True):
+        st.markdown(f"""
+    ### Indice global de dérive cognitive
+    
+    - Pseudo-savoir
+    - Intuition dogmatique
+    - Fermeture cognitive
+    
+    Formule :
+    M = (G + N) − D
+    
+    Score : {global_score}
+    Niveau : {global_label}
+    
+    {result["cognitive_drift_interpretation"]}
+    """)
+
+    st.divider()
+
+    
+    
+    # =============================
+    # 🗣️ 2. PRESSIONS DISCURSIVES
+    # =============================
+    st.subheader("🗣️ Pressions discursives")
+    st.caption("Forces rhétoriques influençant la perception et l’interprétation du discours.")
+    
+    pd1, pd2, pd3 = st.columns(3)
+    
+    with pd1:
+        st.markdown("### Pression rhétorique")
+        # jauge ici
+    
+    with pd2:
+        st.markdown("### Charge émotionnelle")
+        # jauge ici
+    
+    with pd3:
+        st.markdown("### Asymétrie argumentative")
+        # jauge ici
+    
+    st.divider()
+    
+    
+    # =============================
+    # 🧩 3. STRUCTURE DU RAISONNEMENT
+    # =============================
+    st.subheader("🧩 Structure du raisonnement")
+    st.caption("Analyse de la cohérence interne du discours, indépendamment de sa vérifiabilité.")
+    
+    sr1, sr2 = st.columns(2)
+    
+    with sr1:
+        st.markdown("### Cohérence discursive")
+        # jauge ici
+    
+    with sr2:
+        st.markdown("### Cohérence trompeuse")
+        # jauge ici
+    
+    st.divider()
+    
+    
+    # =============================
+    # 🧭 4. ORIENTATION IDÉOLOGIQUE
+    # =============================
+    st.subheader("🧭 Orientation idéologique")
+    st.caption("Détection des structures narratives orientées ou propagandistes.")
+    
+    oi1, oi2, oi3 = st.columns(3)
+    
+    with oi1:
+        st.markdown("### Jauge propagandiste")
+        # jauge ici
+    
+    with oi2:
+        st.markdown("### Narration propagandiste")
+        # jauge ici
+    
+    with oi3:
+        st.markdown("### Polarisation / Ennemi abstrait")
+        # jauge ici
+    
+    st.divider()
+    
+    
+    # =============================
+    # ⚖️ 5. ANALYSE LOGIQUE
+    # =============================
+    st.subheader("⚖️ Analyse logique")
+    st.caption("Identification des erreurs de raisonnement et des structures logiques.")
+    
+    al1, al2, al3 = st.columns(3)
+    
+    with al1:
+        st.markdown("### Confusion logique")
+        # jauge ici
+    
+    with al2:
+        st.markdown("### Fausse causalité")
+        # jauge ici
+    
+    with al3:
+        st.markdown("### Faux dilemme")
+        # jauge ici
+    
+    al4, al5, al6 = st.columns(3)
+    
+    with al4:
+        st.markdown("### Pétition de principe")
+        # jauge ici
+    
+    with al5:
+        st.markdown("### Cherry picking")
+        # jauge ici
+    
+    with al6:
+        st.markdown("### Sophismes détectés")
+        # jauge ici
+    
+    st.markdown("### Syllogismes / Enthymèmes")
+    # bloc logique ici
+    
+    st.divider()
+    
+    
+    # =============================
+    # 🧪 6. BIAIS DE FORMULATION
+    # =============================
+    st.subheader("🧪 Biais de formulation")
+    st.caption("Biais liés au langage, à la présentation et à l’apparence de crédibilité.")
+    
+    bf1, bf2, bf3 = st.columns(3)
+    
+    with bf1:
+        st.markdown("### Autorité vague")
+        # jauge ici
+    
+    with bf2:
+        st.markdown("### Qualification normative")
+        # jauge ici
+    
+    with bf3:
+        st.markdown("### Scientificité rhétorique")
+        # jauge ici
+    
+    bf4, bf5 = st.columns(2)
+    
+    with bf4:
+        st.markdown("### Glissement sémantique")
+        # jauge ici
+    
+    with bf5:
+        st.markdown("### Faux consensus")
+        # jauge ici
+    
+    st.divider()
+    
+    
+    # =============================
+    # 📊 7. SYNTHÈSE FINALE
+    # =============================
+    st.subheader("📊 Synthèse finale")
+    st.caption("Vision globale du discours après analyse des différentes dimensions.")
+    
+    st.markdown("### Verdict global")
+    # verdict ici
+    
+    st.markdown("### Crédibilité finale")
+    # jauge ici
+    
+    st.markdown("### Régime cognitif dominant")
+    # affichage ici
+    
     st.subheader("Jauge de pression rhétorique")
     st.caption(
         "Cette jauge ne mesure pas un mensonge certain, mais l’intensité des procédés discursifs "
         "susceptibles d’orienter, de verrouiller ou de dramatiser un discours."
     )
-
+    
     rp = result["rhetorical_pressure"]
     rp_label, rp_color = interpret_rhetorical_pressure(rp)
-
+    
     st.markdown(f"""
-    <div style="width:100%; margin-top:10px; margin-bottom:10px;">
-        <div style="
-            width:100%;
-            height:26px;
-            background:#e5e7eb;
-            border-radius:12px;
-            overflow:hidden;
-            border:1px solid #cbd5e1;
-        ">
+        <div style="width:100%; margin-top:10px; margin-bottom:10px;">
             <div style="
-                width:{rp*100}%;
-                height:100%;
-                background:{rp_color};
-                transition:width 0.4s ease;
-            "></div>
+                width:100%;
+                height:26px;
+                background:#e5e7eb;
+                border-radius:12px;
+                overflow:hidden;
+                border:1px solid #cbd5e1;
+            ">
+                <div style="
+                    width:{rp*100}%;
+                    height:100%;
+                    background:{rp_color};
+                    transition:width 0.4s ease;
+                "></div>
+            </div>
         </div>
-    </div>
-    """, unsafe_allow_html=True)
-
+        """, unsafe_allow_html=True)
+    
     st.markdown(
         f"<b style='color:{rp_color}'>{rp_label}</b> — {round(rp*100, 1)}%",
         unsafe_allow_html=True
     )
-
+    
     st.caption("Pression rhétorique faible ⟵⟶ Pression rhétorique forte")
-
+    
     st.divider()
+    
+    
     st.subheader("Cohérence trompeuse")
     st.caption(
         "Cette jauge mesure si le texte paraît cohérent tout en restant fragile, orienté ou insuffisamment vérifiable."
     )
-
+    
     value = result.get("deceptive_coherence", 0)
     label = result.get("deceptive_coherence_label", "—")
-
+    
     if value < 0.25:
         color = "#ca8a04"
     elif value < 0.50:
@@ -8387,16 +8711,16 @@ with col_center:
         color = "#f97316"
     else:
         color = "#dc2626"
-
+    
     render_custom_gauge(value, color)
-
+    
     st.markdown(
         f"<b style='color:{color}'>{label}</b> — {round(value * 100, 1)}%",
         unsafe_allow_html=True
     )
-
+    
     st.caption("Cohérence apparente ⟵⟶ Cohérence trompeuse")
-
+    
     st.divider()
     st.subheader("Jauge propagandiste")
     st.caption(
@@ -8405,31 +8729,31 @@ with col_center:
         "Elle aide à estimer si le texte relève d’un simple discours orienté "
         "ou d’une structure plus franchement propagandiste."
     )
-
+    
     closure_for_discourse = (
         (result["D"] * (1 + len(result["red_flags"]) / 5)) / (result["G"] + result["N"])
         if (result["G"] + result["N"]) > 0 else 10
     )
-
+    
     propaganda_value = compute_propaganda_gauge(
         lie_gauge=gauge_value,
         rhetorical_pressure=rp,
         political_pattern_score=result["political_pattern_score"],
         closure=closure_for_discourse
     )
-
+    
     propaganda_label, propaganda_color, propaganda_text = interpret_propaganda_gauge(propaganda_value)
-
+    
     render_custom_gauge(propaganda_value, propaganda_color)
-
+    
     st.markdown(
         f"<b style='color:{propaganda_color}'>{propaganda_label}</b> — {round(propaganda_value*100, 1)}%",
         unsafe_allow_html=True
     )
-
+    
     st.caption("Discours peu orienté ⟵⟶ Structure propagandiste")
     st.caption(propaganda_text)
-
+    
     discursive_profile = interpret_discursive_profile(
         lie_gauge=gauge_value,
         rhetorical_pressure=rp,
@@ -8439,13 +8763,13 @@ with col_center:
         scientific_simulation_score=result["scientific_simulation_score"],
         discursive_coherence_score=result["discursive_coherence_score"],
     )
-
+    
     st.subheader("Profil discursif global")
     st.write(discursive_profile)
-
+    
     st.divider()
     st.subheader("Cartographie discursive complémentaire")
-
+    
     st.caption(
         "Cette cartographie regroupe les principaux mécanismes discursifs détectables "
         "dans un texte : jugements de valeur, prémisses implicites, structures propagandistes, "
@@ -8455,7 +8779,7 @@ with col_center:
         "(syllogismes, enthymèmes et sophismes) ainsi que par des indicateurs "
         "stratégiques permettant d’identifier certaines formes de manipulation argumentative."
     )
-
+    
     row1_col1, row1_col2, row1_col3 = st.columns(3)
     row2_col1, row2_col2, row2_col3 = st.columns(3)
     row3_col1, row3_col2, row3_col3 = st.columns(3)
@@ -8472,16 +8796,16 @@ with col_center:
     row14_col1, row14_col2, row14_col3 = st.columns(3)
     row15_col1, row15_col2 = st.columns(2)
     
-
+    
     # -----------------------------
     # 1) Qualifications normatives
     # -----------------------------
     with row1_col1:
         st.markdown("### Qualification normative")
         st.caption("Jugements de valeur présentés comme des faits.")
-
+    
         normative_value = result["normative_score"]
-
+    
         if normative_value < 0.20:
             normative_label, normative_color = "Faible", "#ca8a04"
         elif normative_value < 0.40:
@@ -8490,19 +8814,19 @@ with col_center:
             normative_label, normative_color = "Élevée", "#ea580c"
         else:
             normative_label, normative_color = "Très élevée", "#dc2626"
-
+    
         render_custom_gauge(normative_value, normative_color)
-
+    
         st.markdown(
             f"<b style='color:{normative_color}'>{normative_label}</b> — {round(normative_value * 100, 1)}%",
             unsafe_allow_html=True
         )
         st.caption(result["normative_interpretation"])
-
+    
         with st.expander("Voir les marqueurs", expanded=False):
             normative_terms = result.get("normative_terms", [])
             judgment_markers = result.get("normative_judgment_markers", [])
-
+    
             if not normative_terms and not judgment_markers:
                 st.info("Aucun marqueur saillant détecté.")
             else:
@@ -8514,16 +8838,16 @@ with col_center:
                     st.markdown("**Marqueurs de jugement**")
                     for term in judgment_markers:
                         st.warning(term)
-
+    
     # -----------------------------
     # 2) Prémisses idéologiques implicites
     # -----------------------------
     with row1_col2:
         st.markdown("### Prémisses implicites")
         st.caption("Idées présentées comme évidentes sans démonstration.")
-
+    
         premise_value = result["premise_score"]
-
+    
         if premise_value < 0.20:
             premise_label, premise_color = "Faible", "#ca8a04"
         elif premise_value < 0.40:
@@ -8532,33 +8856,33 @@ with col_center:
             premise_label, premise_color = "Élevée", "#ea580c"
         else:
             premise_label, premise_color = "Très élevée", "#dc2626"
-
+    
         render_custom_gauge(premise_value, premise_color)
-
+    
         st.markdown(
             f"<b style='color:{premise_color}'>{premise_label}</b> — {round(premise_value * 100, 1)}%",
             unsafe_allow_html=True
         )
         st.caption(result["premise_interpretation"])
-
+    
         with st.expander("Voir les marqueurs", expanded=False):
             premise_markers = result.get("premise_markers", [])
-
+    
             if not premise_markers:
                 st.info("Aucune prémisse implicite saillante détectée.")
             else:
                 for marker in premise_markers:
                     st.warning(marker)
-
+    
     # -----------------------------
     # 3) Propagande narrative
     # -----------------------------
     with row1_col3:
         st.markdown("### Narration propagandiste")
         st.caption("Urgence, ennemi abstrait, certitude et charge émotionnelle.")
-
+    
         propaganda_value = result["propaganda_score"]
-
+    
         if propaganda_value < 0.20:
             propaganda_label, propaganda_color = "Faible", "#ca8a04"
         elif propaganda_value < 0.40:
@@ -8567,21 +8891,21 @@ with col_center:
             propaganda_label, propaganda_color = "Élevée", "#ea580c"
         else:
             propaganda_label, propaganda_color = "Très élevée", "#dc2626"
-
+    
         render_custom_gauge(propaganda_value, propaganda_color)
-
+    
         st.markdown(
             f"<b style='color:{propaganda_color}'>{propaganda_label}</b> — {round(propaganda_value * 100, 1)}%",
             unsafe_allow_html=True
         )
         st.caption(result["propaganda_interpretation"])
-
+    
         with st.expander("Voir les marqueurs", expanded=False):
             enemy_terms = result.get("propaganda_enemy_terms", [])
             urgency_terms = result.get("propaganda_urgency_terms", [])
             certainty_terms = result.get("propaganda_certainty_terms", [])
             emotional_terms = result.get("propaganda_emotional_terms", [])
-
+    
             if not any([enemy_terms, urgency_terms, certainty_terms, emotional_terms]):
                 st.info("Aucun marqueur narratif saillant détecté.")
             else:
@@ -8589,23 +8913,23 @@ with col_center:
                     st.markdown("**Ennemi / bloc adverse**")
                     for term in enemy_terms:
                         st.error(term)
-
+    
                 if urgency_terms:
                     st.markdown("**Urgence / menace**")
                     for term in urgency_terms:
                         st.warning(term)
-
+    
                 if certainty_terms:
                     st.markdown("**Certitude absolue**")
                     for term in certainty_terms:
                         st.warning(term)
-
+    
                 if emotional_terms:
                     st.markdown("**Charge émotionnelle**")
                     for term in emotional_terms:
                         st.error(term)
 
-        # -----------------------------
+    # -----------------------------
     # 4) Cohérence discursive
     # -----------------------------
     with row2_col1:
@@ -10167,9 +10491,7 @@ if show_method:
         f"- **{T['revisability']}** : `(G + N + V) - D`\n"
         f"- **{T['cognitive_closure']}** : `(D * S) / (G + N)`\n\n"
         f"{T['disclaimer']}"
-    )
-
-
+)
 # -----------------------------
 # Laboratoire interactif
 # -----------------------------
