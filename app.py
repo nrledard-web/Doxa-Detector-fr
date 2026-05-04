@@ -7731,21 +7731,21 @@ La certitude paraît plus forte que les preuves disponibles, mais les signaux ne
 else:
     pass
     
-st.markdown("""
-<div style="text-align:center; margin:25px 0; color:#888;">
-────────── ✦ ──────────
-</div>
-""", unsafe_allow_html=True)
-
-st.markdown("""
-<h3 style="text-align:center;">VERDICT FINAL</h3>
-""", unsafe_allow_html=True)
-
-st.markdown("""
-<div style="text-align:center; margin:25px 0; color:#888;">
-────────── ✦ ──────────
-</div>
-""", unsafe_allow_html=True)
+    st.markdown("""
+    <div style="text-align:center; margin:25px 0; color:#888;">
+    ────────── ✦ ──────────
+    </div>
+    """, unsafe_allow_html=True)
+    
+    st.markdown("""
+    <h3 style="text-align:center;">VERDICT FINAL</h3>
+    """, unsafe_allow_html=True)
+    
+    st.markdown("""
+    <div style="text-align:center; margin:25px 0; color:#888;">
+    ────────── ✦ ──────────
+    </div>
+    """, unsafe_allow_html=True)
 
 
     # =============================
