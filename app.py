@@ -1570,7 +1570,7 @@ def compute_lie_gauge(M: float, ME: float):
         label = "Mensonge probable"
         color = "#dc2626"
     else:
-        label = "Mensonge extrême"
+        label = "Mensonge structurel détecté"
         color = "#991b1b"
 
     intensity = abs(gauge - 0.5) * 2
@@ -7657,7 +7657,7 @@ if result["ME"] > result["M"] and result["ME"] > 0:
 elif result["M"] < 0:
     cognitive_type = "Forte mécroyance / clôture cognitive"
 else:
-    cognitive_type = "Cognition probablement sincère mais désalignée"
+    cognitive_type = "Structure fortement désalignée, compatible avec une construction de type mensonge, sans indication claire d’intention manipulatoire."
 
 st.subheader("Interprétation cognitive")
 st.write(cognitive_type)
