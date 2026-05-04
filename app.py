@@ -7737,7 +7737,7 @@ else:
 </div>
 """, unsafe_allow_html=True)
 
-st.subheader("VERDICTE FINAL")
+    st.subheader("VERDICTE FINAL")
     
     st.markdown("""
 <div style="text-align:center; margin:25px 0; color:#888;">
