@@ -1433,6 +1433,7 @@ def search_articles_by_keyword(keyword: str, max_results: int = 10) -> List[Dict
         clean_keyword = keyword.strip()
 
         core_query = clean_keyword.lower()
+        core_query = core_query.replace(" wiki", "").replace(" wikipedia", "").strip()
 
         for article_word in ["le ", "la ", "les ", "un ", "une ", "des "]:
             if core_query.startswith(article_word):
@@ -1471,9 +1472,16 @@ def search_articles_by_keyword(keyword: str, max_results: int = 10) -> List[Dict
             title_l = title.lower()
             url_l = url.lower()
             
-            # On garde seulement si l’expression exacte est dans le TITRE ou l’URL
-            if core_query not in title_l and core_query.replace(" ", "-") not in url_l:
-                continue
+            # Filtre souple : au moins un mot significatif dans le titre, l'extrait ou l'URL
+            query_words = [w for w in core_query.split() if len(w) > 3]
+            
+            if query_words:
+                title_hits = sum(1 for w in query_words if w in title_l)
+                snippet_hits = sum(1 for w in query_words if w in snippet.lower())
+                url_hits = sum(1 for w in query_words if w in url_l)
+            
+                if title_hits + snippet_hits + url_hits < 1:
+                    continue
 
             bad_url_parts = [
                 "/tag/",
@@ -1507,7 +1515,7 @@ def search_articles_by_keyword(keyword: str, max_results: int = 10) -> List[Dict
             if web_noise["is_noise"]:
                 continue
 
-            analysis = analyze_article(text)
+            # analysis = analyze_article(text)
 
             articles.append({
                 "title": title,
@@ -4327,6 +4335,11 @@ def detect_aristotelian_fallacies(text: str):
         "argument_from_nature": argument_from_nature,
         "descriptive_normative_confusion": descriptive_normative_confusion,
     }
+
+    return {
+        "descriptive_normative_confusion": descriptive_normative_confusion,
+    }
+
 def compute_brain_indices(result: dict) -> dict:
     def clamp01(x):
         return max(0.0, min(1.0, x))
@@ -4393,14 +4406,47 @@ def compute_brain_indices(result: dict) -> dict:
     else:
         profile = "Structure mixte ou ambiguë"
 
+    # -----------------------------
+    # Stabilité / gravité du cerveau DOXA
+    # avec impact modulé du mensonge
+    # -----------------------------
+
+    cognitive_density = clamp01((G + N) / 20)
+
+    lie_gauge = result.get("lie_gauge", strategic_index)
+    if lie_gauge > 1:
+        lie_gauge = lie_gauge / 100
+
+    lie_impact = lie_gauge * (1 - cognitive_density)
+
+    gravity = clamp01(
+        strategic_index * 0.35 +
+        closure_index * 0.30 +
+        IR * 0.20 +
+        lie_impact * 0.40
+    )
+
+    stability = clamp01(
+        1 -
+        (
+            gravity * 0.60 +
+            closure_index * 0.25 +
+            lie_impact * 0.30
+        )
+    )
+
     return {
         "IR": round(IR, 3),
         "IL": round(IL, 3),
         "IC": round(IC, 3),
         "strategic_index": round(strategic_index, 3),
         "closure_index": round(closure_index, 3),
+        "lie_impact": round(lie_impact, 3),
+        "gravity": round(gravity, 3),
+        "stability": round(stability, 3),
         "brain_profile": profile,
     }
+
     
 def analyze_claim(sentence: str) -> Claim:
     s = sentence.lower()
@@ -4714,27 +4760,27 @@ def compute_global_penalties(result: dict) -> dict:
     penalty += min(red_flags_count * 0.25, 2.0)
 
     # 2) Dérives discursives déjà calculées
-    penalty += result.get("normative_score", 0) * 0.8
-    penalty += result.get("premise_score", 0) * 1.0
-    penalty += result.get("propaganda_score", 0) * 1.2
-    penalty += result.get("logic_confusion_score", 0) * 1.0
-    penalty += result.get("scientific_simulation_score", 0) * 0.8
-
+    penalty += result.get("normative_score", 0) * 0.6
+    penalty += result.get("premise_score", 0) * 0.7
+    penalty += result.get("propaganda_score", 0) * 0.8
+    penalty += result.get("logic_confusion_score", 0) * 0.7
+    penalty += result.get("scientific_simulation_score", 0) * 0.6
+    
     # 3) Sophismes simples
-    penalty += result.get("petition_score", 0) * 0.8
-    penalty += result.get("false_causality_basic_score", 0) * 0.9
-    penalty += result.get("hasty_generalization_score", 0) * 0.8
-    penalty += result.get("false_dilemma_score", 0) * 0.8
-
+    penalty += result.get("petition_score", 0) * 0.5
+    penalty += result.get("false_causality_basic_score", 0) * 0.6
+    penalty += result.get("hasty_generalization_score", 0) * 0.5
+    penalty += result.get("false_dilemma_score", 0) * 0.5
+    
     # 4) Verrouillage / manipulation
-    penalty += result.get("doxic_rigidity_score", 0) * 1.0
-    penalty += result.get("narrative_overdetermination_score", 0) * 0.9
-    penalty += result.get("moral_polarization_score", 0) * 0.8
-    penalty += result.get("strategic_simplification_score", 0) * 0.8
-    penalty += result.get("argument_asymmetry_score", 0) * 0.7
-
-    # Plafond pour éviter de casser artificiellement le score
-    penalty = round(min(penalty, 6.0), 2)
+    penalty += result.get("doxic_rigidity_score", 0) * 0.7
+    penalty += result.get("narrative_overdetermination_score", 0) * 0.6
+    penalty += result.get("moral_polarization_score", 0) * 0.6
+    penalty += result.get("strategic_simplification_score", 0) * 0.6
+    penalty += result.get("argument_asymmetry_score", 0) * 0.5
+    
+    # Plafond plus doux
+    penalty = round(min(penalty, 4.0), 2)
 
     if penalty < 1:
         label = "Faible"
@@ -6980,62 +7026,65 @@ Les discours philosophiques, moraux ou spéculatifs obtiennent souvent des score
 
 Certaines jauges ne cherchent pas à “comprendre” le texte comme un humain.
 
-Elles repèrent simplement des mots ou expressions connus pour porter une **charge émotionnelle, rhétorique ou cognitive**.
+Elles repèrent des mots ou expressions associés à une charge émotionnelle, rhétorique ou cognitive, et analysent leur contexte d’utilisation.
 
-Chaque mot agit comme un **signal** :
+Chaque mot agit comme un signal :
 
-> plus il y a de mots marqués, plus la jauge s’allume
+plus il y a de mots marqués, plus les jauges s’allument.
+
+Cependant, ces signaux sont modulés par leur environnement (négation, atténuation, intensification), ce qui permet une lecture plus nuancée.
 
 ---
 
-### Ce qu'une jauge détecte réellement
+Ce que ces jauges détectent réellement
 
-Elle ne dit pas si le texte est vrai ou faux.
+Elles ne disent pas si le texte est vrai ou faux.
 
-Elle mesure :
+Elles mesurent :
 
 - l’intensité du langage utilisé  
 - la pression exercée sur le lecteur  
-- la présence de formulations typiques (crise, urgence, jamais, catastrophe…)
+- la manière dont les formulations orientent la perception (crise, urgence, jamais, catastrophe…)
 
-👉 Autrement dit : **comment le texte cherche à faire réagir**, pas ce qu’il prouve.
-
----
-
-### Exemple
-
-- “Une crise majeure menace le pays” → langage chargé → jauge monte  
-- “Il n’y a pas de crise actuellement” → mot détecté malgré la négation → signal imparfait  
+👉 Autrement dit : comment le texte cherche à faire réagir, pas ce qu’il prouve.
 
 ---
 
-### Pourquoi ce système ?
+Exemple
+
+“Une crise majeure menace le pays” → langage chargé → les jauges montent  
+“Il n’y a pas de crise actuellement” → présence de négation → signal atténué  
+“Il semble possible qu’une crise survienne” → signal modéré par l’incertitude  
+
+---
+
+Pourquoi ce système ?
 
 Parce qu’un discours peut être :
 
-- **très convaincant sans être solide**
-- **très chargé sans être démontré**
+- très convaincant sans être solide  
+- très chargé sans être démontré  
 
-Ces jauge captent cette dimension.
+Ces jauges captent cette dimension.
 
 ---
 
-### Limite importante
+Limite importante
 
-Elles lisent des mots, pas leur intention.
+Elles analysent des structures linguistiques, pas une intention consciente.
 
 Elles peuvent donc :
 
 - surestimer certains textes neutres  
-- ou manquer des nuances
+- ou manquer des nuances complexes  
 
 ---
 
-### Comment interpréter
+Comment interpréter
 
 👉 Ces jauges ne sont jamais à lire seules.
 
-Elles indiquent un **niveau de pression linguistique**, à croiser avec :
+Elles indiquent un niveau de pression linguistique, à croiser avec :
 
 - la solidité argumentative  
 - la vérifiabilité  
@@ -7043,11 +7092,12 @@ Elles indiquent un **niveau de pression linguistique**, à croiser avec :
 
 ---
 
-### Résumé
+Résumé
 
-➡️ Elles mesurent **l’impact du langage**  
-➡️ Pas la vérité du contenu  
-➡️ Ni l’intention réelle de l’auteur
+➡️ Elles mesurent l’impact du langage  
+➡️ Elles intègrent partiellement le contexte  
+➡️ Elles n’évaluent pas directement la vérité du contenu
+➡️ Elles n’interprètent pas l’intention réelle de l’auteur
 """)
 
 # =====================================================
@@ -7074,22 +7124,26 @@ st.caption(
     "Analyse analogique du raisonnement à partir des structures du langage afin d’estimer la solidité épistémique du discours."
 )
 
-base_score = result.get("final_credibility_score", result.get("hard_fact_score", 0))
+real_score = result.get("final_credibility_score", result.get("hard_fact_score", 0))
 
-# Couleurs et verdict
-if base_score < 6:
+# Plancher VISUEL uniquement
+display_score = max(real_score, 2.0)
+display_score = min(display_score, 20.0)
+
+# Couleurs et verdict — basés sur le score affiché
+if display_score < 6:
     score_icon = "🔴"
     score_color = "#dc2626"
     score_label = "Faible"
-elif base_score < 9:
+elif display_score < 9:
     score_icon = "🟠"
     score_color = "#f97316"
     score_label = "Fragile"
-elif base_score < 13:
+elif display_score < 13:
     score_icon = "🟡"
     score_color = "#facc15"
     score_label = "Modérée"
-elif base_score < 16:
+elif display_score < 16:
     score_icon = "🟢"
     score_color = "#22c55e"
     score_label = "Solide"
@@ -7110,7 +7164,7 @@ st.markdown(f"""
         border:1px solid #cbd5e1;
     ">
         <div style="
-            width:{min(base_score / 20, 1) * 100}%;
+            width:{min(display_score / 20, 1) * 100}%;
             height:100%;
             background:{score_color};
             transition:width 0.4s ease;
@@ -7120,17 +7174,17 @@ st.markdown(f"""
 """, unsafe_allow_html=True)
 
 st.markdown(
-    f"<b style='color:{score_color}'>Score analogique : {score_icon} {round(base_score,1)}/20 — {score_label}</b>",
+    f"<b style='color:{score_color}'>Score analogique : {score_icon} {round(display_score,1)}/20 — {score_label}</b>",
     unsafe_allow_html=True
 )
 
-if base_score < 6:
+if display_score < 6:
     analogique_message = "Le raisonnement paraît faible : les enchaînements logiques sont insuffisants ou trop fragmentaires."
-elif base_score < 9:
+elif display_score < 9:
     analogique_message = "Le raisonnement est fragile : une structure existe, mais elle reste incomplète ou peu démonstrative."
-elif base_score < 13:
+elif display_score < 13:
     analogique_message = "Le raisonnement est modéré : la structure logique est présente, mais plusieurs liens restent partiels ou insuffisamment soutenus."
-elif base_score < 16:
+elif display_score < 16:
     analogique_message = "Le raisonnement est solide : les idées s’enchaînent de manière globalement cohérente."
 else:
     analogique_message = "Le raisonnement est très solide : le discours présente une progression claire, cohérente et bien structurée."
@@ -7142,73 +7196,42 @@ with st.popover("ℹ️ Formule / explication"):
     st.markdown(f"""
 ### Analyse analogique du raisonnement
 
-Cette jauge analyse la **solidité cognitive et argumentative du raisonnement**.
+Cette jauge estime la **solidité cognitive et argumentative du raisonnement**.
 
-Elle ne mesure pas seulement la vérité brute des affirmations : elle estime la **structure logique apparente du discours**, son niveau de vérifiabilité et les fragilités rhétoriques détectées.
+Elle ne mesure pas seulement la vérité brute des affirmations : elle évalue la **structure logique du discours**, sa vérifiabilité et les fragilités détectées.
 
 ---
 
 ### Résultats de cette analyse
 
-Score analogique : **{round(base_score,1)}/20**
+Score analogique affiché : **{round(display_score,1)}/20**  
+Score brut calculé : **{round(real_score,1)}/20**
 
 Verdict : **{score_label}**
 
 ---
 
-### Signaux analysés
+### Lecture du score
 
-La jauge examine la **structure du discours** et la manière dont les idées sont reliées, justifiées et appuyées.
+Un score faible ne signifie pas nécessairement absence totale de contenu, mais plutôt une **accumulation de signaux de fragilité**.
 
-Elle s’appuie sur plusieurs dimensions :
+Plusieurs jauges secondaires peuvent être activées simultanément :
 
-- présence d’éléments vérifiables
-- qualité des sources
-- vérifiabilité moyenne des affirmations
-- équilibre entre **G — gnōsis**, **N — nous** et **D — doxa**
-- risque rhétorique
-- pénalités de crédibilité
-- bonus épistémique pour certaines formulations sobres ou prudentes
+- pression rhétorique  
+- certitude excessive  
+- simplification narrative  
+- déséquilibre entre savoir et affirmation  
+- pénalités de crédibilité  
 
-#### 1️⃣ Structure du raisonnement
+Lorsque ces signaux s’additionnent, ils **réduisent fortement la solidité apparente du raisonnement**, même si le texte reste structuré en surface.
 
-Le système observe si le texte contient des éléments de raisonnement structurés :
+---
 
-- affirmation → justification
-- prémisse → conclusion
-- observation → interprétation
+### Plancher visuel
 
-Ces structures indiquent qu’un raisonnement est **articulé et développé**, plutôt qu’une simple succession d’opinions.
+Le score affiché applique un **plancher minimal de 2/20** afin d’éviter une barre vide.
 
-#### 2️⃣ Vérifiabilité des affirmations
-
-Le moteur tient compte des éléments qui rendent une affirmation plus contrôlable :
-
-- chiffres
-- dates
-- entités nommées
-- sources ou références
-- formulations factuelles précises
-
-#### 3️⃣ Risque rhétorique
-
-Le score est diminué lorsque le texte contient des signaux de fragilité :
-
-- certitude excessive
-- pression rhétorique
-- affirmations peu vérifiables
-- risque moyen des affirmations
-- pénalités de crédibilité
-
-#### 4️⃣ Équilibre cognitif
-
-La jauge tient aussi compte du rapport entre :
-
-- **G** : savoir explicite
-- **N** : compréhension / nuance
-- **D** : certitude ou rigidité
-
-Un discours plus équilibré entre savoir, compréhension et certitude obtient un meilleur score.
+Le score réel (**{round(real_score,1)}**) reste utilisé pour tous les calculs internes.
 
 ---
 
@@ -7224,15 +7247,15 @@ Le score final est borné entre **0 et 20**.
 
 Avec :
 
-- **G** : gnōsis
-- **N** : nous
-- **V** : vérifiabilité globale
-- **QS** : qualité des sources
-- **VC** : vérifiabilité moyenne des affirmations
-- **D** : doxa
-- **R** : risque rhétorique
-- **RC** : risque moyen des affirmations
-- **P** : pénalités de crédibilité
+- **G** : gnōsis  
+- **N** : nous  
+- **V** : vérifiabilité globale  
+- **QS** : qualité des sources  
+- **VC** : vérifiabilité moyenne des affirmations  
+- **D** : doxa  
+- **R** : risque rhétorique  
+- **RC** : risque moyen des affirmations  
+- **P** : pénalités de crédibilité  
 
 ---
 
@@ -7242,13 +7265,14 @@ Avec :
 6–9 : raisonnement fragile  
 9–13 : raisonnement modéré  
 13–16 : raisonnement solide  
-16–20 : raisonnement très solide
+16–20 : raisonnement très solide  
 
 ---
 
-### Lecture du résultat
+### Conclusion
 
-Un score de **{round(base_score,1)}/20** indique un raisonnement **{score_label.lower()}**.
+Un score de **{round(display_score,1)}/20** indique un raisonnement **{score_label.lower()}**,  
+avec une **présence notable de signaux de fragilité cognitive**.
 """)
 
 st.markdown("""
@@ -9419,40 +9443,6 @@ with row3_col2:
                 st.warning(marker)
 
 # -----------------------------
-# 9) Charge émotionnelle
-# -----------------------------
-with row3_col3:
-    st.markdown("### Charge émotionnelle")
-    st.caption("Intensité affective du lexique utilisé pour orienter la lecture.")
-
-    emotional_value = result["emotional_intensity_score"]
-
-    if emotional_value < 0.15:
-        emotional_label, emotional_color = "Faible", "#ca8a04"
-    elif emotional_value < 0.35:
-        emotional_label, emotional_color = "Modérée", "#f97316"
-    elif emotional_value < 0.60:
-        emotional_label, emotional_color = "Élevée", "#ea580c"
-    else:
-        emotional_label, emotional_color = "Très élevée", "#dc2626"
-
-    render_custom_gauge(emotional_value, emotional_color)
-
-    st.markdown(
-        f"<b style='color:{emotional_color}'>{emotional_label}</b> — {round(emotional_value * 100, 1)}%",
-        unsafe_allow_html=True
-    )
-    st.caption(result["emotional_intensity_interpretation"])
-
-    with st.expander("Voir les marqueurs", expanded=False):
-        markers = result.get("emotional_intensity_markers", [])
-        if not markers:
-            st.info("Aucun marqueur émotionnel notable détecté.")
-        else:
-            for marker in markers:
-                st.warning(marker)
-
-# -----------------------------
 # 10) Généralisation abusive
 # -----------------------------
 with row4_col1:
@@ -9979,11 +9969,13 @@ for title, score, label, interpretation in gauges:
         title_html = interpret_warning_risk_gauge(title, score)
     else:
         title_html = interpret_generic_risk_gauge(title, score)
-
+    
+    # ✅ Plancher visuel : jamais moins de 10%
+    
     st.markdown(title_html, unsafe_allow_html=True)
     st.progress(score)
     st.caption(f"{label} — {round(score * 100, 1)}%")
-
+    
     if interpretation:
         st.write(interpretation)
 
