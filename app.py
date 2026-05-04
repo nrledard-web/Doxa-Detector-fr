@@ -19,6 +19,53 @@ try:
 except Exception:
     client = None
 
+import math
+
+NEGATIONS = {"pas", "aucun", "jamais", "ni", "rien"}
+ATTENUATORS = {"peut-être", "semble", "probable", "possible"}
+INTENSIFIERS = {"grave", "extrême", "massif", "violent"}
+
+def tokenize(text):
+    return re.findall(r"\b[\wà-ÿ'-]+\b", text.lower())
+
+def compute_emotional_score(text, emotion_dict):
+    words = tokenize(text)
+    total_score = 0.0
+    word_count = len(words)
+
+    for i, word in enumerate(words):
+
+        # gestion simple du pluriel
+        base_word = word.rstrip("s")
+
+        if base_word in emotion_dict:
+            base_weight = emotion_dict[base_word]
+            modifier = 1.0
+
+            # fenêtre locale
+            context = words[max(0, i-2):i+3]
+
+            context_set = set(context)
+
+            # négation
+            if context_set & NEGATIONS:
+                modifier *= 0.2
+
+            # atténuation
+            if context_set & ATTENUATORS:
+                modifier *= 0.6
+
+            # intensification
+            if context_set & INTENSIFIERS:
+                modifier *= 1.4
+
+            total_score += base_weight * modifier
+
+    # normalisation + stabilisation
+    score = total_score / (math.log(1 + word_count) + 1)
+
+    return min(score, 1.0)
+
 st.markdown("""
 <style>
 
@@ -2804,32 +2851,33 @@ CERTAINTY_TERMS = [
     "la preuve que"
 ]
 
-EMOTIONAL_INTENSITY_TERMS = [
-    "scandale",
-    "honte",
-    "catastrophe",
-    "désastre",
-    "trahison",
-    "danger",
-    "peur",
-    "menace",
-    "crise",
-    "urgent",
-    "incroyable",
-    "terrible",
-    "révolution",
-    "effondrement",
-    "panique",
-    "massacre",
-    "destruction",
-    "panic",
-    "scandal",
-    "outrage",
-    "fear",
-    "collapse",
-    "crisis",
-    "urgent",
-]
+EMOTIONAL_DICT = {
+    "scandale": 0.6,
+    "honte": 0.5,
+    "catastrophe": 0.8,
+    "désastre": 0.75,
+    "trahison": 0.6,
+    "danger": 0.5,
+    "peur": 0.6,
+    "menace": 0.5,
+    "crise": 0.5,
+    "urgent": 0.6,
+    "incroyable": 0.35,
+    "terrible": 0.5,
+    "révolution": 0.55,
+    "effondrement": 0.7,
+    "panique": 0.7,
+    "massacre": 0.85,
+    "destruction": 0.75,
+
+    # anglais (optionnel)
+    "panic": 0.7,
+    "scandal": 0.6,
+    "outrage": 0.6,
+    "fear": 0.6,
+    "collapse": 0.7,
+    "crisis": 0.5,
+}
 # -----------------------------
 # Faux consensus
 # -----------------------------
@@ -5174,7 +5222,23 @@ def analyze_article(text: str) -> Dict:
     index_page_analysis = detect_index_or_multilink_page(text)
     causal_overreach_analysis = compute_causal_overreach(text)
     vague_authority_analysis = compute_vague_authority(text)
-    emotional_intensity_analysis = compute_emotional_intensity(text)
+    emotional_score = compute_emotional_score(text, EMOTIONAL_DICT)
+    emotional_intensity_analysis = {
+        "score": emotional_score,
+        "markers": [
+            w for w in tokenize(text)
+            if w.rstrip("s") in EMOTIONAL_DICT
+        ],
+        "interpretation": (
+            "Le texte mobilise une charge émotionnelle faible."
+            if emotional_score < 0.15 else
+            "Le texte mobilise une charge émotionnelle modérée."
+            if emotional_score < 0.35 else
+            "Le texte mobilise une charge émotionnelle notable."
+            if emotional_score < 0.60 else
+            "Le texte mobilise une charge émotionnelle très forte."
+        )
+    }
     generalization_analysis = compute_generalization(text)
     abstract_enemy_analysis = compute_abstract_enemy(text)
     certainty_analysis = compute_certainty(text)
@@ -5248,17 +5312,20 @@ def analyze_article(text: str) -> Dict:
     })
 
     V = clamp(G * 0.8 + N * 0.2, 0, 10)
-
+    
+    # modulation émotion par N (nous)
+    emotional_effect = emotional_intensity_analysis["score"] * (1 - (N / 10))
+    
     R = clamp(
         (
-            D * 0.50 +
-            emotional_intensity_analysis["score"] * 10 * 0.25 +
+            D * 0.55 +
+            emotional_effect * 10 * 0.20 +
             propaganda_analysis["score"] * 10 * 0.25
         ),
         0,
         10
     )
-
+    
     improved = round((G + N + V) - (D + R), 1)
 
     # -----------------------------
@@ -7629,143 +7696,143 @@ else:
         etiquette_c = "Très solide"
         message_c = "Le texte présente une structure cognitive robuste et peu de signaux de fragilité."
     
-st.subheader(f"{couleur_c} Crédibilité finale : {etiquette_c}")
-
-st.caption(
-    "Cette jauge synthétise la crédibilité globale du texte en combinant "
-    "la solidité factuelle, l’équilibre cognitif entre savoir et certitude, "
-    "et la pression discursive détectée dans le langage."
-)
-
-st.markdown(f"""
-<div style="width:100%; margin-top:10px; margin-bottom:10px;">
-    <div style="
-        width:100%;
-        height:26px;
-        background:#e5e7eb;
-        border-radius:12px;
-        overflow:hidden;
-        border:1px solid #cbd5e1;
-    ">
-        <div style="
-            width:{min(final_score / 20, 1) * 100}%;
-            height:100%;
-            background:{color_c};
-            transition:width 0.4s ease;
-        "></div>
-    </div>
-</div>
-""", unsafe_allow_html=True)
-
-st.markdown(
-    f"<b style='color:{color_c}'>{etiquette_c}</b> — Score final : {round(final_score,1)}/20",
-    unsafe_allow_html=True
-)
-
-st.caption(message_c)
-
-with st.popover("ℹ️ Formule / explication"):
-
-    st.subheader(f"{T['verdict']} : {couleur_c} Crédibilité finale — {etiquette_c}")
-    st.caption(f"Score final : {round(final_score, 1)}/20 — {message_c}")
-    st.subheader(T["summary"])
-
-    m1, m2 = st.columns(2)
-    m1.metric("HFS", round(result["hard_fact_score"], 1))
-    m2.metric("G — gnōsis", round(result["G"], 2))
+    st.subheader(f"{couleur_c} Crédibilité finale : {etiquette_c}")
     
-    m3, m4 = st.columns(2)
-    m3.metric("N — nous", round(result["N"], 2))
-    m4.metric("D — doxa", round(result["D"], 2))
-    
-    m5, m6 = st.columns(2)
-    m5.metric("Pression discursive", round(result.get("discursive_pressure", 0), 2))
-    m6.metric("ID", round(result.get("ID", 0), 2))
-    
-    m7, m8 = st.columns(2)
-    m7.metric("Pénalité jauges", round(result.get("display_gauge_penalty", 0), 2))
-    m8.metric("Score final", round(final_score, 1))
+    st.caption(
+        "Cette jauge synthétise la crédibilité globale du texte en combinant "
+        "la solidité factuelle, l’équilibre cognitif entre savoir et certitude, "
+        "et la pression discursive détectée dans le langage."
+    )
     
     st.markdown(f"""
-    Cette jauge synthétise la **crédibilité globale du texte**.
-    
-    Elle combine trois dimensions :
-    
-    - la solidité factuelle du texte  
-    - l’équilibre cognitif entre connaissance, compréhension et certitude  
-    - la pression discursive détectée dans le langage  
-    
-    ---
-    
-    ### 1️⃣ Solidité factuelle
-    
-    `HFS = hard_fact_score / 20`
-    
-    Dans cette analyse :
-    
-    `HFS = {round(result["hard_fact_score"], 1)} / 20`
-    
-    ---
-    
-    ### 2️⃣ Calibration cognitive
-    
-    `OC = (G + N) / (G + N + D)`
-    
-    avec :
-    
-    G = gnōsis  
-    N = nous  
-    D = doxa  
-    
-    Dans cette analyse :
-    
-    `OC = ({round(result["G"],2)} + {round(result["N"],2)}) / ({round(result["G"],2)} + {round(result["N"],2)} + {round(result["D"],2)})`
-    
-    `OC ≈ {round((result["G"] + result["N"]) / max((result["G"] + result["N"] + result["D"]), 1), 2)}`
-    
-    ---
-    
-    ### 3️⃣ Indice de pression discursive
-    
-    `ID = 1 − pression_discursive`
-    
-    avec :
-    
-    `pression_discursive = propagande + pression_rhétorique`
-    
-    Plus la pression discursive est forte, plus le score final diminue.
-    
-    ---
-    
-    ### 4️⃣ Formule heuristique principale
-    
-    `score_initial = 20 × HFS × OC × ID`
-    
-    ---
-    
-    ### 5️⃣ Ajustement final
-    
-    `score_final = score_initial − pénalité_jauges`
-    
-    Score final observé :
-    
-    `score_final = {round(final_score, 1)} / 20`
-    
-    ---
-    
-    ### Interprétation du score final
-    
-    0–5 : crédibilité très fragile  
-    6–9 : crédibilité fragile  
-    10–14 : crédibilité prudente  
-    15–20 : crédibilité robuste
-    """)
-
-    st.markdown("""
-    <div style="text-align:center; margin:25px 0; color:#bbb;">
-    ✦ ✦ ✦
+    <div style="width:100%; margin-top:10px; margin-bottom:10px;">
+        <div style="
+            width:100%;
+            height:26px;
+            background:#e5e7eb;
+            border-radius:12px;
+            overflow:hidden;
+            border:1px solid #cbd5e1;
+        ">
+            <div style="
+                width:{min(final_score / 20, 1) * 100}%;
+                height:100%;
+                background:{color_c};
+                transition:width 0.4s ease;
+            "></div>
+        </div>
     </div>
     """, unsafe_allow_html=True)
+    
+    st.markdown(
+        f"<b style='color:{color_c}'>{etiquette_c}</b> — Score final : {round(final_score,1)}/20",
+        unsafe_allow_html=True
+    )
+    
+    st.caption(message_c)
+    
+    with st.popover("ℹ️ Formule / explication"):
+    
+        st.subheader(f"{T['verdict']} : {couleur_c} Crédibilité finale — {etiquette_c}")
+        st.caption(f"Score final : {round(final_score, 1)}/20 — {message_c}")
+        st.subheader(T["summary"])
+    
+        m1, m2 = st.columns(2)
+        m1.metric("HFS", round(result["hard_fact_score"], 1))
+        m2.metric("G — gnōsis", round(result["G"], 2))
+        
+        m3, m4 = st.columns(2)
+        m3.metric("N — nous", round(result["N"], 2))
+        m4.metric("D — doxa", round(result["D"], 2))
+        
+        m5, m6 = st.columns(2)
+        m5.metric("Pression discursive", round(result.get("discursive_pressure", 0), 2))
+        m6.metric("ID", round(result.get("ID", 0), 2))
+        
+        m7, m8 = st.columns(2)
+        m7.metric("Pénalité jauges", round(result.get("display_gauge_penalty", 0), 2))
+        m8.metric("Score final", round(final_score, 1))
+        
+        st.markdown(f"""
+        Cette jauge synthétise la **crédibilité globale du texte**.
+        
+        Elle combine trois dimensions :
+        
+        - la solidité factuelle du texte  
+        - l’équilibre cognitif entre connaissance, compréhension et certitude  
+        - la pression discursive détectée dans le langage  
+        
+        ---
+        
+        ### 1️⃣ Solidité factuelle
+        
+        `HFS = hard_fact_score / 20`
+        
+        Dans cette analyse :
+        
+        `HFS = {round(result["hard_fact_score"], 1)} / 20`
+        
+        ---
+        
+        ### 2️⃣ Calibration cognitive
+        
+        `OC = (G + N) / (G + N + D)`
+        
+        avec :
+        
+        G = gnōsis  
+        N = nous  
+        D = doxa  
+        
+        Dans cette analyse :
+        
+        `OC = ({round(result["G"],2)} + {round(result["N"],2)}) / ({round(result["G"],2)} + {round(result["N"],2)} + {round(result["D"],2)})`
+        
+        `OC ≈ {round((result["G"] + result["N"]) / max((result["G"] + result["N"] + result["D"]), 1), 2)}`
+        
+        ---
+        
+        ### 3️⃣ Indice de pression discursive
+        
+        `ID = 1 − pression_discursive`
+        
+        avec :
+        
+        `pression_discursive = propagande + pression_rhétorique`
+        
+        Plus la pression discursive est forte, plus le score final diminue.
+        
+        ---
+        
+        ### 4️⃣ Formule heuristique principale
+        
+        `score_initial = 20 × HFS × OC × ID`
+        
+        ---
+        
+        ### 5️⃣ Ajustement final
+        
+        `score_final = score_initial − pénalité_jauges`
+        
+        Score final observé :
+        
+        `score_final = {round(final_score, 1)} / 20`
+        
+        ---
+        
+        ### Interprétation du score final
+        
+        0–5 : crédibilité très fragile  
+        6–9 : crédibilité fragile  
+        10–14 : crédibilité prudente  
+        15–20 : crédibilité robuste
+        """)
+    
+        st.markdown("""
+        <div style="text-align:center; margin:25px 0; color:#bbb;">
+        ✦ ✦ ✦
+        </div>
+        """, unsafe_allow_html=True)
     
 st.markdown("""
 <div style="text-align:center; margin:25px 0; color:#888;">
