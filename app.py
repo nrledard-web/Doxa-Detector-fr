@@ -1082,6 +1082,9 @@ def detect_political_patterns(text: str):
         "dilution": DILUTION_RESPONSABILITE,
         "causalite": CAUSALITE_IMPLICITE,
         "moralisation_discours": MORALISATION_DISCOURS,
+        "prediction_absolue": ABSOLUTE_PREDICTION_MARKERS,
+        "amplification_menace": THREAT_AMPLIFICATION_MARKERS,
+        "certitude_forte": STRONG_CERTAINTY_MARKERS,
     }
 
     results = {}
