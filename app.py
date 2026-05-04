@@ -1049,6 +1049,28 @@ STRONG_CERTAINTY_MARKERS = [
     "personne ne peut nier",
     "de toute évidence",
 ]
+
+RELIGIEUX_SPIRITUEL_MARKERS = [
+    "dieu", "foi", "âme", "péché", "salut",
+    "prière", "sacré", "sacrifice", "prophète",
+    "révélation", "transcendance", "divin",
+    "grâce", "miracle", "éternité", "jugement dernier",
+    "god", "faith", "soul", "sin", "salvation",
+    "prayer", "sacred", "prophet", "revelation",
+    "divine", "miracle"
+]
+
+PHILOSOPHIQUE_CONCEPTUEL_MARKERS = [
+    "vérité", "être", "raison", "conscience",
+    "liberté", "morale", "principe", "concept",
+    "existence", "essence", "sens", "néant",
+    "justice", "bien", "mal", "devoir",
+    "connaissance", "subjectivité", "objectivité",
+    "truth", "being", "reason", "consciousness",
+    "freedom", "morality", "principle", "existence",
+    "meaning", "knowledge", "subjectivity", "objectivity"
+]
+
 def detect_political_patterns(text: str):
     """
     Détecte des manœuvres discursives politiques ou rhétoriques
@@ -1098,6 +1120,32 @@ def detect_political_patterns(text: str):
         total_score += len(hits)
 
     return total_score, results, matched_terms
+
+def detect_conceptual_domains(text: str):
+    """
+    Détecte le domaine conceptuel dominant du discours :
+    religieux / spirituel ou philosophique / conceptuel.
+    """
+
+    if not text:
+        return {}, {}
+
+    t = text.lower()
+
+    domains = {
+        "religieux_spirituel": RELIGIEUX_SPIRITUEL_MARKERS,
+        "philosophique_conceptuel": PHILOSOPHIQUE_CONCEPTUEL_MARKERS,
+    }
+
+    results = {}
+    matched_terms = {}
+
+    for name, terms in domains.items():
+        hits = [term for term in terms if contains_term(t, term)]
+        results[name] = len(hits)
+        matched_terms[name] = hits
+
+    return results, matched_terms
 
 
 def compute_rhetorical_pressure(results: dict) -> float:
