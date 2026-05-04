@@ -4434,6 +4434,10 @@ def compute_brain_indices(result: dict) -> dict:
             lie_impact * 0.30
         )
     )
+    secondary_pressure = compute_secondary_alert_pressure(result)
+    
+    gravity = min(1.0, gravity + secondary_pressure * 0.45)
+    stability = max(0.0, stability - secondary_pressure * 0.35)
 
     return {
         "IR": round(IR, 3),
@@ -4442,12 +4446,17 @@ def compute_brain_indices(result: dict) -> dict:
         "strategic_index": round(strategic_index, 3),
         "closure_index": round(closure_index, 3),
         "lie_impact": round(lie_impact, 3),
+    
+        # anciennes clés si utilisées ailleurs
         "gravity": round(gravity, 3),
         "stability": round(stability, 3),
+    
+        "cognitive_gravity": round(gravity, 3),
+        "cognitive_stability": round(stability, 3),
+    
         "brain_profile": profile,
     }
-
-    
+      
 def analyze_claim(sentence: str) -> Claim:
     s = sentence.lower()
 
@@ -4801,6 +4810,24 @@ def compute_global_penalties(result: dict) -> dict:
         "penalty_interpretation": interpretation,
         "red_flags_penalty_count": red_flags_count,
     }
+
+def compute_secondary_alert_pressure(result: dict) -> float:
+    signals = [
+        result.get("propaganda_score", 0) * 1.4,
+        result.get("argument_asymmetry_score", 0) * 1.2,
+        result.get("emotional_intensity_score", 0) * 1.0,
+        result.get("normative_score", 0) * 1.1,
+        result.get("premise_score", 0) * 1.1,
+        result.get("coherence_trompeuse_score", 0) * 1.3,
+        result.get("logic_confusion_score", 0) * 1.0,
+        result.get("scientific_simulation_score", 0) * 1.0,
+        result.get("hasty_generalization_score", 0) * 1.0,
+        result.get("false_dilemma_score", 0) * 0.9,
+        result.get("dissonance_score", 0) * 1.2,
+    ]
+
+    pressure = sum(signals) / 12
+    return round(min(pressure, 1.0), 3)
 
 def compute_doxa_brain(result: dict) -> dict:
     """
@@ -5610,6 +5637,9 @@ def analyze_article(text: str) -> Dict:
         "semantic_shift_score": semantic_shift_analysis["score"],
         "doxic_rigidity_score": doxic_rigidity_analysis["score"],
         "narrative_overdetermination_score": narrative_overdetermination_analysis["score"],
+        "argument_asymmetry_score": argument_asymmetry_analysis["score"],
+        "coherence_trompeuse_score": 0,
+        "dissonance_score": internal_dissonance_analysis["score"],
     })
     # -----------------------------
     # Score analogique du raisonnement
@@ -7318,17 +7348,17 @@ elif score < 16:
     couleur_r = "🟢"
     color_r = "#16a34a"
     etiquette_r = "Solide"
-    message_r = "Le raisonnement est structuré et globalement cohérent."
+    message_r = "Le discours est bien organisé en surface, mais cette cohérence ne garantit pas sa validité épistémique."
 else:
     couleur_r = "🟢"
     color_r = "#15803d"
     etiquette_r = "Très solide"
     message_r = "Le texte présente un raisonnement robuste, structuré et bien soutenu."
 
-st.subheader(f"{couleur_r} Solidité argumentative : {etiquette_r}")
+st.subheader(f"{couleur_r} Cohérence structurelle : {etiquette_r}")
 # Barre épaisse colorée
 st.caption(
-    "Cette jauge mesure la solidité argumentative du texte : structure du raisonnement, "
+    "Cette jauge mesure la Cohérence structurelle du texte : structure du raisonnement, "
     "cohérence logique et présence d’éléments vérifiables. "
     "La crédibilité globale dépend aussi de la qualité des sources et de la vérifiabilité des affirmations."
 )
@@ -7934,9 +7964,16 @@ background:linear-gradient(135deg, rgba(15,23,42,0.06), rgba(30,41,59,0.03));
 # Variables principales
 stability = brain.get("cognitive_stability", 0)
 gravity = brain.get("cognitive_gravity", 1 - stability)
+
 dominant_regime = brain.get("dominant_regime", "Non déterminé")
 brain_summary = brain.get("brain_summary", "Aucun résumé disponible.")
 brain_advice = brain.get("brain_advice", "")
+
+# ✅ Correction dynamique avec jauges secondaires
+secondary_pressure = compute_secondary_alert_pressure(result)
+
+gravity = min(1.0, gravity + secondary_pressure * 0.65)
+stability = max(0.0, stability - secondary_pressure * 0.55)
 
 # Couleur stabilité
 if stability >= 0.80:
@@ -7977,7 +8014,7 @@ background-color:rgba(255,255,255,0.03);
 <b style='color:{stability_color};'>
 Stabilité {stability_label} — {stability:.2f}
 </b><br>
-{brain.get("brain_advice", "Le discours présente peu de signaux de dérive cognitive.")}
+"Le discours reste relativement cohérent, mais plusieurs signaux secondaires réduisent son équilibre cognitif."
 </div>
 """,
     unsafe_allow_html=True
@@ -8066,11 +8103,11 @@ Dans cette analyse :
 
 L’indice ajusté ajoute des corrections complémentaires au score classique.
 
-Il permet d’obtenir une lecture plus large du niveau de robustesse cognitive du discours.
+Il permet d’obtenir une lecture plus large du niveau de robustesse cognitive du discours, en tenant compte non seulement du noyau **M = (G + N) − D**, mais aussi des pénalités, des fragilités discursives et des jauges secondaires détectées.
 
 Dans cette analyse :
 
-`Indice ajusté = {round(result.get("improved", 0), 2)}`
+**Indice ajusté = {round(result.get("M_adjusted", result.get("ME", 0)), 2)}**
 
 ---
 
@@ -8111,7 +8148,9 @@ Même si la stabilité est élevée, le régime dominant peut signaler une fragi
 # =============================
 # Gravité cognitive globale
 # =============================
-gravity = result.get("cognitive_gravity", 0)
+# 👉 utiliser la gravité corrigée déjà calculée
+# NE PAS relire result ici
+# gravity est déjà modifiée plus haut
 gravity_pct = round(gravity * 100, 1)
 
 if gravity < 0.2:
@@ -8203,15 +8242,29 @@ La jauge combine plusieurs indicateurs détectés dans le texte :
 
 Ces signaux sont agrégés pour produire un **diagnostic global de santé cognitive du discours**.
 
-#### Formule heuristique
+### Formule heuristique
+
+La gravité cognitive est calculée à partir de plusieurs composantes combinées :
+
+- indice stratégique (tension entre mécroyance et mensonge)
+- fermeture cognitive (déséquilibre entre G, N et D)
+- pression discursive (rhétorique, émotion, simplification)
+- impact du mensonge potentiel
+- pression secondaire (accumulation des jauges activées)
+
+Formule simplifiée :
 
 gravité =
-0.25 × mensonge
-+ 0.20 × pression rhétorique
-+ 0.20 × propagande
-+ 0.20 × dissonance factuelle
-+ 0.10 × fermeture cognitive
-+ 0.05 × faiblesse factuelle
+    (indice stratégique × 0.35)
+  + (fermeture cognitive × 0.30)
+  + (pression discursive × 0.20)
+  + (impact du mensonge × 0.40)
+
+Puis ajustement :
+
+gravité = gravité + (pression secondaire × 0.45)
+
+Le score final est borné entre 0 et 1.
 
 #### Interprétation
 0 → discours sain
@@ -8239,7 +8292,7 @@ elif life_score < 70:
 elif life_score < 85:
     life_label = "Solide"
     life_color = "#16a34a"
-    life_text = "Vitalité cognitive solide — le discours est globalement structuré et appuyé."
+    life_text = "Le discours contient une matière cognitive dense : les idées sont développées, reliées et appuyées."
 else:
     life_label = "Très solide"
     life_color = "#15803d"
