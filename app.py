@@ -7050,11 +7050,11 @@ Les discours philosophiques, moraux ou spéculatifs obtiennent souvent des score
 
 
     def show_word_lists_help():
-        with st.popover("ℹ️ Rôle des listes de mots et des coefficients"):
+        with st.popover("ℹ️ Rôle de la heuristique et des coefficients"):
             st.markdown("""
 ### Comment certaines jauges lisent le texte
 
-Certaines jauges ne cherchent pas à “comprendre” le texte comme un humain.
+Certaines jauges ne cherchent pas à “comprendre” le texte comme un humain. Elles n'ont pas besoin de sémantique. Aucune définition n'est nécessaire.
 
 Elles repèrent des mots ou expressions associés à une charge émotionnelle, rhétorique ou cognitive, et analysent leur contexte d’utilisation.
 
