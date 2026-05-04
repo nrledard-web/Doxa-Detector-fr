@@ -7954,6 +7954,20 @@ if st.session_state.get("semantic_mode", False):
 else:
     st.info("Activez l’analyse sémantique pour calculer cette jauge.")
 
+# -----------------------------
+# Type de discours détecté
+# -----------------------------
+disc = detect_discourse_type(article_for_analysis, result)
+
+st.markdown("### Type de discours détecté")
+st.info(f"**{disc['label']}**")
+st.caption(disc["description"])
+
+with st.expander("Voir le détail de la détection discursive"):
+    for key, value in disc["scores"].items():
+        label = DISCOURSE_LIBRARY[key]["label"]
+        st.write(f"{label} : {value}")
+
 st.markdown("""
 <div style="text-align:center; margin:25px 0; color:#888;">
 ──── 🧠 ────
