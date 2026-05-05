@@ -7808,13 +7808,13 @@ st.subheader("Interprétation cognitive")
 st.write(cognitive_type)
 
 if result["M"] - result["ME"] > 3:
-    diagnosis = "Structure de mécroyance forte"
+    diagnosis = "Structure de mécroyance avérée"
 elif result["M"] > result["ME"]:
     diagnosis = "Structure de mécroyance modérée"
 elif abs(result["M"] - result["ME"]) <= 1:
     diagnosis = "Structure cognitive ambiguë"
 else:
-    diagnosis = "Tromperie stratégique possible"
+    diagnosis = "Tromperie stratégique possible ou mensonge"
 
 st.subheader("Diagnostic cognitif")
 st.write(diagnosis)
