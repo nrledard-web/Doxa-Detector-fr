@@ -7789,7 +7789,7 @@ elif result["M"] < 0:
 
 elif result["M"] - result["ME"] > 3:
     cognitive_type = (
-        "Mécroyance marquée : avec absence d’intention manipulatoire détectée, "
+        "Mécroyance marquée : avec absence d’intention manipulatoire détectée. "
     )
 
 elif result["M"] > result["ME"]:
@@ -7808,9 +7808,9 @@ st.subheader("Interprétation cognitive")
 st.write(cognitive_type)
 
 if result["M"] - result["ME"] > 3:
-    diagnosis = "Structure de mécroyance avérée"
+    diagnosis = "Mécroyance avérée"
 elif result["M"] > result["ME"]:
-    diagnosis = "Structure de mécroyance modérée"
+    diagnosis = "Mécroyance modérée"
 elif abs(result["M"] - result["ME"]) <= 1:
     diagnosis = "Structure cognitive ambiguë"
 else:
