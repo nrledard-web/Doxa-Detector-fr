@@ -5270,6 +5270,70 @@ def compute_strong_certainty(text):
         )
     }
 
+# =====================================================
+# DÉTECTION DES DOMAINES CONCEPTUELS
+# =====================================================
+def contains_term(text: str, term: str) -> bool:
+    return re.search(rf"\b{re.escape(term.lower())}\b", text.lower()) is not None
+
+
+JOURNALISTIC_MARKERS = [
+    "selon", "d'après", "rapport", "étude", "enquête",
+    "article", "communiqué", "sondage", "journal", "presse",
+    "média", "journaliste", "source", "porte-parole",
+    "a déclaré", "a affirmé", "a indiqué", "a annoncé",
+    "selon une étude", "selon le rapport", "d'après les données",
+]
+
+PHILOSOPHICAL_MARKERS = [
+    "vérité", "réalité", "existence", "être", "essence",
+    "conscience", "raison", "pensée", "savoir", "croyance",
+    "doute", "concept", "principe", "idée", "notion",
+    "morale", "éthique", "justice", "liberté", "devoir",
+    "dans quelle mesure", "qu'est-ce que", "en ce sens",
+]
+
+RELIGIOUS_MARKERS = [
+    "dieu", "divin", "foi", "religion", "croyant",
+    "âme", "esprit", "sacré", "saint", "prière",
+    "rite", "culte", "église", "mosquée", "temple",
+    "prophète", "révélation", "évangile", "coran", "bible",
+    "péché", "salut", "grâce", "paradis", "enfer",
+]
+
+
+def detect_conceptual_domains(text: str):
+    t = text.lower()
+
+    domains = {
+        "journalistique": 0,
+        "philosophique": 0,
+        "religieux": 0,
+    }
+
+    terms = {
+        "journalistique": [],
+        "philosophique": [],
+        "religieux": [],
+    }
+
+    for marker in JOURNALISTIC_MARKERS:
+        if contains_term(t, marker):
+            domains["journalistique"] += 1
+            terms["journalistique"].append(marker)
+
+    for marker in PHILOSOPHICAL_MARKERS:
+        if contains_term(t, marker):
+            domains["philosophique"] += 1
+            terms["philosophique"].append(marker)
+
+    for marker in RELIGIOUS_MARKERS:
+        if contains_term(t, marker):
+            domains["religieux"] += 1
+            terms["religieux"].append(marker)
+
+    return domains, terms
+
 def analyze_article(text: str) -> Dict:
     words = text.split()
     sentences = [s.strip() for s in re.split(r"[.!?]+", text) if len(s.strip()) > 10]
