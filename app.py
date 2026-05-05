@@ -7783,18 +7783,18 @@ if result["ME"] > result["M"] and result["ME"] > 0:
 
 elif result["M"] < 0:
     cognitive_type = (
-        "Forte mécroyance / clôture cognitive : la certitude dépasse fortement "
+        "Clôture cognitive : la certitude dépasse fortement "
         "les éléments de savoir et de compréhension disponibles."
     )
 
 elif result["M"] - result["ME"] > 3:
     cognitive_type = (
-        "Mécroyance marquée : avec absence d’intention manipulatoire détectée. "
+        "texte orienté avec absence d’intention manipulatoire détectée. "
     )
 
 elif result["M"] > result["ME"]:
     cognitive_type = (
-        "Mécroyance modérée : le discours présente un désalignement cognitif notable, "
+        "Le discours présente un désalignement cognitif notable, "
         "sans indication claire de manipulation."
     )
 
