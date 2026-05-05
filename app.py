@@ -7804,6 +7804,18 @@ else:
         "entre erreur sincère et orientation stratégique."
     )
 
+st.subheader("Interprétation cognitive")
+st.write(cognitive_type)
+
+if result["M"] - result["ME"] > 3:
+    diagnosis = "Structure de mécroyance forte"
+elif result["M"] > result["ME"]:
+    diagnosis = "Structure de mécroyance modérée"
+elif abs(result["M"] - result["ME"]) <= 1:
+    diagnosis = "Structure cognitive ambiguë"
+else:
+    diagnosis = "Tromperie stratégique possible"
+
 st.subheader("Diagnostic cognitif")
 st.write(diagnosis)
 
