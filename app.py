@@ -7780,7 +7780,7 @@ if result["ME"] > result["M"] and result["ME"] > 0:
 elif result["M"] < 0:
     cognitive_type = "Forte mécroyance / clôture cognitive"
 else:
-    cognitive_type = "compatible avec une construction de type mensonge"
+    cognitive_type = "la structuration du discours soulève la possibilité d’un désalignement cognitif associé à une intention manipulatoire."
 
 st.subheader("Interprétation cognitive")
 st.write(cognitive_type)
