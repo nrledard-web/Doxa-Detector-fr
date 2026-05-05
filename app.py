@@ -5889,6 +5889,8 @@ def analyze_article(text: str) -> Dict:
         "strong_certainty_label": strong_certainty_analysis["label"],
         "strong_certainty_interpretation": strong_certainty_analysis["interpretation"],
 
+        
+
         "linguistic_trigger_count": ling["trigger_count"],
         "linguistic_pressure_hits": ling["rhetorical_pressure"],
         "absolute_claims": ling["absolute_claims"],
@@ -5954,6 +5956,9 @@ def analyze_article(text: str) -> Dict:
         "drift_intuition_dogmatique": drifts["drift_intuition_dogmatique"],
         "global_cognitive_drift": drifts["global_cognitive_drift"],
         "cognitive_drift_interpretation": drifts["cognitive_drift_interpretation"],
+
+        "conceptual_domains": conceptual_domains,
+        "conceptual_terms": conceptual_terms,
     }
 
     result["brain"] = brain
