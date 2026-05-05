@@ -6314,30 +6314,63 @@ def detect_discourse_type(result):
     closure = result.get("cognitive_closure", 0)
     final_score = result.get("final_credibility_score", result.get("hard_fact_score", 0))
 
+    # Nouveaux marqueurs descriptifs uniquement
+    domains = result.get("conceptual_domains", {})
+
+    journalistic = domains.get("journalistique", 0)
+    philosophical = domains.get("philosophique", 0)
+    religious = domains.get("religieux", 0)
+
+    # 1) Priorité aux discours fortement orientés
     if propaganda >= 0.6 or rhetorical_pressure >= 0.7 or closure >= 0.7:
         return (
             "Discours propagandiste",
             "Forte pression rhétorique, simplification narrative ou fermeture cognitive."
         )
 
+    # 2) Discours religieux
+    if religious >= 2:
+        return (
+            "Discours religieux",
+            "Le texte mobilise un registre religieux, spirituel ou doctrinal."
+        )
+
+    # 3) Discours philosophique
+    if philosophical >= 2 and rhetorical_pressure < 0.5:
+        return (
+            "Discours philosophique",
+            "Le texte mobilise des notions abstraites, conceptuelles ou réflexives."
+        )
+
+    # 4) Discours journalistique
+    if journalistic >= 2 and V >= 4:
+        return (
+            "Discours journalistique",
+            "Le texte présente une forme informative avec attribution, rapport, enquête, étude ou référence médiatique."
+        )
+
+    # 5) Discours polémique
     if rhetorical_pressure >= 0.4 or D >= 7:
         return (
             "Discours polémique",
             "Argumentation orientée, certitude élevée ou pression rhétorique notable."
         )
 
+    # 6) Discours factuel
     if G >= 6 and V >= 6 and final_score >= 13:
         return (
             "Discours factuel",
             "Raisonnement appuyé sur des éléments vérifiables, des sources ou des faits identifiables."
         )
 
+    # 7) Ancien cas philosophique, gardé en secours
     if N >= 7 and G < 4 and V < 5 and rhetorical_pressure < 0.3:
         return (
             "Discours spéculatif / philosophique",
             "Réflexion conceptuelle cohérente, mais reposant surtout sur des idées générales plutôt que sur des éléments vérifiables."
         )
 
+    # 8) Discours analytique
     if N >= 6 and rhetorical_pressure < 0.4:
         return (
             "Discours analytique",
