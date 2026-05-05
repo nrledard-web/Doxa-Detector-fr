@@ -5337,6 +5337,9 @@ def analyze_article(text: str) -> Dict:
     threat_amplification_advanced_analysis = compute_threat_amplification_advanced(text)
     strong_certainty_analysis = compute_strong_certainty(text)
 
+    conceptual_domains, conceptual_terms = detect_conceptual_domains(text)
+
+
     # -----------------------------
     # Jauges structurelles avancées
     # -----------------------------
