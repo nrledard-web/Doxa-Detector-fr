@@ -3791,3 +3791,130 @@ Cinq règles de prudence intellectuelle
 
 Note finale
 • Sur l’impossibilité d’une immunité épistémique
+
+
+
+
+
+<img width="1181" height="1331" alt="loops" src="https://github.com/user-attachments/assets/594eae6d-f34d-4369-ae41-e7098b159178" />
+
+# =============================
+# Anti-Coherence Loop Module
+# =============================
+
+def anti_coherence_loop(
+    claim: str,
+    reasoning_chain: list[str],
+    sources: list[str] = None,
+    confidence: float = 0.0,
+    contradiction_signals: int = 0,
+    novelty_signals: int = 0
+):
+    """
+    Empêche une IA de confondre cohérence interne et vérité.
+    """
+
+    sources = sources or []
+
+    # 1) Cohérence interne
+    coherence_score = min(len(reasoning_chain) / 6, 1.0)
+
+    # 2) Ancrage externe
+    external_grounding = min(len(sources) / 3, 1.0)
+
+    # 3) Risque de boucle fermée
+    closure_risk = coherence_score * (1 - external_grounding)
+
+    # 4) Surconfiance
+    overconfidence = max(0, confidence - external_grounding)
+
+    # 5) Fragilité épistémique
+    epistemic_fragility = (
+        closure_risk * 0.45
+        + overconfidence * 0.35
+        + contradiction_signals * 0.10
+        - novelty_signals * 0.10
+    )
+
+    epistemic_fragility = max(0, min(epistemic_fragility, 1))
+
+    # 6) Verdict
+    if epistemic_fragility > 0.70:
+        status = "⚠️ Boucle de cohérence probable"
+        instruction = (
+            "Réduire la certitude. Signaler que le raisonnement est cohérent "
+            "mais insuffisamment ancré dans des preuves externes."
+        )
+    elif epistemic_fragility > 0.40:
+        status = "🟠 Risque de cohérence fermée"
+        instruction = (
+            "Nuancer la réponse. Ajouter des réserves et distinguer hypothèse, "
+            "raisonnement et fait établi."
+        )
+    else:
+        status = "🟢 Cohérence acceptable"
+        instruction = (
+            "Réponse possible, mais conserver la distinction entre cohérence "
+            "logique et vérité démontrée."
+        )
+
+    return {
+        "claim": claim,
+        "coherence_score": round(coherence_score, 2),
+        "external_grounding": round(external_grounding, 2),
+        "closure_risk": round(closure_risk, 2),
+        "overconfidence": round(overconfidence, 2),
+        "epistemic_fragility": round(epistemic_fragility, 2),
+        "status": status,
+        "instruction": instruction
+    }
+
+En version DOXA, je le traduirais ainsi :
+
+def doxa_loop_guard(G, N, D, sources_count, contradiction_count):
+    """
+    G = savoir articulé
+    N = compréhension intégrée
+    D = certitude stabilisée
+    """
+
+    M = (G + N) - D
+
+    grounding = min(sources_count / 3, 1.0)
+    contradiction_penalty = min(contradiction_count * 0.15, 0.6)
+
+    coherence_without_ground = max(0, (N / 20) - grounding)
+    doxic_closure = max(0, (D / 20) - ((G + N) / 40))
+
+    loop_risk = (
+        coherence_without_ground * 0.45
+        + doxic_closure * 0.40
+        + contradiction_penalty * 0.15
+    )
+
+    loop_risk = round(min(loop_risk, 1.0), 2)
+
+    if loop_risk > 0.65:
+        verdict = "Boucle de cohérence forte"
+    elif loop_risk > 0.35:
+        verdict = "Boucle de cohérence possible"
+    else:
+        verdict = "Boucle faible"
+
+    return {
+        "M": round(M, 2),
+        "loop_risk": loop_risk,
+        "verdict": verdict
+    }
+
+La formule centrale serait :
+
+Risque de boucle = cohérence interne élevée − ancrage externe + excès de certitude
+
+Autrement dit : une IA ne devrait jamais conclure :
+
+“C’est cohérent, donc c’est vrai.”
+
+Elle devrait conclure :
+
+“C’est cohérent, mais est-ce suffisamment fondé ?”
