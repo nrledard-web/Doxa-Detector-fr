@@ -7789,7 +7789,7 @@ elif result["M"] < 0:
 
 elif result["M"] - result["ME"] > 3:
     cognitive_type = (
-        "Mécroyance marquée : absence d’intention manipulatoire détectée, "
+        "Mécroyance marquée : avec absence d’intention manipulatoire détectée, "
     )
 
 elif result["M"] > result["ME"]:
