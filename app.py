@@ -7809,7 +7809,7 @@ st.subheader("Interprétation cognitive")
 st.write(cognitive_type)
 
 if result["M"] - result["ME"] > 3:
-    diagnosis = "Structure de mécroyance forte"
+    diagnosis = "Structure de mécroyance marquée"
 elif result["M"] > result["ME"]:
     diagnosis = "Structure de mécroyance modérée"
 elif abs(result["M"] - result["ME"]) <= 1:
