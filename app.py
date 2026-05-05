@@ -7776,11 +7776,34 @@ else:
     dominant_pattern = "Structure dominante : mixte ou ambiguë"
 
 if result["ME"] > result["M"] and result["ME"] > 0:
-    cognitive_type = "Mensonge stratégique possible"
+    cognitive_type = (
+        "Mensonge stratégique : la structuration du discours laisse apparaître "
+        "un désalignement cognitif pouvant suggérer une intention manipulatoire."
+    )
+
 elif result["M"] < 0:
-    cognitive_type = "Forte mécroyance / clôture cognitive"
+    cognitive_type = (
+        "Forte mécroyance / clôture cognitive : la certitude dépasse fortement "
+        "les éléments de savoir et de compréhension disponibles."
+    )
+
+elif result["M"] - result["ME"] > 3:
+    cognitive_type = (
+        "Mécroyance forte : absence d’intention manipulatoire détectée, "
+        "mais désalignement cognitif pouvant produire un effet proche du mensonge involontaire."
+    )
+
+elif result["M"] > result["ME"]:
+    cognitive_type = (
+        "Mécroyance modérée : le discours présente un désalignement cognitif notable, "
+        "sans indication claire de manipulation."
+    )
+
 else:
-    cognitive_type = "la structuration du discours soulève la possibilité d’un désalignement cognitif associé à une intention manipulatoire."
+    cognitive_type = (
+        "Zone ambiguë : le discours présente une tension cognitive difficile à trancher "
+        "entre erreur sincère et orientation stratégique."
+    )
 
 st.subheader("Interprétation cognitive")
 st.write(cognitive_type)
