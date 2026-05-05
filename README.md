@@ -3802,6 +3802,111 @@ Note finale
 # Anti-Coherence Loop Module
 # =============================
 
+import re
+from typing import List, Dict, Any
+
+
+def clamp(x, low=0.0, high=1.0):
+    return max(low, min(x, high))
+
+
+def contains_evidence_marker(text: str) -> bool:
+    markers = [
+        r"\bétude\b", r"\brapport\b", r"\bdonnées\b", r"\bsource\b",
+        r"\bmesure\b", r"\bstatistique\b", r"\bpublication\b",
+        r"\bselon\b", r"\brevue\b", r"\bpreuve\b", r"\bchiffre\b"
+    ]
+    return any(re.search(m, text.lower()) for m in markers)
+
+
+def anti_coherence_loop(
+    claim: str,
+    reasoning_chain: List[str],
+    sources: List[str] = None,
+    confidence: float = 0.5,
+    contradiction_signals: int = 0,
+    nuance_signals: int = 0,
+    speculative_signals: int = 0
+) -> Dict[str, Any]:
+
+    sources = sources or []
+
+    # 1. G — gnōsis : ancrage factuel
+    source_score = clamp(len(sources) / 4)
+    evidence_score = clamp(
+        sum(contains_evidence_marker(step) for step in reasoning_chain) / max(len(reasoning_chain), 1)
+    )
+    G = clamp((source_score * 0.65) + (evidence_score * 0.35))
+
+    # 2. N — nous : intégration, nuance, prudence
+    reasoning_depth = clamp(len(reasoning_chain) / 6)
+    nuance_score = clamp(nuance_signals / 3)
+    contradiction_penalty = clamp(contradiction_signals / 4)
+
+    N = clamp(
+        (reasoning_depth * 0.55)
+        + (nuance_score * 0.35)
+        - (contradiction_penalty * 0.25)
+    )
+
+    # 3. D — doxa : certitude stabilisée
+    D = clamp(
+        confidence
+        + speculative_signals * 0.12
+        - nuance_score * 0.15
+    )
+
+    # 4. Formule centrale DOXA
+    M_raw = (G + N) - D
+
+    # 5. Risque de boucle de cohérence
+    coherence_density = clamp(len(reasoning_chain) / 5)
+    grounding_gap = clamp(D - G)
+    integration_gap = clamp(D - N)
+
+    loop_risk = clamp(
+        coherence_density * 0.30
+        + grounding_gap * 0.40
+        + integration_gap * 0.30
+    )
+
+    # 6. Fragilité épistémique
+    epistemic_fragility = clamp(
+        loop_risk * 0.50
+        + contradiction_penalty * 0.25
+        + speculative_signals * 0.10
+        - nuance_score * 0.15
+    )
+
+    if epistemic_fragility < 0.25:
+        status = "🟢 Cohérence révisable"
+        instruction = "Réponse publiable avec formulation normale."
+    elif epistemic_fragility < 0.50:
+        status = "🟡 Cohérence prudente"
+        instruction = "Ajouter quelques nuances et distinguer faits, hypothèses et interprétation."
+    elif epistemic_fragility < 0.75:
+        status = "🟠 Risque de boucle de cohérence"
+        instruction = "Réécrire avec prudence, réduire la certitude et demander des sources externes."
+    else:
+        status = "🔴 Boucle de cohérence probable"
+        instruction = "Ne pas publier tel quel. Vérification externe nécessaire avant réponse finale."
+
+    return {
+        "G_gnosis": round(G, 2),
+        "N_nous": round(N, 2),
+        "D_doxa": round(D, 2),
+        "M_doxa_balance": round(M_raw, 2),
+        "loop_risk": round(loop_risk, 2),
+        "epistemic_fragility": round(epistemic_fragility, 2),
+        "status": status,
+        "instruction": instruction
+    }
+
+premier Module 
+# =============================
+# Anti-Coherence Loop Module
+# =============================
+
 def anti_coherence_loop(
     claim: str,
     reasoning_chain: list[str],
