@@ -10609,7 +10609,7 @@ with oi6:
             "Un faux consensus renforcé élevé ne signifie pas que l’idée est fausse. "
             "Il indique que le texte transforme un accord supposé en preuve argumentative."
         )
-oi7, oi8 = st.columns(3)
+oi7, oi8 = st.columns(2)
 # =============================
 # Prémisse idéologique implicite
 # =============================
