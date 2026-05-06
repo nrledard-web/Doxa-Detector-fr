@@ -11605,39 +11605,6 @@ with row13_col2:
                 st.warning(marker)
 
 # -----------------------------
-# 39) Victimisation stratégique
-# -----------------------------
-with row14_col1:
-    st.markdown("### Victimisation stratégique")
-    st.caption("Mise en scène d’une persécution ou d’un empêchement de dire.")
-
-    value = result["victimization_score"]
-
-    if value < 0.15:
-        label, color = "Faible", "#ca8a04"
-    elif value < 0.35:
-        label, color = "Modérée", "#f97316"
-    elif value < 0.60:
-        label, color = "Élevée", "#ea580c"
-    else:
-        label, color = "Très élevée", "#dc2626"
-
-    render_custom_gauge(value, color)
-    st.markdown(
-        f"<b style='color:{color}'>{label}</b> — {round(value*100,1)}%",
-        unsafe_allow_html=True
-    )
-    st.caption(result["victimization_interpretation"])
-
-    with st.expander("Voir les marqueurs", expanded=False):
-        markers = result.get("victimization_markers", [])
-        if not markers:
-            st.info("Aucune victimisation stratégique notable détectée.")
-        else:
-            for marker in markers:
-                st.warning(marker)
-
-# -----------------------------
 # 40) Polarisation morale
 # -----------------------------
 with row14_col2:
