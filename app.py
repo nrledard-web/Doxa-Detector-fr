@@ -10690,6 +10690,87 @@ with oi7:
             "Elle indique que le raisonnement repose sur un cadre idéologique peu explicité."
         )
 
+# =============================
+# Argument de nature
+# =============================
+with oi8:
+    st.markdown("### Argument de nature")
+    st.caption("Le caractère naturel est utilisé comme argument de vérité ou de valeur.")
+
+    value = result["argument_from_nature_score"]
+
+    if value < 0.15:
+        label, color = "Faible", "#ca8a04"
+    elif value < 0.35:
+        label, color = "Modérée", "#f97316"
+    elif value < 0.60:
+        label, color = "Élevée", "#ea580c"
+    else:
+        label, color = "Très élevée", "#dc2626"
+
+    render_custom_gauge(value, color)
+
+    st.markdown(
+        f"<b style='color:{color}'>{label}</b> — {round(value*100,1)}%",
+        unsafe_allow_html=True
+    )
+
+    st.caption(result["argument_from_nature_interpretation"])
+
+    with st.expander("🔎 Voir les marqueurs", expanded=False):
+        markers = result.get("argument_from_nature_markers", [])
+        if not markers:
+            st.info("Aucun argument de nature notable détecté.")
+        else:
+            for marker in markers:
+                st.warning(marker)
+
+    with st.popover("ℹ️ Comprendre cette jauge"):
+        st.markdown("### Argument de nature")
+
+        st.write(
+            "Cette jauge détecte les raisonnements qui utilisent le caractère "
+            "« naturel » comme argument de vérité, de légitimité ou de valeur."
+        )
+
+        st.markdown("**Principe**")
+        st.write(
+            "Le texte est comparé à des marqueurs d’argument de nature : "
+            "référence à ce qui est « naturel » pour justifier une position, "
+            "sans démonstration supplémentaire."
+        )
+
+        st.markdown("**Formule utilisée**")
+        st.code(
+            "markers = arguments de nature détectés\n"
+            "score = min(len(markers) * coefficient / 10, 1.0)",
+            language="python"
+        )
+
+        markers = result.get("argument_from_nature_markers", [])
+
+        st.markdown("**Valeur actuelle**")
+        st.write(f"Score : **{round(value * 100, 1)}%**")
+        st.write(f"Niveau : **{label}**")
+        st.write(f"Marqueurs détectés : **{len(markers)}**")
+
+        st.markdown("**Interprétation actuelle**")
+        st.write(result["argument_from_nature_interpretation"])
+
+        st.markdown("**Lecture**")
+        st.write(
+            "🟢 Faible : peu ou pas d’argument de nature\n"
+            "🟡 Modérée : recours ponctuel au naturel\n"
+            "🟠 Élevée : justification notable par le naturel\n"
+            "🔴 Très élevée : le naturel est utilisé comme preuve centrale"
+        )
+
+        st.markdown("**Attention**")
+        st.write(
+            "Un argument de nature élevé ne signifie pas que le texte est faux. "
+            "Il indique que le discours utilise le « naturel » comme fondement argumentatif."
+        )
+
 
 st.divider()
 
@@ -12107,36 +12188,6 @@ with row12_col1:
         markers = result.get("normative_qualification_markers", [])
         if not markers:
             st.info("Aucune qualification normative notable détectée.")
-        else:
-            for marker in markers:
-                st.warning(marker)
-
-with row13_col1:
-    st.markdown("### Argument de nature")
-    st.caption("Le caractère naturel est utilisé comme argument de vérité ou de valeur.")
-
-    value = result["argument_from_nature_score"]
-
-    if value < 0.15:
-        label, color = "Faible", "#ca8a04"
-    elif value < 0.35:
-        label, color = "Modérée", "#f97316"
-    elif value < 0.60:
-        label, color = "Élevée", "#ea580c"
-    else:
-        label, color = "Très élevée", "#dc2626"
-
-    render_custom_gauge(value, color)
-    st.markdown(
-        f"<b style='color:{color}'>{label}</b> — {round(value*100,1)}%",
-        unsafe_allow_html=True
-    )
-    st.caption(result["argument_from_nature_interpretation"])
-
-    with st.expander("Voir les marqueurs", expanded=False):
-        markers = result.get("argument_from_nature_markers", [])
-        if not markers:
-            st.info("Aucun argument de nature notable détecté.")
         else:
             for marker in markers:
                 st.warning(marker)
