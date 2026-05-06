@@ -9179,7 +9179,7 @@ with pd1:
                 "Elle indique seulement que le discours attaque davantage qu’il ne démontre."
             )
             
-pd4, pd5, pd6 = st.columns(3)
+pd4, pd5, pd6, pd7 = st.columns(3)
 
 # -----------------------------
 #  Certitude absolue
@@ -9338,6 +9338,87 @@ with st.popover("ℹ️ Comprendre cette jauge"):
     st.write(
         "Une amplification de menace élevée ne signifie pas que le danger est imaginaire. "
         "Elle indique que le texte intensifie fortement la perception du risque."
+    )
+
+# -----------------------------
+# Rigidité doxique
+# -----------------------------
+with pd7:
+    st.markdown("### Rigidité doxique")
+    st.caption("Degré de fermeture du texte par excès de certitude partagée.")
+
+    value = result["doxic_rigidity_score"]
+
+    if value < 0.15:
+        label, color = "Faible", "#ca8a04"
+    elif value < 0.35:
+        label, color = "Modérée", "#f97316"
+    elif value < 0.60:
+        label, color = "Élevée", "#ea580c"
+    else:
+        label, color = "Très élevée", "#dc2626"
+
+    render_custom_gauge(value, color)
+
+    st.markdown(
+        f"<b style='color:{color}'>{label}</b> — {round(value*100,1)}%",
+        unsafe_allow_html=True
+    )
+
+    st.caption(result["doxic_rigidity_interpretation"])
+
+with st.expander("🔎 Voir les marqueurs", expanded=False):
+    markers = result.get("doxic_rigidity_markers", [])
+    if not markers:
+        st.info("Aucune rigidité doxique notable détectée.")
+    else:
+        for marker in markers:
+            st.warning(marker)
+
+with st.popover("ℹ️ Comprendre cette jauge"):
+    st.markdown("### Rigidité doxique")
+
+    st.write(
+        "Cette jauge mesure la tendance du discours à s’appuyer sur une certitude partagée "
+        "ou supposée évidente, réduisant la possibilité de remise en question."
+    )
+
+    st.markdown("**Principe**")
+    st.write(
+        "Le texte est comparé à des marqueurs de rigidité doxique : "
+        "affirmations collectives, évidences supposées, ou consensus implicites renforçant la certitude."
+    )
+
+    st.markdown("**Formule utilisée**")
+    st.code(
+        "markers = marqueurs de rigidité doxique détectés\n"
+        "score = min(len(markers) * coefficient / 10, 1.0)",
+        language="python"
+    )
+
+    markers = result.get("doxic_rigidity_markers", [])
+
+    st.markdown("**Valeur actuelle**")
+    st.write(f"Score : **{round(value * 100, 1)}%**")
+    st.write(f"Niveau : **{label}**")
+    st.write(f"Marqueurs détectés : **{len(markers)}**")
+
+    st.markdown("**Interprétation actuelle**")
+    st.write(result["doxic_rigidity_interpretation"])
+
+    st.markdown("**Lecture**")
+    st.write(
+        "🟢 Faible : discours ouvert et révisable\n"
+        "🟡 Modérée : quelques évidences implicites\n"
+        "🟠 Élevée : forte adhésion à une certitude partagée\n"
+        "🔴 Très élevée : fermeture collective du discours"
+    )
+
+    st.markdown("**Attention**")
+    st.write(
+        "Une rigidité doxique élevée ne signifie pas que le texte est faux. "
+        "Elle indique que le discours s’appuie fortement sur des évidences supposées "
+        "plutôt que sur une démonstration ouverte à la discussion."
     )
         
     st.divider()
@@ -11053,36 +11134,6 @@ with row8_col1:
         markers = result.get("normative_saturation_markers", [])
         if not markers:
             st.info("Aucune saturation normative notable détectée.")
-        else:
-            for marker in markers:
-                st.warning(marker)
-
-# -----------------------------
-# 23) Rigidité doxique
-# -----------------------------
-with row8_col2:
-    st.markdown("### Rigidité doxique")
-    st.caption("Degré de fermeture du texte par excès de certitude partagée.")
-
-    value = result["doxic_rigidity_score"]
-
-    if value < 0.15:
-        label, color = "Faible", "#ca8a04"
-    elif value < 0.35:
-        label, color = "Modérée", "#f97316"
-    elif value < 0.60:
-        label, color = "Élevée", "#ea580c"
-    else:
-        label, color = "Très élevée", "#dc2626"
-
-    render_custom_gauge(value, color)
-    st.markdown(f"<b style='color:{color}'>{label}</b> — {round(value*100,1)}%", unsafe_allow_html=True)
-    st.caption(result["doxic_rigidity_interpretation"])
-
-    with st.expander("Voir les marqueurs", expanded=False):
-        markers = result.get("doxic_rigidity_markers", [])
-        if not markers:
-            st.info("Aucune rigidité doxique notable détectée.")
         else:
             for marker in markers:
                 st.warning(marker)
