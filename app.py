@@ -9045,8 +9045,8 @@ with pd1:
         )
         st.caption(result["emotional_intensity_interpretation"])
 
-        with st.expander("Voir les marqueurs", expanded=False):
-            markers = result.get("emotional_intensity_markers", [])
+        with st.expander(" Voir les marqueurs", expanded=False):
+            markers = result.get("🔎 emotional_intensity_markers", [])
             if not markers:
                 st.info("Aucun marqueur émotionnel notable détecté.")
             else:
@@ -9143,7 +9143,7 @@ Elle mesure l’équilibre entre accusation et démonstration.
         st.write(f"**Appuis logiques détectés :** {result['argument_support_count']}")
 """)
         # 📐 POPOVER FORMULE
-        with st.popover("📐 Formule et explication"):
+        with st.popover("ℹ️ Comprendre cette jauge"):
             st.markdown("Formule utilisée :")
     
             st.code("""
