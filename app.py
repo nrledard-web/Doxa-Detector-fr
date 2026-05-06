@@ -9816,10 +9816,87 @@ with al2:
             "Une fausse causalité élevée ne signifie pas que le texte est entièrement faux. "
             "Elle indique que certains liens de cause à effet doivent être vérifiés ou approfondis."
         )
-
+# -----------------------------
+# 7) Faux dilemme
+# -----------------------------
 with al3:
     st.markdown("### Faux dilemme")
-    # jauge ici
+    st.caption("Réduction artificielle du réel à deux options.")
+
+    value = result["false_dilemma_score"]
+
+    if value < 0.15:
+        label, color = "Faible", "#ca8a04"
+    elif value < 0.35:
+        label, color = "Modérée", "#f97316"
+    elif value < 0.60:
+        label, color = "Élevée", "#ea580c"
+    else:
+        label, color = "Très élevée", "#dc2626"
+
+    render_custom_gauge(value, color)
+
+    st.markdown(
+        f"<b style='color:{color}'>{label}</b> — {round(value*100,1)}%",
+        unsafe_allow_html=True
+    )
+
+    st.caption(result["false_dilemma_interpretation"])
+
+    # 🔎 Marqueurs
+    with st.expander("🔎 Voir les marqueurs", expanded=False):
+        markers = result.get("false_dilemma_markers", [])
+        if not markers:
+            st.info("Aucun faux dilemme notable détecté.")
+        else:
+            for marker in markers:
+                st.warning(marker)
+
+    # ℹ️ Explication
+    with st.popover("ℹ️ Comprendre cette jauge"):
+        st.markdown("### Faux dilemme")
+
+        st.write(
+            "Cette jauge détecte les situations où un problème complexe est réduit "
+            "à deux choix exclusifs, souvent opposés, alors que d’autres options existent."
+        )
+
+        st.markdown("**Principe**")
+        st.write(
+            "Le texte est comparé à des marqueurs de dichotomisation : formulations binaires, "
+            "alternatives forcées ou oppositions simplifiées."
+        )
+
+        st.markdown("**Formule utilisée**")
+        st.code(
+            "markers = marqueurs de faux dilemme détectés\n"
+            "score = min(len(markers) * coefficient / 10, 1.0)",
+            language="python"
+        )
+
+        markers = result.get("false_dilemma_markers", [])
+
+        st.markdown("**Valeur actuelle**")
+        st.write(f"Score : **{round(value * 100, 1)}%**")
+        st.write(f"Niveau : **{label}**")
+        st.write(f"Marqueurs détectés : **{len(markers)}**")
+
+        st.markdown("**Interprétation actuelle**")
+        st.write(result["false_dilemma_interpretation"])
+
+        st.markdown("**Lecture**")
+        st.write(
+            "🟢 Faible : alternatives ouvertes\n"
+            "🟡 Modérée : simplification partielle\n"
+            "🟠 Élevée : opposition binaire dominante\n"
+            "🔴 Très élevée : réduction forte du réel à deux choix"
+        )
+
+        st.markdown("**Attention**")
+        st.write(
+            "Un faux dilemme élevé ne signifie pas que le texte est faux. "
+            "Il indique une simplification excessive qui peut masquer d’autres possibilités."
+        )
 
 al4, al5, al6 = st.columns(3)
 
@@ -10762,36 +10839,6 @@ with row11_col1:
         markers = result.get("vague_authority_basic_markers", [])
         if not markers:
             st.info("Aucune autorité vague simple notable détectée.")
-        else:
-            for marker in markers:
-                st.warning(marker)
-
-with row11_col2:
-    st.markdown("### Faux dilemme")
-    st.caption("Réduction artificielle du réel à deux options.")
-
-    value = result["false_dilemma_score"]
-
-    if value < 0.15:
-        label, color = "Faible", "#ca8a04"
-    elif value < 0.35:
-        label, color = "Modérée", "#f97316"
-    elif value < 0.60:
-        label, color = "Élevée", "#ea580c"
-    else:
-        label, color = "Très élevée", "#dc2626"
-
-    render_custom_gauge(value, color)
-    st.markdown(
-        f"<b style='color:{color}'>{label}</b> — {round(value*100,1)}%",
-        unsafe_allow_html=True
-    )
-    st.caption(result["false_dilemma_interpretation"])
-
-    with st.expander("Voir les marqueurs", expanded=False):
-        markers = result.get("false_dilemma_markers", [])
-        if not markers:
-            st.info("Aucun faux dilemme notable détecté.")
         else:
             for marker in markers:
                 st.warning(marker)
