@@ -12671,7 +12671,14 @@ c2.metric(T["calibration"], round(calibration, 2))
 c3, c4 = st.columns(2)
 c3.metric(T["revisability"], round(revisability, 2))
 c4.metric(T["cognitive_closure"], round(closure, 2))
+
 st.divider()
+st.markdown("""
+<div style="text-align:center; margin:25px 0; color:#888;">
+──── 🧠 ────
+</div>
+""", unsafe_allow_html=True)
+
 st.subheader("Jauge de clôture cognitive")
 
 st.caption(
