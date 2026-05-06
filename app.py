@@ -10450,6 +10450,87 @@ with oi4:
             "Elle indique que certaines parties du discours semblent entrer en tension ou se contredire."
         )
 
+# -----------------------------
+# Polarisation morale
+# -----------------------------
+with oi5:
+    st.markdown("### Polarisation morale")
+    st.caption("Découpage moral du réel en camps du bien et du mal.")
+
+    value = result["moral_polarization_score"]
+
+    if value < 0.15:
+        label, color = "Faible", "#ca8a04"
+    elif value < 0.35:
+        label, color = "Modérée", "#f97316"
+    elif value < 0.60:
+        label, color = "Élevée", "#ea580c"
+    else:
+        label, color = "Très élevée", "#dc2626"
+
+    render_custom_gauge(value, color)
+
+    st.markdown(
+        f"<b style='color:{color}'>{label}</b> — {round(value*100,1)}%",
+        unsafe_allow_html=True
+    )
+
+    st.caption(result["moral_polarization_interpretation"])
+
+    with st.expander("🔎 Voir les marqueurs", expanded=False):
+        markers = result.get("moral_polarization_markers", [])
+        if not markers:
+            st.info("Aucune polarisation morale notable détectée.")
+        else:
+            for marker in markers:
+                st.warning(marker)
+
+    with st.popover("ℹ️ Comprendre cette jauge"):
+        st.markdown("### Polarisation morale")
+
+        st.write(
+            "Cette jauge détecte les discours qui découpent le réel en camps moraux opposés : "
+            "les bons contre les mauvais, les justes contre les coupables."
+        )
+
+        st.markdown("**Principe**")
+        st.write(
+            "Le texte est comparé à des marqueurs de polarisation morale : "
+            "oppositions morales fortes, disqualification éthique de l’adversaire, "
+            "ou séparation du monde en camps irréconciliables."
+        )
+
+        st.markdown("**Formule utilisée**")
+        st.code(
+            "markers = marqueurs de polarisation morale détectés\n"
+            "score = min(len(markers) * coefficient / 10, 1.0)",
+            language="python"
+        )
+
+        markers = result.get("moral_polarization_markers", [])
+
+        st.markdown("**Valeur actuelle**")
+        st.write(f"Score : **{round(value * 100, 1)}%**")
+        st.write(f"Niveau : **{label}**")
+        st.write(f"Marqueurs détectés : **{len(markers)}**")
+
+        st.markdown("**Interprétation actuelle**")
+        st.write(result["moral_polarization_interpretation"])
+
+        st.markdown("**Lecture**")
+        st.write(
+            "🟢 Faible : discours peu polarisant\n"
+            "🟡 Modérée : quelques oppositions morales\n"
+            "🟠 Élevée : polarisation morale notable\n"
+            "🔴 Très élevée : découpage moral dominant du réel"
+        )
+
+        st.markdown("**Attention**")
+        st.write(
+            "Une polarisation morale élevée ne signifie pas que le texte est faux. "
+            "Elle indique que le discours organise fortement le réel en camps moraux opposés."
+        )
+
 st.divider()
 
 
@@ -11990,38 +12071,6 @@ with row13_col2:
             for marker in markers:
                 st.warning(marker)
 
-# -----------------------------
-# 40) Polarisation morale
-# -----------------------------
-with row14_col2:
-    st.markdown("### Polarisation morale")
-    st.caption("Découpage moral du réel en camps du bien et du mal.")
-
-    value = result["moral_polarization_score"]
-
-    if value < 0.15:
-        label, color = "Faible", "#ca8a04"
-    elif value < 0.35:
-        label, color = "Modérée", "#f97316"
-    elif value < 0.60:
-        label, color = "Élevée", "#ea580c"
-    else:
-        label, color = "Très élevée", "#dc2626"
-
-    render_custom_gauge(value, color)
-    st.markdown(
-        f"<b style='color:{color}'>{label}</b> — {round(value*100,1)}%",
-        unsafe_allow_html=True
-    )
-    st.caption(result["moral_polarization_interpretation"])
-
-    with st.expander("Voir les marqueurs", expanded=False):
-        markers = result.get("moral_polarization_markers", [])
-        if not markers:
-            st.info("Aucune polarisation morale notable détectée.")
-        else:
-            for marker in markers:
-                st.warning(marker)
 
 st.divider()
 st.subheader("Structure cognitive du texte analysé")
