@@ -12031,36 +12031,6 @@ with row5_col2:
                 st.warning(marker)
 
 # -----------------------------
-# 20) Surinterprétation factuelle
-# -----------------------------
-with row7_col2:
-    st.markdown("### Surinterprétation factuelle")
-    st.caption("Conclusions excessives tirées à partir d’indices partiels.")
-
-    value = result["factual_overinterpretation_score"]
-
-    if value < 0.15:
-        label, color = "Faible", "#ca8a04"
-    elif value < 0.35:
-        label, color = "Modérée", "#f97316"
-    elif value < 0.60:
-        label, color = "Élevée", "#ea580c"
-    else:
-        label, color = "Très élevée", "#dc2626"
-
-    render_custom_gauge(value, color)
-    st.markdown(f"<b style='color:{color}'>{label}</b> — {round(value*100,1)}%", unsafe_allow_html=True)
-    st.caption(result["factual_overinterpretation_interpretation"])
-
-    with st.expander("Voir les marqueurs", expanded=False):
-        markers = result.get("factual_overinterpretation_markers", [])
-        if not markers:
-            st.info("Aucune surinterprétation factuelle notable détectée.")
-        else:
-            for marker in markers:
-                st.warning(marker)
-
-# -----------------------------
 # 22) Saturation normative
 # -----------------------------
 with row8_col1:
