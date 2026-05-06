@@ -12562,37 +12562,6 @@ with row5_col2:
         else:
             for marker in markers:
                 st.warning(marker)
-
-# -----------------------------
-# 24) Surdétermination narrative
-# -----------------------------
-with row8_col3:
-    st.markdown("### Surdétermination narrative")
-    st.caption("Réduction du réel à un récit unique supposé tout expliquer.")
-
-    value = result["narrative_overdetermination_score"]
-
-    if value < 0.15:
-        label, color = "Faible", "#ca8a04"
-    elif value < 0.35:
-        label, color = "Modérée", "#f97316"
-    elif value < 0.60:
-        label, color = "Élevée", "#ea580c"
-    else:
-        label, color = "Très élevée", "#dc2626"
-
-    render_custom_gauge(value, color)
-    st.markdown(f"<b style='color:{color}'>{label}</b> — {round(value*100,1)}%", unsafe_allow_html=True)
-    st.caption(result["narrative_overdetermination_interpretation"])
-
-    with st.expander("Voir les marqueurs", expanded=False):
-        markers = result.get("narrative_overdetermination_markers", [])
-        if not markers:
-            st.info("Aucune surdétermination narrative notable détectée.")
-        else:
-            for marker in markers:
-                st.warning(marker)
-
 # -----------------------------
 # 18) Clôture cognitive
 # -----------------------------
