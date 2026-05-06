@@ -13229,3 +13229,23 @@ if submitted:
         df.to_csv(FEEDBACK_FILE, index=False)
 
         st.success("Merci, votre feedback a bien été enregistré.")
+
+# =============================
+# Bloc admin (lecture feedbacks)
+# =============================
+
+st.divider()
+st.subheader("🔒 Admin — Feedbacks reçus")
+
+with st.expander("Afficher les feedbacks"):
+    admin_code = st.text_input("Code admin", type="password")
+
+    if admin_code == st.secrets.get("ADMIN_CODE", ""):
+        if os.path.exists("feedback_doxa.csv"):
+            import pandas as pd
+            df = pd.read_csv("feedback_doxa.csv")
+            st.dataframe(df, use_container_width=True)
+        else:
+            st.info("Aucun feedback enregistré.")
+    elif admin_code:
+        st.error("Code incorrect.")
