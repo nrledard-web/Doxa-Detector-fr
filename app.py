@@ -8941,11 +8941,11 @@ st.caption(
     "stratégiques permettant d’identifier certaines formes de manipulation argumentative."
 )
 
-        st.markdown("""
-    <div style="text-align:center; margin:25px 0; color:#888;">
-    ──── 🧠 ────
-    </div>
-    """, unsafe_allow_html=True)
+    st.markdown("""
+<div style="text-align:center; margin:25px 0; color:#888;">
+──── 🧠 ────
+</div>
+""", unsafe_allow_html=True)
 
 # =============================
 # 🗣️ 2. PRESSIONS DISCURSIVES
