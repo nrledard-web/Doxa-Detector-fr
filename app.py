@@ -9508,7 +9508,7 @@ with pd7:
 st.subheader("🧩 Structure du raisonnement")
 st.caption("Analyse de la cohérence interne du discours, indépendamment de sa vérifiabilité.")
 
-sr1, sr2 = st.columns(2)
+sr1, sr2, sr3, sr4 = st.columns(4)
 
 # -----------------------------
 #  Cohérence discursive
@@ -9669,6 +9669,87 @@ with sr2:
             "Une cohérence trompeuse élevée ne signifie pas forcément manipulation. "
             "Elle indique qu’un discours peut être convaincant dans sa forme, "
             "tout en restant insuffisamment fondé dans son contenu."
+        )
+
+# -----------------------------
+# Prémisses implicites
+# -----------------------------
+with sr3:
+    st.markdown("### Prémisses implicites")
+    st.caption("Idées présentées comme évidentes sans démonstration.")
+
+    premise_value = result["premise_score"]
+
+    if premise_value < 0.20:
+        premise_label, premise_color = "Faible", "#ca8a04"
+    elif premise_value < 0.40:
+        premise_label, premise_color = "Modérée", "#f97316"
+    elif premise_value < 0.70:
+        premise_label, premise_color = "Élevée", "#ea580c"
+    else:
+        premise_label, premise_color = "Très élevée", "#dc2626"
+
+    render_custom_gauge(premise_value, premise_color)
+
+    st.markdown(
+        f"<b style='color:{premise_color}'>{premise_label}</b> — {round(premise_value * 100, 1)}%",
+        unsafe_allow_html=True
+    )
+
+    st.caption(result["premise_interpretation"])
+
+    with st.expander("🔎 Voir les marqueurs", expanded=False):
+        premise_markers = result.get("premise_markers", [])
+
+        if not premise_markers:
+            st.info("Aucune prémisse implicite saillante détectée.")
+        else:
+            for marker in premise_markers:
+                st.warning(marker)
+
+    with st.popover("ℹ️ Comprendre cette jauge"):
+        st.markdown("### Prémisses implicites")
+
+        st.write(
+            "Cette jauge détecte les idées présentées comme évidentes, "
+            "sans être explicitement démontrées dans le texte."
+        )
+
+        st.markdown("**Principe**")
+        st.write(
+            "Le texte est analysé pour repérer les affirmations qui reposent sur des présupposés implicites : "
+            "ce qui est tenu pour acquis sans justification."
+        )
+
+        st.markdown("**Formule utilisée**")
+        st.code(
+            "markers = prémisses implicites détectées\n"
+            "score = min(len(markers) * coefficient / 10, 1.0)",
+            language="python"
+        )
+
+        premise_markers = result.get("premise_markers", [])
+
+        st.markdown("**Valeur actuelle**")
+        st.write(f"Score : **{round(premise_value * 100, 1)}%**")
+        st.write(f"Niveau : **{premise_label}**")
+        st.write(f"Marqueurs détectés : **{len(premise_markers)}**")
+
+        st.markdown("**Interprétation actuelle**")
+        st.write(result["premise_interpretation"])
+
+        st.markdown("**Lecture**")
+        st.write(
+            "🟢 Faible : peu de présupposés implicites\n"
+            "🟡 Modérée : quelques évidences non démontrées\n"
+            "🟠 Élevée : dépendance notable à des prémisses implicites\n"
+            "🔴 Très élevée : raisonnement fortement fondé sur des évidences non explicitées"
+        )
+
+        st.markdown("**Attention**")
+        st.write(
+            "Une présence élevée de prémisses implicites ne signifie pas que le texte est faux. "
+            "Elle indique que certaines bases du raisonnement ne sont pas explicitement justifiées."
         )
 
 st.divider()
@@ -10994,41 +11075,6 @@ row12_col1, row12_col2, row12_col3 = st.columns(3)
 row13_col1, row13_col2, row13_col3 = st.columns(3)
 row14_col1, row14_col2, row14_col3 = st.columns(3)
 row15_col1, row15_col2 = st.columns(2)
-
-# -----------------------------
-# 2) Prémisses idéologiques implicites
-# -----------------------------
-with row1_col2:
-    st.markdown("### Prémisses implicites")
-    st.caption("Idées présentées comme évidentes sans démonstration.")
-
-    premise_value = result["premise_score"]
-
-    if premise_value < 0.20:
-        premise_label, premise_color = "Faible", "#ca8a04"
-    elif premise_value < 0.40:
-        premise_label, premise_color = "Modérée", "#f97316"
-    elif premise_value < 0.70:
-        premise_label, premise_color = "Élevée", "#ea580c"
-    else:
-        premise_label, premise_color = "Très élevée", "#dc2626"
-
-    render_custom_gauge(premise_value, premise_color)
-
-    st.markdown(
-        f"<b style='color:{premise_color}'>{premise_label}</b> — {round(premise_value * 100, 1)}%",
-        unsafe_allow_html=True
-    )
-    st.caption(result["premise_interpretation"])
-
-    with st.expander("Voir les marqueurs", expanded=False):
-        premise_markers = result.get("premise_markers", [])
-
-        if not premise_markers:
-            st.info("Aucune prémisse implicite saillante détectée.")
-        else:
-            for marker in premise_markers:
-                st.warning(marker)
 
 # -----------------------------
 # 10) Généralisation abusive
