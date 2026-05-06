@@ -9124,10 +9124,6 @@ with pd1:
 
         st.caption(result["argument_asymmetry_interpretation"])
     
-        st.caption(
-            f"Attaques : {result['argument_attack_count']} | "
-            f"Appuis logiques : {result['argument_support_count']}"
-        )
         with st.popover("🔎 Marqueurs détectés"):
             st.markdown("""
 Cette jauge repose sur des marqueurs lexicaux.
@@ -9139,7 +9135,10 @@ Elle compare :
 
 Elle mesure l’équilibre entre accusation et démonstration.
 
-
+        st.caption(
+            f"Attaques : {result['argument_attack_count']} | "
+            f"Appuis logiques : {result['argument_support_count']}"
+        )
         st.write(f"**Attaques détectées :** {result['argument_attack_count']}")
         st.write(f"**Appuis logiques détectés :** {result['argument_support_count']}")
 """)
