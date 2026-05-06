@@ -9022,162 +9022,162 @@ with pd1:
             "🔴 Très élevée : forte pression narrative"
         )
 
-    with pd2:
-        st.markdown("### Charge émotionnelle")
-        st.caption("Intensité affective du lexique utilisé pour orienter la lecture.")
+with pd2:
+    st.markdown("### Charge émotionnelle")
+    st.caption("Intensité affective du lexique utilisé pour orienter la lecture.")
 
-        emotional_value = result["emotional_intensity_score"]
+    emotional_value = result["emotional_intensity_score"]
 
-        if emotional_value < 0.15:
-            emotional_label, emotional_color = "Faible", "#ca8a04"
-        elif emotional_value < 0.35:
-            emotional_label, emotional_color = "Modérée", "#f97316"
-        elif emotional_value < 0.60:
-            emotional_label, emotional_color = "Élevée", "#ea580c"
+    if emotional_value < 0.15:
+        emotional_label, emotional_color = "Faible", "#ca8a04"
+    elif emotional_value < 0.35:
+        emotional_label, emotional_color = "Modérée", "#f97316"
+    elif emotional_value < 0.60:
+        emotional_label, emotional_color = "Élevée", "#ea580c"
+    else:
+        emotional_label, emotional_color = "Très élevée", "#dc2626"
+
+    render_custom_gauge(emotional_value, emotional_color)
+
+    st.markdown(
+        f"<b style='color:{emotional_color}'>{emotional_label}</b> — {round(emotional_value * 100, 1)}%",
+        unsafe_allow_html=True
+    )
+    st.caption(result["emotional_intensity_interpretation"])
+
+    with st.expander("🔎 Marqueurs détectés", expanded=False):
+        markers = result.get("emotional_intensity_markers", [])
+        if not markers:
+            st.info("Aucun marqueur émotionnel notable détecté.")
         else:
-            emotional_label, emotional_color = "Très élevée", "#dc2626"
+            for marker in markers:
+                st.warning(marker)
 
-        render_custom_gauge(emotional_value, emotional_color)
-
-        st.markdown(
-            f"<b style='color:{emotional_color}'>{emotional_label}</b> — {round(emotional_value * 100, 1)}%",
-            unsafe_allow_html=True
-        )
-        st.caption(result["emotional_intensity_interpretation"])
-
-        with st.expander("🔎 Marqueurs détectés", expanded=False):
-            markers = result.get("emotional_intensity_markers", [])
-            if not markers:
-                st.info("Aucun marqueur émotionnel notable détecté.")
-            else:
-                for marker in markers:
-                    st.warning(marker)
-
-        
-        with st.popover("ℹ️ Comprendre cette jauge"):
-            st.markdown("### Charge émotionnelle")
-        
-            st.write(
-                "Cette jauge mesure l’intensité affective du vocabulaire utilisé. "
-                "Elle repère les mots qui peuvent orienter la lecture par l’émotion plutôt que par la démonstration."
-            )
-        
-            st.markdown("**Principe**")
-            st.write(
-                "Le texte est comparé à une liste de marqueurs émotionnels. "
-                "Chaque terme détecté augmente le score de charge émotionnelle."
-            )
-        
-            st.markdown("**Formule utilisée**")
-            st.code(
-                "hits = termes émotionnels détectés\n"
-                "score = min(len(hits) * 2.2 / 10, 1.0)"
-            )
-        
-            st.markdown("**Valeur actuelle**")
-            st.write(f"Score : **{round(emotional_value * 100, 1)}%**")
-            st.write(f"Niveau : **{emotional_label}**")
-        
-            st.code(
-                f"score = min({len(result.get('emotional_intensity_markers', []))} × 2.2 / 10, 1.0)\n"
-                f"score = {emotional_value:.3f}"
-            )
-        
-            st.markdown("**Interprétation actuelle**")
-            st.write(result["emotional_intensity_interpretation"])
-        
-            st.markdown("**Lecture**")
-            st.write(
-                "🟢 Faible : vocabulaire peu chargé émotionnellement\n"
-                "🟡 Modérée : quelques marqueurs affectifs\n"
-                "🟠 Élevée : charge émotionnelle notable\n"
-                "🔴 Très élevée : émotion fortement mobilisée pour orienter la lecture"
-            )
-        
-            st.markdown("**Attention**")
-            st.write(
-                "Une charge émotionnelle élevée ne signifie pas que le texte est faux. "
-                "Elle indique seulement que le discours agit fortement sur l’affect du lecteur."
-            )
     
-    with pd3:
-        st.markdown("### Asymétrie argumentative")
-        st.caption("Le texte attaque davantage qu’il ne démontre.")
+    with st.popover("ℹ️ Comprendre cette jauge"):
+        st.markdown("### Charge émotionnelle")
+    
+        st.write(
+            "Cette jauge mesure l’intensité affective du vocabulaire utilisé. "
+            "Elle repère les mots qui peuvent orienter la lecture par l’émotion plutôt que par la démonstration."
+        )
+    
+        st.markdown("**Principe**")
+        st.write(
+            "Le texte est comparé à une liste de marqueurs émotionnels. "
+            "Chaque terme détecté augmente le score de charge émotionnelle."
+        )
+    
+        st.markdown("**Formule utilisée**")
+        st.code(
+            "hits = termes émotionnels détectés\n"
+            "score = min(len(hits) * 2.2 / 10, 1.0)"
+        )
+    
+        st.markdown("**Valeur actuelle**")
+        st.write(f"Score : **{round(emotional_value * 100, 1)}%**")
+        st.write(f"Niveau : **{emotional_label}**")
+    
+        st.code(
+            f"score = min({len(result.get('emotional_intensity_markers', []))} × 2.2 / 10, 1.0)\n"
+            f"score = {emotional_value:.3f}"
+        )
+    
+        st.markdown("**Interprétation actuelle**")
+        st.write(result["emotional_intensity_interpretation"])
+    
+        st.markdown("**Lecture**")
+        st.write(
+            "🟢 Faible : vocabulaire peu chargé émotionnellement\n"
+            "🟡 Modérée : quelques marqueurs affectifs\n"
+            "🟠 Élevée : charge émotionnelle notable\n"
+            "🔴 Très élevée : émotion fortement mobilisée pour orienter la lecture"
+        )
+    
+        st.markdown("**Attention**")
+        st.write(
+            "Une charge émotionnelle élevée ne signifie pas que le texte est faux. "
+            "Elle indique seulement que le discours agit fortement sur l’affect du lecteur."
+        )
+    
+with pd3:
+    st.markdown("### Asymétrie argumentative")
+    st.caption("Le texte attaque davantage qu’il ne démontre.")
 
-        value = result["argument_asymmetry_score"]
+    value = result["argument_asymmetry_score"]
 
-        if value < 0.15:
-            label, color = "Faible", "#ca8a04"
-        elif value < 0.35:
-            label, color = "Modérée", "#f97316"
-        elif value < 0.60:
-            label, color = "Élevée", "#ea580c"
-        else:
-            label, color = "Très élevée", "#dc2626"
+    if value < 0.15:
+        label, color = "Faible", "#ca8a04"
+    elif value < 0.35:
+        label, color = "Modérée", "#f97316"
+    elif value < 0.60:
+        label, color = "Élevée", "#ea580c"
+    else:
+        label, color = "Très élevée", "#dc2626"
 
-        render_custom_gauge(value, color)
+    render_custom_gauge(value, color)
 
-        st.markdown(
-            f"<b style='color:{color}'>{label}</b> — {round(value * 100, 1)}%",
-            unsafe_allow_html=True
+    st.markdown(
+        f"<b style='color:{color}'>{label}</b> — {round(value * 100, 1)}%",
+        unsafe_allow_html=True
+    )
+
+    st.caption(result["argument_asymmetry_interpretation"])
+
+    with st.popover("🔎 Marqueurs détectés"):
+        st.markdown("### Marqueurs détectés")
+
+        st.write(
+            "Cette jauge repose sur deux familles de marqueurs : "
+            "les termes d’attaque ou de disqualification, "
+            "et les termes d’appui logique ou explicatif."
         )
 
-        st.caption(result["argument_asymmetry_interpretation"])
+        st.write(f"**Attaques détectées :** {result['argument_attack_count']}")
+        st.write(f"**Appuis logiques détectés :** {result['argument_support_count']}")
 
-        with st.popover("🔎 Marqueurs détectés"):
-            st.markdown("### Marqueurs détectés")
+    with st.popover("ℹ️ Comprendre cette jauge"):
+        st.markdown("### Asymétrie argumentative")
 
-            st.write(
-                "Cette jauge repose sur deux familles de marqueurs : "
-                "les termes d’attaque ou de disqualification, "
-                "et les termes d’appui logique ou explicatif."
-            )
+        st.write(
+            "Cette jauge mesure le déséquilibre entre l’attaque et la démonstration. "
+            "Elle repère si le texte privilégie les formulations accusatoires, "
+            "dépréciatives ou disqualifiantes, plutôt que les appuis logiques, "
+            "explicatifs ou démonstratifs."
+        )
 
-            st.write(f"**Attaques détectées :** {result['argument_attack_count']}")
-            st.write(f"**Appuis logiques détectés :** {result['argument_support_count']}")
+        st.markdown("**Formule utilisée**")
+        st.code(
+            "if argument_count == 0:\n"
+            "    score = attack_count * 0.25\n"
+            "else:\n"
+            "    score = (attack_count / argument_count) * 0.25\n\n"
+            "score = min(score, 1.0)",
+            language="python"
+        )
 
-        with st.popover("ℹ️ Comprendre cette jauge"):
-            st.markdown("### Asymétrie argumentative")
+        st.markdown("**Valeur actuelle**")
+        st.write(f"Score : **{round(value * 100, 1)}%**")
+        st.write(f"Niveau : **{label}**")
+        st.write(f"Attaques : **{result['argument_attack_count']}**")
+        st.write(f"Appuis logiques : **{result['argument_support_count']}**")
 
-            st.write(
-                "Cette jauge mesure le déséquilibre entre l’attaque et la démonstration. "
-                "Elle repère si le texte privilégie les formulations accusatoires, "
-                "dépréciatives ou disqualifiantes, plutôt que les appuis logiques, "
-                "explicatifs ou démonstratifs."
-            )
+        st.markdown("**Interprétation actuelle**")
+        st.write(result["argument_asymmetry_interpretation"])
 
-            st.markdown("**Formule utilisée**")
-            st.code(
-                "if argument_count == 0:\n"
-                "    score = attack_count * 0.25\n"
-                "else:\n"
-                "    score = (attack_count / argument_count) * 0.25\n\n"
-                "score = min(score, 1.0)",
-                language="python"
-            )
+        st.markdown("**Lecture**")
+        st.write(
+            "🟢 Faible : discours globalement équilibré\n"
+            "🟡 Modérée : légère asymétrie argumentative\n"
+            "🟠 Élevée : l’attaque domine la démonstration\n"
+            "🔴 Très élevée : rhétorique d’attaque dominante"
+        )
 
-            st.markdown("**Valeur actuelle**")
-            st.write(f"Score : **{round(value * 100, 1)}%**")
-            st.write(f"Niveau : **{label}**")
-            st.write(f"Attaques : **{result['argument_attack_count']}**")
-            st.write(f"Appuis logiques : **{result['argument_support_count']}**")
-
-            st.markdown("**Interprétation actuelle**")
-            st.write(result["argument_asymmetry_interpretation"])
-
-            st.markdown("**Lecture**")
-            st.write(
-                "🟢 Faible : discours globalement équilibré\n"
-                "🟡 Modérée : légère asymétrie argumentative\n"
-                "🟠 Élevée : l’attaque domine la démonstration\n"
-                "🔴 Très élevée : rhétorique d’attaque dominante"
-            )
-
-            st.markdown("**Attention**")
-            st.write(
-                "Une asymétrie argumentative élevée ne signifie pas que le texte est faux. "
-                "Elle indique seulement que le discours attaque davantage qu’il ne démontre."
-            )
+        st.markdown("**Attention**")
+        st.write(
+            "Une asymétrie argumentative élevée ne signifie pas que le texte est faux. "
+            "Elle indique seulement que le discours attaque davantage qu’il ne démontre."
+        )
             
 pd4, pd5, pd6, pd7 = st.columns(4)
 
@@ -9208,58 +9208,58 @@ with pd4:
 
     st.caption(result["certainty_interpretation"])
 
-with st.expander("🔎 Voir les marqueurs", expanded=False):
-    markers = result.get("certainty_markers", [])
-    if not markers:
-        st.info("Aucun marqueur fort de certitude absolue détecté.")
-    else:
-        for marker in markers:
-            st.warning(marker)
-
-with st.popover("ℹ️ Comprendre cette jauge"):
-    st.markdown("### Certitude absolue")
-
-    st.write(
-        "Cette jauge détecte les formulations qui ferment l’interprétation : "
-        "affirmations catégoriques, absence de nuance, impossibilité suggérée du doute."
-    )
-
-    st.markdown("**Principe**")
-    st.write(
-        "Le texte est comparé à des marqueurs de certitude absolue. "
-        "Chaque marqueur augmente le score de rigidité rhétorique."
-    )
-
-    st.markdown("**Formule utilisée**")
-    st.code(
-        "markers = marqueurs de certitude absolue détectés\n"
-        "score = min(len(markers) * coefficient / 10, 1.0)",
-        language="python"
-    )
-
-    markers = result.get("certainty_markers", [])
-
-    st.markdown("**Valeur actuelle**")
-    st.write(f"Score : **{round(certainty_value * 100, 1)}%**")
-    st.write(f"Niveau : **{certainty_label}**")
-    st.write(f"Marqueurs détectés : **{len(markers)}**")
-
-    st.markdown("**Interprétation actuelle**")
-    st.write(result["certainty_interpretation"])
-
-    st.markdown("**Lecture**")
-    st.write(
-        "🟢 Faible : discours relativement nuancé\n"
-        "🟡 Modérée : quelques affirmations catégoriques\n"
-        "🟠 Élevée : forte rigidité assertive\n"
-        "🔴 Très élevée : fermeture interprétative dominante"
-    )
-
-    st.markdown("**Attention**")
-    st.write(
-        "Une certitude absolue élevée ne signifie pas que le texte est faux. "
-        "Elle indique que le discours laisse peu de place au doute, à la nuance ou à la révision."
-    )
+    with st.expander("🔎 Voir les marqueurs", expanded=False):
+        markers = result.get("certainty_markers", [])
+        if not markers:
+            st.info("Aucun marqueur fort de certitude absolue détecté.")
+        else:
+            for marker in markers:
+                st.warning(marker)
+    
+    with st.popover("ℹ️ Comprendre cette jauge"):
+        st.markdown("### Certitude absolue")
+    
+        st.write(
+            "Cette jauge détecte les formulations qui ferment l’interprétation : "
+            "affirmations catégoriques, absence de nuance, impossibilité suggérée du doute."
+        )
+    
+        st.markdown("**Principe**")
+        st.write(
+            "Le texte est comparé à des marqueurs de certitude absolue. "
+            "Chaque marqueur augmente le score de rigidité rhétorique."
+        )
+    
+        st.markdown("**Formule utilisée**")
+        st.code(
+            "markers = marqueurs de certitude absolue détectés\n"
+            "score = min(len(markers) * coefficient / 10, 1.0)",
+            language="python"
+        )
+    
+        markers = result.get("certainty_markers", [])
+    
+        st.markdown("**Valeur actuelle**")
+        st.write(f"Score : **{round(certainty_value * 100, 1)}%**")
+        st.write(f"Niveau : **{certainty_label}**")
+        st.write(f"Marqueurs détectés : **{len(markers)}**")
+    
+        st.markdown("**Interprétation actuelle**")
+        st.write(result["certainty_interpretation"])
+    
+        st.markdown("**Lecture**")
+        st.write(
+            "🟢 Faible : discours relativement nuancé\n"
+            "🟡 Modérée : quelques affirmations catégoriques\n"
+            "🟠 Élevée : forte rigidité assertive\n"
+            "🔴 Très élevée : fermeture interprétative dominante"
+        )
+    
+        st.markdown("**Attention**")
+        st.write(
+            "Une certitude absolue élevée ne signifie pas que le texte est faux. "
+            "Elle indique que le discours laisse peu de place au doute, à la nuance ou à la révision."
+        )
 # -----------------------------
 # Amplification de menace
 # -----------------------------
@@ -9295,50 +9295,50 @@ with st.expander("🔎 Voir les marqueurs", expanded=False):
         for marker in markers:
             st.warning(marker)
 
-with st.popover("ℹ️ Comprendre cette jauge"):
-    st.markdown("### Amplification de menace")
-
-    st.write(
-        "Cette jauge détecte les formulations qui dramatisent fortement un danger, "
-        "une crise ou une menace."
-    )
-
-    st.markdown("**Principe**")
-    st.write(
-        "Le texte est comparé à des marqueurs d’amplification de menace : "
-        "catastrophe, danger extrême, effondrement, menace existentielle, ou formulations équivalentes."
-    )
-
-    st.markdown("**Formule utilisée**")
-    st.code(
-        "markers = marqueurs d’amplification de menace détectés\n"
-        "score = min(len(markers) * coefficient / 10, 1.0)",
-        language="python"
-    )
-
-    markers = result.get("threat_amplification_markers", [])
-
-    st.markdown("**Valeur actuelle**")
-    st.write(f"Score : **{round(threat_value * 100, 1)}%**")
-    st.write(f"Niveau : **{threat_label}**")
-    st.write(f"Marqueurs détectés : **{len(markers)}**")
-
-    st.markdown("**Interprétation actuelle**")
-    st.write(result["threat_amplification_interpretation"])
-
-    st.markdown("**Lecture**")
-    st.write(
-        "🟢 Faible : menace peu dramatisée\n"
-        "🟡 Modérée : quelques formulations alarmistes\n"
-        "🟠 Élevée : danger fortement amplifié\n"
-        "🔴 Très élevée : dramatisation centrale du discours"
-    )
-
-    st.markdown("**Attention**")
-    st.write(
-        "Une amplification de menace élevée ne signifie pas que le danger est imaginaire. "
-        "Elle indique que le texte intensifie fortement la perception du risque."
-    )
+    with st.popover("ℹ️ Comprendre cette jauge"):
+        st.markdown("### Amplification de menace")
+    
+        st.write(
+            "Cette jauge détecte les formulations qui dramatisent fortement un danger, "
+            "une crise ou une menace."
+        )
+    
+        st.markdown("**Principe**")
+        st.write(
+            "Le texte est comparé à des marqueurs d’amplification de menace : "
+            "catastrophe, danger extrême, effondrement, menace existentielle, ou formulations équivalentes."
+        )
+    
+        st.markdown("**Formule utilisée**")
+        st.code(
+            "markers = marqueurs d’amplification de menace détectés\n"
+            "score = min(len(markers) * coefficient / 10, 1.0)",
+            language="python"
+        )
+    
+        markers = result.get("threat_amplification_markers", [])
+    
+        st.markdown("**Valeur actuelle**")
+        st.write(f"Score : **{round(threat_value * 100, 1)}%**")
+        st.write(f"Niveau : **{threat_label}**")
+        st.write(f"Marqueurs détectés : **{len(markers)}**")
+    
+        st.markdown("**Interprétation actuelle**")
+        st.write(result["threat_amplification_interpretation"])
+    
+        st.markdown("**Lecture**")
+        st.write(
+            "🟢 Faible : menace peu dramatisée\n"
+            "🟡 Modérée : quelques formulations alarmistes\n"
+            "🟠 Élevée : danger fortement amplifié\n"
+            "🔴 Très élevée : dramatisation centrale du discours"
+        )
+    
+        st.markdown("**Attention**")
+        st.write(
+            "Une amplification de menace élevée ne signifie pas que le danger est imaginaire. "
+            "Elle indique que le texte intensifie fortement la perception du risque."
+        )
 
 # -----------------------------
 # Rigidité doxique
@@ -9375,51 +9375,51 @@ with st.expander("🔎 Voir les marqueurs", expanded=False):
         for marker in markers:
             st.warning(marker)
 
-with st.popover("ℹ️ Comprendre cette jauge"):
-    st.markdown("### Rigidité doxique")
-
-    st.write(
-        "Cette jauge mesure la tendance du discours à s’appuyer sur une certitude partagée "
-        "ou supposée évidente, réduisant la possibilité de remise en question."
-    )
-
-    st.markdown("**Principe**")
-    st.write(
-        "Le texte est comparé à des marqueurs de rigidité doxique : "
-        "affirmations collectives, évidences supposées, ou consensus implicites renforçant la certitude."
-    )
-
-    st.markdown("**Formule utilisée**")
-    st.code(
-        "markers = marqueurs de rigidité doxique détectés\n"
-        "score = min(len(markers) * coefficient / 10, 1.0)",
-        language="python"
-    )
-
-    markers = result.get("doxic_rigidity_markers", [])
-
-    st.markdown("**Valeur actuelle**")
-    st.write(f"Score : **{round(value * 100, 1)}%**")
-    st.write(f"Niveau : **{label}**")
-    st.write(f"Marqueurs détectés : **{len(markers)}**")
-
-    st.markdown("**Interprétation actuelle**")
-    st.write(result["doxic_rigidity_interpretation"])
-
-    st.markdown("**Lecture**")
-    st.write(
-        "🟢 Faible : discours ouvert et révisable\n"
-        "🟡 Modérée : quelques évidences implicites\n"
-        "🟠 Élevée : forte adhésion à une certitude partagée\n"
-        "🔴 Très élevée : fermeture collective du discours"
-    )
-
-    st.markdown("**Attention**")
-    st.write(
-        "Une rigidité doxique élevée ne signifie pas que le texte est faux. "
-        "Elle indique que le discours s’appuie fortement sur des évidences supposées "
-        "plutôt que sur une démonstration ouverte à la discussion."
-    )
+    with st.popover("ℹ️ Comprendre cette jauge"):
+        st.markdown("### Rigidité doxique")
+    
+        st.write(
+            "Cette jauge mesure la tendance du discours à s’appuyer sur une certitude partagée "
+            "ou supposée évidente, réduisant la possibilité de remise en question."
+        )
+    
+        st.markdown("**Principe**")
+        st.write(
+            "Le texte est comparé à des marqueurs de rigidité doxique : "
+            "affirmations collectives, évidences supposées, ou consensus implicites renforçant la certitude."
+        )
+    
+        st.markdown("**Formule utilisée**")
+        st.code(
+            "markers = marqueurs de rigidité doxique détectés\n"
+            "score = min(len(markers) * coefficient / 10, 1.0)",
+            language="python"
+        )
+    
+        markers = result.get("doxic_rigidity_markers", [])
+    
+        st.markdown("**Valeur actuelle**")
+        st.write(f"Score : **{round(value * 100, 1)}%**")
+        st.write(f"Niveau : **{label}**")
+        st.write(f"Marqueurs détectés : **{len(markers)}**")
+    
+        st.markdown("**Interprétation actuelle**")
+        st.write(result["doxic_rigidity_interpretation"])
+    
+        st.markdown("**Lecture**")
+        st.write(
+            "🟢 Faible : discours ouvert et révisable\n"
+            "🟡 Modérée : quelques évidences implicites\n"
+            "🟠 Élevée : forte adhésion à une certitude partagée\n"
+            "🔴 Très élevée : fermeture collective du discours"
+        )
+    
+        st.markdown("**Attention**")
+        st.write(
+            "Une rigidité doxique élevée ne signifie pas que le texte est faux. "
+            "Elle indique que le discours s’appuie fortement sur des évidences supposées "
+            "plutôt que sur une démonstration ouverte à la discussion."
+        )
         
     st.divider()
     
