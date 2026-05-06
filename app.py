@@ -10754,14 +10754,47 @@ with row15_col2:
         label, color = "Très élevée", "#dc2626"
 
     render_custom_gauge(value, color)
+
     st.markdown(
         f"<b style='color:{color}'>{label}</b> — {round(value*100,1)}%",
         unsafe_allow_html=True
     )
+
     st.caption(result["argument_asymmetry_interpretation"])
+
     st.caption(
-        f"Attaques : {result['argument_attack_count']} | Appuis logiques : {result['argument_support_count']}"
+        f"Attaques : {result['argument_attack_count']} | "
+        f"Appuis logiques : {result['argument_support_count']}"
     )
+
+    # 🔎 POPOVER MARQUEURS
+    with st.popover("🔎 Marqueurs détectés"):
+        st.markdown("""
+Cette jauge repose sur des marqueurs lexicaux.
+
+Elle compare :
+
+- les termes d’attaque ou de disqualification ;
+- les termes d’appui logique ou explicatif.
+
+Elle mesure l’équilibre entre accusation et démonstration.
+""")
+
+        st.write(f"**Attaques détectées :** {result['argument_attack_count']}")
+        st.write(f"**Appuis logiques détectés :** {result['argument_support_count']}")
+
+    # 📐 POPOVER FORMULE
+    with st.popover("📐 Formule et explication"):
+        st.markdown("""
+Formule utilisée :
+
+```python
+if argument_count == 0:
+    score = attack_count * 0.25
+else:
+    score = (attack_count / argument_count) * 0.25
+
+score = min(score, 1.0)
 
 with st.expander("Voir les manœuvres discursives détectées", expanded=False):
     if result["political_pattern_score"] == 0:
