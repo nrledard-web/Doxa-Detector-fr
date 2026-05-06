@@ -9190,7 +9190,7 @@ st.caption("Analyse de la cohérence interne du discours, indépendamment de sa 
 sr1, sr2 = st.columns(2)
 
 # -----------------------------
-# 4) Cohérence discursive
+#  Cohérence discursive
 # -----------------------------
 with sr1:
     st.markdown("### Cohérence discursive")
@@ -9461,7 +9461,7 @@ with oi1:
         )
     
 # -----------------------------
-# 3) Propagande narrative
+#  Propagande narrative
 # -----------------------------
 with oi2:
     st.markdown("### Narration propagandiste")
@@ -9565,7 +9565,7 @@ with oi2:
             "Elle indique une construction discursive orientée visant à influencer la perception."
         )
 # -----------------------------
-# 11) Ennemi abstrait
+#  Ennemi abstrait
 # -----------------------------
 with oi3:
     st.markdown("### Polarisation / Ennemi abstrait")
@@ -9656,7 +9656,7 @@ st.caption("Identification des erreurs de raisonnement et des structures logique
 al1, al2, al3 = st.columns(3)
 
 # -----------------------------
-# 5) Confusion logique
+#  Confusion logique
 # -----------------------------
 with al1:
     st.markdown("### Confusion logique")
@@ -9736,7 +9736,7 @@ with al1:
             "Elle indique que certains liens de cause, de conséquence ou de projection méritent d’être vérifiés."
         )
 # -----------------------------
-# 7) Fausse causalité
+#  Fausse causalité
 # -----------------------------
 with al2:
     st.markdown("### Fausse causalité")
@@ -9817,7 +9817,7 @@ with al2:
             "Elle indique que certains liens de cause à effet doivent être vérifiés ou approfondis."
         )
 # -----------------------------
-# 7) Faux dilemme
+#  Faux dilemme
 # -----------------------------
 with al3:
     st.markdown("### Faux dilemme")
@@ -9898,9 +9898,9 @@ with al3:
             "Il indique une simplification excessive qui peut masquer d’autres possibilités."
         )
 
-al4, al5, al6 = st.columns(3)
+al4, al5, al6, al7, = st.columns(3)
 # -----------------------------
-# 7) Pétition de principe
+#  Pétition de principe
 # -----------------------------
 with al4:
     st.markdown("### Pétition de principe")
@@ -9979,7 +9979,7 @@ with al4:
             "Elle indique que le texte tend à répéter ou présupposer sa conclusion au lieu de la démontrer."
         )
 # -----------------------------
-# 7) Cherry Picking
+# Cherry Picking
 # -----------------------------
 with al5:
     st.markdown("### Cherry Picking")
