@@ -10369,6 +10369,86 @@ with oi3:
             "Un score élevé ne signifie pas que le texte est faux. "
             "Il indique que le discours tend à construire un adversaire global, abstrait ou peu spécifié."
         )
+oi4, oi5, oi6 = st.columns(3)
+# -----------------------------
+# Dissonance interne
+# -----------------------------
+with oi4:
+    st.markdown("### Dissonance interne")
+    st.caption("Contradictions ou incompatibilités au sein du même discours.")
+
+    value = result["internal_dissonance_score"]
+
+    if value < 0.15:
+        label, color = "Faible", "#ca8a04"
+    elif value < 0.35:
+        label, color = "Modérée", "#f97316"
+    elif value < 0.60:
+        label, color = "Élevée", "#ea580c"
+    else:
+        label, color = "Très élevée", "#dc2626"
+
+    render_custom_gauge(value, color)
+
+    st.markdown(
+        f"<b style='color:{color}'>{label}</b> — {round(value*100,1)}%",
+        unsafe_allow_html=True
+    )
+
+    st.caption(result["internal_dissonance_interpretation"])
+
+    with st.expander("🔎 Voir les marqueurs", expanded=False):
+        markers = result.get("internal_dissonance_markers", [])
+        if not markers:
+            st.info("Aucune dissonance interne notable détectée.")
+        else:
+            for marker in markers:
+                st.warning(marker)
+
+    with st.popover("ℹ️ Comprendre cette jauge"):
+        st.markdown("### Dissonance interne")
+
+        st.write(
+            "Cette jauge détecte les contradictions, tensions ou incompatibilités internes "
+            "présentes dans un même discours."
+        )
+
+        st.markdown("**Principe**")
+        st.write(
+            "Le texte est analysé pour repérer les marqueurs de contradiction : "
+            "affirmations incompatibles, revirements, oppositions internes ou incohérences entre passages."
+        )
+
+        st.markdown("**Formule utilisée**")
+        st.code(
+            "markers = dissonances internes détectées\n"
+            "score = min(len(markers) * coefficient / 10, 1.0)",
+            language="python"
+        )
+
+        markers = result.get("internal_dissonance_markers", [])
+
+        st.markdown("**Valeur actuelle**")
+        st.write(f"Score : **{round(value * 100, 1)}%**")
+        st.write(f"Niveau : **{label}**")
+        st.write(f"Marqueurs détectés : **{len(markers)}**")
+
+        st.markdown("**Interprétation actuelle**")
+        st.write(result["internal_dissonance_interpretation"])
+
+        st.markdown("**Lecture**")
+        st.write(
+            "🟢 Faible : discours globalement cohérent\n"
+            "🟡 Modérée : quelques tensions internes\n"
+            "🟠 Élevée : contradictions notables\n"
+            "🔴 Très élevée : incohérence interne dominante"
+        )
+
+        st.markdown("**Attention**")
+        st.write(
+            "Une dissonance interne élevée ne signifie pas que tout le texte est faux. "
+            "Elle indique que certaines parties du discours semblent entrer en tension ou se contredire."
+        )
 
 st.divider()
 
@@ -11523,36 +11603,6 @@ with row7_col2:
         markers = result.get("factual_overinterpretation_markers", [])
         if not markers:
             st.info("Aucune surinterprétation factuelle notable détectée.")
-        else:
-            for marker in markers:
-                st.warning(marker)
-
-# -----------------------------
-# 21) Dissonance interne
-# -----------------------------
-with row7_col3:
-    st.markdown("### Dissonance interne")
-    st.caption("Contradictions ou incompatibilités au sein du même discours.")
-
-    value = result["internal_dissonance_score"]
-
-    if value < 0.15:
-        label, color = "Faible", "#ca8a04"
-    elif value < 0.35:
-        label, color = "Modérée", "#f97316"
-    elif value < 0.60:
-        label, color = "Élevée", "#ea580c"
-    else:
-        label, color = "Très élevée", "#dc2626"
-
-    render_custom_gauge(value, color)
-    st.markdown(f"<b style='color:{color}'>{label}</b> — {round(value*100,1)}%", unsafe_allow_html=True)
-    st.caption(result["internal_dissonance_interpretation"])
-
-    with st.expander("Voir les marqueurs", expanded=False):
-        markers = result.get("internal_dissonance_markers", [])
-        if not markers:
-            st.info("Aucune dissonance interne notable détectée.")
         else:
             for marker in markers:
                 st.warning(marker)
