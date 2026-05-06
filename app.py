@@ -8926,7 +8926,27 @@ with col_center:
     ──── 🧠 ────
     </div>
     """, unsafe_allow_html=True)
-    
+
+st.subheader("Cartographie discursive complémentaire")
+
+st.caption(
+    "Cette cartographie regroupe les principaux mécanismes discursifs détectables dans un texte : "
+    "jugements de valeur, prémisses implicites, structures propagandistes, confusions logiques, "
+    "simulations scientifiques, biais narratifs et mécanismes de fermeture cognitive."
+)
+
+st.caption(
+    "Elle est complétée par une analyse logique des raisonnements "
+    "(syllogismes, enthymèmes et sophismes) ainsi que par des indicateurs "
+    "stratégiques permettant d’identifier certaines formes de manipulation argumentative."
+)
+
+        st.markdown("""
+    <div style="text-align:center; margin:25px 0; color:#888;">
+    ──── 🧠 ────
+    </div>
+    """, unsafe_allow_html=True)
+
 # =============================
 # 🗣️ 2. PRESSIONS DISCURSIVES
 # =============================
@@ -9502,6 +9522,12 @@ with pd7:
         
     st.divider()
     
+        st.markdown("""
+    <div style="text-align:center; margin:25px 0; color:#888;">
+    ──── 🧠 ────
+    </div>
+    """, unsafe_allow_html=True)
+
 # =============================
 # 🧩 3. STRUCTURE DU RAISONNEMENT
 # =============================
@@ -10077,7 +10103,11 @@ with sr7:
         )
 
 st.divider()
-
+        st.markdown("""
+    <div style="text-align:center; margin:25px 0; color:#888;">
+    ──── 🧠 ────
+    </div>
+    """, unsafe_allow_html=True)
 
 # =============================
 # 🧭 4. ORIENTATION IDÉOLOGIQUE
@@ -10854,7 +10884,11 @@ with oi9:
 
 
 st.divider()
-
+        st.markdown("""
+    <div style="text-align:center; margin:25px 0; color:#888;">
+    ──── 🧠 ────
+    </div>
+    """, unsafe_allow_html=True)
 
 # =============================
 # ⚖️ 5. ANALYSE LOGIQUE
@@ -11974,6 +12008,11 @@ with al14:
         )
 
 st.divider()
+        st.markdown("""
+    <div style="text-align:center; margin:25px 0; color:#888;">
+    ──── 🧠 ────
+    </div>
+    """, unsafe_allow_html=True)
 
 # =============================
 # 🧪 6. BIAIS DE FORMULATION
@@ -12559,35 +12598,11 @@ with bf7:
         )
 st.divider()
 
-# =============================
-# 📊 7. SYNTHÈSE FINALE
-# =============================
-st.subheader("📊 Synthèse finale")
-st.caption("Vision globale du discours après analyse des différentes dimensions.")
-
-st.markdown("### Verdict global")
-# verdict ici
-
-st.markdown("### Crédibilité finale")
-# jauge ici
-
-st.markdown("### Régime cognitif dominant")
-# affichage ici
-
-st.divider()
-
-
-st.subheader("Cartographie discursive complémentaire")
-
-st.caption(
-    "Cette cartographie regroupe les principaux mécanismes discursifs détectables "
-    "dans un texte : jugements de valeur, prémisses implicites, structures propagandistes, "
-    "confusions logiques, simulations scientifiques, biais narratifs et mécanismes de "
-    "fermeture cognitive.\n\n"
-    "Elle est complétée par une analyse logique des raisonnements "
-    "(syllogismes, enthymèmes et sophismes) ainsi que par des indicateurs "
-    "stratégiques permettant d’identifier certaines formes de manipulation argumentative."
-)
+        st.markdown("""
+    <div style="text-align:center; margin:25px 0; color:#888;">
+    ──── 🧠 ────
+    </div>
+    """, unsafe_allow_html=True)
 
 # -----------------------------
 # 18) Clôture cognitive
@@ -12769,6 +12784,13 @@ else:
     st.info("Aucun syllogisme détecté.")
 
 st.divider()
+
+        st.markdown("""
+    <div style="text-align:center; margin:25px 0; color:#888;">
+    ──── 🧠 ────
+    </div>
+    """, unsafe_allow_html=True)
+
 st.subheader("Enthymèmes détectés")
 
 if result.get("enthymemes"):
