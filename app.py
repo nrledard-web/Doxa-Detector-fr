@@ -12323,7 +12323,7 @@ with bf5:
     # =============================
     # Autorité vague (simple)
     # =============================
-    with bf5:
+    with bf6:
         st.markdown("### Autorité vague (simple)")
         st.caption("Autorité invoquée sans source clairement traçable.")
     
