@@ -12592,7 +12592,7 @@ st.caption(
 # -----------------------------
 # 18) Clôture cognitive
 # -----------------------------
-with st.expander(...):
+with st.expander(Clôture cognitive):
     st.markdown("### Clôture cognitive")
     st.caption("Degré de verrouillage du discours par excès de certitude.")
 
