@@ -12673,11 +12673,6 @@ c3.metric(T["revisability"], round(revisability, 2))
 c4.metric(T["cognitive_closure"], round(closure, 2))
 
 st.divider()
-st.markdown("""
-<div style="text-align:center; margin:25px 0; color:#888;">
-──── 🧠 ────
-</div>
-""", unsafe_allow_html=True)
 
 st.subheader("Jauge de clôture cognitive")
 
@@ -12701,6 +12696,12 @@ st.caption("Ouverture cognitive ⟵⟶ Clôture cognitive")
 
 st.caption(closure_text)
 st.markdown(f"**{T['interpretation']} :** {cog.interpret()}")
+
+st.markdown("""
+<div style="text-align:center; margin:25px 0; color:#888;">
+──── 🧠 ────
+</div>
+""", unsafe_allow_html=True)
 
 st.subheader(T["hard_fact_checking_by_claim"])
 claims_df = pd.DataFrame(
