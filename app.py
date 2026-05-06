@@ -11026,9 +11026,9 @@ with al3:
             "Il indique une simplification excessive qui peut masquer d’autres possibilités."
         )
 # -----------------------------
-#  Pétition de principe
+#  Confusion descriptif / normatif
 # -----------------------------
-with al3bis:
+with al4:
     st.markdown("### Confusion descriptif / normatif")
     st.caption("Glissement d’une description vers une injonction sans justification suffisante.")
 
@@ -11106,11 +11106,93 @@ with al3bis:
             "Elle indique que des jugements ou normes sont présentés comme des faits."
         )
 
-al4, al5, al6, al7, = st.columns(4)
+al5, al6, al7, al8, = st.columns(4)
 # -----------------------------
 #  Pétition de principe
 # -----------------------------
-with al4:
+with al5:
+    st.markdown("### Confusion descriptif / normatif")
+    st.caption("Glissement d’une description vers une injonction sans justification suffisante.")
+
+    value = result["descriptive_normative_confusion_score"]
+
+    if value < 0.15:
+        label, color = "Faible", "#ca8a04"
+    elif value < 0.35:
+        label, color = "Modérée", "#f97316"
+    elif value < 0.60:
+        label, color = "Élevée", "#ea580c"
+    else:
+        label, color = "Très élevée", "#dc2626"
+
+    render_custom_gauge(value, color)
+
+    st.markdown(
+        f"<b style='color:{color}'>{label}</b> — {round(value*100,1)}%",
+        unsafe_allow_html=True
+    )
+
+    st.caption(result["descriptive_normative_confusion_interpretation"])
+
+    with st.expander("🔎 Voir les marqueurs", expanded=False):
+        markers = result.get("descriptive_normative_confusion_markers", [])
+        if not markers:
+            st.info("Aucune confusion descriptif / normatif notable détectée.")
+        else:
+            for marker in markers:
+                st.warning(marker)
+
+    with st.popover("ℹ️ Comprendre cette jauge"):
+        st.markdown("### Confusion descriptif / normatif")
+
+        st.write(
+            "Cette jauge détecte les situations où un fait ou une description "
+            "est transformé en jugement, norme ou injonction sans justification."
+        )
+
+        st.markdown("**Principe**")
+        st.write(
+            "Le texte est comparé à des marqueurs de glissement normatif : "
+            "passage du descriptif (« ce qui est ») au normatif (« ce qui doit être ») "
+            "sans étape argumentative explicite."
+        )
+
+        st.markdown("**Formule utilisée**")
+        st.code(
+            "markers = confusions descriptif/normatif détectées\n"
+            "score = min(len(markers) * coefficient / 10, 1.0)",
+            language="python"
+        )
+
+        markers = result.get("descriptive_normative_confusion_markers", [])
+
+        st.markdown("**Valeur actuelle**")
+        st.write(f"Score : **{round(value * 100, 1)}%**")
+        st.write(f"Niveau : **{label}**")
+        st.write(f"Marqueurs détectés : **{len(markers)}**")
+
+        st.markdown("**Interprétation actuelle**")
+        st.write(result["descriptive_normative_confusion_interpretation"])
+
+        st.markdown("**Lecture**")
+        st.write(
+            "🟢 Faible : distinction claire entre faits et jugements\n"
+            "🟡 Modérée : glissements ponctuels\n"
+            "🟠 Élevée : confusion notable entre description et norme\n"
+            "🔴 Très élevée : injonctions déguisées en faits"
+        )
+
+        st.markdown("**Attention**")
+        st.write(
+            "Une confusion descriptif / normatif élevée ne signifie pas que le texte est faux. "
+            "Elle indique que des jugements ou normes sont présentés comme des faits."
+        )
+
+
+# -----------------------------
+#  Pétition de principe
+# -----------------------------
+with al6:
     st.markdown("### Pétition de principe")
     st.caption("Conclusion répétée comme si elle constituait une preuve.")
 
@@ -11189,7 +11271,7 @@ with al4:
 # -----------------------------
 # Cherry Picking
 # -----------------------------
-with al5:
+with al7:
     st.markdown("### Cherry Picking")
     st.caption("Sélection biaisée d’exemples, de cas ou de preuves allant dans un seul sens.")
 
@@ -11281,7 +11363,7 @@ with al5:
 # -----------------------------
 #  Sophismes syllogistiques détectés
 # -----------------------------
-with al6:
+with al8:
     st.markdown("### Sophismes syllogistiques détectés")
     st.caption("Failles formelles ou conclusions invalides dans les raisonnements syllogistiques.")
 
@@ -11344,10 +11426,12 @@ with al6:
             "L’absence de sophisme détecté ne signifie pas que le texte est vrai. "
             "Elle signifie seulement qu’aucune faille syllogistique formelle n’a été repérée."
         )
+
+al9, al10, al11, al12 = st.columns(4)
 # -----------------------------
 #  Syllogismes / Enthymèmes détectés
 # -----------------------------
-with al7:
+with al9:
     st.markdown("### Syllogismes / Enthymèmes détectés")
     st.caption("Raisonnements incomplets ou implicites repérés dans le texte.")
 
@@ -11409,11 +11493,11 @@ with al7:
             "Un enthymème n’est pas forcément une erreur. "
             "Il indique seulement qu’une partie du raisonnement est laissée implicite."
         )
-al8, al9, al10, al11 = st.columns(4)
+
 # -----------------------------
 # Fausse analogie
 # -----------------------------
-with al8:
+with al10:
     st.markdown("### Fausse analogie")
     st.caption("Comparaisons trompeuses qui court-circuitent l’analyse.")
 
@@ -11493,7 +11577,7 @@ with al8:
 # -----------------------------
 #  Surinterprétation factuelle
 # -----------------------------
-with al9:
+with al11:
     st.markdown("### Surinterprétation factuelle")
     st.caption("Conclusions excessives tirées à partir d’indices partiels.")
 
@@ -11573,7 +11657,7 @@ with al9:
 # =============================
 # Fausse causalité (simple)
 # =============================
-with al10:
+with al12:
     st.markdown("### Fausse causalité (simple)")
     st.caption("Lien causal affirmé sans démonstration suffisante.")
 
@@ -11650,11 +11734,11 @@ with al10:
             "Une fausse causalité élevée ne signifie pas que la relation est fausse. "
             "Elle indique que le lien causal est affirmé plus vite qu’il n’est démontré."
         )
-
+al13, al14 = st.columns(2)
 # -----------------------------
 #  Généralisation abusive
 # -----------------------------
-with al11:
+with al13:
     st.markdown("### Généralisation abusive")
     st.caption("Simplification du réel par catégories globales.")
 
@@ -11734,7 +11818,7 @@ with al11:
 # =============================
 # Confusion descriptif / normatif
 # =============================
-with al3bis:
+with al14:
     st.markdown("### Confusion descriptif / normatif")
     st.caption("Glissement d’une description vers une injonction sans justification suffisante.")
 
