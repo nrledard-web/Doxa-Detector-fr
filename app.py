@@ -11329,6 +11329,86 @@ with al7:
             "Un enthymème n’est pas forcément une erreur. "
             "Il indique seulement qu’une partie du raisonnement est laissée implicite."
         )
+al8, al9, al10, al11 = st.columns(4)
+# -----------------------------
+# Fausse analogie
+# -----------------------------
+with al8:
+    st.markdown("### Fausse analogie")
+    st.caption("Comparaisons trompeuses qui court-circuitent l’analyse.")
+
+    value = result["false_analogy_score"]
+
+    if value < 0.15:
+        label, color = "Faible", "#ca8a04"
+    elif value < 0.35:
+        label, color = "Modérée", "#f97316"
+    elif value < 0.60:
+        label, color = "Élevée", "#ea580c"
+    else:
+        label, color = "Très élevée", "#dc2626"
+
+    render_custom_gauge(value, color)
+
+    st.markdown(
+        f"<b style='color:{color}'>{label}</b> — {round(value*100,1)}%",
+        unsafe_allow_html=True
+    )
+
+    st.caption(result["false_analogy_interpretation"])
+
+    with st.expander("🔎 Voir les marqueurs", expanded=False):
+        markers = result.get("false_analogy_markers", [])
+        if not markers:
+            st.info("Aucune fausse analogie notable détectée.")
+        else:
+            for marker in markers:
+                st.warning(marker)
+
+    with st.popover("ℹ️ Comprendre cette jauge"):
+        st.markdown("### Fausse analogie")
+
+        st.write(
+            "Cette jauge détecte les comparaisons qui rapprochent deux situations "
+            "de manière trompeuse ou simplificatrice."
+        )
+
+        st.markdown("**Principe**")
+        st.write(
+            "Le texte est comparé à des marqueurs d’analogie douteuse : "
+            "rapprochements abusifs, comparaisons rapides ou équivalences non démontrées."
+        )
+
+        st.markdown("**Formule utilisée**")
+        st.code(
+            "markers = analogies trompeuses détectées\n"
+            "score = min(len(markers) * coefficient / 10, 1.0)",
+            language="python"
+        )
+
+        markers = result.get("false_analogy_markers", [])
+
+        st.markdown("**Valeur actuelle**")
+        st.write(f"Score : **{round(value * 100, 1)}%**")
+        st.write(f"Niveau : **{label}**")
+        st.write(f"Marqueurs détectés : **{len(markers)}**")
+
+        st.markdown("**Interprétation actuelle**")
+        st.write(result["false_analogy_interpretation"])
+
+        st.markdown("**Lecture**")
+        st.write(
+            "🟢 Faible : comparaisons pertinentes ou absentes\n"
+            "🟡 Modérée : analogies discutables ponctuelles\n"
+            "🟠 Élevée : analogies trompeuses notables\n"
+            "🔴 Très élevée : analogies abusives dominantes"
+        )
+
+        st.markdown("**Attention**")
+        st.write(
+            "Une fausse analogie élevée ne signifie pas que le texte est faux. "
+            "Elle indique que le raisonnement repose sur des comparaisons fragiles."
+        )
 
 st.divider()
 
@@ -11865,36 +11945,6 @@ with row5_col2:
         markers = result.get("binary_opposition_markers", [])
         if not markers:
             st.info("Aucune opposition binaire notable détectée.")
-        else:
-            for marker in markers:
-                st.warning(marker)
-
-# -----------------------------
-# 19) Fausse analogie
-# -----------------------------
-with row7_col1:
-    st.markdown("### Fausse analogie")
-    st.caption("Comparaisons trompeuses qui court-circuitent l’analyse.")
-
-    value = result["false_analogy_score"]
-
-    if value < 0.15:
-        label, color = "Faible", "#ca8a04"
-    elif value < 0.35:
-        label, color = "Modérée", "#f97316"
-    elif value < 0.60:
-        label, color = "Élevée", "#ea580c"
-    else:
-        label, color = "Très élevée", "#dc2626"
-
-    render_custom_gauge(value, color)
-    st.markdown(f"<b style='color:{color}'>{label}</b> — {round(value*100,1)}%", unsafe_allow_html=True)
-    st.caption(result["false_analogy_interpretation"])
-
-    with st.expander("Voir les marqueurs", expanded=False):
-        markers = result.get("false_analogy_markers", [])
-        if not markers:
-            st.info("Aucune fausse analogie notable détectée.")
         else:
             for marker in markers:
                 st.warning(marker)
