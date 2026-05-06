@@ -11410,6 +11410,87 @@ with al8:
             "Elle indique que le raisonnement repose sur des comparaisons fragiles."
         )
 
+# -----------------------------
+#  Surinterprétation factuelle
+# -----------------------------
+with al9:
+    st.markdown("### Surinterprétation factuelle")
+    st.caption("Conclusions excessives tirées à partir d’indices partiels.")
+
+    value = result["factual_overinterpretation_score"]
+
+    if value < 0.15:
+        label, color = "Faible", "#ca8a04"
+    elif value < 0.35:
+        label, color = "Modérée", "#f97316"
+    elif value < 0.60:
+        label, color = "Élevée", "#ea580c"
+    else:
+        label, color = "Très élevée", "#dc2626"
+
+    render_custom_gauge(value, color)
+
+    st.markdown(
+        f"<b style='color:{color}'>{label}</b> — {round(value*100,1)}%",
+        unsafe_allow_html=True
+    )
+
+    st.caption(result["factual_overinterpretation_interpretation"])
+
+    with st.expander("🔎 Voir les marqueurs", expanded=False):
+        markers = result.get("factual_overinterpretation_markers", [])
+        if not markers:
+            st.info("Aucune surinterprétation factuelle notable détectée.")
+        else:
+            for marker in markers:
+                st.warning(marker)
+
+    with st.popover("ℹ️ Comprendre cette jauge"):
+        st.markdown("### Surinterprétation factuelle")
+
+        st.write(
+            "Cette jauge détecte les situations où des conclusions sont tirées "
+            "à partir d’indices partiels, insuffisants ou mal étayés."
+        )
+
+        st.markdown("**Principe**")
+        st.write(
+            "Le texte est comparé à des marqueurs de surinterprétation : "
+            "généralisation rapide, extrapolation excessive, ou conclusions "
+            "qui dépassent les éléments disponibles."
+        )
+
+        st.markdown("**Formule utilisée**")
+        st.code(
+            "markers = surinterprétations détectées\n"
+            "score = min(len(markers) * coefficient / 10, 1.0)",
+            language="python"
+        )
+
+        markers = result.get("factual_overinterpretation_markers", [])
+
+        st.markdown("**Valeur actuelle**")
+        st.write(f"Score : **{round(value * 100, 1)}%**")
+        st.write(f"Niveau : **{label}**")
+        st.write(f"Marqueurs détectés : **{len(markers)}**")
+
+        st.markdown("**Interprétation actuelle**")
+        st.write(result["factual_overinterpretation_interpretation"])
+
+        st.markdown("**Lecture**")
+        st.write(
+            "🟢 Faible : conclusions proportionnées aux faits\n"
+            "🟡 Modérée : extrapolations ponctuelles\n"
+            "🟠 Élevée : conclusions excessives notables\n"
+            "🔴 Très élevée : surinterprétation dominante"
+        )
+
+        st.markdown("**Attention**")
+        st.write(
+            "Une surinterprétation factuelle élevée ne signifie pas que le texte est faux. "
+            "Elle indique que les conclusions dépassent les éléments réellement disponibles."
+        )
+
 st.divider()
 
 # =============================
