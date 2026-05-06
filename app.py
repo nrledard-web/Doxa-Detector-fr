@@ -8941,7 +8941,7 @@ st.caption(
     "stratégiques permettant d’identifier certaines formes de manipulation argumentative."
 )
 
-    st.markdown("""
+st.markdown("""
 <div style="text-align:center; margin:25px 0; color:#888;">
 ──── 🧠 ────
 </div>
