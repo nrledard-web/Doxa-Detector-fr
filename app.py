@@ -9752,6 +9752,85 @@ with sr3:
             "Elle indique que certaines bases du raisonnement ne sont pas explicitement justifiées."
         )
 
+# -----------------------------
+# Prémisses idéologiques implicites
+# -----------------------------
+with sr4:
+    st.markdown("### Prémisses idéologiques")
+    st.caption("Présupposés idéologiques présentés comme allant de soi.")
+
+    ideological_value = result["ideological_premise_score"]
+
+    if ideological_value < 0.20:
+        ideological_label, ideological_color = "Faible", "#ca8a04"
+    elif ideological_value < 0.40:
+        ideological_label, ideological_color = "Modérée", "#f97316"
+    elif ideological_value < 0.70:
+        ideological_label, ideological_color = "Élevée", "#ea580c"
+    else:
+        ideological_label, ideological_color = "Très élevée", "#dc2626"
+
+    render_custom_gauge(ideological_value, ideological_color)
+
+    st.markdown(
+        f"<b style='color:{ideological_color}'>{ideological_label}</b> — {round(ideological_value * 100, 1)}%",
+        unsafe_allow_html=True
+    )
+
+    st.caption(result["ideological_premise_interpretation"])
+
+    with st.expander("🔎 Voir les marqueurs", expanded=False):
+        markers = result.get("ideological_premise_markers", [])
+        if not markers:
+            st.info("Aucune prémisse idéologique saillante détectée.")
+        else:
+            for marker in markers:
+                st.warning(marker)
+
+    with st.popover("ℹ️ Comprendre cette jauge"):
+        st.markdown("### Prémisses idéologiques")
+
+        st.write(
+            "Cette jauge détecte les présupposés idéologiques présentés comme naturels, évidents ou allant de soi."
+        )
+
+        st.markdown("**Principe**")
+        st.write(
+            "Le texte est comparé à des marqueurs de prémisses idéologiques : "
+            "idées de départ implicites, cadres politiques ou sociaux supposés vrais sans démonstration."
+        )
+
+        st.markdown("**Formule utilisée**")
+        st.code(
+            "markers = prémisses idéologiques détectées\n"
+            "score = min(len(markers) * coefficient / 10, 1.0)",
+            language="python"
+        )
+
+        markers = result.get("ideological_premise_markers", [])
+
+        st.markdown("**Valeur actuelle**")
+        st.write(f"Score : **{round(ideological_value * 100, 1)}%**")
+        st.write(f"Niveau : **{ideological_label}**")
+        st.write(f"Marqueurs détectés : **{len(markers)}**")
+
+        st.markdown("**Interprétation actuelle**")
+        st.write(result["ideological_premise_interpretation"])
+
+        st.markdown("**Lecture**")
+        st.write(
+            "🟢 Faible : peu de présupposés idéologiques\n"
+            "🟡 Modérée : quelques cadres idéologiques implicites\n"
+            "🟠 Élevée : présupposés idéologiques notables\n"
+            "🔴 Très élevée : raisonnement fortement fondé sur un cadre idéologique implicite"
+        )
+
+        st.markdown("**Attention**")
+        st.write(
+            "Une prémisse idéologique élevée ne signifie pas que le texte est faux. "
+            "Elle indique que le discours repose sur un cadre d’évidence idéologique peu explicité."
+        )
+
 st.divider()
 
 
@@ -11289,40 +11368,6 @@ with row8_col3:
         markers = result.get("narrative_overdetermination_markers", [])
         if not markers:
             st.info("Aucune surdétermination narrative notable détectée.")
-        else:
-            for marker in markers:
-                st.warning(marker)
-
-# -----------------------------
-# 17) Prémisses idéologiques implicites
-# -----------------------------
-with row6_col2:
-    st.markdown("### Prémisses idéologiques")
-    st.caption("Présupposés idéologiques présentés comme allant de soi.")
-
-    ideological_value = result["ideological_premise_score"]
-
-    if ideological_value < 0.20:
-        ideological_label, ideological_color = "Faible", "#ca8a04"
-    elif ideological_value < 0.40:
-        ideological_label, ideological_color = "Modérée", "#f97316"
-    elif ideological_value < 0.70:
-        ideological_label, ideological_color = "Élevée", "#ea580c"
-    else:
-        ideological_label, ideological_color = "Très élevée", "#dc2626"
-
-    render_custom_gauge(ideological_value, ideological_color)
-
-    st.markdown(
-        f"<b style='color:{ideological_color}'>{ideological_label}</b> — {round(ideological_value * 100, 1)}%",
-        unsafe_allow_html=True
-    )
-    st.caption(result["ideological_premise_interpretation"])
-
-    with st.expander("Voir les marqueurs", expanded=False):
-        markers = result.get("ideological_premise_markers", [])
-        if not markers:
-            st.info("Aucune prémisse idéologique saillante détectée.")
         else:
             for marker in markers:
                 st.warning(marker)
