@@ -11571,6 +11571,87 @@ with al10:
             "Elle indique que le lien causal est affirmé plus vite qu’il n’est démontré."
         )
 
+# -----------------------------
+#  Généralisation abusive
+# -----------------------------
+with al11:
+    st.markdown("### Généralisation abusive")
+    st.caption("Simplification du réel par catégories globales.")
+
+    generalization_value = result["generalization_score"]
+
+    if generalization_value < 0.20:
+        generalization_label, generalization_color = "Faible", "#ca8a04"
+    elif generalization_value < 0.40:
+        generalization_label, generalization_color = "Modérée", "#f97316"
+    elif generalization_value < 0.70:
+        generalization_label, generalization_color = "Élevée", "#ea580c"
+    else:
+        generalization_label, generalization_color = "Très élevée", "#dc2626"
+
+    render_custom_gauge(generalization_value, generalization_color)
+
+    st.markdown(
+        f"<b style='color:{generalization_color}'>{generalization_label}</b> — {round(generalization_value * 100, 1)}%",
+        unsafe_allow_html=True
+    )
+
+    st.caption(result["generalization_interpretation"])
+
+    with st.expander("🔎 Voir les marqueurs", expanded=False):
+        markers = result.get("generalization_markers", [])
+        if not markers:
+            st.info("Aucune généralisation abusive notable détectée.")
+        else:
+            for marker in markers:
+                st.warning(marker)
+
+    with st.popover("ℹ️ Comprendre cette jauge"):
+        st.markdown("### Généralisation abusive")
+
+        st.write(
+            "Cette jauge détecte les situations où des cas particuliers sont transformés "
+            "en règles générales ou en vérités globales."
+        )
+
+        st.markdown("**Principe**")
+        st.write(
+            "Le texte est comparé à des marqueurs de généralisation : "
+            "emploi de termes globaux (toujours, jamais, tous, etc.), "
+            "ou extension abusive d’un cas à l’ensemble."
+        )
+
+        st.markdown("**Formule utilisée**")
+        st.code(
+            "markers = généralisations détectées\n"
+            "score = min(len(markers) * coefficient / 10, 1.0)",
+            language="python"
+        )
+
+        markers = result.get("generalization_markers", [])
+
+        st.markdown("**Valeur actuelle**")
+        st.write(f"Score : **{round(generalization_value * 100, 1)}%**")
+        st.write(f"Niveau : **{generalization_label}**")
+        st.write(f"Marqueurs détectés : **{len(markers)}**")
+
+        st.markdown("**Interprétation actuelle**")
+        st.write(result["generalization_interpretation"])
+
+        st.markdown("**Lecture**")
+        st.write(
+            "🟢 Faible : discours nuancé\n"
+            "🟡 Modérée : généralisations ponctuelles\n"
+            "🟠 Élevée : généralisation notable\n"
+            "🔴 Très élevée : généralisation dominante"
+        )
+
+        st.markdown("**Attention**")
+        st.write(
+            "Une généralisation abusive élevée ne signifie pas que le texte est faux. "
+            "Elle indique que le discours simplifie excessivement la réalité."
+        )
+
 st.divider()
 
 # =============================
@@ -12043,39 +12124,6 @@ row13_col1, row13_col2, row13_col3 = st.columns(3)
 row14_col1, row14_col2, row14_col3 = st.columns(3)
 row15_col1, row15_col2 = st.columns(2)
 
-# -----------------------------
-# 10) Généralisation abusive
-# -----------------------------
-with row4_col1:
-    st.markdown("### Généralisation abusive")
-    st.caption("Simplification du réel par catégories globales.")
-
-    generalization_value = result["generalization_score"]
-
-    if generalization_value < 0.20:
-        generalization_label, generalization_color = "Faible", "#ca8a04"
-    elif generalization_value < 0.40:
-        generalization_label, generalization_color = "Modérée", "#f97316"
-    elif generalization_value < 0.70:
-        generalization_label, generalization_color = "Élevée", "#ea580c"
-    else:
-        generalization_label, generalization_color = "Très élevée", "#dc2626"
-
-    render_custom_gauge(generalization_value, generalization_color)
-
-    st.markdown(
-        f"<b style='color:{generalization_color}'>{generalization_label}</b> — {round(generalization_value * 100, 1)}%",
-        unsafe_allow_html=True
-    )
-    st.caption(result["generalization_interpretation"])
-
-    with st.expander("Voir les marqueurs", expanded=False):
-        markers = result.get("generalization_markers", [])
-        if not markers:
-            st.info("Aucune généralisation abusive notable détectée.")
-        else:
-            for marker in markers:
-                st.warning(marker)
 # -----------------------------
 # 14) Opposition binaire
 # -----------------------------
