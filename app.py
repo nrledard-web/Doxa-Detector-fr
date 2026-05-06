@@ -7112,7 +7112,26 @@ if not result:
     st.stop()
 
 if result:
+    
+import streamlit.components.v1 as components
 
+components.html(
+    """
+    <script>
+    const target = window.parent.document.getElementById("scroll-analyse-target");
+
+    if (target) {
+        setTimeout(() => {
+            target.scrollIntoView({
+                behavior: "smooth",
+                block: "start"
+            });
+        }, 500);
+    }
+    </script>
+    """,
+    height=0
+)
 # =====================================================
 # AIDE DE LECTURE DES JAUGES
 # =====================================================
