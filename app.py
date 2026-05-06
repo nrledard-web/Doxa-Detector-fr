@@ -9287,13 +9287,13 @@ with pd5:
     
     st.caption(result["threat_amplification_interpretation"])
     
-with st.expander("🔎 Voir les marqueurs", expanded=False):
-    markers = result.get("threat_amplification_markers", [])
-    if not markers:
-        st.info("Aucune amplification de menace notable détectée.")
-    else:
-        for marker in markers:
-            st.warning(marker)
+    with st.expander("🔎 Voir les marqueurs", expanded=False):
+        markers = result.get("threat_amplification_markers", [])
+        if not markers:
+            st.info("Aucune amplification de menace notable détectée.")
+        else:
+            for marker in markers:
+                st.warning(marker)
 
     with st.popover("ℹ️ Comprendre cette jauge"):
         st.markdown("### Amplification de menace")
