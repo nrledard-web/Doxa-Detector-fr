@@ -9260,6 +9260,85 @@ with st.popover("ℹ️ Comprendre cette jauge"):
         "Une certitude absolue élevée ne signifie pas que le texte est faux. "
         "Elle indique que le discours laisse peu de place au doute, à la nuance ou à la révision."
     )
+# -----------------------------
+# Amplification de menace
+# -----------------------------
+with pd5:
+    st.markdown("### Amplification de menace")
+    st.caption("Exagération dramatique du danger ou de la gravité.")
+    
+    threat_value = result["threat_amplification_score"]
+    
+    if threat_value < 0.15:
+        threat_label, threat_color = "Faible", "#ca8a04"
+    elif threat_value < 0.35:
+        threat_label, threat_color = "Modérée", "#f97316"
+    elif threat_value < 0.60:
+        threat_label, threat_color = "Élevée", "#ea580c"
+    else:
+        threat_label, threat_color = "Très élevée", "#dc2626"
+    
+    render_custom_gauge(threat_value, threat_color)
+    
+    st.markdown(
+        f"<b style='color:{threat_color}'>{threat_label}</b> — {round(threat_value * 100, 1)}%",
+        unsafe_allow_html=True
+    )
+    
+    st.caption(result["threat_amplification_interpretation"])
+    
+with st.expander("🔎 Voir les marqueurs", expanded=False):
+    markers = result.get("threat_amplification_markers", [])
+    if not markers:
+        st.info("Aucune amplification de menace notable détectée.")
+    else:
+        for marker in markers:
+            st.warning(marker)
+
+with st.popover("ℹ️ Comprendre cette jauge"):
+    st.markdown("### Amplification de menace")
+
+    st.write(
+        "Cette jauge détecte les formulations qui dramatisent fortement un danger, "
+        "une crise ou une menace."
+    )
+
+    st.markdown("**Principe**")
+    st.write(
+        "Le texte est comparé à des marqueurs d’amplification de menace : "
+        "catastrophe, danger extrême, effondrement, menace existentielle, ou formulations équivalentes."
+    )
+
+    st.markdown("**Formule utilisée**")
+    st.code(
+        "markers = marqueurs d’amplification de menace détectés\n"
+        "score = min(len(markers) * coefficient / 10, 1.0)",
+        language="python"
+    )
+
+    markers = result.get("threat_amplification_markers", [])
+
+    st.markdown("**Valeur actuelle**")
+    st.write(f"Score : **{round(threat_value * 100, 1)}%**")
+    st.write(f"Niveau : **{threat_label}**")
+    st.write(f"Marqueurs détectés : **{len(markers)}**")
+
+    st.markdown("**Interprétation actuelle**")
+    st.write(result["threat_amplification_interpretation"])
+
+    st.markdown("**Lecture**")
+    st.write(
+        "🟢 Faible : menace peu dramatisée\n"
+        "🟡 Modérée : quelques formulations alarmistes\n"
+        "🟠 Élevée : danger fortement amplifié\n"
+        "🔴 Très élevée : dramatisation centrale du discours"
+    )
+
+    st.markdown("**Attention**")
+    st.write(
+        "Une amplification de menace élevée ne signifie pas que le danger est imaginaire. "
+        "Elle indique que le texte intensifie fortement la perception du risque."
+    )
         
     st.divider()
     
@@ -10854,41 +10933,6 @@ with row5_col2:
         markers = result.get("binary_opposition_markers", [])
         if not markers:
             st.info("Aucune opposition binaire notable détectée.")
-        else:
-            for marker in markers:
-                st.warning(marker)
-
-
-# -----------------------------
-# 15) Amplification de menace
-# -----------------------------
-with row5_col3:
-    st.markdown("### Amplification de menace")
-    st.caption("Exagération dramatique du danger ou de la gravité.")
-
-    threat_value = result["threat_amplification_score"]
-
-    if threat_value < 0.15:
-        threat_label, threat_color = "Faible", "#ca8a04"
-    elif threat_value < 0.35:
-        threat_label, threat_color = "Modérée", "#f97316"
-    elif threat_value < 0.60:
-        threat_label, threat_color = "Élevée", "#ea580c"
-    else:
-        threat_label, threat_color = "Très élevée", "#dc2626"
-
-    render_custom_gauge(threat_value, threat_color)
-
-    st.markdown(
-        f"<b style='color:{threat_color}'>{threat_label}</b> — {round(threat_value * 100, 1)}%",
-        unsafe_allow_html=True
-    )
-    st.caption(result["threat_amplification_interpretation"])
-
-    with st.expander("Voir les marqueurs", expanded=False):
-        markers = result.get("threat_amplification_markers", [])
-        if not markers:
-            st.info("Aucune amplification de menace notable détectée.")
         else:
             for marker in markers:
                 st.warning(marker)
