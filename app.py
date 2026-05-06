@@ -12239,7 +12239,7 @@ with bf4:
             "Il indique que le choix des mots peut déplacer l’interprétation du lecteur."
         )
 
-bf5, bf6, bf8, bf8 = st.columns(4)
+bf5, bf6, bf7, bf8 = st.columns(4)
 # -----------------------------
 #  Faux consensus
 # -----------------------------
