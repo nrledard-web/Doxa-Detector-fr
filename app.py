@@ -10292,10 +10292,99 @@ with bf1:
             "Une autorité vague élevée ne signifie pas que l’information est fausse. "
             "Elle indique que les sources sont insuffisamment précises pour être vérifiées."
         )
-
+# -----------------------------
+# 1) Qualifications normatives
+# -----------------------------
 with bf2:
     st.markdown("### Qualification normative")
-    # jauge ici
+    st.caption("Jugements de valeur présentés comme des faits.")
+
+    normative_value = result["normative_score"]
+
+    if normative_value < 0.20:
+        normative_label, normative_color = "Faible", "#ca8a04"
+    elif normative_value < 0.40:
+        normative_label, normative_color = "Modérée", "#f97316"
+    elif normative_value < 0.70:
+        normative_label, normative_color = "Élevée", "#ea580c"
+    else:
+        normative_label, normative_color = "Très élevée", "#dc2626"
+
+    render_custom_gauge(normative_value, normative_color)
+
+    st.markdown(
+        f"<b style='color:{normative_color}'>{normative_label}</b> — {round(normative_value * 100, 1)}%",
+        unsafe_allow_html=True
+    )
+
+    st.caption(result["normative_interpretation"])
+
+    with st.expander("🔎 Voir les marqueurs", expanded=False):
+        normative_terms = result.get("normative_terms", [])
+        judgment_markers = result.get("normative_judgment_markers", [])
+
+        if not normative_terms and not judgment_markers:
+            st.info("Aucun marqueur saillant détecté.")
+        else:
+            if normative_terms:
+                st.markdown("**Termes normatifs**")
+                for term in normative_terms:
+                    st.error(term)
+
+            if judgment_markers:
+                st.markdown("**Marqueurs de jugement**")
+                for term in judgment_markers:
+                    st.warning(term)
+
+    with st.popover("ℹ️ Comprendre cette jauge"):
+        st.markdown("### Qualification normative")
+
+        st.write(
+            "Cette jauge détecte les jugements de valeur présentés comme s’ils étaient des faits. "
+            "Elle repère les formulations qui qualifient moralement, politiquement ou affectivement une réalité "
+            "sans toujours distinguer description et jugement."
+        )
+
+        st.markdown("**Principe**")
+        st.write(
+            "Le texte est comparé à deux familles de signaux : les termes normatifs "
+            "et les marqueurs explicites de jugement."
+        )
+
+        st.markdown("**Formule utilisée**")
+        st.code(
+            "normative_terms = termes normatifs détectés\n"
+            "judgment_markers = marqueurs de jugement détectés\n"
+            "score = min((len(normative_terms) + len(judgment_markers)) * coefficient / 10, 1.0)",
+            language="python"
+        )
+
+        normative_terms = result.get("normative_terms", [])
+        judgment_markers = result.get("normative_judgment_markers", [])
+
+        st.markdown("**Valeur actuelle**")
+        st.write(f"Score : **{round(normative_value * 100, 1)}%**")
+        st.write(f"Niveau : **{normative_label}**")
+        st.write(f"Termes normatifs : **{len(normative_terms)}**")
+        st.write(f"Marqueurs de jugement : **{len(judgment_markers)}**")
+
+        st.markdown("**Interprétation actuelle**")
+        st.write(result["normative_interpretation"])
+
+        st.markdown("**Lecture**")
+        st.write(
+            "🟢 Faible : discours surtout descriptif\n"
+            "🟡 Modérée : quelques jugements intégrés au discours\n"
+            "🟠 Élevée : forte présence de qualification normative\n"
+            "🔴 Très élevée : jugement de valeur dominant"
+        )
+
+        st.markdown("**Attention**")
+        st.write(
+            "Une qualification normative élevée ne signifie pas que le texte est faux. "
+            "Elle indique que le discours présente davantage des jugements comme des évidences "
+            "que des faits strictement démontrés."
+        )
 
 with bf3:
     st.markdown("### Scientificité rhétorique")
@@ -10361,47 +10450,7 @@ row14_col1, row14_col2, row14_col3 = st.columns(3)
 row15_col1, row15_col2 = st.columns(2)
     
     
-# -----------------------------
-# 1) Qualifications normatives
-# -----------------------------
-with row1_col1:
-    st.markdown("### Qualification normative")
-    st.caption("Jugements de valeur présentés comme des faits.")
 
-    normative_value = result["normative_score"]
-
-    if normative_value < 0.20:
-        normative_label, normative_color = "Faible", "#ca8a04"
-    elif normative_value < 0.40:
-        normative_label, normative_color = "Modérée", "#f97316"
-    elif normative_value < 0.70:
-        normative_label, normative_color = "Élevée", "#ea580c"
-    else:
-        normative_label, normative_color = "Très élevée", "#dc2626"
-
-    render_custom_gauge(normative_value, normative_color)
-
-    st.markdown(
-        f"<b style='color:{normative_color}'>{normative_label}</b> — {round(normative_value * 100, 1)}%",
-        unsafe_allow_html=True
-    )
-    st.caption(result["normative_interpretation"])
-
-    with st.expander("Voir les marqueurs", expanded=False):
-        normative_terms = result.get("normative_terms", [])
-        judgment_markers = result.get("normative_judgment_markers", [])
-
-        if not normative_terms and not judgment_markers:
-            st.info("Aucun marqueur saillant détecté.")
-        else:
-            if normative_terms:
-                st.markdown("**Termes normatifs**")
-                for term in normative_terms:
-                    st.error(term)
-            if judgment_markers:
-                st.markdown("**Marqueurs de jugement**")
-                for term in judgment_markers:
-                    st.warning(term)
 
 # -----------------------------
 # 2) Prémisses idéologiques implicites
