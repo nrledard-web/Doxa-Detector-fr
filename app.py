@@ -12625,37 +12625,6 @@ for title, score, label, interpretation in gauges:
     if interpretation:
         st.write(interpretation)
 
-with row12_col1:
-    st.markdown("### Qualification normative")
-    st.caption("Usage de jugements de valeur comme substitut d’argument.")
-
-    value = result["normative_qualification_score"]
-
-    if value < 0.15:
-        label, color = "Faible", "#ca8a04"
-    elif value < 0.35:
-        label, color = "Modérée", "#f97316"
-    elif value < 0.60:
-        label, color = "Élevée", "#ea580c"
-    else:
-        label, color = "Très élevée", "#dc2626"
-
-    render_custom_gauge(value, color)
-    st.markdown(
-        f"<b style='color:{color}'>{label}</b> — {round(value*100,1)}%",
-        unsafe_allow_html=True
-    )
-    st.caption(result["normative_qualification_interpretation"])
-
-    with st.expander("Voir les marqueurs", expanded=False):
-        markers = result.get("normative_qualification_markers", [])
-        if not markers:
-            st.info("Aucune qualification normative notable détectée.")
-        else:
-            for marker in markers:
-                st.warning(marker)
-
-
 st.divider()
 st.subheader("Structure cognitive du texte analysé")
 st.info(T["llm_intro"])
