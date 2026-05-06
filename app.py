@@ -9564,10 +9564,85 @@ with oi2:
             "Une narration propagandiste élevée ne signifie pas que le texte est faux. "
             "Elle indique une construction discursive orientée visant à influencer la perception."
         )
-
+# -----------------------------
+# 11) Ennemi abstrait
+# -----------------------------
 with oi3:
     st.markdown("### Polarisation / Ennemi abstrait")
-    # jauge ici
+    st.caption("Construction d’un adversaire flou ou globalisant.")
+
+    abstract_enemy_value = result["abstract_enemy_score"]
+
+    if abstract_enemy_value < 0.20:
+        abstract_enemy_label, abstract_enemy_color = "Faible", "#ca8a04"
+    elif abstract_enemy_value < 0.40:
+        abstract_enemy_label, abstract_enemy_color = "Modérée", "#f97316"
+    elif abstract_enemy_value < 0.70:
+        abstract_enemy_label, abstract_enemy_color = "Élevée", "#ea580c"
+    else:
+        abstract_enemy_label, abstract_enemy_color = "Très élevée", "#dc2626"
+
+    render_custom_gauge(abstract_enemy_value, abstract_enemy_color)
+
+    st.markdown(
+        f"<b style='color:{abstract_enemy_color}'>{abstract_enemy_label}</b> — {round(abstract_enemy_value * 100, 1)}%",
+        unsafe_allow_html=True
+    )
+
+    st.caption(result["abstract_enemy_interpretation"])
+
+    with st.expander("🔎 Voir les marqueurs", expanded=False):
+        markers = result.get("abstract_enemy_markers", [])
+        if not markers:
+            st.info("Aucun ennemi abstrait notable détecté.")
+        else:
+            for marker in markers:
+                st.warning(marker)
+
+    with st.popover("ℹ️ Comprendre cette jauge"):
+        st.markdown("### Ennemi abstrait")
+
+        st.write(
+            "Cette jauge détecte la construction d’un adversaire vague, global ou mal défini. "
+            "Elle repère les formulations qui désignent un bloc hostile sans toujours préciser les acteurs, les faits ou les responsabilités."
+        )
+
+        st.markdown("**Principe**")
+        st.write(
+            "Le texte est comparé à une liste de marqueurs d’ennemi abstrait. "
+            "Chaque marqueur détecté augmente le score."
+        )
+
+        st.markdown("**Formule utilisée**")
+        st.code(
+            "markers = marqueurs d’ennemi abstrait détectés\n"
+            "score = min(len(markers) * coefficient / 10, 1.0)",
+            language="python"
+        )
+
+        markers = result.get("abstract_enemy_markers", [])
+
+        st.markdown("**Valeur actuelle**")
+        st.write(f"Score : **{round(abstract_enemy_value * 100, 1)}%**")
+        st.write(f"Niveau : **{abstract_enemy_label}**")
+        st.write(f"Marqueurs détectés : **{len(markers)}**")
+
+        st.markdown("**Interprétation actuelle**")
+        st.write(result["abstract_enemy_interpretation"])
+
+        st.markdown("**Lecture**")
+        st.write(
+            "🟢 Faible : adversaire peu ou pas construit\n"
+            "🟡 Modérée : désignation adverse présente mais limitée\n"
+            "🟠 Élevée : adversaire flou ou globalisant notable\n"
+            "🔴 Très élevée : forte construction d’un bloc ennemi"
+        )
+
+        st.markdown("**Attention**")
+        st.write(
+            "Un score élevé ne signifie pas que le texte est faux. "
+            "Il indique que le discours tend à construire un adversaire global, abstrait ou peu spécifié."
+        )
 
 st.divider()
 
