@@ -13175,3 +13175,57 @@ for i, (name, low, high) in enumerate(stages):
             st.info(name)
 
 st.caption("Lorsque G et N augmentent sans inflation de D, la cognition gagne en revisabilité.")
+
+# =============================
+# Formulaire de feedback
+# =============================
+
+import os
+from datetime import datetime
+import pandas as pd
+
+st.divider()
+st.subheader("📩 Feedback")
+st.caption("Signalez un bug, proposez une amélioration ou laissez un commentaire sur DOXA Detector.")
+
+FEEDBACK_FILE = "feedback_doxa.csv"
+
+with st.form("feedback_form"):
+    feedback_type = st.selectbox(
+        "Type de retour",
+        ["Bug", "Suggestion", "Problème d'affichage", "Résultat incompris", "Autre"]
+    )
+
+    user_email = st.text_input(
+        "Votre email — facultatif",
+        placeholder="exemple@email.com"
+    )
+
+    message = st.text_area(
+        "Votre message",
+        placeholder="Décrivez le problème ou votre suggestion...",
+        height=160
+    )
+
+    submitted = st.form_submit_button("Envoyer le feedback")
+
+if submitted:
+    if not message.strip():
+        st.warning("Veuillez écrire un message avant d’envoyer.")
+    else:
+        new_feedback = {
+            "date": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+            "type": feedback_type,
+            "email": user_email.strip(),
+            "message": message.strip()
+        }
+
+        if os.path.exists(FEEDBACK_FILE):
+            df = pd.read_csv(FEEDBACK_FILE)
+            df = pd.concat([df, pd.DataFrame([new_feedback])], ignore_index=True)
+        else:
+            df = pd.DataFrame([new_feedback])
+
+        df.to_csv(FEEDBACK_FILE, index=False)
+
+        st.success("Merci, votre feedback a bien été enregistré.")
