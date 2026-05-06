@@ -9770,61 +9770,6 @@ with row1_col2:
                 st.warning(marker)
 
 # -----------------------------
-# 3) Propagande narrative
-# -----------------------------
-with row1_col3:
-    st.markdown("### Narration propagandiste")
-    st.caption("Urgence, ennemi abstrait, certitude et charge émotionnelle.")
-
-    propaganda_value = result["propaganda_score"]
-
-    if propaganda_value < 0.20:
-        propaganda_label, propaganda_color = "Faible", "#ca8a04"
-    elif propaganda_value < 0.40:
-        propaganda_label, propaganda_color = "Modérée", "#f97316"
-    elif propaganda_value < 0.70:
-        propaganda_label, propaganda_color = "Élevée", "#ea580c"
-    else:
-        propaganda_label, propaganda_color = "Très élevée", "#dc2626"
-
-    render_custom_gauge(propaganda_value, propaganda_color)
-
-    st.markdown(
-        f"<b style='color:{propaganda_color}'>{propaganda_label}</b> — {round(propaganda_value * 100, 1)}%",
-        unsafe_allow_html=True
-    )
-    st.caption(result["propaganda_interpretation"])
-
-    with st.expander("Voir les marqueurs", expanded=False):
-        enemy_terms = result.get("propaganda_enemy_terms", [])
-        urgency_terms = result.get("propaganda_urgency_terms", [])
-        certainty_terms = result.get("propaganda_certainty_terms", [])
-        emotional_terms = result.get("propaganda_emotional_terms", [])
-
-        if not any([enemy_terms, urgency_terms, certainty_terms, emotional_terms]):
-            st.info("Aucun marqueur narratif saillant détecté.")
-        else:
-            if enemy_terms:
-                st.markdown("**Ennemi / bloc adverse**")
-                for term in enemy_terms:
-                    st.error(term)
-
-            if urgency_terms:
-                st.markdown("**Urgence / menace**")
-                for term in urgency_terms:
-                    st.warning(term)
-
-            if certainty_terms:
-                st.markdown("**Certitude absolue**")
-                for term in certainty_terms:
-                    st.warning(term)
-
-            if emotional_terms:
-                st.markdown("**Charge émotionnelle**")
-                for term in emotional_terms:
-                    st.error(term)
-
-# -----------------------------
 # 5) Confusion logique
 # -----------------------------
 with row2_col2:
