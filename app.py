@@ -10136,9 +10136,70 @@ with al6:
             "L’absence de sophisme détecté ne signifie pas que le texte est vrai. "
             "Elle signifie seulement qu’aucune faille syllogistique formelle n’a été repérée."
         )
+# -----------------------------
+# 26) Syllogismes / Enthymèmes détectés
+# -----------------------------
+st.markdown("### Syllogismes / Enthymèmes détectés")
+    st.caption("Raisonnements incomplets ou implicites repérés dans le texte.")
 
-st.markdown("### Syllogismes / Enthymèmes")
-# bloc logique ici
+    value = min(result["enthymeme_signal"] / 4, 1.0)
+
+    if result["enthymeme_signal"] == 0:
+        label, color = "Aucun signal", "#16a34a"
+    elif result["enthymeme_signal"] == 1:
+        label, color = "Signal faible", "#ca8a04"
+    elif result["enthymeme_signal"] <= 3:
+        label, color = "Signal modéré", "#f97316"
+    else:
+        label, color = "Signal fort", "#dc2626"
+
+    render_custom_gauge(value, color)
+
+    st.markdown(
+        f"<b style='color:{color}'>{result['enthymeme_label']}</b> — {result['enthymeme_signal']} repéré(s)",
+        unsafe_allow_html=True
+    )
+
+    st.caption("Conclusion présente, prémisse partiellement implicite.")
+
+    with st.popover("ℹ️ Comprendre cette jauge"):
+        st.markdown("### Enthymèmes détectés")
+
+        st.write(
+            "Cette jauge repère les raisonnements incomplets : une conclusion est présente, "
+            "mais une partie de la démonstration reste implicite."
+        )
+
+        st.markdown("**Principe**")
+        st.write(
+            "Elle cherche les cas où le texte suggère une conclusion sans expliciter toutes les prémisses nécessaires."
+        )
+
+        st.markdown("**Formule utilisée**")
+        st.code(
+            "enthymeme_signal = nombre d’enthymèmes détectés\n"
+            "value = min(enthymeme_signal / 4, 1.0)",
+            language="python"
+        )
+
+        st.markdown("**Valeur actuelle**")
+        st.write(f"Signal : **{result['enthymeme_signal']} repéré(s)**")
+        st.write(f"Niveau : **{result['enthymeme_label']}**")
+        st.write(f"Score jauge : **{round(value * 100, 1)}%**")
+
+        st.markdown("**Lecture**")
+        st.write(
+            "🟢 Aucun signal : aucun raisonnement implicite repéré\n"
+            "🟡 Signal faible : prémisse implicite ponctuelle\n"
+            "🟠 Signal modéré : plusieurs raisonnements incomplets\n"
+            "🔴 Signal fort : forte dépendance à des prémisses non explicitées"
+        )
+
+        st.markdown("**Attention**")
+        st.write(
+            "Un enthymème n’est pas forcément une erreur. "
+            "Il indique seulement qu’une partie du raisonnement est laissée implicite."
+        )
 
 st.divider()
 
@@ -10871,57 +10932,6 @@ for title, score, label, interpretation in gauges:
     
     if interpretation:
         st.write(interpretation)
-
-# -----------------------------
-# 25) Syllogismes détectés
-# -----------------------------
-with row9_col1:
-    st.markdown("### Syllogismes détectés")
-    st.caption("Structures logiques explicites repérées dans le texte.")
-
-    value = min(result["syllogism_signal"] / 2, 1.0)
-
-    if result["syllogism_signal"] == 0:
-        label, color = "Aucun signal", "#16a34a"
-    elif result["syllogism_signal"] == 1:
-        label, color = "Signal faible", "#ca8a04"
-    elif result["syllogism_signal"] <= 3:
-        label, color = "Signal modéré", "#f97316"
-    else:
-        label, color = "Signal fort", "#dc2626"
-
-    render_custom_gauge(value, color)
-    st.markdown(
-        f"<b style='color:{color}'>{result['syllogism_label']}</b> — {result['syllogism_signal']} repéré(s)",
-        unsafe_allow_html=True
-    )
-    st.caption("Détection de prémisses et conclusion enchaînées.")
-
-# -----------------------------
-# 26) Enthymèmes détectés
-# -----------------------------
-with row9_col2:
-    st.markdown("### Enthymèmes détectés")
-    st.caption("Raisonnements incomplets ou implicites repérés dans le texte.")
-
-    value = min(result["enthymeme_signal"] / 4, 1.0)
-
-    if result["enthymeme_signal"] == 0:
-        label, color = "Aucun signal", "#16a34a"
-    elif result["enthymeme_signal"] == 1:
-        label, color = "Signal faible", "#ca8a04"
-    elif result["enthymeme_signal"] <= 3:
-        label, color = "Signal modéré", "#f97316"
-    else:
-        label, color = "Signal fort", "#dc2626"
-
-    render_custom_gauge(value, color)
-    st.markdown(
-        f"<b style='color:{color}'>{result['enthymeme_label']}</b> — {result['enthymeme_signal']} repéré(s)",
-        unsafe_allow_html=True
-    )
-    st.caption("Conclusion présente, prémisse partiellement implicite.")
-
 
 with row10_col2:
     st.markdown("### Fausse causalité (simple)")
