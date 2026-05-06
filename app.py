@@ -10139,7 +10139,8 @@ with al6:
 # -----------------------------
 # 26) Syllogismes / Enthymèmes détectés
 # -----------------------------
-st.markdown("### Syllogismes / Enthymèmes détectés")
+with al7:
+    st.markdown("### Syllogismes / Enthymèmes détectés")
     st.caption("Raisonnements incomplets ou implicites repérés dans le texte.")
 
     value = min(result["enthymeme_signal"] / 4, 1.0)
