@@ -11904,7 +11904,7 @@ st.divider()
 st.subheader("🧪 Biais de formulation")
 st.caption("Biais liés au langage, à la présentation et à l’apparence de crédibilité.")
 
-bf1, bf2, bf3 = st.columns(3)
+bf1, bf2, bf3, bf4 = st.columns(4)
 # -----------------------------
 #  Autorité vague
 # -----------------------------
@@ -12158,8 +12158,7 @@ with bf3:
             "Une scientificité rhétorique élevée ne signifie pas que le texte est faux. "
             "Elle indique que le discours mobilise une apparence de science sans rendre ses bases clairement vérifiables."
         )
-
-bf4, bf5 = st.columns(2)
+        
 # -----------------------------
 #  Glissement sémantique
 # -----------------------------
@@ -12239,6 +12238,8 @@ with bf4:
             "Un glissement sémantique élevé ne signifie pas que le texte est faux. "
             "Il indique que le choix des mots peut déplacer l’interprétation du lecteur."
         )
+
+bf5, bf6, bf8, bf8 = st.columns(4)
 # -----------------------------
 #  Faux consensus
 # -----------------------------
@@ -12318,6 +12319,88 @@ with bf5:
             "Un faux consensus élevé ne signifie pas que l’idée est fausse. "
             "Il indique seulement que le texte présente un accord collectif sans le démontrer clairement."
         )
+# =============================
+# Autorité vague (simple)
+# =============================
+with bf5:
+    st.markdown("### Autorité vague (simple)")
+    st.caption("Autorité invoquée sans source clairement traçable.")
+
+    value = result["vague_authority_basic_score"]
+
+    if value < 0.15:
+        label, color = "Faible", "#ca8a04"
+    elif value < 0.35:
+        label, color = "Modérée", "#f97316"
+    elif value < 0.60:
+        label, color = "Élevée", "#ea580c"
+    else:
+        label, color = "Très élevée", "#dc2626"
+
+    render_custom_gauge(value, color)
+
+    st.markdown(
+        f"<b style='color:{color}'>{label}</b> — {round(value*100,1)}%",
+        unsafe_allow_html=True
+    )
+
+    st.caption(result["vague_authority_basic_interpretation"])
+
+    with st.expander("🔎 Voir les marqueurs", expanded=False):
+        markers = result.get("vague_authority_basic_markers", [])
+        if not markers:
+            st.info("Aucune autorité vague simple notable détectée.")
+        else:
+            for marker in markers:
+                st.warning(marker)
+
+    with st.popover("ℹ️ Comprendre cette jauge"):
+        st.markdown("### Autorité vague (simple)")
+
+        st.write(
+            "Cette jauge détecte les appels à une autorité non précisée : "
+            "experts, études ou sources évoqués sans référence vérifiable."
+        )
+
+        st.markdown("**Principe**")
+        st.write(
+            "Le texte est comparé à des marqueurs d’autorité vague : "
+            "expressions comme « des experts », « des études montrent », "
+            "sans indication claire de source."
+        )
+
+        st.markdown("**Formule utilisée**")
+        st.code(
+            "markers = autorités vagues détectées\n"
+            "score = min(len(markers) * coefficient / 10, 1.0)",
+            language="python"
+        )
+
+        markers = result.get("vague_authority_basic_markers", [])
+
+        st.markdown("**Valeur actuelle**")
+        st.write(f"Score : **{round(value * 100, 1)}%**")
+        st.write(f"Niveau : **{label}**")
+        st.write(f"Marqueurs détectés : **{len(markers)}**")
+
+        st.markdown("**Interprétation actuelle**")
+        st.write(result["vague_authority_basic_interpretation"])
+
+        st.markdown("**Lecture**")
+        st.write(
+            "🟢 Faible : sources précises ou absentes\n"
+            "🟡 Modérée : références floues ponctuelles\n"
+            "🟠 Élevée : recours notable à des autorités non identifiées\n"
+            "🔴 Très élevée : argument d’autorité flou dominant"
+        )
+
+        st.markdown("**Attention**")
+        st.write(
+            "Une autorité vague élevée ne signifie pas que le contenu est faux. "
+            "Elle indique que les sources invoquées ne sont pas clairement vérifiables."
+        )
+
+
 
 st.divider()
 
@@ -12544,66 +12627,6 @@ for title, score, label, interpretation in gauges:
     
     if interpretation:
         st.write(interpretation)
-
-with row10_col3:
-    st.markdown("### Généralisation abusive")
-    st.caption("Passage abusif de cas particuliers à une règle générale.")
-
-    value = result["hasty_generalization_score"]
-
-    if value < 0.15:
-        label, color = "Faible", "#ca8a04"
-    elif value < 0.35:
-        label, color = "Modérée", "#f97316"
-    elif value < 0.60:
-        label, color = "Élevée", "#ea580c"
-    else:
-        label, color = "Très élevée", "#dc2626"
-
-    render_custom_gauge(value, color)
-    st.markdown(
-        f"<b style='color:{color}'>{label}</b> — {round(value*100,1)}%",
-        unsafe_allow_html=True
-    )
-    st.caption(result["hasty_generalization_interpretation"])
-
-    with st.expander("Voir les marqueurs", expanded=False):
-        markers = result.get("hasty_generalization_markers", [])
-        if not markers:
-            st.info("Aucune généralisation abusive notable détectée.")
-        else:
-            for marker in markers:
-                st.warning(marker)
-
-with row11_col1:
-    st.markdown("### Autorité vague (simple)")
-    st.caption("Autorité invoquée sans source clairement traçable.")
-
-    value = result["vague_authority_basic_score"]
-
-    if value < 0.15:
-        label, color = "Faible", "#ca8a04"
-    elif value < 0.35:
-        label, color = "Modérée", "#f97316"
-    elif value < 0.60:
-        label, color = "Élevée", "#ea580c"
-    else:
-        label, color = "Très élevée", "#dc2626"
-
-    render_custom_gauge(value, color)
-    st.markdown(
-        f"<b style='color:{color}'>{label}</b> — {round(value*100,1)}%",
-        unsafe_allow_html=True
-    )
-    st.caption(result["vague_authority_basic_interpretation"])
-
-    with st.expander("Voir les marqueurs", expanded=False):
-        markers = result.get("vague_authority_basic_markers", [])
-        if not markers:
-            st.info("Aucune autorité vague simple notable détectée.")
-        else:
-            for marker in markers:
-                st.warning(marker)
 
 with row12_col1:
     st.markdown("### Qualification normative")
