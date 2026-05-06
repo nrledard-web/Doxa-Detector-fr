@@ -9045,7 +9045,7 @@ with pd1:
         )
         st.caption(result["emotional_intensity_interpretation"])
 
-        with st.expander("🔎 Voir les marqueurs", expanded=False):
+        with st.expander("🔎 Marqueurs détectés", expanded=False):
             markers = result.get("emotional_intensity_markers", [])
             if not markers:
                 st.info("Aucun marqueur émotionnel notable détecté.")
