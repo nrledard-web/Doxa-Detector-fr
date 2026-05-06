@@ -9189,9 +9189,93 @@ st.caption("Analyse de la cohérence interne du discours, indépendamment de sa 
 
 sr1, sr2 = st.columns(2)
 
+# -----------------------------
+# 4) Cohérence discursive
+# -----------------------------
 with sr1:
     st.markdown("### Cohérence discursive")
-    # jauge ici
+    st.caption("Solidité interne du texte, indépendamment de sa vérifiabilité.")
+
+    coherence_score = result["discursive_coherence_score"]
+    coherence_value = coherence_score / 20
+
+    if coherence_value < 0.20:
+        coherence_label, coherence_color = "Faible", "#dc2626"
+    elif coherence_value < 0.40:
+        coherence_label, coherence_color = "Limitée", "#f97316"
+    elif coherence_value < 0.65:
+        coherence_label, coherence_color = "Correcte", "#ca8a04"
+    elif coherence_value < 0.85:
+        coherence_label, coherence_color = "Solide", "#84cc16"
+    else:
+        coherence_label, coherence_color = "Très forte", "#16a34a"
+
+    render_custom_gauge(coherence_value, coherence_color)
+
+    st.markdown(
+        f"<b style='color:{coherence_color}'>{coherence_label}</b> — {coherence_score}/20",
+        unsafe_allow_html=True
+    )
+
+    st.caption(result["discursive_coherence_label"])
+
+    with st.popover("ℹ️ Comprendre cette jauge"):
+        st.markdown("### Cohérence discursive")
+
+        st.write(
+            "Cette jauge mesure la solidité interne du texte. "
+            "Elle ne vérifie pas si le texte est vrai ou faux : elle observe si le discours est construit, stable et cohérent."
+        )
+
+        st.markdown("**Principe**")
+        st.write(
+            "Le score combine plusieurs dimensions : logique discursive, stabilité thématique, longueur utile, "
+            "cohérence entre paragraphes, puis applique des pénalités en cas de contradiction ou de rupture de sujet."
+        )
+
+        st.markdown("**Formule utilisée**")
+        st.code(
+            "score = logic_score + stability_score + length_score + paragraph_score\n"
+            "score = score - contradiction_penalty - topic_shift_penalty\n"
+            "score = max(0, min(score, 20))",
+            language="python"
+        )
+
+        d = result["discursive_coherence_details"]
+
+        st.markdown("**Valeur actuelle**")
+        st.write(f"Score : **{coherence_score}/20**")
+        st.write(f"Niveau : **{coherence_label}**")
+
+        st.write(f"Logique discursive : **{d['logic_score']}/5**")
+        st.write(f"Stabilité thématique : **{d['stability_score']}/4**")
+        st.write(f"Longueur utile : **{d['length_score']}/5**")
+        st.write(f"Cohérence entre paragraphes : **{d['paragraph_score']}/4**")
+        st.write(f"Pénalité de contradiction : **-{d['contradiction_penalty']}**")
+        st.write(f"Pénalité de rupture thématique : **-{d['topic_shift_penalty']}**")
+
+        if d["top_keywords"]:
+            st.markdown("**Mots-clés dominants**")
+            for word, count in d["top_keywords"]:
+                st.write(f"- {word} ({count})")
+
+        st.markdown("**Interprétation actuelle**")
+        st.write(result["discursive_coherence_label"])
+
+        st.markdown("**Lecture**")
+        st.write(
+            "🔴 Faible : texte peu structuré ou instable\n"
+            "🟠 Limitée : cohérence fragile\n"
+            "🟡 Correcte : structure compréhensible mais perfectible\n"
+            "🟢 Solide : discours bien organisé\n"
+            "🟢 Très forte : cohérence interne très robuste"
+        )
+
+        st.markdown("**Attention**")
+        st.write(
+            "Une forte cohérence discursive ne prouve pas qu’un texte est vrai. "
+            "Un discours peut être très cohérent tout en restant faux, idéologique ou invérifiable."
+        )
 
 with sr2:
     st.markdown("### Cohérence trompeuse")
