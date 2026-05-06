@@ -12597,31 +12597,6 @@ st.markdown("""
 </div>
 """, unsafe_allow_html=True)
 
-# -----------------------------
-# 18) Clôture cognitive
-# -----------------------------
-with st.expander("Clôture cognitive"):
-    st.markdown("### Clôture cognitive")
-    st.caption("Degré de verrouillage du discours par excès de certitude.")
-
-    closure_local = (
-        (result["D"] * (1 + len(result["red_flags"]) / 5)) / (result["G"] + result["N"])
-        if (result["G"] + result["N"]) > 0 else 10
-    )
-
-    closure_value = min(closure_local / 1.5, 1.0)
-
-    if closure_local < 0.40:
-        closure_label, closure_color = "Ouverte", "#16a34a"
-    elif closure_local < 0.75:
-        closure_label, closure_color = "Modérée", "#ca8a04"
-    elif closure_local < 1.10:
-        closure_label, closure_color = "Élevée", "#f97316"
-    else:
-        closure_label, closure_color = "Critique", "#dc2626"
-
-    render_custom_gauge(closure_value, closure_color)
-
 # =============================
 # Jauges structurelles avancées
 # =============================
