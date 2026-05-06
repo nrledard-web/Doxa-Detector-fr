@@ -9100,9 +9100,71 @@ with pd1:
                 "Elle indique seulement que le discours agit fortement sur l’affect du lecteur."
             )
     
-        with pd3:
-            st.markdown("### Asymétrie argumentative")
-            # jauge ici
+    with pd3:
+        st.markdown("### Asymétrie argumentative")
+        st.caption("Le texte attaque davantage qu’il ne démontre.")
+    
+        value = result["argument_asymmetry_score"]
+    
+        if value < 0.15:
+            label, color = "Faible", "#ca8a04"
+        elif value < 0.35:
+            label, color = "Modérée", "#f97316"
+        elif value < 0.60:
+            label, color = "Élevée", "#ea580c"
+        else:
+            label, color = "Très élevée", "#dc2626"
+    
+        render_custom_gauge(value, color)
+    
+        st.markdown(
+            f"<b style='color:{color}'>{label}</b> — {round(value*100,1)}%",
+            unsafe_allow_html=True
+        )
+
+        st.caption(result["argument_asymmetry_interpretation"])
+    
+        st.caption(
+            f"Attaques : {result['argument_attack_count']} | "
+            f"Appuis logiques : {result['argument_support_count']}"
+        )
+        with st.popover("🔎 Marqueurs détectés"):
+            st.markdown("""
+Cette jauge repose sur des marqueurs lexicaux.
+
+Elle compare :
+
+- les termes d’attaque ou de disqualification ;
+- les termes d’appui logique ou explicatif.
+
+Elle mesure l’équilibre entre accusation et démonstration.
+""")
+
+        st.write(f"**Attaques détectées :** {result['argument_attack_count']}")
+        st.write(f"**Appuis logiques détectés :** {result['argument_support_count']}")
+
+        # 📐 POPOVER FORMULE
+        with st.popover("📐 Formule et explication"):
+            st.markdown("Formule utilisée :")
+    
+            st.code("""
+    if argument_count == 0:
+        score = attack_count * 0.25
+    else:
+        score = (attack_count / argument_count) * 0.25
+    
+    score = min(score, 1.0)
+    """, language="python")
+    
+            st.markdown("""
+    Interprétation :
+    
+    - plus les attaques augmentent ;
+    - plus les appuis logiques diminuent ;
+    - plus l’asymétrie augmente.
+    
+    Un score élevé indique un discours plus accusatoire ou peu démonstratif.
+    """)
         
     st.divider()
     
