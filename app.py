@@ -12853,6 +12853,12 @@ if st.session_state.get("article_source") == "paste":
                     st.warning(T["no_strong_sources_found"])
     else:
         st.info(T["no_corroboration_found"])
+        
+st.markdown("""
+<div style="text-align:center; margin:25px 0; color:#888;">
+──── 🧠 ────
+</div>
+""", unsafe_allow_html=True)
 
 # -----------------------------
 # Méthode
