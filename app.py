@@ -10783,27 +10783,27 @@ Elle mesure l’équilibre entre accusation et démonstration.
     st.write(f"**Attaques détectées :** {result['argument_attack_count']}")
     st.write(f"**Appuis logiques détectés :** {result['argument_support_count']}")
 
-with st.popover("📐 Formule et explication"):
-    st.markdown("Formule utilisée :")
-
-    st.code("""
-if argument_count == 0:
-    score = attack_count * 0.25
-else:
-    score = (attack_count / argument_count) * 0.25
-
-score = min(score, 1.0)
-""", language="python")
-
-    st.markdown("""
-Interprétation :
-
-- plus les attaques augmentent ;
-- plus les appuis logiques diminuent ;
-- plus l’asymétrie augmente.
-
-Un score élevé indique un discours plus accusatoire ou peu démonstratif.
-""")
+    with st.popover("📐 Formule et explication"):
+        st.markdown("Formule utilisée :")
+    
+        st.code("""
+    if argument_count == 0:
+        score = attack_count * 0.25
+    else:
+        score = (attack_count / argument_count) * 0.25
+    
+    score = min(score, 1.0)
+    """, language="python")
+    
+        st.markdown("""
+    Interprétation :
+    
+    - plus les attaques augmentent ;
+    - plus les appuis logiques diminuent ;
+    - plus l’asymétrie augmente.
+    
+    Un score élevé indique un discours plus accusatoire ou peu démonstratif.
+    """)
 
 with st.expander("Voir les manœuvres discursives détectées", expanded=False):
     if result["political_pattern_score"] == 0:
