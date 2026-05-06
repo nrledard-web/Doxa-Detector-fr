@@ -12648,8 +12648,14 @@ for title, score, label, interpretation in gauges:
     
     if interpretation:
         st.write(interpretation)
-
+        
+st.markdown("""
+<div style="text-align:center; margin:25px 0; color:#888;">
+──── 🧠 ────
+</div>
+""", unsafe_allow_html=True)
 st.divider()
+
 st.subheader("Structure cognitive du texte analysé")
 st.info(T["llm_intro"])
 
@@ -12716,6 +12722,12 @@ if not claims_df.empty:
     st.dataframe(claims_df, use_container_width=True, hide_index=True)
 else:
     st.info(T["paste_longer_text"])
+    
+st.markdown("""
+<div style="text-align:center; margin:25px 0; color:#888;">
+──── 🧠 ────
+</div>
+""", unsafe_allow_html=True)
 
 st.divider()
 st.subheader("Analyse syllogistique")
@@ -12746,12 +12758,6 @@ else:
     st.info("Aucun syllogisme détecté.")
 
 st.divider()
-
-st.markdown("""
-<div style="text-align:center; margin:25px 0; color:#888;">
-──── 🧠 ────
-</div>
-""", unsafe_allow_html=True)
 
 st.subheader("Enthymèmes détectés")
 
