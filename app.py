@@ -9735,10 +9735,87 @@ with al1:
             "Une confusion logique élevée ne signifie pas automatiquement que le texte est faux. "
             "Elle indique que certains liens de cause, de conséquence ou de projection méritent d’être vérifiés."
         )
-
+# -----------------------------
+# 7) Fausse causalité
+# -----------------------------
 with al2:
     st.markdown("### Fausse causalité")
-    # jauge ici
+    st.caption("Liens causaux affirmés plus vite qu'ils ne sont démontrés.")
+
+    causal_value = result["causal_overreach_score"]
+
+    if causal_value < 0.20:
+        causal_label, causal_color = "Faible", "#ca8a04"
+    elif causal_value < 0.40:
+        causal_label, causal_color = "Modérée", "#f97316"
+    elif causal_value < 0.70:
+        causal_label, causal_color = "Élevée", "#ea580c"
+    else:
+        causal_label, causal_color = "Très élevée", "#dc2626"
+
+    render_custom_gauge(causal_value, causal_color)
+
+    st.markdown(
+        f"<b style='color:{causal_color}'>{causal_label}</b> — {round(causal_value * 100, 1)}%",
+        unsafe_allow_html=True
+    )
+
+    st.caption(result["causal_overreach_interpretation"])
+
+    # 🔎 Marqueurs
+    with st.expander("🔎 Voir les marqueurs", expanded=False):
+        markers = result.get("causal_overreach_markers", [])
+        if not markers:
+            st.info("Aucun marqueur de causalité abusive détecté.")
+        else:
+            for marker in markers:
+                st.warning(marker)
+
+    # ℹ️ Explication
+    with st.popover("ℹ️ Comprendre cette jauge"):
+        st.markdown("### Fausse causalité")
+
+        st.write(
+            "Cette jauge détecte les situations où un lien de cause à effet est affirmé trop rapidement, "
+            "sans preuve suffisante ou sans démonstration rigoureuse."
+        )
+
+        st.markdown("**Principe**")
+        st.write(
+            "Le texte est comparé à des marqueurs de causalité abusive : liens implicites, "
+            "enchaînements rapides, corrélations présentées comme des causes."
+        )
+
+        st.markdown("**Formule utilisée**")
+        st.code(
+            "markers = marqueurs de causalité détectés\n"
+            "score = min(len(markers) * coefficient / 10, 1.0)",
+            language="python"
+        )
+
+        markers = result.get("causal_overreach_markers", [])
+
+        st.markdown("**Valeur actuelle**")
+        st.write(f"Score : **{round(causal_value * 100, 1)}%**")
+        st.write(f"Niveau : **{causal_label}**")
+        st.write(f"Marqueurs détectés : **{len(markers)}**")
+
+        st.markdown("**Interprétation actuelle**")
+        st.write(result["causal_overreach_interpretation"])
+
+        st.markdown("**Lecture**")
+        st.write(
+            "🟢 Faible : causalité prudente ou absente\n"
+            "🟡 Modérée : quelques raccourcis causaux\n"
+            "🟠 Élevée : causalité affirmée sans preuve solide\n"
+            "🔴 Très élevée : enchaînements causaux abusifs"
+        )
+
+        st.markdown("**Attention**")
+        st.write(
+            "Une fausse causalité élevée ne signifie pas que le texte est entièrement faux. "
+            "Elle indique que certains liens de cause à effet doivent être vérifiés ou approfondis."
+        )
 
 with al3:
     st.markdown("### Faux dilemme")
@@ -9952,40 +10029,6 @@ with row2_col3:
         markers = result.get("scientific_simulation_markers", [])
         if not markers:
             st.info("Aucun marqueur de scientificité rhétorique détecté.")
-        else:
-            for marker in markers:
-                st.warning(marker)
-
-# -----------------------------
-# 7) Fausse causalité
-# -----------------------------
-with row3_col1:
-    st.markdown("### Fausse causalité")
-    st.caption("Liens causaux affirmés plus vite qu'ils ne sont démontrés.")
-
-    causal_value = result["causal_overreach_score"]
-
-    if causal_value < 0.20:
-        causal_label, causal_color = "Faible", "#ca8a04"
-    elif causal_value < 0.40:
-        causal_label, causal_color = "Modérée", "#f97316"
-    elif causal_value < 0.70:
-        causal_label, causal_color = "Élevée", "#ea580c"
-    else:
-        causal_label, causal_color = "Très élevée", "#dc2626"
-
-    render_custom_gauge(causal_value, causal_color)
-
-    st.markdown(
-        f"<b style='color:{causal_color}'>{causal_label}</b> — {round(causal_value * 100, 1)}%",
-        unsafe_allow_html=True
-    )
-    st.caption(result["causal_overreach_interpretation"])
-
-    with st.expander("Voir les marqueurs", expanded=False):
-        markers = result.get("causal_overreach_markers", [])
-        if not markers:
-            st.info("Aucun marqueur de causalité abusive détecté.")
         else:
             for marker in markers:
                 st.warning(marker)
