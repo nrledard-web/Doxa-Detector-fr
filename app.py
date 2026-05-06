@@ -10795,6 +10795,17 @@ else:
     score = (attack_count / argument_count) * 0.25
 
 score = min(score, 1.0)
+""", language="python")
+
+    st.markdown("""
+Interprétation :
+
+- plus les attaques augmentent ;
+- plus les appuis logiques diminuent ;
+- plus l’asymétrie augmente.
+
+Un score élevé indique un discours plus accusatoire ou peu démonstratif.
+""")
 
 with st.expander("Voir les manœuvres discursives détectées", expanded=False):
     if result["political_pattern_score"] == 0:
