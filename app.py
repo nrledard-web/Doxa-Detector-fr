@@ -10204,7 +10204,6 @@ with al7:
 
 st.divider()
 
-
 # =============================
 # 🧪 6. BIAIS DE FORMULATION
 # =============================
@@ -10212,10 +10211,87 @@ st.subheader("🧪 Biais de formulation")
 st.caption("Biais liés au langage, à la présentation et à l’apparence de crédibilité.")
 
 bf1, bf2, bf3 = st.columns(3)
-
+# -----------------------------
+# 8) Autorité vague
+# -----------------------------
 with bf1:
     st.markdown("### Autorité vague")
-    # jauge ici
+    st.caption("Appels à des experts, études ou spécialistes sans source précise.")
+
+    vague_auth_value = result["vague_authority_score"]
+
+    if vague_auth_value < 0.20:
+        vague_auth_label, vague_auth_color = "Faible", "#ca8a04"
+    elif vague_auth_value < 0.40:
+        vague_auth_label, vague_auth_color = "Modérée", "#f97316"
+    elif vague_auth_value < 0.70:
+        vague_auth_label, vague_auth_color = "Élevée", "#ea580c"
+    else:
+        vague_auth_label, vague_auth_color = "Très élevée", "#dc2626"
+
+    render_custom_gauge(vague_auth_value, vague_auth_color)
+
+    st.markdown(
+        f"<b style='color:{vague_auth_color}'>{vague_auth_label}</b> — {round(vague_auth_value * 100, 1)}%",
+        unsafe_allow_html=True
+    )
+
+    st.caption(result["vague_authority_interpretation"])
+
+    # 🔎 Marqueurs
+    with st.expander("🔎 Voir les marqueurs", expanded=False):
+        markers = result.get("vague_authority_markers", [])
+        if not markers:
+            st.info("Aucun marqueur d'autorité vague détecté.")
+        else:
+            for marker in markers:
+                st.warning(marker)
+
+    # ℹ️ Explication
+    with st.popover("ℹ️ Comprendre cette jauge"):
+        st.markdown("### Autorité vague")
+
+        st.write(
+            "Cette jauge détecte les appels à l’autorité non vérifiables : experts non nommés, "
+            "études sans source, ou références imprécises."
+        )
+
+        st.markdown("**Principe**")
+        st.write(
+            "Le texte est comparé à des marqueurs d’autorité vague : formulations du type "
+            "“selon des experts”, “des études montrent”, sans précision ni source traçable."
+        )
+
+        st.markdown("**Formule utilisée**")
+        st.code(
+            "markers = marqueurs d’autorité vague détectés\n"
+            "score = min(len(markers) * coefficient / 10, 1.0)",
+            language="python"
+        )
+
+        markers = result.get("vague_authority_markers", [])
+
+        st.markdown("**Valeur actuelle**")
+        st.write(f"Score : **{round(vague_auth_value * 100, 1)}%**")
+        st.write(f"Niveau : **{vague_auth_label}**")
+        st.write(f"Marqueurs détectés : **{len(markers)}**")
+
+        st.markdown("**Interprétation actuelle**")
+        st.write(result["vague_authority_interpretation"])
+
+        st.markdown("**Lecture**")
+        st.write(
+            "🟢 Faible : sources explicites ou absentes\n"
+            "🟡 Modérée : références peu précises\n"
+            "🟠 Élevée : appui fréquent sur des autorités vagues\n"
+            "🔴 Très élevée : argument d’autorité dominant et non vérifiable"
+        )
+
+        st.markdown("**Attention**")
+        st.write(
+            "Une autorité vague élevée ne signifie pas que l’information est fausse. "
+            "Elle indique que les sources sont insuffisamment précises pour être vérifiées."
+        )
 
 with bf2:
     st.markdown("### Qualification normative")
@@ -10393,40 +10469,6 @@ with row2_col3:
         markers = result.get("scientific_simulation_markers", [])
         if not markers:
             st.info("Aucun marqueur de scientificité rhétorique détecté.")
-        else:
-            for marker in markers:
-                st.warning(marker)
-
-# -----------------------------
-# 8) Autorité vague
-# -----------------------------
-with row3_col2:
-    st.markdown("### Autorité vague")
-    st.caption("Appels à des experts, études ou spécialistes sans source précise.")
-
-    vague_auth_value = result["vague_authority_score"]
-
-    if vague_auth_value < 0.20:
-        vague_auth_label, vague_auth_color = "Faible", "#ca8a04"
-    elif vague_auth_value < 0.40:
-        vague_auth_label, vague_auth_color = "Modérée", "#f97316"
-    elif vague_auth_value < 0.70:
-        vague_auth_label, vague_auth_color = "Élevée", "#ea580c"
-    else:
-        vague_auth_label, vague_auth_color = "Très élevée", "#dc2626"
-
-    render_custom_gauge(vague_auth_value, vague_auth_color)
-
-    st.markdown(
-        f"<b style='color:{vague_auth_color}'>{vague_auth_label}</b> — {round(vague_auth_value * 100, 1)}%",
-        unsafe_allow_html=True
-    )
-    st.caption(result["vague_authority_interpretation"])
-
-    with st.expander("Voir les marqueurs", expanded=False):
-        markers = result.get("vague_authority_markers", [])
-        if not markers:
-            st.info("Aucun marqueur d'autorité vague détecté.")
         else:
             for marker in markers:
                 st.warning(marker)
