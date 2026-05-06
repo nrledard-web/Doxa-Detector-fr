@@ -10071,7 +10071,7 @@ with al5:
             "en négligeant d’autres données nécessaires à l’équilibre de l’analyse."
         )
 # -----------------------------
-# 27) Sophismes syllogistiques détectés
+#  Sophismes syllogistiques détectés
 # -----------------------------
 with al6:
     st.markdown("### Sophismes syllogistiques détectés")
@@ -10137,7 +10137,7 @@ with al6:
             "Elle signifie seulement qu’aucune faille syllogistique formelle n’a été repérée."
         )
 # -----------------------------
-# 26) Syllogismes / Enthymèmes détectés
+#  Syllogismes / Enthymèmes détectés
 # -----------------------------
 with al7:
     st.markdown("### Syllogismes / Enthymèmes détectés")
@@ -10212,7 +10212,7 @@ st.caption("Biais liés au langage, à la présentation et à l’apparence de c
 
 bf1, bf2, bf3 = st.columns(3)
 # -----------------------------
-# 8) Autorité vague
+#  Autorité vague
 # -----------------------------
 with bf1:
     st.markdown("### Autorité vague")
@@ -10293,7 +10293,7 @@ with bf1:
             "Elle indique que les sources sont insuffisamment précises pour être vérifiées."
         )
 # -----------------------------
-# 1) Qualifications normatives
+#  Qualifications normatives
 # -----------------------------
 with bf2:
     st.markdown("### Qualification normative")
@@ -10386,7 +10386,7 @@ with bf2:
             "que des faits strictement démontrés."
         )
 # -----------------------------
-# 6) Scientificité rhétorique
+#  Scientificité rhétorique
 # -----------------------------
 with bf3:
     st.markdown("### Scientificité rhétorique")
@@ -10467,7 +10467,7 @@ with bf3:
 
 bf4, bf5 = st.columns(2)
 # -----------------------------
-# 16) Glissement sémantique
+#  Glissement sémantique
 # -----------------------------
 with bf4:
     st.markdown("### Glissement sémantique")
@@ -10545,10 +10545,85 @@ with bf4:
             "Un glissement sémantique élevé ne signifie pas que le texte est faux. "
             "Il indique que le choix des mots peut déplacer l’interprétation du lecteur."
         )
-
+# -----------------------------
+#  Faux consensus
+# -----------------------------
 with bf5:
     st.markdown("### Faux consensus")
-    # jauge ici
+    st.caption("Simulation d’un accord collectif présenté comme évident.")
+
+    false_consensus_value = result["false_consensus_score"]
+
+    if false_consensus_value < 0.15:
+        false_consensus_label, false_consensus_color = "Faible", "#ca8a04"
+    elif false_consensus_value < 0.35:
+        false_consensus_label, false_consensus_color = "Modérée", "#f97316"
+    elif false_consensus_value < 0.60:
+        false_consensus_label, false_consensus_color = "Élevée", "#ea580c"
+    else:
+        false_consensus_label, false_consensus_color = "Très élevée", "#dc2626"
+
+    render_custom_gauge(false_consensus_value, false_consensus_color)
+
+    st.markdown(
+        f"<b style='color:{false_consensus_color}'>{false_consensus_label}</b> — {round(false_consensus_value * 100, 1)}%",
+        unsafe_allow_html=True
+    )
+
+    st.caption(result["false_consensus_interpretation"])
+
+    with st.expander("🔎 Voir les marqueurs", expanded=False):
+        markers = result.get("false_consensus_markers", [])
+        if not markers:
+            st.info("Aucun faux consensus notable détecté.")
+        else:
+            for marker in markers:
+                st.warning(marker)
+
+    with st.popover("ℹ️ Comprendre cette jauge"):
+        st.markdown("### Faux consensus")
+
+        st.write(
+            "Cette jauge détecte les formulations qui donnent l’impression qu’un accord collectif existe, "
+            "alors que cet accord n’est pas démontré."
+        )
+
+        st.markdown("**Principe**")
+        st.write(
+            "Le texte est comparé à des marqueurs de consensus apparent : expressions comme "
+            "“tout le monde sait”, “personne ne conteste”, ou formes équivalentes."
+        )
+
+        st.markdown("**Formule utilisée**")
+        st.code(
+            "markers = marqueurs de faux consensus détectés\n"
+            "score = min(len(markers) * coefficient / 10, 1.0)",
+            language="python"
+        )
+
+        markers = result.get("false_consensus_markers", [])
+
+        st.markdown("**Valeur actuelle**")
+        st.write(f"Score : **{round(false_consensus_value * 100, 1)}%**")
+        st.write(f"Niveau : **{false_consensus_label}**")
+        st.write(f"Marqueurs détectés : **{len(markers)}**")
+
+        st.markdown("**Interprétation actuelle**")
+        st.write(result["false_consensus_interpretation"])
+
+        st.markdown("**Lecture**")
+        st.write(
+            "🟢 Faible : pas de consensus simulé\n"
+            "🟡 Modérée : accord collectif suggéré ponctuellement\n"
+            "🟠 Élevée : consensus apparent notable\n"
+            "🔴 Très élevée : accord collectif fortement présenté comme évident"
+        )
+
+        st.markdown("**Attention**")
+        st.write(
+            "Un faux consensus élevé ne signifie pas que l’idée est fausse. "
+            "Il indique seulement que le texte présente un accord collectif sans le démontrer clairement."
+        )
 
 st.divider()
 
@@ -10701,42 +10776,6 @@ with row4_col3:
         else:
             for marker in markers:
                 st.warning(marker)
-
-# -----------------------------
-# 13) Faux consensus
-# -----------------------------
-with row5_col1:
-    st.markdown("### Faux consensus")
-    st.caption("Simulation d’un accord collectif présenté comme évident.")
-
-    false_consensus_value = result["false_consensus_score"]
-
-    if false_consensus_value < 0.15:
-        false_consensus_label, false_consensus_color = "Faible", "#ca8a04"
-    elif false_consensus_value < 0.35:
-        false_consensus_label, false_consensus_color = "Modérée", "#f97316"
-    elif false_consensus_value < 0.60:
-        false_consensus_label, false_consensus_color = "Élevée", "#ea580c"
-    else:
-        false_consensus_label, false_consensus_color = "Très élevée", "#dc2626"
-
-    render_custom_gauge(false_consensus_value, false_consensus_color)
-
-    st.markdown(
-        f"<b style='color:{false_consensus_color}'>{false_consensus_label}</b> — {round(false_consensus_value * 100, 1)}%",
-        unsafe_allow_html=True
-    )
-    st.caption(result["false_consensus_interpretation"])
-
-    with st.expander("Voir les marqueurs", expanded=False):
-        markers = result.get("false_consensus_markers", [])
-        if not markers:
-            st.info("Aucun faux consensus notable détecté.")
-        else:
-            for marker in markers:
-                st.warning(marker)
-
-
 # -----------------------------
 # 14) Opposition binaire
 # -----------------------------
