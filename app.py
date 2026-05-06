@@ -9103,9 +9103,9 @@ with pd1:
     with pd3:
         st.markdown("### Asymétrie argumentative")
         st.caption("Le texte attaque davantage qu’il ne démontre.")
-    
+
         value = result["argument_asymmetry_score"]
-    
+
         if value < 0.15:
             label, color = "Faible", "#ca8a04"
         elif value < 0.35:
@@ -9114,56 +9114,70 @@ with pd1:
             label, color = "Élevée", "#ea580c"
         else:
             label, color = "Très élevée", "#dc2626"
-    
+
         render_custom_gauge(value, color)
-    
+
         st.markdown(
-            f"<b style='color:{color}'>{label}</b> — {round(value*100,1)}%",
+            f"<b style='color:{color}'>{label}</b> — {round(value * 100, 1)}%",
             unsafe_allow_html=True
         )
 
         st.caption(result["argument_asymmetry_interpretation"])
-    
+
         with st.popover("🔎 Marqueurs détectés"):
-            st.markdown("""
-Cette jauge repose sur des marqueurs lexicaux.
+            st.markdown("### Marqueurs détectés")
 
-Elle compare :
+            st.write(
+                "Cette jauge repose sur deux familles de marqueurs : "
+                "les termes d’attaque ou de disqualification, "
+                "et les termes d’appui logique ou explicatif."
+            )
 
-- les termes d’attaque ou de disqualification ;
-- les termes d’appui logique ou explicatif.
+            st.write(f"**Attaques détectées :** {result['argument_attack_count']}")
+            st.write(f"**Appuis logiques détectés :** {result['argument_support_count']}")
 
-Elle mesure l’équilibre entre accusation et démonstration.
-
-        st.caption(
-            f"Attaques : {result['argument_attack_count']} | "
-            f"Appuis logiques : {result['argument_support_count']}"
-        )
-        st.write(f"**Attaques détectées :** {result['argument_attack_count']}")
-        st.write(f"**Appuis logiques détectés :** {result['argument_support_count']}")
-""")
-        # 📐 POPOVER FORMULE
         with st.popover("ℹ️ Comprendre cette jauge"):
-            st.markdown("Formule utilisée :")
-    
-            st.code("""
-    if argument_count == 0:
-        score = attack_count * 0.25
-    else:
-        score = (attack_count / argument_count) * 0.25
-    
-    score = min(score, 1.0)
-    """, language="python")
-    
-            st.markdown("""
-    Interprétation :
-    
-    - plus les attaques augmentent ;
-    - plus les appuis logiques diminuent ;
-    - plus l’asymétrie augmente.
-    
-    Un score élevé indique un discours plus accusatoire ou peu démonstratif.
-    """)
+            st.markdown("### Asymétrie argumentative")
+
+            st.write(
+                "Cette jauge mesure le déséquilibre entre l’attaque et la démonstration. "
+                "Elle repère si le texte privilégie les formulations accusatoires, "
+                "dépréciatives ou disqualifiantes, plutôt que les appuis logiques, "
+                "explicatifs ou démonstratifs."
+            )
+
+            st.markdown("**Formule utilisée**")
+            st.code(
+                "if argument_count == 0:\n"
+                "    score = attack_count * 0.25\n"
+                "else:\n"
+                "    score = (attack_count / argument_count) * 0.25\n\n"
+                "score = min(score, 1.0)",
+                language="python"
+            )
+
+            st.markdown("**Valeur actuelle**")
+            st.write(f"Score : **{round(value * 100, 1)}%**")
+            st.write(f"Niveau : **{label}**")
+            st.write(f"Attaques : **{result['argument_attack_count']}**")
+            st.write(f"Appuis logiques : **{result['argument_support_count']}**")
+
+            st.markdown("**Interprétation actuelle**")
+            st.write(result["argument_asymmetry_interpretation"])
+
+            st.markdown("**Lecture**")
+            st.write(
+                "🟢 Faible : discours globalement équilibré\n"
+                "🟡 Modérée : légère asymétrie argumentative\n"
+                "🟠 Élevée : l’attaque domine la démonstration\n"
+                "🔴 Très élevée : rhétorique d’attaque dominante"
+            )
+
+            st.markdown("**Attention**")
+            st.write(
+                "Une asymétrie argumentative élevée ne signifie pas que le texte est faux. "
+                "Elle indique seulement que le discours attaque davantage qu’il ne démontre."
+            )
         
     st.divider()
     
