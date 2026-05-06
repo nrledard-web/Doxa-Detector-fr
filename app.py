@@ -9460,10 +9460,110 @@ with oi1:
             "et motifs idéologiques."
         )
     
-
+# -----------------------------
+# 3) Propagande narrative
+# -----------------------------
 with oi2:
     st.markdown("### Narration propagandiste")
-    # jauge ici
+    st.caption("Urgence, ennemi abstrait, certitude et charge émotionnelle.")
+
+    propaganda_value = result["propaganda_score"]
+
+    if propaganda_value < 0.20:
+        propaganda_label, propaganda_color = "Faible", "#ca8a04"
+    elif propaganda_value < 0.40:
+        propaganda_label, propaganda_color = "Modérée", "#f97316"
+    elif propaganda_value < 0.70:
+        propaganda_label, propaganda_color = "Élevée", "#ea580c"
+    else:
+        propaganda_label, propaganda_color = "Très élevée", "#dc2626"
+
+    render_custom_gauge(propaganda_value, propaganda_color)
+
+    st.markdown(
+        f"<b style='color:{propaganda_color}'>{propaganda_label}</b> — {round(propaganda_value * 100, 1)}%",
+        unsafe_allow_html=True
+    )
+
+    st.caption(result["propaganda_interpretation"])
+
+    # 🔎 Marqueurs
+    with st.expander("🔎 Voir les marqueurs", expanded=False):
+        enemy_terms = result.get("propaganda_enemy_terms", [])
+        urgency_terms = result.get("propaganda_urgency_terms", [])
+        certainty_terms = result.get("propaganda_certainty_terms", [])
+        emotional_terms = result.get("propaganda_emotional_terms", [])
+
+        if not any([enemy_terms, urgency_terms, certainty_terms, emotional_terms]):
+            st.info("Aucun marqueur narratif saillant détecté.")
+        else:
+            if enemy_terms:
+                st.markdown("**Ennemi / bloc adverse**")
+                for term in enemy_terms:
+                    st.error(term)
+
+            if urgency_terms:
+                st.markdown("**Urgence / menace**")
+                for term in urgency_terms:
+                    st.warning(term)
+
+            if certainty_terms:
+                st.markdown("**Certitude absolue**")
+                for term in certainty_terms:
+                    st.warning(term)
+
+            if emotional_terms:
+                st.markdown("**Charge émotionnelle**")
+                for term in emotional_terms:
+                    st.error(term)
+
+    # ℹ️ Popover explicatif
+    with st.popover("ℹ️ Comprendre cette jauge"):
+        st.markdown("### Narration propagandiste")
+
+        st.write(
+            "Cette jauge détecte une structure narrative orientée, typique des discours cherchant à mobiliser, "
+            "convaincre ou polariser."
+        )
+
+        st.markdown("**Principe**")
+        st.write(
+            "Elle s’appuie sur la détection de quatre types de marqueurs : "
+            "désignation d’un ennemi, urgence ou menace, certitude absolue et charge émotionnelle."
+        )
+
+        st.markdown("**Formule utilisée**")
+        st.code(
+            "score = f(enemy_terms, urgency_terms, certainty_terms, emotional_terms)\n"
+            "score = min(score, 1.0)",
+            language="python"
+        )
+
+        st.markdown("**Valeur actuelle**")
+        st.write(f"Score : **{round(propaganda_value * 100, 1)}%**")
+        st.write(f"Niveau : **{propaganda_label}**")
+
+        st.write(f"Ennemi : **{len(result.get('propaganda_enemy_terms', []))}**")
+        st.write(f"Urgence : **{len(result.get('propaganda_urgency_terms', []))}**")
+        st.write(f"Certitude : **{len(result.get('propaganda_certainty_terms', []))}**")
+        st.write(f"Émotion : **{len(result.get('propaganda_emotional_terms', []))}**")
+
+        st.markdown("**Interprétation actuelle**")
+        st.write(result["propaganda_interpretation"])
+
+        st.markdown("**Lecture**")
+        st.write(
+            "🟢 Faible : discours peu narratif ou neutre\n"
+            "🟡 Modérée : présence de cadrage narratif\n"
+            "🟠 Élevée : narration orientée\n"
+            "🔴 Très élevée : structure fortement propagandiste"
+        )
+
+        st.markdown("**Attention**")
+        st.write(
+            "Une narration propagandiste élevée ne signifie pas que le texte est faux. "
+            "Elle indique une construction discursive orientée visant à influencer la perception."
+        )
 
 with oi3:
     st.markdown("### Polarisation / Ennemi abstrait")
