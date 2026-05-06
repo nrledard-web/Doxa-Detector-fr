@@ -10385,10 +10385,85 @@ with bf2:
             "Elle indique que le discours présente davantage des jugements comme des évidences "
             "que des faits strictement démontrés."
         )
-
+# -----------------------------
+# 6) Scientificité rhétorique
+# -----------------------------
 with bf3:
     st.markdown("### Scientificité rhétorique")
-    # jauge ici
+    st.caption("Simulation d’objectivité scientifique sans base identifiable.")
+
+    sim_value = result["scientific_simulation_score"]
+
+    if sim_value < 0.20:
+        sim_label, sim_color = "Faible", "#ca8a04"
+    elif sim_value < 0.40:
+        sim_label, sim_color = "Modérée", "#f97316"
+    elif sim_value < 0.70:
+        sim_label, sim_color = "Élevée", "#ea580c"
+    else:
+        sim_label, sim_color = "Très élevée", "#dc2626"
+
+    render_custom_gauge(sim_value, sim_color)
+
+    st.markdown(
+        f"<b style='color:{sim_color}'>{sim_label}</b> — {round(sim_value * 100, 1)}%",
+        unsafe_allow_html=True
+    )
+
+    st.caption(result["scientific_simulation_interpretation"])
+
+    with st.expander("🔎 Voir les marqueurs", expanded=False):
+        markers = result.get("scientific_simulation_markers", [])
+        if not markers:
+            st.info("Aucun marqueur de scientificité rhétorique détecté.")
+        else:
+            for marker in markers:
+                st.warning(marker)
+
+    with st.popover("ℹ️ Comprendre cette jauge"):
+        st.markdown("### Scientificité rhétorique")
+
+        st.write(
+            "Cette jauge détecte les formulations qui donnent une apparence scientifique au discours "
+            "sans fournir de base identifiable, vérifiable ou sourcée."
+        )
+
+        st.markdown("**Principe**")
+        st.write(
+            "Le texte est comparé à des marqueurs de scientificité rhétorique : vocabulaire technique, "
+            "références à des études, chiffres ou méthodes sans ancrage précis."
+        )
+
+        st.markdown("**Formule utilisée**")
+        st.code(
+            "markers = marqueurs de scientificité rhétorique détectés\n"
+            "score = min(len(markers) * coefficient / 10, 1.0)",
+            language="python"
+        )
+
+        markers = result.get("scientific_simulation_markers", [])
+
+        st.markdown("**Valeur actuelle**")
+        st.write(f"Score : **{round(sim_value * 100, 1)}%**")
+        st.write(f"Niveau : **{sim_label}**")
+        st.write(f"Marqueurs détectés : **{len(markers)}**")
+
+        st.markdown("**Interprétation actuelle**")
+        st.write(result["scientific_simulation_interpretation"])
+
+        st.markdown("**Lecture**")
+        st.write(
+            "🟢 Faible : peu d’apparence scientifique non fondée\n"
+            "🟡 Modérée : quelques signaux d’objectivité rhétorique\n"
+            "🟠 Élevée : forte apparence scientifique à vérifier\n"
+            "🔴 Très élevée : simulation scientifique dominante"
+        )
+
+        st.markdown("**Attention**")
+        st.write(
+            "Une scientificité rhétorique élevée ne signifie pas que le texte est faux. "
+            "Elle indique que le discours mobilise une apparence de science sans rendre ses bases clairement vérifiables."
+        )
 
 bf4, bf5 = st.columns(2)
 
@@ -10448,9 +10523,6 @@ row12_col1, row12_col2, row12_col3 = st.columns(3)
 row13_col1, row13_col2, row13_col3 = st.columns(3)
 row14_col1, row14_col2, row14_col3 = st.columns(3)
 row15_col1, row15_col2 = st.columns(2)
-    
-    
-
 
 # -----------------------------
 # 2) Prémisses idéologiques implicites
@@ -10485,41 +10557,6 @@ with row1_col2:
             st.info("Aucune prémisse implicite saillante détectée.")
         else:
             for marker in premise_markers:
-                st.warning(marker)
-
-
-# -----------------------------
-# 6) Scientificité rhétorique
-# -----------------------------
-with row2_col3:
-    st.markdown("### Scientificité rhétorique")
-    st.caption("Simulation d’objectivité scientifique sans base identifiable.")
-
-    sim_value = result["scientific_simulation_score"]
-
-    if sim_value < 0.20:
-        sim_label, sim_color = "Faible", "#ca8a04"
-    elif sim_value < 0.40:
-        sim_label, sim_color = "Modérée", "#f97316"
-    elif sim_value < 0.70:
-        sim_label, sim_color = "Élevée", "#ea580c"
-    else:
-        sim_label, sim_color = "Très élevée", "#dc2626"
-
-    render_custom_gauge(sim_value, sim_color)
-
-    st.markdown(
-        f"<b style='color:{sim_color}'>{sim_label}</b> — {round(sim_value * 100, 1)}%",
-        unsafe_allow_html=True
-    )
-    st.caption(result["scientific_simulation_interpretation"])
-
-    with st.expander("Voir les marqueurs", expanded=False):
-        markers = result.get("scientific_simulation_markers", [])
-        if not markers:
-            st.info("Aucun marqueur de scientificité rhétorique détecté.")
-        else:
-            for marker in markers:
                 st.warning(marker)
 
 # -----------------------------
