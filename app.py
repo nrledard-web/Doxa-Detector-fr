@@ -9522,11 +9522,11 @@ with pd7:
         
     st.divider()
     
-        st.markdown("""
-    <div style="text-align:center; margin:25px 0; color:#888;">
-    ──── 🧠 ────
-    </div>
-    """, unsafe_allow_html=True)
+st.markdown("""
+<div style="text-align:center; margin:25px 0; color:#888;">
+──── 🧠 ────
+</div>
+""", unsafe_allow_html=True)
 
 # =============================
 # 🧩 3. STRUCTURE DU RAISONNEMENT
@@ -10103,11 +10103,12 @@ with sr7:
         )
 
 st.divider()
-        st.markdown("""
-    <div style="text-align:center; margin:25px 0; color:#888;">
-    ──── 🧠 ────
-    </div>
-    """, unsafe_allow_html=True)
+    
+st.markdown("""
+<div style="text-align:center; margin:25px 0; color:#888;">
+──── 🧠 ────
+</div>
+""", unsafe_allow_html=True)
 
 # =============================
 # 🧭 4. ORIENTATION IDÉOLOGIQUE
@@ -10215,7 +10216,6 @@ with oi1:
             "Elle indique une convergence de signaux : pression, orientation, fermeture cognitive "
             "et motifs idéologiques."
         )
-    
 # -----------------------------
 #  Propagande narrative
 # -----------------------------
@@ -10479,7 +10479,6 @@ with oi4:
             "Une dissonance interne élevée ne signifie pas que tout le texte est faux. "
             "Elle indique que certaines parties du discours semblent entrer en tension ou se contredire."
         )
-
 # -----------------------------
 # Polarisation morale
 # -----------------------------
@@ -10719,7 +10718,6 @@ with oi7:
             "Une prémisse idéologique implicite élevée ne signifie pas que le texte est faux. "
             "Elle indique que le raisonnement repose sur un cadre idéologique peu explicité."
         )
-
 # =============================
 # Argument de nature
 # =============================
@@ -10800,7 +10798,6 @@ with oi8:
             "Un argument de nature élevé ne signifie pas que le texte est faux. "
             "Il indique que le discours utilise le « naturel » comme fondement argumentatif."
         )
-
 # -----------------------------
 #  Opposition binaire
 # -----------------------------
@@ -10881,14 +10878,12 @@ with oi9:
             "Elle indique que le discours réduit le réel à des camps opposés, "
             "ce qui peut renforcer la polarisation et la clôture cognitive."
         )
-
-
 st.divider()
-        st.markdown("""
-    <div style="text-align:center; margin:25px 0; color:#888;">
-    ──── 🧠 ────
-    </div>
-    """, unsafe_allow_html=True)
+st.markdown("""
+<div style="text-align:center; margin:25px 0; color:#888;">
+──── 🧠 ────
+</div>
+""", unsafe_allow_html=True)
 
 # =============================
 # ⚖️ 5. ANALYSE LOGIQUE
@@ -12008,11 +12003,11 @@ with al14:
         )
 
 st.divider()
-        st.markdown("""
-    <div style="text-align:center; margin:25px 0; color:#888;">
-    ──── 🧠 ────
-    </div>
-    """, unsafe_allow_html=True)
+st.markdown("""
+<div style="text-align:center; margin:25px 0; color:#888;">
+──── 🧠 ────
+</div>
+""", unsafe_allow_html=True)
 
 # =============================
 # 🧪 6. BIAIS DE FORMULATION
@@ -12273,8 +12268,7 @@ with bf3:
         st.write(
             "Une scientificité rhétorique élevée ne signifie pas que le texte est faux. "
             "Elle indique que le discours mobilise une apparence de science sans rendre ses bases clairement vérifiables."
-        )
-        
+        )     
 # -----------------------------
 #  Glissement sémantique
 # -----------------------------
@@ -12434,8 +12428,7 @@ with bf5:
         st.write(
             "Un faux consensus élevé ne signifie pas que l’idée est fausse. "
             "Il indique seulement que le texte présente un accord collectif sans le démontrer clairement."
-        )
-        
+        )      
     # =============================
     # Autorité vague (simple)
     # =============================
@@ -12598,11 +12591,11 @@ with bf7:
         )
 st.divider()
 
-        st.markdown("""
-    <div style="text-align:center; margin:25px 0; color:#888;">
-    ──── 🧠 ────
-    </div>
-    """, unsafe_allow_html=True)
+st.markdown("""
+<div style="text-align:center; margin:25px 0; color:#888;">
+──── 🧠 ────
+</div>
+""", unsafe_allow_html=True)
 
 # -----------------------------
 # 18) Clôture cognitive
@@ -12785,11 +12778,11 @@ else:
 
 st.divider()
 
-        st.markdown("""
-    <div style="text-align:center; margin:25px 0; color:#888;">
-    ──── 🧠 ────
-    </div>
-    """, unsafe_allow_html=True)
+st.markdown("""
+<div style="text-align:center; margin:25px 0; color:#888;">
+──── 🧠 ────
+</div>
+""", unsafe_allow_html=True)
 
 st.subheader("Enthymèmes détectés")
 
