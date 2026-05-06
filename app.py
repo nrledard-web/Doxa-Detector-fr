@@ -7428,6 +7428,13 @@ Un score de **{round(display_score,1)}/20** indique un raisonnement **{score_lab
 avec une **présence notable de signaux de fragilité cognitive**.
 """)
 
+st.markdown(
+    """
+    <div id="scroll-analyse-target"></div>
+    """,
+    unsafe_allow_html=True
+)
+
 st.markdown("""
 <div style="text-align:center; margin:25px 0; color:#888;">
 ────────── ✦ ──────────
@@ -7444,7 +7451,6 @@ st.markdown("""
 ────────── ✦ ──────────
 </div>
 """, unsafe_allow_html=True)
-
 
 # =============================
 # Barre de raisonnement
