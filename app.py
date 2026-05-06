@@ -12513,59 +12513,12 @@ st.caption(
     "stratégiques permettant d’identifier certaines formes de manipulation argumentative."
 )
 
-row1_col1, row1_col2, row1_col3 = st.columns(3)
-row2_col1, row2_col2, row2_col3 = st.columns(3)
-row3_col1, row3_col2, row3_col3 = st.columns(3)
-row4_col1, row4_col2, row4_col3 = st.columns(3)
-row5_col1, row5_col2, row5_col3 = st.columns(3)
-row6_col1, row6_col2, row6_col3 = st.columns(3)
-row7_col1, row7_col2, row7_col3 = st.columns(3)
-row8_col1, row8_col2, row8_col3 = st.columns(3)
-row9_col1, row9_col2, row9_col3 = st.columns(3)
-row10_col1, row10_col2, row10_col3 = st.columns(3)
-row11_col1, row11_col2, row11_col3 = st.columns(3)
-row12_col1, row12_col2, row12_col3 = st.columns(3)
-row13_col1, row13_col2, row13_col3 = st.columns(3)
-row14_col1, row14_col2, row14_col3 = st.columns(3)
-row15_col1, row15_col2 = st.columns(2)
 
-# -----------------------------
-# 14) Opposition binaire
-# -----------------------------
-with row5_col2:
-    st.markdown("### Opposition binaire")
-    st.caption("Découpage du discours en camps antagonistes.")
 
-    binary_value = result["binary_opposition_score"]
-
-    if binary_value < 0.15:
-        binary_label, binary_color = "Faible", "#ca8a04"
-    elif binary_value < 0.35:
-        binary_label, binary_color = "Modérée", "#f97316"
-    elif binary_value < 0.60:
-        binary_label, binary_color = "Élevée", "#ea580c"
-    else:
-        binary_label, binary_color = "Très élevée", "#dc2626"
-
-    render_custom_gauge(binary_value, binary_color)
-
-    st.markdown(
-        f"<b style='color:{binary_color}'>{binary_label}</b> — {round(binary_value * 100, 1)}%",
-        unsafe_allow_html=True
-    )
-    st.caption(result["binary_opposition_interpretation"])
-
-    with st.expander("Voir les marqueurs", expanded=False):
-        markers = result.get("binary_opposition_markers", [])
-        if not markers:
-            st.info("Aucune opposition binaire notable détectée.")
-        else:
-            for marker in markers:
-                st.warning(marker)
 # -----------------------------
 # 18) Clôture cognitive
 # -----------------------------
-with row6_col3:
+with :
     st.markdown("### Clôture cognitive")
     st.caption("Degré de verrouillage du discours par excès de certitude.")
 
