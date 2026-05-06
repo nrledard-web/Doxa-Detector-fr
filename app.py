@@ -12810,6 +12810,12 @@ else:
     st.info("Aucun sophisme syllogistique détecté.")
 
 st.divider()
+st.markdown("""
+<div style="text-align:center; margin:25px 0; color:#888;">
+──── 🧠 ────
+</div>
+""", unsafe_allow_html=True)
+
 st.subheader(T["ai_module"])
 st.caption(T["ai_module_caption"])
 
