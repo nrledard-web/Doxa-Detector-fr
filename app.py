@@ -10530,6 +10530,85 @@ with oi5:
             "Une polarisation morale élevée ne signifie pas que le texte est faux. "
             "Elle indique que le discours organise fortement le réel en camps moraux opposés."
         )
+# =============================
+# Faux consensus renforcé
+# =============================
+with oi6:
+    st.markdown("### Faux consensus renforcé")
+    st.caption("Simulation d’un accord collectif présenté comme preuve.")
+
+    value = result["false_consensus_strong_score"]
+
+    if value < 0.15:
+        label, color = "Faible", "#ca8a04"
+    elif value < 0.35:
+        label, color = "Modérée", "#f97316"
+    elif value < 0.60:
+        label, color = "Élevée", "#ea580c"
+    else:
+        label, color = "Très élevée", "#dc2626"
+
+    render_custom_gauge(value, color)
+
+    st.markdown(
+        f"<b style='color:{color}'>{label}</b> — {round(value*100,1)}%",
+        unsafe_allow_html=True
+    )
+
+    st.caption(result["false_consensus_strong_interpretation"])
+
+    with st.expander("🔎 Voir les marqueurs", expanded=False):
+        markers = result.get("false_consensus_strong_markers", [])
+        if not markers:
+            st.info("Aucun faux consensus renforcé notable détecté.")
+        else:
+            for marker in markers:
+                st.warning(marker)
+
+    with st.popover("ℹ️ Comprendre cette jauge"):
+        st.markdown("### Faux consensus renforcé")
+
+        st.write(
+            "Cette jauge détecte les formulations qui présentent un accord collectif "
+            "comme une preuve en soi."
+        )
+
+        st.markdown("**Principe**")
+        st.write(
+            "Le texte est comparé à des marqueurs de consensus renforcé : "
+            "accord général supposé, évidence collective, majorité invoquée comme argument."
+        )
+
+        st.markdown("**Formule utilisée**")
+        st.code(
+            "markers = marqueurs de faux consensus renforcé détectés\n"
+            "score = min(len(markers) * coefficient / 10, 1.0)",
+            language="python"
+        )
+
+        markers = result.get("false_consensus_strong_markers", [])
+
+        st.markdown("**Valeur actuelle**")
+        st.write(f"Score : **{round(value * 100, 1)}%**")
+        st.write(f"Niveau : **{label}**")
+        st.write(f"Marqueurs détectés : **{len(markers)}**")
+
+        st.markdown("**Interprétation actuelle**")
+        st.write(result["false_consensus_strong_interpretation"])
+
+        st.markdown("**Lecture**")
+        st.write(
+            "🟢 Faible : pas de consensus utilisé comme preuve\n"
+            "🟡 Modérée : accord collectif suggéré\n"
+            "🟠 Élevée : consensus présenté comme appui argumentatif\n"
+            "🔴 Très élevée : consensus collectif utilisé comme preuve centrale"
+        )
+
+        st.markdown("**Attention**")
+        st.write(
+            "Un faux consensus renforcé élevé ne signifie pas que l’idée est fausse. "
+            "Il indique que le texte transforme un accord supposé en preuve argumentative."
+        )
 
 st.divider()
 
@@ -11977,36 +12056,6 @@ with row12_col2:
         markers = result.get("ideological_premise_sophism_markers", [])
         if not markers:
             st.info("Aucune prémisse idéologique implicite notable détectée.")
-        else:
-            for marker in markers:
-                st.warning(marker)
-
-with row12_col3:
-    st.markdown("### Faux consensus renforcé")
-    st.caption("Simulation d’un accord collectif présenté comme preuve.")
-
-    value = result["false_consensus_strong_score"]
-
-    if value < 0.15:
-        label, color = "Faible", "#ca8a04"
-    elif value < 0.35:
-        label, color = "Modérée", "#f97316"
-    elif value < 0.60:
-        label, color = "Élevée", "#ea580c"
-    else:
-        label, color = "Très élevée", "#dc2626"
-
-    render_custom_gauge(value, color)
-    st.markdown(
-        f"<b style='color:{color}'>{label}</b> — {round(value*100,1)}%",
-        unsafe_allow_html=True
-    )
-    st.caption(result["false_consensus_strong_interpretation"])
-
-    with st.expander("Voir les marqueurs", expanded=False):
-        markers = result.get("false_consensus_strong_markers", [])
-        if not markers:
-            st.info("Aucun faux consensus renforcé notable détecté.")
         else:
             for marker in markers:
                 st.warning(marker)
