@@ -9178,6 +9178,88 @@ with pd1:
                 "Une asymétrie argumentative élevée ne signifie pas que le texte est faux. "
                 "Elle indique seulement que le discours attaque davantage qu’il ne démontre."
             )
+            
+pd4, pd5, pd6 = st.columns(3)
+
+# -----------------------------
+# 12) Certitude absolue
+# -----------------------------
+with row4_col3:
+    st.markdown("### Certitude absolue")
+    st.caption("Rigidité rhétorique et fermeture interprétative.")
+
+    certainty_value = result["certainty_score"]
+
+    if certainty_value < 0.20:
+        certainty_label, certainty_color = "Faible", "#ca8a04"
+    elif certainty_value < 0.40:
+        certainty_label, certainty_color = "Modérée", "#f97316"
+    elif certainty_value < 0.70:
+        certainty_label, certainty_color = "Élevée", "#ea580c"
+    else:
+        certainty_label, certainty_color = "Très élevée", "#dc2626"
+
+    render_custom_gauge(certainty_value, certainty_color)
+
+    st.markdown(
+        f"<b style='color:{certainty_color}'>{certainty_label}</b> — {round(certainty_value * 100, 1)}%",
+        unsafe_allow_html=True
+    )
+
+    st.caption(result["certainty_interpretation"])
+
+    with st.expander("🔎 Voir les marqueurs", expanded=False):
+        markers = result.get("certainty_markers", [])
+        if not markers:
+            st.info("Aucun marqueur fort de certitude absolue détecté.")
+        else:
+            for marker in markers:
+                st.warning(marker)
+
+    with st.popover("ℹ️ Comprendre cette jauge"):
+        st.markdown("### Certitude absolue")
+
+        st.write(
+            "Cette jauge détecte les formulations qui ferment l’interprétation : "
+            "affirmations catégoriques, absence de nuance, impossibilité suggérée du doute."
+        )
+
+        st.markdown("**Principe**")
+        st.write(
+            "Le texte est comparé à des marqueurs de certitude absolue. "
+            "Chaque marqueur augmente le score de rigidité rhétorique."
+        )
+
+        st.markdown("**Formule utilisée**")
+        st.code(
+            "markers = marqueurs de certitude absolue détectés\n"
+            "score = min(len(markers) * coefficient / 10, 1.0)",
+            language="python"
+        )
+
+        markers = result.get("certainty_markers", [])
+
+        st.markdown("**Valeur actuelle**")
+        st.write(f"Score : **{round(certainty_value * 100, 1)}%**")
+        st.write(f"Niveau : **{certainty_label}**")
+        st.write(f"Marqueurs détectés : **{len(markers)}**")
+
+        st.markdown("**Interprétation actuelle**")
+        st.write(result["certainty_interpretation"])
+
+        st.markdown("**Lecture**")
+        st.write(
+            "🟢 Faible : discours relativement nuancé\n"
+            "🟡 Modérée : quelques affirmations catégoriques\n"
+            "🟠 Élevée : forte rigidité assertive\n"
+            "🔴 Très élevée : fermeture interprétative dominante"
+        )
+
+        st.markdown("**Attention**")
+        st.write(
+            "Une certitude absolue élevée ne signifie pas que le texte est faux. "
+            "Elle indique que le discours laisse peu de place au doute, à la nuance ou à la révision."
+        )
         
     st.divider()
     
@@ -10739,40 +10821,6 @@ with row4_col1:
         markers = result.get("generalization_markers", [])
         if not markers:
             st.info("Aucune généralisation abusive notable détectée.")
-        else:
-            for marker in markers:
-                st.warning(marker)
-
-# -----------------------------
-# 12) Certitude absolue
-# -----------------------------
-with row4_col3:
-    st.markdown("### Certitude absolue")
-    st.caption("Rigidité rhétorique et fermeture interprétative.")
-
-    certainty_value = result["certainty_score"]
-
-    if certainty_value < 0.20:
-        certainty_label, certainty_color = "Faible", "#ca8a04"
-    elif certainty_value < 0.40:
-        certainty_label, certainty_color = "Modérée", "#f97316"
-    elif certainty_value < 0.70:
-        certainty_label, certainty_color = "Élevée", "#ea580c"
-    else:
-        certainty_label, certainty_color = "Très élevée", "#dc2626"
-
-    render_custom_gauge(certainty_value, certainty_color)
-
-    st.markdown(
-        f"<b style='color:{certainty_color}'>{certainty_label}</b> — {round(certainty_value * 100, 1)}%",
-        unsafe_allow_html=True
-    )
-    st.caption(result["certainty_interpretation"])
-
-    with st.expander("Voir les marqueurs", expanded=False):
-        markers = result.get("certainty_markers", [])
-        if not markers:
-            st.info("Aucun marqueur fort de certitude absolue détecté.")
         else:
             for marker in markers:
                 st.warning(marker)
