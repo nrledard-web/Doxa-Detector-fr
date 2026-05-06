@@ -10609,7 +10609,7 @@ with oi6:
             "Un faux consensus renforcé élevé ne signifie pas que l’idée est fausse. "
             "Il indique que le texte transforme un accord supposé en preuve argumentative."
         )
-oi7, oi8 = st.columns(2)
+oi7, oi8, oi9 = st.columns(3)
 # =============================
 # Prémisse idéologique implicite
 # =============================
@@ -10769,6 +10769,87 @@ with oi8:
         st.write(
             "Un argument de nature élevé ne signifie pas que le texte est faux. "
             "Il indique que le discours utilise le « naturel » comme fondement argumentatif."
+        )
+
+# -----------------------------
+#  Opposition binaire
+# -----------------------------
+with oi9:
+    st.markdown("### Opposition binaire")
+    st.caption("Découpage du discours en camps antagonistes.")
+
+    binary_value = result["binary_opposition_score"]
+
+    if binary_value < 0.15:
+        binary_label, binary_color = "Faible", "#ca8a04"
+    elif binary_value < 0.35:
+        binary_label, binary_color = "Modérée", "#f97316"
+    elif binary_value < 0.60:
+        binary_label, binary_color = "Élevée", "#ea580c"
+    else:
+        binary_label, binary_color = "Très élevée", "#dc2626"
+
+    render_custom_gauge(binary_value, binary_color)
+
+    st.markdown(
+        f"<b style='color:{binary_color}'>{binary_label}</b> — {round(binary_value * 100, 1)}%",
+        unsafe_allow_html=True
+    )
+
+    st.caption(result["binary_opposition_interpretation"])
+
+    with st.expander("🔎 Voir les marqueurs", expanded=False):
+        markers = result.get("binary_opposition_markers", [])
+        if not markers:
+            st.info("Aucune opposition binaire notable détectée.")
+        else:
+            for marker in markers:
+                st.warning(marker)
+
+    with st.popover("ℹ️ Comprendre cette jauge"):
+        st.markdown("### Opposition binaire")
+
+        st.write(
+            "Cette jauge détecte les discours qui divisent le réel en deux camps opposés : "
+            "nous contre eux, vérité contre mensonge, bien contre mal."
+        )
+
+        st.markdown("**Principe**")
+        st.write(
+            "Le texte est comparé à des marqueurs d’opposition binaire : "
+            "formulations antagonistes, camps irréconciliables, ou découpage simplifié du débat."
+        )
+
+        st.markdown("**Formule utilisée**")
+        st.code(
+            "markers = marqueurs d’opposition binaire détectés\n"
+            "score = min(len(markers) * coefficient / 10, 1.0)",
+            language="python"
+        )
+
+        markers = result.get("binary_opposition_markers", [])
+
+        st.markdown("**Valeur actuelle**")
+        st.write(f"Score : **{round(binary_value * 100, 1)}%**")
+        st.write(f"Niveau : **{binary_label}**")
+        st.write(f"Marqueurs détectés : **{len(markers)}**")
+
+        st.markdown("**Interprétation actuelle**")
+        st.write(result["binary_opposition_interpretation"])
+
+        st.markdown("**Lecture**")
+        st.write(
+            "🟢 Faible : peu d’opposition en camps\n"
+            "🟡 Modérée : antagonisme ponctuel\n"
+            "🟠 Élevée : opposition binaire notable\n"
+            "🔴 Très élevée : découpage dominant en camps antagonistes"
+        )
+
+        st.markdown("**Attention**")
+        st.write(
+            "Une opposition binaire élevée ne signifie pas que le texte est faux. "
+            "Elle indique que le discours réduit le réel à des camps opposés, "
+            "ce qui peut renforcer la polarisation et la clôture cognitive."
         )
 
 
@@ -11187,8 +11268,6 @@ with al5:
             "Une confusion descriptif / normatif élevée ne signifie pas que le texte est faux. "
             "Elle indique que des jugements ou normes sont présentés comme des faits."
         )
-
-
 # -----------------------------
 #  Pétition de principe
 # -----------------------------
@@ -11493,7 +11572,6 @@ with al9:
             "Un enthymème n’est pas forcément une erreur. "
             "Il indique seulement qu’une partie du raisonnement est laissée implicite."
         )
-
 # -----------------------------
 # Fausse analogie
 # -----------------------------
@@ -11573,7 +11651,6 @@ with al10:
             "Une fausse analogie élevée ne signifie pas que le texte est faux. "
             "Elle indique que le raisonnement repose sur des comparaisons fragiles."
         )
-
 # -----------------------------
 #  Surinterprétation factuelle
 # -----------------------------
@@ -12400,7 +12477,6 @@ with bf5:
                 "Une autorité vague élevée ne signifie pas que le contenu est faux. "
                 "Elle indique que les sources invoquées ne sont pas clairement vérifiables."
             )
-
 # -----------------------------
 #  Saturation normative
 # -----------------------------
@@ -12512,8 +12588,6 @@ st.caption(
     "(syllogismes, enthymèmes et sophismes) ainsi que par des indicateurs "
     "stratégiques permettant d’identifier certaines formes de manipulation argumentative."
 )
-
-
 
 # -----------------------------
 # 18) Clôture cognitive
