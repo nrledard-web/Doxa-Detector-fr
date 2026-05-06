@@ -9278,8 +9278,77 @@ with sr1:
         )
 
 with sr2:
-    st.markdown("### Cohérence trompeuse")
-    # jauge ici
+    st.subheader("Cohérence trompeuse")
+    st.caption(
+        "Cette jauge mesure si le texte paraît cohérent tout en restant fragile, orienté ou insuffisamment vérifiable."
+    )
+    
+    value = result.get("deceptive_coherence", 0)
+    label = result.get("deceptive_coherence_label", "—")
+    
+    if value < 0.25:
+        color = "#ca8a04"
+    elif value < 0.50:
+        color = "#ca8a04"
+    elif value < 0.75:
+        color = "#f97316"
+    else:
+        color = "#dc2626"
+    
+    render_custom_gauge(value, color)
+    
+    st.markdown(
+        f"<b style='color:{color}'>{label}</b> — {round(value * 100, 1)}%",
+        unsafe_allow_html=True
+    )
+    
+    st.caption("Cohérence apparente ⟵⟶ Cohérence trompeuse")
+    
+    with st.popover("ℹ️ Comprendre cette jauge"):
+        st.markdown("### Cohérence trompeuse")
+    
+        st.write(
+            "Cette jauge détecte un phénomène particulier : un discours peut sembler cohérent, "
+            "fluide et bien structuré, tout en étant fragile sur le fond, insuffisamment vérifié "
+            "ou orienté."
+        )
+    
+        st.markdown("**Principe**")
+        st.write(
+            "Elle compare la cohérence discursive (structure du texte) avec la solidité factuelle "
+            "et l’équilibre cognitif. Plus la cohérence dépasse la vérifiabilité et le fondement, "
+            "plus le risque de cohérence trompeuse augmente."
+        )
+    
+        st.markdown("**Formule utilisée**")
+        st.code(
+            "deceptive_coherence = coherence_score - fact_score\n"
+            "deceptive_coherence = max(0, deceptive_coherence)\n"
+            "deceptive_coherence = min(deceptive_coherence / 20, 1.0)",
+            language="python"
+        )
+    
+        st.markdown("**Valeur actuelle**")
+        st.write(f"Score : **{round(value * 100, 1)}%**")
+        st.write(f"Niveau : **{label}**")
+    
+        st.markdown("**Interprétation actuelle**")
+        st.write(label)
+    
+        st.markdown("**Lecture**")
+        st.write(
+            "🟢 Faible : cohérence alignée avec le fond\n"
+            "🟡 Modérée : léger écart entre structure et fond\n"
+            "🟠 Élevée : discours cohérent mais fragile\n"
+            "🔴 Très élevée : forte illusion de solidité"
+        )
+    
+        st.markdown("**Attention**")
+        st.write(
+            "Une cohérence trompeuse élevée ne signifie pas forcément manipulation. "
+            "Elle indique qu’un discours peut être convaincant dans sa forme, "
+            "tout en restant insuffisamment fondé dans son contenu."
+        )
 
 st.divider()
 
