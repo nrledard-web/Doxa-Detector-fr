@@ -7062,7 +7062,7 @@ if analyze_submitted:
         st.session_state.last_result = None
         st.session_state.last_article = article
 
-        if st.session_state.get("auto_scroll_to_analysis", False):
+    if st.session_state.get("auto_scroll_to_analysis", False):
         components.html(
             """
             <script>
@@ -7081,7 +7081,7 @@ if analyze_submitted:
             height=0
         )
 
-    st.session_state["auto_scroll_to_analysis"] = False
+        st.session_state["auto_scroll_to_analysis"] = False
 
         st.warning("⚠️ Analyse impossible")
         st.caption("Le texte est trop court pour permettre une analyse fiable.")
