@@ -10767,9 +10767,9 @@ with row15_col2:
         f"Appuis logiques : {result['argument_support_count']}"
     )
 
-    # 🔎 POPOVER MARQUEURS
-    with st.popover("🔎 Marqueurs détectés"):
-        st.markdown("""
+# 🔎 POPOVER MARQUEURS
+with st.popover("🔎 Marqueurs détectés"):
+    st.markdown("""
 Cette jauge repose sur des marqueurs lexicaux.
 
 Elle compare :
@@ -10780,15 +10780,13 @@ Elle compare :
 Elle mesure l’équilibre entre accusation et démonstration.
 """)
 
-        st.write(f"**Attaques détectées :** {result['argument_attack_count']}")
-        st.write(f"**Appuis logiques détectés :** {result['argument_support_count']}")
+    st.write(f"**Attaques détectées :** {result['argument_attack_count']}")
+    st.write(f"**Appuis logiques détectés :** {result['argument_support_count']}")
 
-    # 📐 POPOVER FORMULE
-    with st.popover("📐 Formule et explication"):
-        st.markdown("""
-Formule utilisée :
+with st.popover("📐 Formule et explication"):
+    st.markdown("Formule utilisée :")
 
-```python
+    st.code("""
 if argument_count == 0:
     score = attack_count * 0.25
 else:
