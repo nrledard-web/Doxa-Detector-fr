@@ -10781,7 +10781,7 @@ st.divider()
 st.subheader("⚖️ Analyse logique")
 st.caption("Identification des erreurs de raisonnement et des structures logiques.")
 
-al1, al2, al3 = st.columns(3)
+al1, al2, al3, al4 = st.columns(4)
 
 # -----------------------------
 #  Confusion logique
@@ -11024,6 +11024,86 @@ with al3:
         st.write(
             "Un faux dilemme élevé ne signifie pas que le texte est faux. "
             "Il indique une simplification excessive qui peut masquer d’autres possibilités."
+        )
+# -----------------------------
+#  Pétition de principe
+# -----------------------------
+with al3bis:
+    st.markdown("### Confusion descriptif / normatif")
+    st.caption("Glissement d’une description vers une injonction sans justification suffisante.")
+
+    value = result["descriptive_normative_confusion_score"]
+
+    if value < 0.15:
+        label, color = "Faible", "#ca8a04"
+    elif value < 0.35:
+        label, color = "Modérée", "#f97316"
+    elif value < 0.60:
+        label, color = "Élevée", "#ea580c"
+    else:
+        label, color = "Très élevée", "#dc2626"
+
+    render_custom_gauge(value, color)
+
+    st.markdown(
+        f"<b style='color:{color}'>{label}</b> — {round(value*100,1)}%",
+        unsafe_allow_html=True
+    )
+
+    st.caption(result["descriptive_normative_confusion_interpretation"])
+
+    with st.expander("🔎 Voir les marqueurs", expanded=False):
+        markers = result.get("descriptive_normative_confusion_markers", [])
+        if not markers:
+            st.info("Aucune confusion descriptif / normatif notable détectée.")
+        else:
+            for marker in markers:
+                st.warning(marker)
+
+    with st.popover("ℹ️ Comprendre cette jauge"):
+        st.markdown("### Confusion descriptif / normatif")
+
+        st.write(
+            "Cette jauge détecte les situations où un fait ou une description "
+            "est transformé en jugement, norme ou injonction sans justification."
+        )
+
+        st.markdown("**Principe**")
+        st.write(
+            "Le texte est comparé à des marqueurs de glissement normatif : "
+            "passage du descriptif (« ce qui est ») au normatif (« ce qui doit être ») "
+            "sans étape argumentative explicite."
+        )
+
+        st.markdown("**Formule utilisée**")
+        st.code(
+            "markers = confusions descriptif/normatif détectées\n"
+            "score = min(len(markers) * coefficient / 10, 1.0)",
+            language="python"
+        )
+
+        markers = result.get("descriptive_normative_confusion_markers", [])
+
+        st.markdown("**Valeur actuelle**")
+        st.write(f"Score : **{round(value * 100, 1)}%**")
+        st.write(f"Niveau : **{label}**")
+        st.write(f"Marqueurs détectés : **{len(markers)}**")
+
+        st.markdown("**Interprétation actuelle**")
+        st.write(result["descriptive_normative_confusion_interpretation"])
+
+        st.markdown("**Lecture**")
+        st.write(
+            "🟢 Faible : distinction claire entre faits et jugements\n"
+            "🟡 Modérée : glissements ponctuels\n"
+            "🟠 Élevée : confusion notable entre description et norme\n"
+            "🔴 Très élevée : injonctions déguisées en faits"
+        )
+
+        st.markdown("**Attention**")
+        st.write(
+            "Une confusion descriptif / normatif élevée ne signifie pas que le texte est faux. "
+            "Elle indique que des jugements ou normes sont présentés comme des faits."
         )
 
 al4, al5, al6, al7, = st.columns(4)
@@ -11654,7 +11734,7 @@ with al11:
 # =============================
 # Confusion descriptif / normatif
 # =============================
-with al12:
+with al3bis:
     st.markdown("### Confusion descriptif / normatif")
     st.caption("Glissement d’une description vers une injonction sans justification suffisante.")
 
