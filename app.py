@@ -9994,6 +9994,88 @@ with sr6:
             "Elle indique que le discours réduit fortement la complexité du réel."
         )
 
+# -----------------------------
+#  Frame shift
+# -----------------------------
+with sr7:
+    st.markdown("### Frame shift")
+    st.caption("Déplacement du cadre du débat pour orienter l’interprétation.")
+
+    value = result["frame_shift_score"]
+
+    if value < 0.15:
+        label, color = "Faible", "#ca8a04"
+    elif value < 0.35:
+        label, color = "Modérée", "#f97316"
+    elif value < 0.60:
+        label, color = "Élevée", "#ea580c"
+    else:
+        label, color = "Très élevée", "#dc2626"
+
+    render_custom_gauge(value, color)
+
+    st.markdown(
+        f"<b style='color:{color}'>{label}</b> — {round(value*100,1)}%",
+        unsafe_allow_html=True
+    )
+
+    st.caption(result["frame_shift_interpretation"])
+
+    with st.expander("🔎 Voir les marqueurs", expanded=False):
+        markers = result.get("frame_shift_markers", [])
+        if not markers:
+            st.info("Aucun déplacement de cadre notable détecté.")
+        else:
+            for marker in markers:
+                st.warning(marker)
+
+    with st.popover("ℹ️ Comprendre cette jauge"):
+        st.markdown("### Frame shift")
+
+        st.write(
+            "Cette jauge détecte les déplacements du cadre du débat : "
+            "le discours change implicitement les règles d’interprétation "
+            "pour orienter la compréhension du lecteur."
+        )
+
+        st.markdown("**Principe**")
+        st.write(
+            "Le texte est analysé pour repérer les glissements de cadre : "
+            "changement de définition, déplacement du problème, "
+            "ou reformulation orientée du sujet initial."
+        )
+
+        st.markdown("**Formule utilisée**")
+        st.code(
+            "markers = déplacements de cadre détectés\n"
+            "score = min(len(markers) * coefficient / 10, 1.0)",
+            language="python"
+        )
+
+        markers = result.get("frame_shift_markers", [])
+
+        st.markdown("**Valeur actuelle**")
+        st.write(f"Score : **{round(value * 100, 1)}%**")
+        st.write(f"Niveau : **{label}**")
+        st.write(f"Marqueurs détectés : **{len(markers)}**")
+
+        st.markdown("**Interprétation actuelle**")
+        st.write(result["frame_shift_interpretation"])
+
+        st.markdown("**Lecture**")
+        st.write(
+            "🟢 Faible : cadre stable\n"
+            "🟡 Modérée : légers déplacements\n"
+            "🟠 Élevée : recadrage notable du débat\n"
+            "🔴 Très élevée : changement de cadre dominant"
+        )
+
+        st.markdown("**Attention**")
+        st.write(
+            "Un frame shift élevé ne signifie pas que le discours est faux. "
+            "Il indique que le cadre d’interprétation est modifié pour orienter la lecture."
+        )
+
 st.divider()
 
 
@@ -11890,85 +11972,6 @@ with row14_col2:
         else:
             for marker in markers:
                 st.warning(marker)
-
-# -----------------------------
-# 42) Frame shift
-# -----------------------------
-with row15_col1:
-    st.markdown("### Frame shift")
-    st.caption("Déplacement du cadre du débat pour orienter l’interprétation.")
-
-    value = result["frame_shift_score"]
-
-    if value < 0.15:
-        label, color = "Faible", "#ca8a04"
-    elif value < 0.35:
-        label, color = "Modérée", "#f97316"
-    elif value < 0.60:
-        label, color = "Élevée", "#ea580c"
-    else:
-        label, color = "Très élevée", "#dc2626"
-
-    render_custom_gauge(value, color)
-    st.markdown(
-        f"<b style='color:{color}'>{label}</b> — {round(value*100,1)}%",
-        unsafe_allow_html=True
-    )
-    st.caption(result["frame_shift_interpretation"])
-
-    with st.expander("Voir les marqueurs", expanded=False):
-        markers = result.get("frame_shift_markers", [])
-        if not markers:
-            st.info("Aucun déplacement de cadre notable détecté.")
-        else:
-            for marker in markers:
-                st.warning(marker)
-
-with st.expander("Voir les manœuvres discursives détectées", expanded=False):
-    if result["political_pattern_score"] == 0:
-        st.info("Aucun marqueur rhétorique politique saillant détecté.")
-    else:
-        st.metric("Score global de manœuvres discursives", result["political_pattern_score"])
-
-        labels = {
-            "certitude": "Certitude performative",
-            "autorite": "Autorité vague institutionnelle",
-            "autorite_academique": "Autorité académique vague",
-            "dramatisation": "Dramatisation politique",
-            "generalisation": "Généralisation abusive",
-            "naturalisation": "Naturalisation idéologique",
-            "ennemi": "Ennemi abstrait",
-            "victimisation": "Victimisation discursive",
-            "moralisation": "Moralisation politique",
-            "moralisation_discours": "Moralisation du discours",
-            "urgence": "Urgence injonctive",
-            "promesse": "Promesse excessive",
-            "populisme": "Populisme anti-élite",
-            "progressisme_identitaire": "Progressisme identitaire",
-            "socialisme_communisme": "Cadre socialiste / communiste",
-            "delegitimation": "Délégitimation adverse",
-            "dilution": "Dilution de responsabilité",
-            "causalite": "Causalité implicite ou non démontrée",
-        }
-
-        for cat, count in result["political_results"].items():
-            if count > 0:
-                st.markdown(f"**{labels.get(cat, cat)}** : {count}")
-                st.caption(", ".join(result["matched_terms"][cat]))
-
-with st.expander(T["strengths_detected"], expanded=True):
-    if result["strengths"]:
-        for item in result["strengths"]:
-            st.success(item)
-    else:
-        st.info(T["few_strong_signals"])
-
-with st.expander(T["weaknesses_detected"], expanded=True):
-    if result["weaknesses"]:
-        for item in result["weaknesses"]:
-            st.error(item)
-    else:
-        st.success(T["no_major_weakness"])
 
 st.divider()
 st.subheader("Structure cognitive du texte analysé")
