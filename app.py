@@ -9365,10 +9365,8 @@ with oi1:
     
     st.subheader("Jauge propagandiste")
     st.caption(
-        "Cette jauge combine la tension cognitive, la pression rhétorique, "
-        "les motifs idéologiques détectés et le degré de fermeture cognitive. "
-        "Elle aide à estimer si le texte relève d’un simple discours orienté "
-        "ou d’une structure plus franchement propagandiste."
+            "Cette jauge estime si le texte dépasse le simple discours orienté "
+            "pour entrer dans une structure plus fortement propagandiste."
     )
     
     closure_for_discourse = (
@@ -9399,8 +9397,11 @@ with oi1:
         st.markdown("### Jauge propagandiste")
     
         st.write(
-            "Cette jauge estime si le texte dépasse le simple discours orienté "
-            "pour entrer dans une structure plus fortement propagandiste."
+            "Cette jauge combine la tension cognitive, la pression rhétorique, "
+            "les motifs idéologiques détectés et le degré de fermeture cognitive. "
+            "Elle aide à estimer si le texte relève d’un simple discours orienté "
+            "ou d’une structure plus franchement propagandiste. "
+
         )
     
         st.markdown("**Principe**")
@@ -9439,6 +9440,18 @@ with oi1:
             "🟠 Élevée : structure fortement orientée\n"
             "🔴 Très élevée : structure propagandiste probable"
         )
+        discursive_profile = interpret_discursive_profile(
+            lie_gauge=gauge_value,
+            rhetorical_pressure=rp,
+            propaganda_gauge=propaganda_value,
+            premise_score=result["premise_score"],
+            logic_confusion_score=result["logic_confusion_score"],
+            scientific_simulation_score=result["scientific_simulation_score"],
+            discursive_coherence_score=result["discursive_coherence_score"],
+        )
+    
+        st.subheader("Profil discursif global")
+        st.write(discursive_profile)
     
         st.markdown("**Attention**")
         st.write(
@@ -9447,18 +9460,6 @@ with oi1:
             "et motifs idéologiques."
         )
     
-    discursive_profile = interpret_discursive_profile(
-        lie_gauge=gauge_value,
-        rhetorical_pressure=rp,
-        propaganda_gauge=propaganda_value,
-        premise_score=result["premise_score"],
-        logic_confusion_score=result["logic_confusion_score"],
-        scientific_simulation_score=result["scientific_simulation_score"],
-        discursive_coherence_score=result["discursive_coherence_score"],
-    )
-    
-    st.subheader("Profil discursif global")
-    st.write(discursive_profile)
 
 with oi2:
     st.markdown("### Narration propagandiste")
