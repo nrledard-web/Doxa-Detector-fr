@@ -9179,7 +9179,7 @@ with pd1:
                 "Elle indique seulement que le discours attaque davantage qu’il ne démontre."
             )
             
-pd4, pd5, pd6, pd7 = st.columns(3)
+pd4, pd5, pd6, pd7 = st.columns(4)
 
 # -----------------------------
 #  Certitude absolue
