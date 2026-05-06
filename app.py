@@ -10070,10 +10070,72 @@ with al5:
             "Il indique que le texte peut choisir certains éléments favorables "
             "en négligeant d’autres données nécessaires à l’équilibre de l’analyse."
         )
-
+# -----------------------------
+# 27) Sophismes syllogistiques détectés
+# -----------------------------
 with al6:
-    st.markdown("### Sophismes détectés")
-    # jauge ici
+    st.markdown("### Sophismes syllogistiques détectés")
+    st.caption("Failles formelles ou conclusions invalides dans les raisonnements syllogistiques.")
+
+    value = min(result["fallacy_signal"] / 2, 1.0)
+
+    if result["fallacy_signal"] == 0:
+        label, color = "Aucun signal", "#ca8a04"
+    elif result["fallacy_signal"] == 1:
+        label, color = "Signal faible", "#f97316"
+    elif result["fallacy_signal"] <= 3:
+        label, color = "Signal modéré", "#ea580c"
+    else:
+        label, color = "Signal fort", "#dc2626"
+
+    render_custom_gauge(value, color)
+
+    st.markdown(
+        f"<b style='color:{color}'>{result['fallacy_label']}</b> — {result['fallacy_signal']} repéré(s)",
+        unsafe_allow_html=True
+    )
+
+    st.caption("Terme moyen absent, forme invalide ou conclusion trop forte.")
+
+    with st.popover("ℹ️ Comprendre cette jauge"):
+        st.markdown("### Sophismes détectés")
+
+        st.write(
+            "Cette jauge repère les failles formelles dans les raisonnements de type syllogistique : "
+            "enchaînements invalides, terme moyen absent ou conclusion plus forte que les prémisses."
+        )
+
+        st.markdown("**Principe**")
+        st.write(
+            "Elle s’appuie sur l’analyse logique des prémisses et des conclusions détectées dans le texte. "
+            "Contrairement aux jauges rhétoriques, elle ne cherche pas des mots chargés, mais une faiblesse de structure argumentative."
+        )
+
+        st.markdown("**Formule utilisée**")
+        st.code(
+            "fallacy_signal = nombre de sophismes syllogistiques détectés\n"
+            "value = min(fallacy_signal / 2, 1.0)",
+            language="python"
+        )
+
+        st.markdown("**Valeur actuelle**")
+        st.write(f"Signal : **{result['fallacy_signal']} repéré(s)**")
+        st.write(f"Niveau : **{result['fallacy_label']}**")
+        st.write(f"Score jauge : **{round(value * 100, 1)}%**")
+
+        st.markdown("**Lecture**")
+        st.write(
+            "🟢 Aucun signal : aucune faille formelle repérée\n"
+            "🟡 Signal faible : fragilité logique ponctuelle\n"
+            "🟠 Signal modéré : plusieurs failles ou conclusion fragile\n"
+            "🔴 Signal fort : structure argumentative fortement invalide"
+        )
+
+        st.markdown("**Attention**")
+        st.write(
+            "L’absence de sophisme détecté ne signifie pas que le texte est vrai. "
+            "Elle signifie seulement qu’aucune faille syllogistique formelle n’a été repérée."
+        )
 
 st.markdown("### Syllogismes / Enthymèmes")
 # bloc logique ici
@@ -10859,31 +10921,6 @@ with row9_col2:
         unsafe_allow_html=True
     )
     st.caption("Conclusion présente, prémisse partiellement implicite.")
-
-# -----------------------------
-# 27) Sophismes syllogistiques
-# -----------------------------
-with row9_col3:
-    st.markdown("### Sophismes syllogistiques")
-    st.caption("Failles formelles ou conclusions invalides dans les raisonnements.")
-
-    value = min(result["fallacy_signal"] / 2, 1.0)
-
-    if result["fallacy_signal"] == 0:
-        label, color = "Aucun signal", "#ca8a04"
-    elif result["fallacy_signal"] == 1:
-        label, color = "Signal faible", "#f97316"
-    elif result["fallacy_signal"] <= 3:
-        label, color = "Signal modéré", "#ea580c"
-    else:
-        label, color = "Signal fort", "#dc2626"
-
-    render_custom_gauge(value, color)
-    st.markdown(
-        f"<b style='color:{color}'>{result['fallacy_label']}</b> — {result['fallacy_signal']} repéré(s)",
-        unsafe_allow_html=True
-    )
-    st.caption("Terme moyen absent, forme invalide ou conclusion trop forte.")
 
 
 with row10_col2:
