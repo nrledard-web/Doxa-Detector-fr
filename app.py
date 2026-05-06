@@ -7061,26 +7061,6 @@ if analyze_submitted:
     if len(semantic_words) < 3:
         st.session_state.last_result = None
         st.session_state.last_article = article
-
-    if st.session_state.get("auto_scroll_to_analysis", False):
-        components.html(
-            """
-            <script>
-            const target = window.parent.document.getElementById("scroll-analyse-target");
-    
-            if (target) {
-                setTimeout(() => {
-                    target.scrollIntoView({
-                        behavior: "smooth",
-                        block: "start"
-                    });
-                }, 500);
-            }
-            </script>
-            """,
-            height=0
-        )
-
         st.session_state["auto_scroll_to_analysis"] = False
 
         st.warning("⚠️ Analyse impossible")
