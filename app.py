@@ -9899,10 +9899,85 @@ with al3:
         )
 
 al4, al5, al6 = st.columns(3)
-
+# -----------------------------
+# 7) Pétition de principe
+# -----------------------------
 with al4:
     st.markdown("### Pétition de principe")
-    # jauge ici
+    st.caption("Conclusion répétée comme si elle constituait une preuve.")
+
+    value = result["petition_score"]
+
+    if value < 0.15:
+        label, color = "Faible", "#ca8a04"
+    elif value < 0.35:
+        label, color = "Modérée", "#f97316"
+    elif value < 0.60:
+        label, color = "Élevée", "#ea580c"
+    else:
+        label, color = "Très élevée", "#dc2626"
+
+    render_custom_gauge(value, color)
+
+    st.markdown(
+        f"<b style='color:{color}'>{label}</b> — {round(value*100,1)}%",
+        unsafe_allow_html=True
+    )
+
+    st.caption(result["petition_interpretation"])
+
+    with st.expander("🔎 Voir les marqueurs", expanded=False):
+        markers = result.get("petition_markers", [])
+        if not markers:
+            st.info("Aucune pétition de principe notable détectée.")
+        else:
+            for marker in markers:
+                st.warning(marker)
+
+    with st.popover("ℹ️ Comprendre cette jauge"):
+        st.markdown("### Pétition de principe")
+
+        st.write(
+            "Cette jauge détecte les raisonnements circulaires : "
+            "la conclusion est répétée comme si elle constituait elle-même une preuve."
+        )
+
+        st.markdown("**Principe**")
+        st.write(
+            "Le texte est comparé à des marqueurs de circularité argumentative : "
+            "répétition d’une thèse, justification par elle-même, ou conclusion posée comme prémisse."
+        )
+
+        st.markdown("**Formule utilisée**")
+        st.code(
+            "markers = marqueurs de pétition de principe détectés\n"
+            "score = min(len(markers) * coefficient / 10, 1.0)",
+            language="python"
+        )
+
+        markers = result.get("petition_markers", [])
+
+        st.markdown("**Valeur actuelle**")
+        st.write(f"Score : **{round(value * 100, 1)}%**")
+        st.write(f"Niveau : **{label}**")
+        st.write(f"Marqueurs détectés : **{len(markers)}**")
+
+        st.markdown("**Interprétation actuelle**")
+        st.write(result["petition_interpretation"])
+
+        st.markdown("**Lecture**")
+        st.write(
+            "🟢 Faible : raisonnement peu circulaire\n"
+            "🟡 Modérée : circularité légère\n"
+            "🟠 Élevée : conclusion souvent présupposée\n"
+            "🔴 Très élevée : raisonnement fortement circulaire"
+        )
+
+        st.markdown("**Attention**")
+        st.write(
+            "Une pétition de principe élevée ne signifie pas que la conclusion est fausse. "
+            "Elle indique que le texte tend à répéter ou présupposer sa conclusion au lieu de la démontrer."
+        )
 
 with al5:
     st.markdown("### Cherry picking")
@@ -10722,36 +10797,6 @@ with row9_col3:
     )
     st.caption("Terme moyen absent, forme invalide ou conclusion trop forte.")
 
-    
-with row10_col1:
-    st.markdown("### Pétition de principe")
-    st.caption("Conclusion répétée comme si elle constituait une preuve.")
-
-    value = result["petition_score"]
-
-    if value < 0.15:
-        label, color = "Faible", "#ca8a04"
-    elif value < 0.35:
-        label, color = "Modérée", "#f97316"
-    elif value < 0.60:
-        label, color = "Élevée", "#ea580c"
-    else:
-        label, color = "Très élevée", "#dc2626"
-
-    render_custom_gauge(value, color)
-    st.markdown(
-        f"<b style='color:{color}'>{label}</b> — {round(value*100,1)}%",
-        unsafe_allow_html=True
-    )
-    st.caption(result["petition_interpretation"])
-
-    with st.expander("Voir les marqueurs", expanded=False):
-        markers = result.get("petition_markers", [])
-        if not markers:
-            st.info("Aucune pétition de principe notable détectée.")
-        else:
-            for marker in markers:
-                st.warning(marker)
 
 with row10_col2:
     st.markdown("### Fausse causalité (simple)")
