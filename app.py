@@ -9898,7 +9898,7 @@ with al3:
             "Il indique une simplification excessive qui peut masquer d’autres possibilités."
         )
 
-al4, al5, al6, al7, = st.columns(3)
+al4, al5, al6, al7, = st.columns(4)
 # -----------------------------
 #  Pétition de principe
 # -----------------------------
