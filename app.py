@@ -9913,6 +9913,87 @@ with sr5:
             "Elle indique que le discours tend à réduire la complexité du réel à une seule grille de lecture."
         )
 
+# -----------------------------
+#  Simplification stratégique
+# -----------------------------
+with sr6:
+    st.markdown("### Simplification stratégique")
+    st.caption("Réduction d’une réalité complexe à une cause unique ou simple.")
+
+    value = result["strategic_simplification_score"]
+
+    if value < 0.15:
+        label, color = "Faible", "#ca8a04"
+    elif value < 0.35:
+        label, color = "Modérée", "#f97316"
+    elif value < 0.60:
+        label, color = "Élevée", "#ea580c"
+    else:
+        label, color = "Très élevée", "#dc2626"
+
+    render_custom_gauge(value, color)
+
+    st.markdown(
+        f"<b style='color:{color}'>{label}</b> — {round(value*100,1)}%",
+        unsafe_allow_html=True
+    )
+
+    st.caption(result["strategic_simplification_interpretation"])
+
+    with st.expander("🔎 Voir les marqueurs", expanded=False):
+        markers = result.get("strategic_simplification_markers", [])
+        if not markers:
+            st.info("Aucune simplification stratégique notable détectée.")
+        else:
+            for marker in markers:
+                st.warning(marker)
+
+    with st.popover("ℹ️ Comprendre cette jauge"):
+        st.markdown("### Simplification stratégique")
+
+        st.write(
+            "Cette jauge détecte les discours qui réduisent une réalité complexe "
+            "à une cause unique, simple ou trop directement désignée."
+        )
+
+        st.markdown("**Principe**")
+        st.write(
+            "Le texte est comparé à des marqueurs de simplification stratégique : "
+            "cause unique, explication trop directe, ou réduction d’un problème complexe "
+            "à un responsable ou mécanisme simple."
+        )
+
+        st.markdown("**Formule utilisée**")
+        st.code(
+            "markers = marqueurs de simplification stratégique détectés\n"
+            "score = min(len(markers) * coefficient / 10, 1.0)",
+            language="python"
+        )
+
+        markers = result.get("strategic_simplification_markers", [])
+
+        st.markdown("**Valeur actuelle**")
+        st.write(f"Score : **{round(value * 100, 1)}%**")
+        st.write(f"Niveau : **{label}**")
+        st.write(f"Marqueurs détectés : **{len(markers)}**")
+
+        st.markdown("**Interprétation actuelle**")
+        st.write(result["strategic_simplification_interpretation"])
+
+        st.markdown("**Lecture**")
+        st.write(
+            "🟢 Faible : complexité relativement préservée\n"
+            "🟡 Modérée : simplification ponctuelle\n"
+            "🟠 Élevée : réduction forte d’un phénomène complexe\n"
+            "🔴 Très élevée : explication unique dominante"
+        )
+
+        st.markdown("**Attention**")
+        st.write(
+            "Une simplification stratégique élevée ne signifie pas que l’idée est fausse. "
+            "Elle indique que le discours réduit fortement la complexité du réel."
+        )
+
 st.divider()
 
 
@@ -11806,39 +11887,6 @@ with row14_col2:
         markers = result.get("moral_polarization_markers", [])
         if not markers:
             st.info("Aucune polarisation morale notable détectée.")
-        else:
-            for marker in markers:
-                st.warning(marker)
-
-# -----------------------------
-# 41) Simplification stratégique
-# -----------------------------
-with row14_col3:
-    st.markdown("### Simplification stratégique")
-    st.caption("Réduction d’une réalité complexe à une cause unique ou simple.")
-
-    value = result["strategic_simplification_score"]
-
-    if value < 0.15:
-        label, color = "Faible", "#ca8a04"
-    elif value < 0.35:
-        label, color = "Modérée", "#f97316"
-    elif value < 0.60:
-        label, color = "Élevée", "#ea580c"
-    else:
-        label, color = "Très élevée", "#dc2626"
-
-    render_custom_gauge(value, color)
-    st.markdown(
-        f"<b style='color:{color}'>{label}</b> — {round(value*100,1)}%",
-        unsafe_allow_html=True
-    )
-    st.caption(result["strategic_simplification_interpretation"])
-
-    with st.expander("Voir les marqueurs", expanded=False):
-        markers = result.get("strategic_simplification_markers", [])
-        if not markers:
-            st.info("Aucune simplification stratégique notable détectée.")
         else:
             for marker in markers:
                 st.warning(marker)
