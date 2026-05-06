@@ -10466,10 +10466,85 @@ with bf3:
         )
 
 bf4, bf5 = st.columns(2)
-
+# -----------------------------
+# 16) Glissement sémantique
+# -----------------------------
 with bf4:
     st.markdown("### Glissement sémantique")
-    # jauge ici
+    st.caption("Recadrage lexical stratégique du réel par des termes orientés.")
+
+    semantic_value = result["semantic_shift_score"]
+
+    if semantic_value < 0.20:
+        semantic_label, semantic_color = "Faible", "#ca8a04"
+    elif semantic_value < 0.40:
+        semantic_label, semantic_color = "Modérée", "#f97316"
+    elif semantic_value < 0.70:
+        semantic_label, semantic_color = "Élevée", "#ea580c"
+    else:
+        semantic_label, semantic_color = "Très élevée", "#dc2626"
+
+    render_custom_gauge(semantic_value, semantic_color)
+
+    st.markdown(
+        f"<b style='color:{semantic_color}'>{semantic_label}</b> — {round(semantic_value * 100, 1)}%",
+        unsafe_allow_html=True
+    )
+
+    st.caption(result["semantic_shift_interpretation"])
+
+    with st.expander("🔎 Voir les marqueurs", expanded=False):
+        markers = result.get("semantic_shift_markers", [])
+        if not markers:
+            st.info("Aucun glissement sémantique notable détecté.")
+        else:
+            for marker in markers:
+                st.warning(marker)
+
+    with st.popover("ℹ️ Comprendre cette jauge"):
+        st.markdown("### Glissement sémantique")
+
+        st.write(
+            "Cette jauge détecte les recadrages lexicaux : un mot ou une expression peut déplacer "
+            "la perception du réel en imposant une lecture orientée."
+        )
+
+        st.markdown("**Principe**")
+        st.write(
+            "Le texte est comparé à des marqueurs de glissement sémantique : termes qui déplacent "
+            "le sens, requalifient une situation ou transforment une description en cadrage interprétatif."
+        )
+
+        st.markdown("**Formule utilisée**")
+        st.code(
+            "markers = marqueurs de glissement sémantique détectés\n"
+            "score = min(len(markers) * coefficient / 10, 1.0)",
+            language="python"
+        )
+
+        markers = result.get("semantic_shift_markers", [])
+
+        st.markdown("**Valeur actuelle**")
+        st.write(f"Score : **{round(semantic_value * 100, 1)}%**")
+        st.write(f"Niveau : **{semantic_label}**")
+        st.write(f"Marqueurs détectés : **{len(markers)}**")
+
+        st.markdown("**Interprétation actuelle**")
+        st.write(result["semantic_shift_interpretation"])
+
+        st.markdown("**Lecture**")
+        st.write(
+            "🟢 Faible : vocabulaire peu recadrant\n"
+            "🟡 Modérée : quelques termes orientent la lecture\n"
+            "🟠 Élevée : recadrage lexical notable\n"
+            "🔴 Très élevée : forte requalification stratégique du réel"
+        )
+
+        st.markdown("**Attention**")
+        st.write(
+            "Un glissement sémantique élevé ne signifie pas que le texte est faux. "
+            "Il indique que le choix des mots peut déplacer l’interprétation du lecteur."
+        )
 
 with bf5:
     st.markdown("### Faux consensus")
@@ -10907,40 +10982,6 @@ with row8_col3:
         markers = result.get("narrative_overdetermination_markers", [])
         if not markers:
             st.info("Aucune surdétermination narrative notable détectée.")
-        else:
-            for marker in markers:
-                st.warning(marker)
-
-# -----------------------------
-# 16) Glissement sémantique
-# -----------------------------
-with row6_col1:
-    st.markdown("### Glissement sémantique")
-    st.caption("Recadrage lexical stratégique du réel par des termes orientés.")
-
-    semantic_value = result["semantic_shift_score"]
-
-    if semantic_value < 0.20:
-        semantic_label, semantic_color = "Faible", "#ca8a04"
-    elif semantic_value < 0.40:
-        semantic_label, semantic_color = "Modérée", "#f97316"
-    elif semantic_value < 0.70:
-        semantic_label, semantic_color = "Élevée", "#ea580c"
-    else:
-        semantic_label, semantic_color = "Très élevée", "#dc2626"
-
-    render_custom_gauge(semantic_value, semantic_color)
-
-    st.markdown(
-        f"<b style='color:{semantic_color}'>{semantic_label}</b> — {round(semantic_value * 100, 1)}%",
-        unsafe_allow_html=True
-    )
-    st.caption(result["semantic_shift_interpretation"])
-
-    with st.expander("Voir les marqueurs", expanded=False):
-        markers = result.get("semantic_shift_markers", [])
-        if not markers:
-            st.info("Aucun glissement sémantique notable détecté.")
         else:
             for marker in markers:
                 st.warning(marker)
