@@ -9978,10 +9978,98 @@ with al4:
             "Une pétition de principe élevée ne signifie pas que la conclusion est fausse. "
             "Elle indique que le texte tend à répéter ou présupposer sa conclusion au lieu de la démontrer."
         )
-
+# -----------------------------
+# 7) Cherry Picking
+# -----------------------------
 with al5:
-    st.markdown("### Cherry picking")
-    # jauge ici
+    st.markdown("### Cherry Picking")
+    st.caption("Sélection biaisée d’exemples, de cas ou de preuves allant dans un seul sens.")
+
+    value = result["cherry_picking_score"]
+
+    if value < 0.15:
+        label, color = "Faible", "#ca8a04"
+    elif value < 0.35:
+        label, color = "Modérée", "#f97316"
+    elif value < 0.60:
+        label, color = "Élevée", "#ea580c"
+    else:
+        label, color = "Très élevée", "#dc2626"
+
+    render_custom_gauge(value, color)
+
+    st.markdown(
+        f"<b style='color:{color}'>{label}</b> — {round(value*100,1)}%",
+        unsafe_allow_html=True
+    )
+
+    st.caption(result["cherry_picking_interpretation"])
+
+    with st.expander("🔎 Voir les marqueurs", expanded=False):
+        markers = result.get("cherry_picking_markers", [])
+        omissions = result.get("cherry_picking_omission_markers", [])
+
+        if not markers and not omissions:
+            st.info("Aucune sélection biaisée notable détectée.")
+        else:
+            if markers:
+                st.markdown("**Exemples isolés / preuves uniques**")
+                for marker in markers:
+                    st.warning(marker)
+
+            if omissions:
+                st.markdown("**Indices d’omission stratégique**")
+                for marker in omissions:
+                    st.error(marker)
+
+    with st.popover("ℹ️ Comprendre cette jauge"):
+        st.markdown("### Cherry Picking")
+
+        st.write(
+            "Cette jauge détecte les situations où le texte sélectionne certains exemples, "
+            "cas ou preuves allant dans un seul sens, tout en laissant de côté les éléments contraires."
+        )
+
+        st.markdown("**Principe**")
+        st.write(
+            "Le texte est comparé à deux familles de signaux : les exemples isolés ou preuves uniques, "
+            "et les indices d’omission stratégique."
+        )
+
+        st.markdown("**Formule utilisée**")
+        st.code(
+            "markers = exemples isolés ou preuves uniques détectés\n"
+            "omissions = indices d’omission stratégique détectés\n"
+            "score = min((len(markers) + len(omissions) * poids_omission) * coefficient / 10, 1.0)",
+            language="python"
+        )
+
+        markers = result.get("cherry_picking_markers", [])
+        omissions = result.get("cherry_picking_omission_markers", [])
+
+        st.markdown("**Valeur actuelle**")
+        st.write(f"Score : **{round(value * 100, 1)}%**")
+        st.write(f"Niveau : **{label}**")
+        st.write(f"Exemples / preuves uniques : **{len(markers)}**")
+        st.write(f"Omissions stratégiques : **{len(omissions)}**")
+
+        st.markdown("**Interprétation actuelle**")
+        st.write(result["cherry_picking_interpretation"])
+
+        st.markdown("**Lecture**")
+        st.write(
+            "🟢 Faible : sélection peu biaisée\n"
+            "🟡 Modérée : quelques exemples orientés\n"
+            "🟠 Élevée : sélection fortement unilatérale\n"
+            "🔴 Très élevée : omission ou sélection stratégique probable"
+        )
+
+        st.markdown("**Attention**")
+        st.write(
+            "Un score élevé ne signifie pas que les exemples cités sont faux. "
+            "Il indique que le texte peut choisir certains éléments favorables "
+            "en négligeant d’autres données nécessaires à l’équilibre de l’analyse."
+        )
 
 with al6:
     st.markdown("### Sophismes détectés")
@@ -11037,45 +11125,6 @@ with row13_col2:
         else:
             for marker in markers:
                 st.warning(marker)
-
-with row13_col3:
-    st.markdown("### Cherry Picking")
-    st.caption("Sélection biaisée d’exemples, de cas ou de preuves allant dans un seul sens.")
-
-    value = result["cherry_picking_score"]
-
-    if value < 0.15:
-        label, color = "Faible", "#ca8a04"
-    elif value < 0.35:
-        label, color = "Modérée", "#f97316"
-    elif value < 0.60:
-        label, color = "Élevée", "#ea580c"
-    else:
-        label, color = "Très élevée", "#dc2626"
-
-    render_custom_gauge(value, color)
-    st.markdown(
-        f"<b style='color:{color}'>{label}</b> — {round(value*100,1)}%",
-        unsafe_allow_html=True
-    )
-    st.caption(result["cherry_picking_interpretation"])
-
-    with st.expander("Voir les marqueurs", expanded=False):
-        markers = result.get("cherry_picking_markers", [])
-        omissions = result.get("cherry_picking_omission_markers", [])
-
-        if not markers and not omissions:
-            st.info("Aucune sélection biaisée notable détectée.")
-        else:
-            if markers:
-                st.markdown("**Exemples isolés / preuves uniques**")
-                for marker in markers:
-                    st.warning(marker)
-
-            if omissions:
-                st.markdown("**Indices d’omission stratégique**")
-                for marker in omissions:
-                    st.error(marker)
 
 # -----------------------------
 # 39) Victimisation stratégique
