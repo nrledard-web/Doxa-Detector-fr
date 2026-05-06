@@ -12400,6 +12400,87 @@ with bf5:
                 "Une autorité vague élevée ne signifie pas que le contenu est faux. "
                 "Elle indique que les sources invoquées ne sont pas clairement vérifiables."
             )
+
+# -----------------------------
+#  Saturation normative
+# -----------------------------
+with bf7:
+    st.markdown("### Saturation normative")
+    st.caption("Accumulation de jugements moraux à la place de l’analyse.")
+
+    value = result["normative_saturation_score"]
+
+    if value < 0.15:
+        label, color = "Faible", "#ca8a04"
+    elif value < 0.35:
+        label, color = "Modérée", "#f97316"
+    elif value < 0.60:
+        label, color = "Élevée", "#ea580c"
+    else:
+        label, color = "Très élevée", "#dc2626"
+
+    render_custom_gauge(value, color)
+
+    st.markdown(
+        f"<b style='color:{color}'>{label}</b> — {round(value*100,1)}%",
+        unsafe_allow_html=True
+    )
+
+    st.caption(result["normative_saturation_interpretation"])
+
+    with st.expander("🔎 Voir les marqueurs", expanded=False):
+        markers = result.get("normative_saturation_markers", [])
+        if not markers:
+            st.info("Aucune saturation normative notable détectée.")
+        else:
+            for marker in markers:
+                st.warning(marker)
+
+    with st.popover("ℹ️ Comprendre cette jauge"):
+        st.markdown("### Saturation normative")
+
+        st.write(
+            "Cette jauge détecte l’accumulation de jugements moraux ou évaluatifs "
+            "qui peuvent remplacer l’analyse démonstrative."
+        )
+
+        st.markdown("**Principe**")
+        st.write(
+            "Le texte est comparé à des marqueurs de saturation normative : "
+            "enchaînement de qualifications morales, jugements de valeur répétés, "
+            "ou vocabulaire évaluatif dominant."
+        )
+
+        st.markdown("**Formule utilisée**")
+        st.code(
+            "markers = marqueurs de saturation normative détectés\n"
+            "score = min(len(markers) * coefficient / 10, 1.0)",
+            language="python"
+        )
+
+        markers = result.get("normative_saturation_markers", [])
+
+        st.markdown("**Valeur actuelle**")
+        st.write(f"Score : **{round(value * 100, 1)}%**")
+        st.write(f"Niveau : **{label}**")
+        st.write(f"Marqueurs détectés : **{len(markers)}**")
+
+        st.markdown("**Interprétation actuelle**")
+        st.write(result["normative_saturation_interpretation"])
+
+        st.markdown("**Lecture**")
+        st.write(
+            "🟢 Faible : peu de saturation normative\n"
+            "🟡 Modérée : quelques jugements accumulés\n"
+            "🟠 Élevée : forte densité de jugements\n"
+            "🔴 Très élevée : jugement moral dominant au détriment de l’analyse"
+        )
+
+        st.markdown("**Attention**")
+        st.write(
+            "Une saturation normative élevée ne signifie pas que le texte est faux. "
+            "Elle indique que le discours accumule des jugements de valeur, parfois au détriment de la démonstration."
+        )
 st.divider()
 
 # =============================
@@ -12478,36 +12559,6 @@ with row5_col2:
         markers = result.get("binary_opposition_markers", [])
         if not markers:
             st.info("Aucune opposition binaire notable détectée.")
-        else:
-            for marker in markers:
-                st.warning(marker)
-
-# -----------------------------
-# 22) Saturation normative
-# -----------------------------
-with row8_col1:
-    st.markdown("### Saturation normative")
-    st.caption("Accumulation de jugements moraux à la place de l’analyse.")
-
-    value = result["normative_saturation_score"]
-
-    if value < 0.15:
-        label, color = "Faible", "#ca8a04"
-    elif value < 0.35:
-        label, color = "Modérée", "#f97316"
-    elif value < 0.60:
-        label, color = "Élevée", "#ea580c"
-    else:
-        label, color = "Très élevée", "#dc2626"
-
-    render_custom_gauge(value, color)
-    st.markdown(f"<b style='color:{color}'>{label}</b> — {round(value*100,1)}%", unsafe_allow_html=True)
-    st.caption(result["normative_saturation_interpretation"])
-
-    with st.expander("Voir les marqueurs", expanded=False):
-        markers = result.get("normative_saturation_markers", [])
-        if not markers:
-            st.info("Aucune saturation normative notable détectée.")
         else:
             for marker in markers:
                 st.warning(marker)
