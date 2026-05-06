@@ -9138,11 +9138,11 @@ Elle compare :
 - les termes d’appui logique ou explicatif.
 
 Elle mesure l’équilibre entre accusation et démonstration.
-""")
+
 
         st.write(f"**Attaques détectées :** {result['argument_attack_count']}")
         st.write(f"**Appuis logiques détectés :** {result['argument_support_count']}")
-
+""")
         # 📐 POPOVER FORMULE
         with st.popover("📐 Formule et explication"):
             st.markdown("Formule utilisée :")
