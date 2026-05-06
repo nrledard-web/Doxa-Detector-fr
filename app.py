@@ -9362,8 +9362,103 @@ st.caption("Détection des structures narratives orientées ou propagandistes.")
 oi1, oi2, oi3 = st.columns(3)
 
 with oi1:
-    st.markdown("### Jauge propagandiste")
-    # jauge ici
+    
+    st.subheader("Jauge propagandiste")
+    st.caption(
+        "Cette jauge combine la tension cognitive, la pression rhétorique, "
+        "les motifs idéologiques détectés et le degré de fermeture cognitive. "
+        "Elle aide à estimer si le texte relève d’un simple discours orienté "
+        "ou d’une structure plus franchement propagandiste."
+    )
+    
+    closure_for_discourse = (
+        (result["D"] * (1 + len(result["red_flags"]) / 5)) / (result["G"] + result["N"])
+        if (result["G"] + result["N"]) > 0 else 10
+    )
+    
+    propaganda_value = compute_propaganda_gauge(
+        lie_gauge=gauge_value,
+        rhetorical_pressure=rp,
+        political_pattern_score=result["political_pattern_score"],
+        closure=closure_for_discourse
+    )
+    
+    propaganda_label, propaganda_color, propaganda_text = interpret_propaganda_gauge(propaganda_value)
+    
+    render_custom_gauge(propaganda_value, propaganda_color)
+    
+    st.markdown(
+        f"<b style='color:{propaganda_color}'>{propaganda_label}</b> — {round(propaganda_value*100, 1)}%",
+        unsafe_allow_html=True
+    )
+    
+    st.caption("Discours peu orienté ⟵⟶ Structure propagandiste")
+    st.caption(propaganda_text)
+    
+    with st.popover("ℹ️ Comprendre cette jauge"):
+        st.markdown("### Jauge propagandiste")
+    
+        st.write(
+            "Cette jauge estime si le texte dépasse le simple discours orienté "
+            "pour entrer dans une structure plus fortement propagandiste."
+        )
+    
+        st.markdown("**Principe**")
+        st.write(
+            "Elle combine quatre dimensions : la jauge de mensonge ou de tension stratégique, "
+            "la pression rhétorique, les manœuvres discursives détectées et la fermeture cognitive."
+        )
+    
+        st.markdown("**Formule utilisée**")
+        st.code(
+            "propaganda_value = compute_propaganda_gauge(\n"
+            "    lie_gauge=gauge_value,\n"
+            "    rhetorical_pressure=rp,\n"
+            "    political_pattern_score=political_pattern_score,\n"
+            "    closure=closure_for_discourse\n"
+            ")",
+            language="python"
+        )
+    
+        st.markdown("**Valeur actuelle**")
+        st.write(f"Score : **{round(propaganda_value * 100, 1)}%**")
+        st.write(f"Niveau : **{propaganda_label}**")
+    
+        st.write(f"Tension stratégique : **{round(gauge_value * 100, 1)}%**")
+        st.write(f"Pression rhétorique : **{round(rp * 100, 1)}%**")
+        st.write(f"Motifs idéologiques : **{result['political_pattern_score']}**")
+        st.write(f"Fermeture cognitive : **{round(closure_for_discourse, 2)}**")
+    
+        st.markdown("**Interprétation actuelle**")
+        st.write(propaganda_text)
+    
+        st.markdown("**Lecture**")
+        st.write(
+            "🟢 Faible : discours peu orienté\n"
+            "🟡 Modérée : orientation discursive présente\n"
+            "🟠 Élevée : structure fortement orientée\n"
+            "🔴 Très élevée : structure propagandiste probable"
+        )
+    
+        st.markdown("**Attention**")
+        st.write(
+            "Une jauge propagandiste élevée ne prouve pas une intention de propagande. "
+            "Elle indique une convergence de signaux : pression, orientation, fermeture cognitive "
+            "et motifs idéologiques."
+        )
+    
+    discursive_profile = interpret_discursive_profile(
+        lie_gauge=gauge_value,
+        rhetorical_pressure=rp,
+        propaganda_gauge=propaganda_value,
+        premise_score=result["premise_score"],
+        logic_confusion_score=result["logic_confusion_score"],
+        scientific_simulation_score=result["scientific_simulation_score"],
+        discursive_coherence_score=result["discursive_coherence_score"],
+    )
+    
+    st.subheader("Profil discursif global")
+    st.write(discursive_profile)
 
 with oi2:
     st.markdown("### Narration propagandiste")
@@ -9464,37 +9559,9 @@ st.markdown("### Crédibilité finale")
 st.markdown("### Régime cognitif dominant")
 # affichage ici
 
-
 st.divider()
 
 
-st.subheader("Cohérence trompeuse")
-st.caption(
-    "Cette jauge mesure si le texte paraît cohérent tout en restant fragile, orienté ou insuffisamment vérifiable."
-)
-
-value = result.get("deceptive_coherence", 0)
-label = result.get("deceptive_coherence_label", "—")
-
-if value < 0.25:
-    color = "#ca8a04"
-elif value < 0.50:
-    color = "#ca8a04"
-elif value < 0.75:
-    color = "#f97316"
-else:
-    color = "#dc2626"
-
-render_custom_gauge(value, color)
-
-st.markdown(
-    f"<b style='color:{color}'>{label}</b> — {round(value * 100, 1)}%",
-    unsafe_allow_html=True
-)
-
-st.caption("Cohérence apparente ⟵⟶ Cohérence trompeuse")
-
-st.divider()
 st.subheader("Jauge propagandiste")
 st.caption(
     "Cette jauge combine la tension cognitive, la pression rhétorique, "
