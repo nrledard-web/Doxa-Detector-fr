@@ -9655,9 +9655,86 @@ st.caption("Identification des erreurs de raisonnement et des structures logique
 
 al1, al2, al3 = st.columns(3)
 
+# -----------------------------
+# 5) Confusion logique
+# -----------------------------
 with al1:
     st.markdown("### Confusion logique")
-    # jauge ici
+    st.caption("Causalité abusive, extrapolation, prédiction absolue.")
+
+    logic_value = result["logic_confusion_score"]
+
+    if logic_value < 0.20:
+        logic_label, logic_color = "Faible", "#ca8a04"
+    elif logic_value < 0.40:
+        logic_label, logic_color = "Modérée", "#f97316"
+    elif logic_value < 0.70:
+        logic_label, logic_color = "Élevée", "#ea580c"
+    else:
+        logic_label, logic_color = "Très élevée", "#dc2626"
+
+    render_custom_gauge(logic_value, logic_color)
+
+    st.markdown(
+        f"<b style='color:{logic_color}'>{logic_label}</b> — {round(logic_value * 100, 1)}%",
+        unsafe_allow_html=True
+    )
+
+    st.caption(result["logic_confusion_interpretation"])
+
+    with st.expander("🔎 Voir les marqueurs", expanded=False):
+        markers = result.get("logic_confusion_markers", [])
+        if not markers:
+            st.info("Aucune confusion logique saillante détectée.")
+        else:
+            for marker in markers:
+                st.warning(marker)
+
+    with st.popover("ℹ️ Comprendre cette jauge"):
+        st.markdown("### Confusion logique")
+
+        st.write(
+            "Cette jauge détecte les passages où le raisonnement paraît glisser : "
+            "causalité trop rapide, extrapolation excessive, prédiction présentée comme certaine "
+            "ou lien logique insuffisamment démontré."
+        )
+
+        st.markdown("**Principe**")
+        st.write(
+            "Le texte est comparé à une liste de marqueurs de confusion logique. "
+            "Chaque marqueur détecté augmente le score."
+        )
+
+        st.markdown("**Formule utilisée**")
+        st.code(
+            "markers = marqueurs de confusion logique détectés\n"
+            "score = min(len(markers) * coefficient / 10, 1.0)",
+            language="python"
+        )
+
+        markers = result.get("logic_confusion_markers", [])
+
+        st.markdown("**Valeur actuelle**")
+        st.write(f"Score : **{round(logic_value * 100, 1)}%**")
+        st.write(f"Niveau : **{logic_label}**")
+        st.write(f"Marqueurs détectés : **{len(markers)}**")
+
+        st.markdown("**Interprétation actuelle**")
+        st.write(result["logic_confusion_interpretation"])
+
+        st.markdown("**Lecture**")
+        st.write(
+            "🟢 Faible : raisonnement peu confus\n"
+            "🟡 Modérée : quelques glissements logiques\n"
+            "🟠 Élevée : confusion logique notable\n"
+            "🔴 Très élevée : raisonnement fortement instable ou abusif"
+        )
+
+        st.markdown("**Attention**")
+        st.write(
+            "Une confusion logique élevée ne signifie pas automatiquement que le texte est faux. "
+            "Elle indique que certains liens de cause, de conséquence ou de projection méritent d’être vérifiés."
+        )
 
 with al2:
     st.markdown("### Fausse causalité")
@@ -9844,39 +9921,6 @@ with row1_col2:
             for marker in premise_markers:
                 st.warning(marker)
 
-# -----------------------------
-# 5) Confusion logique
-# -----------------------------
-with row2_col2:
-    st.markdown("### Confusion logique")
-    st.caption("Causalité abusive, extrapolation, prédiction absolue.")
-
-    logic_value = result["logic_confusion_score"]
-
-    if logic_value < 0.20:
-        logic_label, logic_color = "Faible", "#ca8a04"
-    elif logic_value < 0.40:
-        logic_label, logic_color = "Modérée", "#f97316"
-    elif logic_value < 0.70:
-        logic_label, logic_color = "Élevée", "#ea580c"
-    else:
-        logic_label, logic_color = "Très élevée", "#dc2626"
-
-    render_custom_gauge(logic_value, logic_color)
-
-    st.markdown(
-        f"<b style='color:{logic_color}'>{logic_label}</b> — {round(logic_value * 100, 1)}%",
-        unsafe_allow_html=True
-    )
-    st.caption(result["logic_confusion_interpretation"])
-
-    with st.expander("Voir les marqueurs", expanded=False):
-        markers = result.get("logic_confusion_markers", [])
-        if not markers:
-            st.info("Aucune confusion logique saillante détectée.")
-        else:
-            for marker in markers:
-                st.warning(marker)
 
 # -----------------------------
 # 6) Scientificité rhétorique
@@ -10010,40 +10054,6 @@ with row4_col1:
         markers = result.get("generalization_markers", [])
         if not markers:
             st.info("Aucune généralisation abusive notable détectée.")
-        else:
-            for marker in markers:
-                st.warning(marker)
-
-# -----------------------------
-# 11) Ennemi abstrait
-# -----------------------------
-with row4_col2:
-    st.markdown("### Ennemi abstrait")
-    st.caption("Construction d’un adversaire flou ou globalisant.")
-
-    abstract_enemy_value = result["abstract_enemy_score"]
-
-    if abstract_enemy_value < 0.20:
-        abstract_enemy_label, abstract_enemy_color = "Faible", "#ca8a04"
-    elif abstract_enemy_value < 0.40:
-        abstract_enemy_label, abstract_enemy_color = "Modérée", "#f97316"
-    elif abstract_enemy_value < 0.70:
-        abstract_enemy_label, abstract_enemy_color = "Élevée", "#ea580c"
-    else:
-        abstract_enemy_label, abstract_enemy_color = "Très élevée", "#dc2626"
-
-    render_custom_gauge(abstract_enemy_value, abstract_enemy_color)
-
-    st.markdown(
-        f"<b style='color:{abstract_enemy_color}'>{abstract_enemy_label}</b> — {round(abstract_enemy_value * 100, 1)}%",
-        unsafe_allow_html=True
-    )
-    st.caption(result["abstract_enemy_interpretation"])
-
-    with st.expander("Voir les marqueurs", expanded=False):
-        markers = result.get("abstract_enemy_markers", [])
-        if not markers:
-            st.info("Aucun ennemi abstrait notable détecté.")
         else:
             for marker in markers:
                 st.warning(marker)
