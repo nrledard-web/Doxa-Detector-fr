@@ -11490,6 +11490,86 @@ with al9:
             "Une surinterprétation factuelle élevée ne signifie pas que le texte est faux. "
             "Elle indique que les conclusions dépassent les éléments réellement disponibles."
         )
+# =============================
+# Fausse causalité (simple)
+# =============================
+with al10:
+    st.markdown("### Fausse causalité (simple)")
+    st.caption("Lien causal affirmé sans démonstration suffisante.")
+
+    value = result["false_causality_basic_score"]
+
+    if value < 0.15:
+        label, color = "Faible", "#ca8a04"
+    elif value < 0.35:
+        label, color = "Modérée", "#f97316"
+    elif value < 0.60:
+        label, color = "Élevée", "#ea580c"
+    else:
+        label, color = "Très élevée", "#dc2626"
+
+    render_custom_gauge(value, color)
+
+    st.markdown(
+        f"<b style='color:{color}'>{label}</b> — {round(value*100,1)}%",
+        unsafe_allow_html=True
+    )
+
+    st.caption(result["false_causality_basic_interpretation"])
+
+    with st.expander("🔎 Voir les marqueurs", expanded=False):
+        markers = result.get("false_causality_basic_markers", [])
+        if not markers:
+            st.info("Aucune fausse causalité simple notable détectée.")
+        else:
+            for marker in markers:
+                st.warning(marker)
+
+    with st.popover("ℹ️ Comprendre cette jauge"):
+        st.markdown("### Fausse causalité (simple)")
+
+        st.write(
+            "Cette jauge détecte les situations où un lien de cause à effet est affirmé "
+            "sans preuve suffisante ou sans démonstration rigoureuse."
+        )
+
+        st.markdown("**Principe**")
+        st.write(
+            "Le texte est comparé à des marqueurs de causalité abusive : "
+            "enchaînement rapide d’événements, corrélation présentée comme causalité, "
+            "ou conclusion causale non justifiée."
+        )
+
+        st.markdown("**Formule utilisée**")
+        st.code(
+            "markers = causalités abusives détectées\n"
+            "score = min(len(markers) * coefficient / 10, 1.0)",
+            language="python"
+        )
+
+        markers = result.get("false_causality_basic_markers", [])
+
+        st.markdown("**Valeur actuelle**")
+        st.write(f"Score : **{round(value * 100, 1)}%**")
+        st.write(f"Niveau : **{label}**")
+        st.write(f"Marqueurs détectés : **{len(markers)}**")
+
+        st.markdown("**Interprétation actuelle**")
+        st.write(result["false_causality_basic_interpretation"])
+
+        st.markdown("**Lecture**")
+        st.write(
+            "🟢 Faible : causalité peu affirmée ou prudente\n"
+            "🟡 Modérée : liens causaux discutables ponctuels\n"
+            "🟠 Élevée : causalité abusive notable\n"
+            "🔴 Très élevée : causalité non démontrée dominante"
+        )
+
+        st.markdown("**Attention**")
+        st.write(
+            "Une fausse causalité élevée ne signifie pas que la relation est fausse. "
+            "Elle indique que le lien causal est affirmé plus vite qu’il n’est démontré."
+        )
 
 st.divider()
 
@@ -12172,36 +12252,6 @@ for title, score, label, interpretation in gauges:
     
     if interpretation:
         st.write(interpretation)
-
-with row10_col2:
-    st.markdown("### Fausse causalité (simple)")
-    st.caption("Lien causal affirmé sans démonstration suffisante.")
-
-    value = result["false_causality_basic_score"]
-
-    if value < 0.15:
-        label, color = "Faible", "#ca8a04"
-    elif value < 0.35:
-        label, color = "Modérée", "#f97316"
-    elif value < 0.60:
-        label, color = "Élevée", "#ea580c"
-    else:
-        label, color = "Très élevée", "#dc2626"
-
-    render_custom_gauge(value, color)
-    st.markdown(
-        f"<b style='color:{color}'>{label}</b> — {round(value*100,1)}%",
-        unsafe_allow_html=True
-    )
-    st.caption(result["false_causality_basic_interpretation"])
-
-    with st.expander("Voir les marqueurs", expanded=False):
-        markers = result.get("false_causality_basic_markers", [])
-        if not markers:
-            st.info("Aucune fausse causalité simple notable détectée.")
-        else:
-            for marker in markers:
-                st.warning(marker)
 
 with row10_col3:
     st.markdown("### Généralisation abusive")
