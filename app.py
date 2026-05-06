@@ -12622,12 +12622,6 @@ with st.expander("Clôture cognitive"):
 
     render_custom_gauge(closure_value, closure_color)
 
-    st.markdown(
-        f"<b style='color:{closure_color}'>{closure_label}</b> — {round(closure_local, 2)}",
-        unsafe_allow_html=True
-    )
-    st.caption("Plus la certitude domine G + N, plus le texte se ferme.")
-
 # =============================
 # Jauges structurelles avancées
 # =============================
