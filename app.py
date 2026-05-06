@@ -9343,7 +9343,7 @@ with pd5:
 # -----------------------------
 # Rigidité doxique
 # -----------------------------
-with pd7:
+with pd6:
     st.markdown("### Rigidité doxique")
     st.caption("Degré de fermeture du texte par excès de certitude partagée.")
 
@@ -9419,6 +9419,85 @@ with pd7:
             "Une rigidité doxique élevée ne signifie pas que le texte est faux. "
             "Elle indique que le discours s’appuie fortement sur des évidences supposées "
             "plutôt que sur une démonstration ouverte à la discussion."
+        )
+# -----------------------------
+# Victimisation stratégique
+# -----------------------------
+with pd7:
+    st.markdown("### Victimisation stratégique")
+    st.caption("Mise en scène d’une persécution ou d’un empêchement de dire.")
+
+    value = result["victimization_score"]
+
+    if value < 0.15:
+        label, color = "Faible", "#ca8a04"
+    elif value < 0.35:
+        label, color = "Modérée", "#f97316"
+    elif value < 0.60:
+        label, color = "Élevée", "#ea580c"
+    else:
+        label, color = "Très élevée", "#dc2626"
+
+    render_custom_gauge(value, color)
+
+    st.markdown(
+        f"<b style='color:{color}'>{label}</b> — {round(value*100,1)}%",
+        unsafe_allow_html=True
+    )
+
+    st.caption(result["victimization_interpretation"])
+
+    with st.expander("🔎 Voir les marqueurs", expanded=False):
+        markers = result.get("victimization_markers", [])
+        if not markers:
+            st.info("Aucune victimisation stratégique notable détectée.")
+        else:
+            for marker in markers:
+                st.warning(marker)
+
+    with st.popover("ℹ️ Comprendre cette jauge"):
+        st.markdown("### Victimisation stratégique")
+
+        st.write(
+            "Cette jauge détecte les situations où le discours met en scène une persécution, "
+            "une censure ou un empêchement de s’exprimer, afin de renforcer son impact ou sa légitimité."
+        )
+
+        st.markdown("**Principe**")
+        st.write(
+            "Le texte est comparé à des marqueurs de victimisation : "
+            "injustice subie, interdiction de dire, oppression, ou sentiment d’attaque ciblée."
+        )
+
+        st.markdown("**Formule utilisée**")
+        st.code(
+            "markers = marqueurs de victimisation détectés\n"
+            "score = min(len(markers) * coefficient / 10, 1.0)",
+            language="python"
+        )
+
+        markers = result.get("victimization_markers", [])
+
+        st.markdown("**Valeur actuelle**")
+        st.write(f"Score : **{round(value * 100, 1)}%**")
+        st.write(f"Niveau : **{label}**")
+        st.write(f"Marqueurs détectés : **{len(markers)}**")
+
+        st.markdown("**Interprétation actuelle**")
+        st.write(result["victimization_interpretation"])
+
+        st.markdown("**Lecture**")
+        st.write(
+            "🟢 Faible : pas de mise en scène victimaire\n"
+            "🟡 Modérée : quelques éléments de victimisation\n"
+            "🟠 Élevée : victimisation notable dans le discours\n"
+            "🔴 Très élevée : posture victimaire dominante"
+        )
+
+        st.markdown("**Attention**")
+        st.write(
+            "Une victimisation stratégique élevée ne signifie pas que la situation décrite est fausse. "
+            "Elle indique que le discours mobilise une posture de victime pour renforcer son effet."
         )
         
     st.divider()
