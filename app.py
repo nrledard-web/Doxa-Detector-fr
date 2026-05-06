@@ -12610,44 +12610,250 @@ if not result:
 
 st.subheader("Jauges structurelles avancées")
 
-gauges = [
-    (
-        "Saut logique",
-        result.get("logical_jump_score", 0),
-        result.get("logical_jump_label", "Non calculée"),
-        result.get("logical_jump_interpretation", "")
-    ),
-    (
-        "Densité argumentative",
-        result.get("argument_density_score", 0),
-        result.get("argument_density_label", "Non calculée"),
-        result.get("argument_density_interpretation", "")
-    ),
-    (
-        "Certitude forte composée",
-        result.get("strong_certainty_score", 0),
-        result.get("strong_certainty_label", "Non calculée"),
-        result.get("strong_certainty_interpretation", "")
-    ),
-]
+js1, js2, js3 = st.columns(3)
 
-for title, score, label, interpretation in gauges:
+# -----------------------------
+# 1) Saut logique
+# -----------------------------
+with js1:
+    st.markdown("### Saut logique")
+    st.caption("Rupture ou accélération excessive dans l’enchaînement du raisonnement.")
 
-    if title == "Densité argumentative":
-        title_html = interpret_generic_quality_gauge(title, score)
-    elif title in ["Cohérence trompeuse", "Jauge propagandiste"]:
-        title_html = interpret_warning_risk_gauge(title, score)
+    value = result.get("logical_jump_score", 0)
+
+    if value < 0.15:
+        label, color = "Faible", "#ca8a04"
+    elif value < 0.35:
+        label, color = "Modérée", "#f97316"
+    elif value < 0.60:
+        label, color = "Élevée", "#ea580c"
     else:
-        title_html = interpret_generic_risk_gauge(title, score)
-    
-    # ✅ Plancher visuel : jamais moins de 10%
-    
-    st.markdown(title_html, unsafe_allow_html=True)
-    st.progress(score)
-    st.caption(f"{label} — {round(score * 100, 1)}%")
-    
-    if interpretation:
-        st.write(interpretation)
+        label, color = "Très élevée", "#dc2626"
+
+    render_custom_gauge(value, color)
+
+    st.markdown(
+        f"<b style='color:{color}'>{label}</b> — {round(value * 100, 1)}%",
+        unsafe_allow_html=True
+    )
+
+    st.caption(result.get("logical_jump_interpretation", ""))
+
+    with st.expander("🔎 Voir les marqueurs", expanded=False):
+        markers = result.get("logical_jump_markers", [])
+        if not markers:
+            st.info("Aucun saut logique notable détecté.")
+        else:
+            for marker in markers:
+                st.warning(marker)
+
+    with st.popover("ℹ️ Comprendre cette jauge"):
+        st.markdown("### Saut logique")
+
+        st.write(
+            "Cette jauge détecte les passages où le raisonnement avance trop vite : "
+            "une conclusion apparaît sans transition suffisante ou sans étapes argumentatives explicites."
+        )
+
+        st.markdown("**Principe**")
+        st.write(
+            "Elle repère les ruptures dans l’enchaînement logique : passage brusque d’un fait à une conclusion, "
+            "enchaînement causal insuffisant, ou absence d’étapes intermédiaires."
+        )
+
+        st.markdown("**Formule utilisée**")
+        st.code(
+            "markers = marqueurs de saut logique détectés\n"
+            "score = min(len(markers) * coefficient / 10, 1.0)",
+            language="python"
+        )
+
+        markers = result.get("logical_jump_markers", [])
+
+        st.markdown("**Valeur actuelle**")
+        st.write(f"Score : **{round(value * 100, 1)}%**")
+        st.write(f"Niveau : **{label}**")
+        st.write(f"Marqueurs détectés : **{len(markers)}**")
+
+        st.markdown("**Interprétation actuelle**")
+        st.write(result.get("logical_jump_interpretation", ""))
+
+        st.markdown("**Lecture**")
+        st.write(
+            "🟢 Faible : enchaînement progressif\n"
+            "🟡 Modérée : quelques transitions rapides\n"
+            "🟠 Élevée : conclusion avancée trop vite\n"
+            "🔴 Très élevée : rupture logique dominante"
+        )
+
+        st.markdown("**Attention**")
+        st.write(
+            "Un saut logique élevé ne signifie pas que la conclusion est fausse. "
+            "Il indique que le chemin argumentatif entre les prémisses et la conclusion est insuffisamment explicité."
+        )
+
+# -----------------------------
+# 2) Densité argumentative
+# -----------------------------
+with js2:
+    st.markdown("### Densité argumentative")
+    st.caption("Quantité d’éléments argumentatifs présents dans le texte.")
+
+    value = result.get("argument_density_score", 0)
+
+    if value < 0.15:
+        label, color = "Très faible", "#dc2626"
+    elif value < 0.35:
+        label, color = "Faible", "#f97316"
+    elif value < 0.60:
+        label, color = "Correcte", "#ca8a04"
+    elif value < 0.80:
+        label, color = "Solide", "#84cc16"
+    else:
+        label, color = "Très élevée", "#16a34a"
+
+    render_custom_gauge(value, color)
+
+    st.markdown(
+        f"<b style='color:{color}'>{label}</b> — {round(value * 100, 1)}%",
+        unsafe_allow_html=True
+    )
+
+    st.caption(result.get("argument_density_interpretation", ""))
+
+    with st.expander("🔎 Voir les indicateurs", expanded=False):
+        markers = result.get("argument_density_markers", [])
+        if not markers:
+            st.info("Aucun indicateur argumentatif détaillé disponible.")
+        else:
+            for marker in markers:
+                st.success(marker)
+
+    with st.popover("ℹ️ Comprendre cette jauge"):
+        st.markdown("### Densité argumentative")
+
+        st.write(
+            "Cette jauge mesure la présence d’éléments argumentatifs dans le texte : "
+            "raisons, justifications, connecteurs logiques, exemples ou développements explicatifs."
+        )
+
+        st.markdown("**Principe**")
+        st.write(
+            "Contrairement aux jauges de risque, une densité argumentative élevée est plutôt positive : "
+            "elle indique que le texte développe davantage ses raisons au lieu d’énoncer simplement une conclusion."
+        )
+
+        st.markdown("**Formule utilisée**")
+        st.code(
+            "markers = indicateurs argumentatifs détectés\n"
+            "score = min(len(markers) * coefficient / 10, 1.0)",
+            language="python"
+        )
+
+        markers = result.get("argument_density_markers", [])
+
+        st.markdown("**Valeur actuelle**")
+        st.write(f"Score : **{round(value * 100, 1)}%**")
+        st.write(f"Niveau : **{label}**")
+        st.write(f"Indicateurs détectés : **{len(markers)}**")
+
+        st.markdown("**Interprétation actuelle**")
+        st.write(result.get("argument_density_interpretation", ""))
+
+        st.markdown("**Lecture**")
+        st.write(
+            "🔴 Très faible : peu d’argumentation explicite\n"
+            "🟠 Faible : justification limitée\n"
+            "🟡 Correcte : argumentation présente\n"
+            "🟢 Solide : bonne densité argumentative\n"
+            "🟢 Très élevée : texte fortement argumenté"
+        )
+
+        st.markdown("**Attention**")
+        st.write(
+            "Une forte densité argumentative ne garantit pas que le texte est vrai. "
+            "Elle indique seulement que le discours contient davantage de matière argumentative."
+        )
+
+# -----------------------------
+# 3) Certitude forte composée
+# -----------------------------
+with js3:
+    st.markdown("### Certitude forte composée")
+    st.caption("Accumulation de marqueurs de certitude renforçant le verrouillage du discours.")
+
+    value = result.get("strong_certainty_score", 0)
+
+    if value < 0.15:
+        label, color = "Faible", "#ca8a04"
+    elif value < 0.35:
+        label, color = "Modérée", "#f97316"
+    elif value < 0.60:
+        label, color = "Élevée", "#ea580c"
+    else:
+        label, color = "Très élevée", "#dc2626"
+
+    render_custom_gauge(value, color)
+
+    st.markdown(
+        f"<b style='color:{color}'>{label}</b> — {round(value * 100, 1)}%",
+        unsafe_allow_html=True
+    )
+
+    st.caption(result.get("strong_certainty_interpretation", ""))
+
+    with st.expander("🔎 Voir les marqueurs", expanded=False):
+        markers = result.get("strong_certainty_markers", [])
+        if not markers:
+            st.info("Aucun marqueur de certitude forte détecté.")
+        else:
+            for marker in markers:
+                st.warning(marker)
+
+    with st.popover("ℹ️ Comprendre cette jauge"):
+        st.markdown("### Certitude forte composée")
+
+        st.write(
+            "Cette jauge détecte l’accumulation de formulations de certitude : "
+            "affirmations catégoriques, absence de nuance, impossibilité suggérée du doute."
+        )
+
+        st.markdown("**Principe**")
+        st.write(
+            "Elle mesure non pas une certitude isolée, mais leur accumulation. "
+            "Plus les marqueurs de certitude se multiplient, plus le discours tend à se fermer."
+        )
+
+        st.markdown("**Formule utilisée**")
+        st.code(
+            "markers = marqueurs de certitude détectés\n"
+            "score = min(len(markers) * coefficient / 10, 1.0)",
+            language="python"
+        )
+
+        markers = result.get("strong_certainty_markers", [])
+
+        st.markdown("**Valeur actuelle**")
+        st.write(f"Score : **{round(value * 100, 1)}%**")
+        st.write(f"Niveau : **{label}**")
+        st.write(f"Marqueurs détectés : **{len(markers)}**")
+
+        st.markdown("**Interprétation actuelle**")
+        st.write(result.get("strong_certainty_interpretation", ""))
+
+        st.markdown("**Lecture**")
+        st.write(
+            "🟢 Faible : discours ouvert et nuancé\n"
+            "🟡 Modérée : quelques affirmations fortes\n"
+            "🟠 Élevée : certitude marquée\n"
+            "🔴 Très élevée : fermeture argumentative dominante"
+        )
+
+        st.markdown("**Attention**")
+        st.write(
+            "Une certitude forte composée élevée ne signifie pas que le texte est faux. "
+            "Elle indique que le discours laisse peu de place à la nuance ou à la remise en question."
+        )
         
 st.markdown("""
 <div style="text-align:center; margin:25px 0; color:#888;">
