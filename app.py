@@ -10609,6 +10609,87 @@ with oi6:
             "Un faux consensus renforcé élevé ne signifie pas que l’idée est fausse. "
             "Il indique que le texte transforme un accord supposé en preuve argumentative."
         )
+oi7, oi8 = st.columns(3)
+# =============================
+# Prémisse idéologique implicite
+# =============================
+with oi7:
+    st.markdown("### Prémisse idéologique implicite")
+    st.caption("Présupposé idéologique utilisé comme point de départ du raisonnement.")
+
+    value = result["ideological_premise_sophism_score"]
+
+    if value < 0.15:
+        label, color = "Faible", "#ca8a04"
+    elif value < 0.35:
+        label, color = "Modérée", "#f97316"
+    elif value < 0.60:
+        label, color = "Élevée", "#ea580c"
+    else:
+        label, color = "Très élevée", "#dc2626"
+
+    render_custom_gauge(value, color)
+
+    st.markdown(
+        f"<b style='color:{color}'>{label}</b> — {round(value*100,1)}%",
+        unsafe_allow_html=True
+    )
+
+    st.caption(result["ideological_premise_sophism_interpretation"])
+
+    with st.expander("🔎 Voir les marqueurs", expanded=False):
+        markers = result.get("ideological_premise_sophism_markers", [])
+        if not markers:
+            st.info("Aucune prémisse idéologique implicite notable détectée.")
+        else:
+            for marker in markers:
+                st.warning(marker)
+
+    with st.popover("ℹ️ Comprendre cette jauge"):
+        st.markdown("### Prémisse idéologique implicite")
+
+        st.write(
+            "Cette jauge détecte les raisonnements qui prennent un présupposé idéologique "
+            "comme point de départ sans le démontrer."
+        )
+
+        st.markdown("**Principe**")
+        st.write(
+            "Le texte est comparé à des marqueurs de prémisse idéologique implicite : "
+            "cadre de pensée supposé évident, orientation politique ou morale utilisée comme base argumentative."
+        )
+
+        st.markdown("**Formule utilisée**")
+        st.code(
+            "markers = marqueurs de prémisse idéologique implicite détectés\n"
+            "score = min(len(markers) * coefficient / 10, 1.0)",
+            language="python"
+        )
+
+        markers = result.get("ideological_premise_sophism_markers", [])
+
+        st.markdown("**Valeur actuelle**")
+        st.write(f"Score : **{round(value * 100, 1)}%**")
+        st.write(f"Niveau : **{label}**")
+        st.write(f"Marqueurs détectés : **{len(markers)}**")
+
+        st.markdown("**Interprétation actuelle**")
+        st.write(result["ideological_premise_sophism_interpretation"])
+
+        st.markdown("**Lecture**")
+        st.write(
+            "🟢 Faible : peu de présupposés idéologiques\n"
+            "🟡 Modérée : cadre idéologique implicite ponctuel\n"
+            "🟠 Élevée : raisonnement fortement orienté par une prémisse implicite\n"
+            "🔴 Très élevée : présupposé idéologique central dans l’argumentation"
+        )
+
+        st.markdown("**Attention**")
+        st.write(
+            "Une prémisse idéologique implicite élevée ne signifie pas que le texte est faux. "
+            "Elle indique que le raisonnement repose sur un cadre idéologique peu explicité."
+        )
+
 
 st.divider()
 
@@ -12026,36 +12107,6 @@ with row12_col1:
         markers = result.get("normative_qualification_markers", [])
         if not markers:
             st.info("Aucune qualification normative notable détectée.")
-        else:
-            for marker in markers:
-                st.warning(marker)
-
-with row12_col2:
-    st.markdown("### Prémisse idéologique implicite")
-    st.caption("Présupposé idéologique utilisé comme point de départ du raisonnement.")
-
-    value = result["ideological_premise_sophism_score"]
-
-    if value < 0.15:
-        label, color = "Faible", "#ca8a04"
-    elif value < 0.35:
-        label, color = "Modérée", "#f97316"
-    elif value < 0.60:
-        label, color = "Élevée", "#ea580c"
-    else:
-        label, color = "Très élevée", "#dc2626"
-
-    render_custom_gauge(value, color)
-    st.markdown(
-        f"<b style='color:{color}'>{label}</b> — {round(value*100,1)}%",
-        unsafe_allow_html=True
-    )
-    st.caption(result["ideological_premise_sophism_interpretation"])
-
-    with st.expander("Voir les marqueurs", expanded=False):
-        markers = result.get("ideological_premise_sophism_markers", [])
-        if not markers:
-            st.info("Aucune prémisse idéologique implicite notable détectée.")
         else:
             for marker in markers:
                 st.warning(marker)
