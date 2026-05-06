@@ -9182,9 +9182,9 @@ with pd1:
 pd4, pd5, pd6 = st.columns(3)
 
 # -----------------------------
-# 12) Certitude absolue
+#  Certitude absolue
 # -----------------------------
-with row4_col3:
+with pd4:
     st.markdown("### Certitude absolue")
     st.caption("Rigidité rhétorique et fermeture interprétative.")
 
