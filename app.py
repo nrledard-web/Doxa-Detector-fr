@@ -9831,6 +9831,88 @@ with sr4:
             "Elle indique que le discours repose sur un cadre d’évidence idéologique peu explicité."
         )
 
+sr5, sr6, sr7, sr8 = st.columns(4)
+
+# -----------------------------
+# Surdétermination narrative
+# -----------------------------
+with sr5:
+    st.markdown("### Surdétermination narrative")
+    st.caption("Réduction du réel à un récit unique supposé tout expliquer.")
+
+    value = result["narrative_overdetermination_score"]
+
+    if value < 0.15:
+        label, color = "Faible", "#ca8a04"
+    elif value < 0.35:
+        label, color = "Modérée", "#f97316"
+    elif value < 0.60:
+        label, color = "Élevée", "#ea580c"
+    else:
+        label, color = "Très élevée", "#dc2626"
+
+    render_custom_gauge(value, color)
+
+    st.markdown(
+        f"<b style='color:{color}'>{label}</b> — {round(value*100,1)}%",
+        unsafe_allow_html=True
+    )
+
+    st.caption(result["narrative_overdetermination_interpretation"])
+
+    with st.expander("🔎 Voir les marqueurs", expanded=False):
+        markers = result.get("narrative_overdetermination_markers", [])
+        if not markers:
+            st.info("Aucune surdétermination narrative notable détectée.")
+        else:
+            for marker in markers:
+                st.warning(marker)
+
+    with st.popover("ℹ️ Comprendre cette jauge"):
+        st.markdown("### Surdétermination narrative")
+
+        st.write(
+            "Cette jauge détecte les situations où le texte réduit la complexité du réel "
+            "à un récit unique censé tout expliquer."
+        )
+
+        st.markdown("**Principe**")
+        st.write(
+            "Le texte est comparé à des marqueurs de surdétermination narrative : "
+            "explication unique, cause globale, ou récit totalisant qui absorbe toutes les interprétations."
+        )
+
+        st.markdown("**Formule utilisée**")
+        st.code(
+            "markers = marqueurs de récit totalisant détectés\n"
+            "score = min(len(markers) * coefficient / 10, 1.0)",
+            language="python"
+        )
+
+        markers = result.get("narrative_overdetermination_markers", [])
+
+        st.markdown("**Valeur actuelle**")
+        st.write(f"Score : **{round(value * 100, 1)}%**")
+        st.write(f"Niveau : **{label}**")
+        st.write(f"Marqueurs détectés : **{len(markers)}**")
+
+        st.markdown("**Interprétation actuelle**")
+        st.write(result["narrative_overdetermination_interpretation"])
+
+        st.markdown("**Lecture**")
+        st.write(
+            "🟢 Faible : pluralité d’explications\n"
+            "🟡 Modérée : tendance à simplifier le récit\n"
+            "🟠 Élevée : récit dominant structurant\n"
+            "🔴 Très élevée : récit unique totalisant"
+        )
+
+        st.markdown("**Attention**")
+        st.write(
+            "Une surdétermination narrative élevée ne signifie pas que l’explication est fausse. "
+            "Elle indique que le discours tend à réduire la complexité du réel à une seule grille de lecture."
+        )
+
 st.divider()
 
 
