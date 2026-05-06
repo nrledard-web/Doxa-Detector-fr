@@ -9367,13 +9367,13 @@ with pd7:
 
     st.caption(result["doxic_rigidity_interpretation"])
 
-with st.expander("🔎 Voir les marqueurs", expanded=False):
-    markers = result.get("doxic_rigidity_markers", [])
-    if not markers:
-        st.info("Aucune rigidité doxique notable détectée.")
-    else:
-        for marker in markers:
-            st.warning(marker)
+    with st.expander("🔎 Voir les marqueurs", expanded=False):
+        markers = result.get("doxic_rigidity_markers", [])
+        if not markers:
+            st.info("Aucune rigidité doxique notable détectée.")
+        else:
+            for marker in markers:
+                st.warning(marker)
 
     with st.popover("ℹ️ Comprendre cette jauge"):
         st.markdown("### Rigidité doxique")
