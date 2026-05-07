@@ -6372,86 +6372,74 @@ def fetch_text_for_textarea(url: str) -> str:
     except Exception:
         return ""
 
-# =====================================================
-# TYPE DE DISCOURS DÉTECTÉ
-# =====================================================
 def detect_discourse_type(result):
-    G = result.get("G", 0)
-    N = result.get("N", 0)
-    D = result.get("D", 0)
-    V = result.get("V", 0)
+    text = result.get("article", "") or result.get("text", "") or ""
+    t = text.lower()
 
-    rhetorical_pressure = result.get("rhetorical_pressure", 0)
-    propaganda = result.get("propaganda_score", 0)
-    closure = result.get("cognitive_closure", 0)
-    final_score = result.get("final_credibility_score", result.get("hard_fact_score", 0))
+    # -----------------------------
+    # Marqueurs journalistiques
+    # -----------------------------
+    journalistic_markers = [
+        "publié", "article", "quotidien", "journal", "selon",
+        "contacté par", "interview", "tribunal", "verdict",
+        "appel", "condamnation", "procès", "statistiques",
+        "insee", "twitter", "cnews", "france 24"
+    ]
 
-    # Nouveaux marqueurs descriptifs uniquement
-    domains = result.get("conceptual_domains", {})
+    # -----------------------------
+    # Marqueurs philosophiques réels
+    # -----------------------------
+    philosophical_markers = [
+        "vérité", "être", "existence", "morale", "justice",
+        "liberté", "conscience", "raison", "essence",
+        "métaphysique", "ontologie", "éthique",
+        "connaissance", "sagesse", "âme", "bien", "mal"
+    ]
 
-    journalistic = domains.get("journalistique", 0)
-    philosophical = domains.get("philosophique", 0)
-    religious = domains.get("religieux", 0)
+    # -----------------------------
+    # Marqueurs idéologiques / interprétatifs
+    # -----------------------------
+    ideological_markers = [
+        "extrême droite", "racisme", "raciste", "nationalisme",
+        "islamophobie", "complot", "identitaire", "alt-right",
+        "privilèges", "civilisation", "pureté raciale",
+        "remplacement", "grand remplacement"
+    ]
 
-    # 1) Priorité aux discours fortement orientés
-    if propaganda >= 0.6 or rhetorical_pressure >= 0.7 or closure >= 0.7:
+    journalistic_score = sum(1 for m in journalistic_markers if m in t)
+    philosophical_score = sum(1 for m in philosophical_markers if m in t)
+    ideological_score = sum(1 for m in ideological_markers if m in t)
+
+    # -----------------------------
+    # Règle anti-faux positif philosophique
+    # -----------------------------
+    if journalistic_score >= 3 and ideological_score >= 2:
         return (
-            "Discours propagandiste",
-            "Forte pression rhétorique, simplification narrative ou fermeture cognitive."
+            "Discours journalistique interprétatif",
+            "Le texte informe sur des faits réels tout en proposant une lecture orientée par un cadre analytique ou idéologique."
         )
 
-    # 2) Discours religieux
-    if religious >= 2:
-        return (
-            "Discours religieux",
-            "Le texte mobilise un registre religieux, spirituel ou doctrinal."
-        )
-
-    # 3) Discours philosophique
-    if philosophical >= 2 and rhetorical_pressure < 0.5:
-        return (
-            "Discours philosophique",
-            "Le texte mobilise des notions abstraites, conceptuelles ou réflexives."
-        )
-
-    # 4) Discours journalistique
-    if journalistic >= 2 and V >= 4:
+    if journalistic_score >= 3:
         return (
             "Discours journalistique",
-            "Le texte présente une forme informative avec attribution, rapport, enquête, étude ou référence médiatique."
+            "Le texte rapporte des faits, cite des sources ou s’inscrit dans un traitement médiatique de l’actualité."
         )
 
-    # 5) Discours polémique
-    if rhetorical_pressure >= 0.4 or D >= 7:
+    if philosophical_score >= 4 and journalistic_score < 2:
         return (
-            "Discours polémique",
-            "Argumentation orientée, certitude élevée ou pression rhétorique notable."
+            "Discours philosophique",
+            "Le texte mobilise des notions abstraites dans une réflexion générale, conceptuelle ou existentielle."
         )
 
-    # 6) Discours factuel
-    if G >= 6 and V >= 6 and final_score >= 13:
+    if ideological_score >= 3:
         return (
-            "Discours factuel",
-            "Raisonnement appuyé sur des éléments vérifiables, des sources ou des faits identifiables."
-        )
-
-    # 7) Ancien cas philosophique, gardé en secours
-    if N >= 7 and G < 4 and V < 5 and rhetorical_pressure < 0.3:
-        return (
-            "Discours spéculatif / philosophique",
-            "Réflexion conceptuelle cohérente, mais reposant surtout sur des idées générales plutôt que sur des éléments vérifiables."
-        )
-
-    # 8) Discours analytique
-    if N >= 6 and rhetorical_pressure < 0.4:
-        return (
-            "Discours analytique",
-            "Raisonnement structuré, mais avec une vérifiabilité ou une démonstration encore partielle."
+            "Discours idéologique / interprétatif",
+            "Le texte organise son propos autour d’un cadre politique, culturel ou doctrinal fortement structurant."
         )
 
     return (
-        "Discours indéterminé",
-        "Le texte ne présente pas assez d’indices dominants pour être classé clairement."
+        "Discours général",
+        "Le texte ne présente pas de dominante discursive suffisamment nette."
     )
 
 # =====================================================
