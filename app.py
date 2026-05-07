@@ -1879,6 +1879,25 @@ def normalize_term(term: Optional[str]) -> Optional[str]:
 
     t = " ".join(normalized_words).strip()
     return t if t else None
+    from typing import Optional
+
+def normalize_term(term: Optional[str]) -> Optional[str]:
+    if not term:
+        return term
+
+    return (
+        term.lower()
+        .replace("’", "'")
+        .replace("‘", "'")
+        .replace("`", "'")
+        .replace("“", '"')
+        .replace("”", '"')
+        .replace("«", '"')
+        .replace("»", '"')
+        .strip()
+    )
+
+
 
 # -----------------------------
 # Extraction sujet / prédicat
