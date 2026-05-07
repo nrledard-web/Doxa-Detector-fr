@@ -6372,23 +6372,44 @@ def fetch_text_for_textarea(url: str) -> str:
     except Exception:
         return ""
 
-def detect_discourse_type(result):
-    text = result.get("article", "") or result.get("text", "") or ""
+def detect_discourse_type(result, article=""):
+    # =============================
+    # 1) Récupération robuste du texte
+    # =============================
+    text = (
+        article
+        or result.get("article", "")
+        or result.get("text", "")
+        or result.get("raw_text", "")
+        or ""
+    )
+
+    if not text or len(text) < 50:
+        return (
+            "Discours indéterminé",
+            "Texte trop court ou non exploitable pour déterminer un type de discours."
+        )
+
     t = text.lower()
 
-    # -----------------------------
-    # Marqueurs journalistiques
-    # -----------------------------
+    # =============================
+    # 2) Marqueurs
+    # =============================
+
     journalistic_markers = [
         "publié", "article", "quotidien", "journal", "selon",
         "contacté par", "interview", "tribunal", "verdict",
         "appel", "condamnation", "procès", "statistiques",
-        "insee", "twitter", "cnews", "france 24"
+        "insee", "twitter", "cnews", "france 24",
+
+        # contexte actu / médias
+        "polémique", "meeting", "débat politique",
+        "podcast", "rmc", "sondage", "harris interactive",
+        "challenges", "candidate", "campagne",
+        "élections", "européennes", "suffrages",
+        "dimanche", "lundi", "mardi"
     ]
 
-    # -----------------------------
-    # Marqueurs philosophiques réels
-    # -----------------------------
     philosophical_markers = [
         "vérité", "être", "existence", "morale", "justice",
         "liberté", "conscience", "raison", "essence",
@@ -6396,9 +6417,6 @@ def detect_discourse_type(result):
         "connaissance", "sagesse", "âme", "bien", "mal"
     ]
 
-    # -----------------------------
-    # Marqueurs idéologiques / interprétatifs
-    # -----------------------------
     ideological_markers = [
         "extrême droite", "racisme", "raciste", "nationalisme",
         "islamophobie", "complot", "identitaire", "alt-right",
@@ -6406,37 +6424,46 @@ def detect_discourse_type(result):
         "remplacement", "grand remplacement"
     ]
 
+    # =============================
+    # 3) Scores
+    # =============================
     journalistic_score = sum(1 for m in journalistic_markers if m in t)
     philosophical_score = sum(1 for m in philosophical_markers if m in t)
     ideological_score = sum(1 for m in ideological_markers if m in t)
 
-    # -----------------------------
-    # Règle anti-faux positif philosophique
-    # -----------------------------
-    if journalistic_score >= 3 and ideological_score >= 2:
+    # =============================
+    # 4) Logique de décision (ordre critique)
+    # =============================
+
+    # 🥇 PRIORITÉ : journalistique interprétatif (cas le plus fréquent)
+    if journalistic_score >= 2 and ideological_score >= 2:
         return (
             "Discours journalistique interprétatif",
-            "Le texte informe sur des faits réels tout en proposant une lecture orientée par un cadre analytique ou idéologique."
+            "Le texte rapporte des faits d’actualité tout en les interprétant à travers un cadre politique ou analytique."
         )
 
-    if journalistic_score >= 3:
+    # 🥈 Journalistique pur
+    if journalistic_score >= 2:
         return (
             "Discours journalistique",
-            "Le texte rapporte des faits, cite des sources ou s’inscrit dans un traitement médiatique de l’actualité."
+            "Le texte relate des faits, des événements ou des données dans un cadre d’actualité."
         )
 
-    if philosophical_score >= 4 and journalistic_score < 2:
+    # 🥉 Philosophique (protégé contre faux positifs)
+    if philosophical_score >= 4 and journalistic_score == 0:
         return (
             "Discours philosophique",
-            "Le texte mobilise des notions abstraites dans une réflexion générale, conceptuelle ou existentielle."
+            "Le texte développe une réflexion conceptuelle autour de notions abstraites ou universelles."
         )
 
+    # 🟠 Idéologique pur
     if ideological_score >= 3:
         return (
             "Discours idéologique / interprétatif",
-            "Le texte organise son propos autour d’un cadre politique, culturel ou doctrinal fortement structurant."
+            "Le texte structure son propos autour d’un cadre politique, culturel ou doctrinal."
         )
 
+    # ⚪ fallback
     return (
         "Discours général",
         "Le texte ne présente pas de dominante discursive suffisamment nette."
