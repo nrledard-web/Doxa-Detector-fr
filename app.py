@@ -1881,12 +1881,12 @@ def normalize_term(term: Optional[str]) -> Optional[str]:
     return t if t else None
     from typing import Optional
 
-def normalize_term(term: Optional[str]) -> Optional[str]:
-    if not term:
-        return term
+def normalize_text_for_markers(text: str) -> str:
+    if not text:
+        return ""
 
     return (
-        term.lower()
+        text.lower()
         .replace("’", "'")
         .replace("‘", "'")
         .replace("`", "'")
@@ -1894,7 +1894,7 @@ def normalize_term(term: Optional[str]) -> Optional[str]:
         .replace("”", '"')
         .replace("«", '"')
         .replace("»", '"')
-        .strip()
+        .replace("\u00a0", " ")
     )
 
 
