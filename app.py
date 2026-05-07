@@ -3503,9 +3503,12 @@ THREAT_AMPLIFICATION_TERMS = [
 ]
 
 def compute_threat_amplification(text: str):
-    text_lower = text.lower()
+    text_lower = normalize_text_for_markers(text)
 
-    hits = [t for t in THREAT_AMPLIFICATION_TERMS if contains_term(text_lower, t)]
+    hits = [
+        marker for marker in THREAT_AMPLIFICATION_MARKERS
+        if contains_term(text_lower, marker)
+    ]
 
     score = min(len(hits) * 3 / 10, 1.0)
 
