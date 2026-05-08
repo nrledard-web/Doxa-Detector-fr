@@ -5962,6 +5962,7 @@ def analyze_article(text: str) -> Dict:
     premise_analysis = compute_implicit_premises(text)
     logic_confusion_analysis = compute_logic_confusion(text)
     aristotelian_fallacies = detect_aristotelian_fallacies(text)
+    descriptive_normative_confusion = detect_descriptive_normative_confusion(text)
     cherry_picking_analysis = detect_cherry_picking(text)
     scientific_simulation_analysis = compute_scientific_simulation(text)
     propaganda_analysis = detect_propaganda_narrative(text)
