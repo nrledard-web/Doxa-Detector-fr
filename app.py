@@ -4382,12 +4382,6 @@ PETITION_PATTERNS = [
     "il suffit d'ouvrir les yeux",
 ]
 
-DESCRIPTIVE_NORMATIVE_CONFUSION_PATTERNS += [
-    "cela implique que nous devons",
-    "cela signifie qu'il faut",
-    "cela montre qu'il faut agir",
-]
-
 # -----------------------------
 # Détection texte historique / chronologique
 # -----------------------------
