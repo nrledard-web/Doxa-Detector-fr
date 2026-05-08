@@ -5331,7 +5331,6 @@ def compute_argument_asymmetry(text):
         "interpretation": "Le discours paraît unilatéral ou peu révisable." if score >= 0.4 else "Présence suffisante de nuances ou d'équilibre."
     }
 
-
 def compute_argument_density(text):
     words = re.findall(r"\b[\wÀ-ÿ'-]+\b", text.lower())
     word_count = max(len(words), 1)
@@ -5340,14 +5339,29 @@ def compute_argument_density(text):
     conclusion_markers = count_marker_occurrences(text, CONCLUSION_MARKERS)
     nuance_markers = count_marker_occurrences(text, NUANCE_MARKERS)
 
-    argumentative_units = reason_markers + conclusion_markers + nuance_markers
-    score = min((argumentative_units / word_count) * 35, 1)
+    # La nuance soutient l’argumentation, mais ne vaut pas une preuve.
+    argumentative_units = (
+        reason_markers
+        + conclusion_markers
+        + (nuance_markers * 0.35)
+    )
+
+    score = min((argumentative_units / word_count) * 22, 1)
+
+    if score < 0.15:
+        interpretation = "Le texte affirme davantage qu'il n'argumente."
+    elif score < 0.35:
+        interpretation = "Le texte contient une densité argumentative limitée."
+    elif score < 0.60:
+        interpretation = "Le texte présente une densité argumentative correcte."
+    else:
+        interpretation = "Le texte contient une forte densité argumentative."
 
     return {
         "score": round(score, 3),
         "label": label_level(score),
-        "units": argumentative_units,
-        "interpretation": "Le texte contient une vraie densité argumentative." if score >= 0.4 else "Le texte affirme davantage qu'il n'argumente."
+        "units": round(argumentative_units, 2),
+        "interpretation": interpretation
     }
 
 def compute_structural_diagnosis(
