@@ -2626,11 +2626,14 @@ def compute_discursive_coherence(text: str):
     # -----------------------------
     sentence_count = max(len([s for s in re.split(r"[.!?]+", text) if s.strip()]), 1)
     
-    if logic_hits > 2 and sentence_count > 3:
-        raw_score += 2.0
+    if sentence_count > 3:
+        raw_score += 1.5
     
-    if logic_hits > 2:
-        raw_score = max(raw_score, 8.0)
+    if logic_hits > 1:
+        raw_score += 1.0
+    
+    if sentence_count > 3:
+        raw_score = max(raw_score, 7.5)
     
     score = clamp(raw_score, 0.0, 20.0)
 
