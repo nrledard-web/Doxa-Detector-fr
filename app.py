@@ -3029,7 +3029,30 @@ BINARY_OPPOSITION_TERMS = [
     "les traîtres",
     "les ennemis du peuple",
     "ceux qui sont avec nous",
-    "ceux qui sont contre nous"
+    "ceux qui sont contre nous",
+
+    # ajouts utiles
+    "d'un côté",
+    "d’un côté",
+    "de l'autre",
+    "de l’autre",
+    "d'un côté ceux",
+    "d’un côté ceux",
+    "de l'autre ceux",
+    "de l’autre ceux",
+    "soit",
+    "soit on",
+    "soit nous",
+    "il n'y a pas de position intermédiaire",
+    "il n’y a pas de position intermédiaire",
+    "pas de position intermédiaire",
+    "refuser de choisir",
+    "c'est déjà choisir",
+    "c’est déjà choisir",
+    "ceux qui ouvrent les yeux",
+    "ceux qui refusent de voir",
+    "ceux qui veulent préserver",
+    "ceux qui participent"
 ]
 
 # -----------------------------
