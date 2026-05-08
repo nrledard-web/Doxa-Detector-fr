@@ -4665,7 +4665,6 @@ def detect_ad_hominem(text: str):
         "interpretation": "Attaque contre la personne plutôt que contre l’argument." if matches else "Aucun ad hominem saillant détecté."
     }
 
-
 def detect_argument_from_ignorance(text: str):
     text_lower = text.lower()
     matches = [p for p in IGNORANCE_PATTERNS if p in text_lower]
