@@ -4246,11 +4246,19 @@ FALSE_CONSENSUS_STRONG_PATTERNS = [
 ]
 
 ARGUMENT_FROM_NATURE_PATTERNS = [
-    "c'est naturel donc",
-    "contre-nature",
-    "contraire à la nature",
+    "par nature",
     "naturellement",
-    "ce qui est naturel est",
+    "il est naturel que",
+    "il est contre-nature",
+    "contre nature",
+    "contre-nature",
+    "nature humaine",
+    "loi naturelle",
+    "ordre naturel",
+    "c'est naturel",
+    "ce n'est pas naturel",
+    "une société ne peut survivre si elle nie ses propres fondements",
+    "tout système finit par se défendre",
 ]
 
 DESCRIPTIVE_NORMATIVE_CONFUSION_PATTERNS = [
