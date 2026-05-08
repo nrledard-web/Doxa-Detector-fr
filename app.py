@@ -4475,6 +4475,11 @@ CHERRY_PICKING_OMISSION_MARKERS += [
     "les chiffres qu'on cache",
     "les données qu'on oublie",
 ]
+CHERRY_PICKING_PATTERNS += [
+    "une seule étude sérieuse suffit",
+    "quelques cas récents prouvent",
+    "quelques cas récents le prouvent",
+]
 
 def detect_cherry_picking(text: str):
     if not text or not text.strip():
@@ -4482,30 +4487,23 @@ def detect_cherry_picking(text: str):
             "score": 0.0,
             "matches": [],
             "omission_markers": [],
+            "structural_markers": [],
+            "markers": [],
             "interpretation": "Aucune sélection biaisée saillante détectée."
         }
 
     t = normalize_text_for_markers(text)
 
-    # -----------------------------
-    # 1) Exemples sélectionnés
-    # -----------------------------
     matches = [
         p for p in CHERRY_PICKING_PATTERNS
         if contains_term(t, p) or p in t
     ]
 
-    # -----------------------------
-    # 2) Omission / cadrage partiel
-    # -----------------------------
     omission_hits = [
         p for p in CHERRY_PICKING_OMISSION_MARKERS
         if contains_term(t, p) or p in t
     ]
 
-    # -----------------------------
-    # 3) Structure critique (clé)
-    # -----------------------------
     structural_hits = []
 
     if (
@@ -4517,14 +4515,14 @@ def detect_cherry_picking(text: str):
     if "comme par exemple" in t and ("donc" in t or "ainsi" in t):
         structural_hits.append("enchaînement exemple → conclusion")
 
-    # -----------------------------
-    # 4) Fusion
-    # -----------------------------
+    if (
+        ("quelques cas" in t or "certains cas" in t or "une seule étude" in t)
+        and ("prouvent" in t or "prouve" in t or "suffit" in t)
+    ):
+        structural_hits.append("cas ou étude isolée utilisée comme preuve")
+
     all_markers = unique_keep_order(matches + omission_hits + structural_hits)
 
-    # -----------------------------
-    # 5) Score (pondéré intelligemment)
-    # -----------------------------
     raw_score = (
         len(matches) * 0.6 +
         len(omission_hits) * 0.4 +
@@ -4533,9 +4531,6 @@ def detect_cherry_picking(text: str):
 
     score = min(raw_score, 1.0)
 
-    # -----------------------------
-    # 6) Interprétation
-    # -----------------------------
     if score < 0.15:
         interpretation = "Peu de sélection biaisée détectée."
     elif score < 0.35:
@@ -4553,7 +4548,6 @@ def detect_cherry_picking(text: str):
         "markers": all_markers,
         "interpretation": interpretation,
     }
-
 PETITION_PATTERNS = [
     "cela prouve que c'est vrai",
     "c'est vrai parce que c'est évident",
