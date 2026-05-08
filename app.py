@@ -2620,6 +2620,18 @@ def compute_discursive_coherence(text: str):
     shift_penalty = topic_shift_penalty(paragraphs)
 
     raw_score = logic_score + stability_score + length_score + paragraph_score - contradiction_penalty - shift_penalty
+
+    # -----------------------------
+    # Correction : cohérence structurelle vs orientation
+    # -----------------------------
+    sentence_count = max(len([s for s in re.split(r"[.!?]+", text) if s.strip()]), 1)
+    
+    if logic_hits > 2 and sentence_count > 3:
+        raw_score += 2.0
+    
+    if logic_hits > 2:
+        raw_score = max(raw_score, 8.0)
+    
     score = clamp(raw_score, 0.0, 20.0)
 
     return {
