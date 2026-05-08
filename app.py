@@ -3258,6 +3258,15 @@ def detect_semantic_shift(text: str):
         markers.append("renversement sémantique")
 
     # -----------------------------
+    # 4) Recadrage global du problème
+    # -----------------------------
+    if (
+        ("crise" in t or "évolution" in t or "situation" in t)
+        and ("submersion" in t or "stratégie globale" in t or "effondrement" in t)
+    ):
+        markers.append("recadrage du problème en menace globale")
+
+    # -----------------------------
     # 4) Nettoyage
     # -----------------------------
     markers = unique_keep_order(markers)
