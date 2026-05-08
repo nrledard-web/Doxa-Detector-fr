@@ -3731,8 +3731,6 @@ def compute_factual_overinterpretation(text: str):
         "markers": all_hits,
         "interpretation": interpretation,
     }
-
-
 # -----------------------------
 # 21) Dissonance interne
 # -----------------------------
@@ -3747,6 +3745,42 @@ INTERNAL_DISSONANCE_PATTERNS = [
     r"\bpossible\b.*\bimpossible\b",
 ]
 
+NUANCE_DISSONANCE_TERMS = [
+    "nuancer",
+    "reste prudent",
+    "restent prudents",
+    "prudence",
+    "certains économistes",
+    "certains experts",
+    "pourraient",
+    "pourrait",
+    "possible",
+    "semble",
+    "selon certains",
+]
+
+CERTAINTY_DISSONANCE_TERMS = [
+    "il est absolument certain",
+    "absolument certain",
+    "sans aucun doute",
+    "il est évident",
+    "c'est évident",
+    "indiscutable",
+    "incontestable",
+    "personne ne peut nier",
+]
+
+THREAT_DISSONANCE_TERMS = [
+    "crise majeure",
+    "crise sociale majeure",
+    "danger imminent",
+    "catastrophe",
+    "effondrement",
+    "désastre",
+    "si rien n'est fait",
+    "immédiatement",
+]
+
 def compute_internal_dissonance(text: str):
     if not text or not text.strip():
         return {
@@ -3755,14 +3789,30 @@ def compute_internal_dissonance(text: str):
             "interpretation": "Aucune dissonance interne saillante détectée."
         }
 
-    text_lower = text.lower()
+    t = normalize_text_for_markers(text)
     hits = []
 
     for pattern in INTERNAL_DISSONANCE_PATTERNS:
-        if re.search(pattern, text_lower, flags=re.DOTALL):
+        if re.search(pattern, t, flags=re.DOTALL):
             hits.append(pattern)
 
-    score = min(len(hits) * 3 / 10, 1.0)
+    has_nuance = any(term in t for term in NUANCE_DISSONANCE_TERMS)
+    has_certainty = any(term in t for term in CERTAINTY_DISSONANCE_TERMS)
+    has_threat = any(term in t for term in THREAT_DISSONANCE_TERMS)
+
+    if has_nuance and has_certainty:
+        hits.append("tension nuance / certitude absolue")
+
+    if has_nuance and has_threat:
+        hits.append("tension prudence / dramatisation de menace")
+
+    if "sans précédent" in t and ("comme" in t or "similaire" in t):
+        hits.append("tension sans précédent / comparaison historique")
+
+    if "urgence" in t and ("calme" in t or "calmement" in t):
+        hits.append("tension urgence / calme")
+
+    score = min(len(hits) * 0.30, 1.0)
 
     if score < 0.15:
         interpretation = "Peu de contradictions internes détectées."
@@ -3778,7 +3828,6 @@ def compute_internal_dissonance(text: str):
         "markers": hits,
         "interpretation": interpretation,
     }
-
 
 # -----------------------------
 # 22) Saturation normative
