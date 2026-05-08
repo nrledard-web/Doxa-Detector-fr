@@ -6424,9 +6424,9 @@ def analyze_article(text: str) -> Dict:
         "descriptive_normative_confusion_markers": descriptive_normative_confusion["markers"],
         "descriptive_normative_confusion_interpretation": descriptive_normative_confusion["interpretation"],
         
-        "petition_score": petition["score"],
-        "petition_markers": petition["markers"],
-        "petition_interpretation": petition["interpretation"],
+        "petition_score": petition_analysis["score"],
+        "petition_markers": petition_analysis["markers"],
+        "petition_interpretation": petition_analysis["interpretation"],
 
         "scientific_simulation_score": scientific_simulation_analysis["score"],
         "scientific_simulation_markers": scientific_simulation_analysis["markers"],
