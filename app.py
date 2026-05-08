@@ -6004,6 +6004,7 @@ def analyze_article(text: str) -> Dict:
         "strong_certainty_score": strong_certainty_analysis["score"],
         "strong_certainty_label": strong_certainty_analysis["label"],
         "strong_certainty_interpretation": strong_certainty_analysis["interpretation"],
+        "strong_certainty_markers": strong_certainty_analysis["markers"],
 
         
 
