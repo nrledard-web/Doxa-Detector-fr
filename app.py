@@ -11812,7 +11812,7 @@ with al4:
         unsafe_allow_html=True
     )
 
-    st.caption(result["descriptive_normative_confusion_interpretation"])
+    st.caption(result["petition_interpretation"])
 
     with st.expander("🔎 Voir les marqueurs", expanded=False):
         markers = result.get("descriptive_normative_confusion_markers", [])
