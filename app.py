@@ -3491,30 +3491,64 @@ def compute_binary_opposition(text: str):
 # =========================================================
 # VICTIMISATION STRATÉGIQUE
 # =========================================================
+VICTIMIZATION_TERMS = [
+    "on nous empêche",
+    "on nous interdit",
+    "on nous censure",
+    "nous sommes censurés",
+    "censuré",
+    "censurée",
+    "censurés",
+    "discrédité",
+    "discréditée",
+    "discrédités",
+    "marginalisé",
+    "marginalisée",
+    "marginalisés",
+    "réduit au silence",
+    "faire taire",
+    "empêcher de dire",
+    "interdit de dire",
+    "vérité interdite",
+    "vérités interdites",
+    "dès que quelqu'un ose",
+    "ceux qui osent parler",
+    "les lanceurs d'alerte",
+    "persécuté",
+    "persécutés",
+    "stigmatisé",
+    "stigmatisés",
+]
+
 def compute_victimization(text: str):
     if not text or not text.strip():
         return {
             "score": 0.0,
             "markers": [],
-            "interpretation": "Aucune victimisation stratégique détectée."
+            "interpretation": "Aucune victimisation stratégique saillante détectée."
         }
 
-    text_lower = text.lower()
-    hits = [term for term in VICTIMIZATION_TERMS if contains_term(text_lower, term) or term in text_lower]
-    score = min(len(hits) * 0.30, 1.0)
+    t = normalize_text_for_markers(text)
+
+    hits = [
+        term for term in VICTIMIZATION_TERMS
+        if contains_term(t, term) or term in t
+    ]
+
+    score = min(len(hits) * 0.28, 1.0)
 
     if score < 0.15:
-        interpretation = "Peu de posture victimaire détectée."
+        interpretation = "Peu de victimisation stratégique détectée."
     elif score < 0.35:
-        interpretation = "Le texte suggère une posture de victimisation."
+        interpretation = "Le texte suggère une mise en scène légère de persécution."
     elif score < 0.60:
-        interpretation = "La victimisation structure partiellement le discours."
+        interpretation = "Le texte mobilise nettement une posture victimaire."
     else:
-        interpretation = "Le discours repose fortement sur une posture victimaire."
+        interpretation = "Le discours repose fortement sur une victimisation stratégique."
 
     return {
         "score": round(score, 3),
-        "markers": hits,
+        "markers": unique_keep_order(hits),
         "interpretation": interpretation,
     }
 
@@ -3642,7 +3676,6 @@ def compute_argument_asymmetry(text: str):
         "argument_count": argument_count,
         "interpretation": interpretation,
     }
-
 
 THREAT_AMPLIFICATION_TERMS = [
     "menace existentielle",
@@ -3987,48 +4020,6 @@ def compute_narrative_overdetermination(text: str):
         "markers": hits,
         "interpretation": interpretation,
     }
-
-# -----------------------------
-# Victimisation stratégique
-# -----------------------------
-VICTIMIZATION_TERMS = [
-    "on veut nous faire taire",
-    "nous sommes censurés",
-    "on nous empêche de parler",
-    "ils veulent nous réduire au silence",
-    "nous sommes persécutés",
-    "on nous attaque parce que nous disons la vérité",
-    "ils nous diabolisent",
-    "on nous calomnie",
-]
-
-def compute_victimization(text: str):
-    if not text or not text.strip():
-        return {
-            "score": 0.0,
-            "markers": [],
-            "interpretation": "Aucune victimisation stratégique saillante détectée."
-        }
-
-    text_lower = text.lower()
-    hits = [t for t in VICTIMIZATION_TERMS if contains_term(text_lower, t) or t in text_lower]
-    score = min(len(hits) * 0.28, 1.0)
-
-    if score < 0.15:
-        interpretation = "Peu de victimisation stratégique détectée."
-    elif score < 0.35:
-        interpretation = "Le texte suggère une mise en scène légère de persécution."
-    elif score < 0.60:
-        interpretation = "Le texte mobilise nettement une posture victimaire."
-    else:
-        interpretation = "Le discours repose fortement sur une victimisation stratégique."
-
-    return {
-        "score": round(score, 3),
-        "markers": hits,
-        "interpretation": interpretation,
-    }
-
 
 # -----------------------------
 # Polarisation morale
