@@ -3164,6 +3164,24 @@ SEMANTIC_SHIFT_MARKERS = [
     "oligarchie",
     "propagande officielle",
     "mensonge d'état",
+
+    # ajouts
+    "vérité interdite",
+    "vérités interdites",
+    "débat n'est plus libre",
+    "débat n’est plus libre",
+    "présenté comme normal",
+    "évolution normale",
+    "en réalité",
+    "transformation profonde",
+    "inversion des valeurs",
+    "ce qui est présenté comme",
+    "ce qui est moralement juste",
+    "le bien est devenu suspect",
+    "le mal est toléré",
+    "destruction",
+    "dérive",
+    "ordre juste",
 ]
 
 def detect_semantic_shift(text: str):
@@ -3174,23 +3192,68 @@ def detect_semantic_shift(text: str):
             "interpretation": "Aucun glissement sémantique détecté."
         }
 
-    text_lower = text.lower()
+    t = normalize_text_for_markers(text)
 
-    markers = unique_keep_order(
-        [w for w in SEMANTIC_SHIFT_MARKERS if contains_term(text_lower, w)]
-    )
+    markers = []
 
+    # -----------------------------
+    # 1) Marqueurs lexicaux directs
+    # -----------------------------
+    for w in SEMANTIC_SHIFT_MARKERS:
+        if contains_term(t, w) or w in t:
+            markers.append(w)
+
+    # -----------------------------
+    # 2) Structures de recadrage (clé)
+    # -----------------------------
+    STRUCTURES = [
+        "ce qui est présenté comme",
+        "en réalité",
+        "en fait",
+        "en vérité",
+        "ce qu'on appelle",
+        "ce que l'on appelle",
+        "soi-disant",
+        "prétendument",
+    ]
+
+    for s in STRUCTURES:
+        if s in t:
+            markers.append(s)
+
+    # -----------------------------
+    # 3) Opposition sémantique (ex : normal → dérive)
+    # -----------------------------
+    if ("normal" in t or "naturel" in t) and (
+        "dérive" in t or "destruction" in t or "effondrement" in t
+    ):
+        markers.append("renversement sémantique")
+
+    # -----------------------------
+    # 4) Nettoyage
+    # -----------------------------
+    markers = unique_keep_order(markers)
+
+    # -----------------------------
+    # 5) Score
+    # -----------------------------
     score = clamp(len(markers) * 2, 0, 20)
+    ratio = score / 20
 
-    if score < 5:
+    # -----------------------------
+    # 6) Interprétation
+    # -----------------------------
+    if ratio < 0.20:
         interpretation = "Peu de glissements sémantiques détectés."
-    elif score < 10:
+    elif ratio < 0.40:
         interpretation = "Quelques recadrages lexicaux sont présents."
+    elif ratio < 0.70:
+        interpretation = "Le texte opère plusieurs glissements sémantiques notables."
     else:
-        interpretation = "Le texte utilise plusieurs recadrages lexicaux stratégiques."
+        interpretation = "Le discours recadre fortement le réel par un lexique orienté."
 
     return {
-        "score": round(score / 20, 3),
+        "score": round(ratio, 3),
         "markers": markers,
         "interpretation": interpretation
     }
