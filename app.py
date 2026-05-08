@@ -4560,13 +4560,64 @@ def detect_cherry_picking(text: str):
         "interpretation": interpretation,
     }
 
+PETITION_PATTERNS = [
+    "cela prouve que c'est vrai",
+    "c'est vrai parce que c'est évident",
+    "c'est évident parce que c'est vrai",
+    "si cela dérange, c'est que c'est vrai",
+    "si certaines idées dérangent autant, c'est précisément parce qu'elles sont vraies",
+    "la preuve, c'est que",
+    "cela démontre ce que nous savons déjà",
+    "les signes sont partout",
+    "il suffit d'ouvrir les yeux",
+]
+
 def detect_petition_principii(text: str):
-    text_lower = text.lower()
-    matches = [p for p in PETITION_PATTERNS if contains_term(text_lower, p) or p in text_lower]
+    if not text or not text.strip():
+        return {
+            "score": 0.0,
+            "matches": [],
+            "markers": [],
+            "interpretation": "Aucune pétition de principe saillante détectée."
+        }
+
+    t = normalize_text_for_markers(text)
+
+    matches = [
+        p for p in PETITION_PATTERNS
+        if contains_term(t, p) or p in t
+    ]
+
+    if (
+        ("si certaines idées dérangent" in t or "si cela dérange" in t)
+        and ("vraies" in t or "vrai" in t)
+    ):
+        matches.append("ce qui dérange serait vrai parce que cela dérange")
+
+    if (
+        ("il est évident" in t or "c'est évident" in t)
+        and ("cela prouve" in t or "cela montre" in t or "donc" in t)
+    ):
+        matches.append("évidence utilisée comme démonstration")
+
+    matches = unique_keep_order(matches)
+
+    score = min(len(matches) * 0.35, 1.0)
+
+    if score < 0.15:
+        interpretation = "Aucune pétition de principe saillante détectée."
+    elif score < 0.35:
+        interpretation = "Le texte contient une circularité argumentative légère."
+    elif score < 0.60:
+        interpretation = "Le texte présente une pétition de principe notable."
+    else:
+        interpretation = "Le raisonnement repose fortement sur une conclusion répétée comme preuve."
+
     return {
-        "score": min(len(matches) * 0.5, 1.0),
+        "score": round(score, 3),
         "matches": matches,
-        "interpretation": "Répétition circulaire d’une idée présentée comme preuve." if matches else "Aucune pétition de principe saillante détectée."
+        "markers": matches,
+        "interpretation": interpretation
     }
 
 def detect_false_causality_basic(text: str):
