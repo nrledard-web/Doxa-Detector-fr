@@ -11876,7 +11876,7 @@ with al5:
     st.markdown("### Pétition de principe")
     st.caption("Glissement d’une description vers une injonction sans justification suffisante.")
 
-    value = result["descriptive_normative_confusion_score"]
+    value = result["petition_score"]
 
     if value < 0.15:
         label, color = "Faible", "#ca8a04"
