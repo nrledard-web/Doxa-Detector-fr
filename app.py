@@ -4879,7 +4879,6 @@ def detect_aristotelian_fallacies(text: str):
     ideological_premise = detect_ideological_premise(text)
     false_consensus_strong = detect_false_consensus_strong(text)
     argument_from_nature = detect_argument_from_nature(text)
-    descriptive_normative_confusion = detect_descriptive_normative_confusion(text)
     
     score = (
         petition["score"]
