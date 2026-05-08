@@ -11815,7 +11815,7 @@ with al4:
     st.caption(result["petition_interpretation"])
 
     with st.expander("🔎 Voir les marqueurs", expanded=False):
-        markers = result.get("descriptive_normative_confusion_markers", [])
+        markers = result.get("petition_markers", [])
         if not markers:
             st.info("Aucune confusion descriptif / normatif notable détectée.")
         else:
