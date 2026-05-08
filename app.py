@@ -4816,6 +4816,11 @@ DESCRIPTIVE_NORMATIVE_CONFUSION_PATTERNS = [
     "cela prouve qu'il faut",
     "cela montre qu'il faut",
     "par conséquent nous devons",
+    "il faut agir",
+    "nous devons agir",
+    "il est nécessaire de",
+    "cela signifie qu'il faut",
+    "cela implique que nous devons",
 ]
 
 def detect_descriptive_normative_confusion(text: str):
@@ -4834,6 +4839,14 @@ def detect_descriptive_normative_confusion(text: str):
         if contains_term(t, p) or p in t
     ]
 
+    if (
+        ("crise" in t or "danger" in t or "menace" in t or "dérive" in t)
+        and ("il faut" in t or "nous devons" in t or "on doit" in t)
+    ):
+        matches.append("glissement constat → obligation")
+
+    matches = unique_keep_order(matches)
+
     score = min(len(matches) * 0.35, 1.0)
 
     if score < 0.15:
@@ -4847,8 +4860,8 @@ def detect_descriptive_normative_confusion(text: str):
 
     return {
         "score": round(score, 3),
-        "matches": unique_keep_order(matches),
-        "markers": unique_keep_order(matches),
+        "matches": matches,
+        "markers": matches,
         "interpretation": interpretation
     }
 
