@@ -4744,6 +4744,14 @@ def detect_petition_principii(text: str):
         "interpretation": interpretation
     }
 
+DESCRIPTIVE_NORMATIVE_CONFUSION_PATTERNS = [
+    "donc il faut",
+    "donc nous devons",
+    "cela prouve qu'il faut",
+    "cela montre qu'il faut",
+    "par conséquent nous devons",
+]
+
 def detect_descriptive_normative_confusion(text: str):
     if not text or not text.strip():
         return {
