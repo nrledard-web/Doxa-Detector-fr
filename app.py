@@ -2431,6 +2431,21 @@ IMPLICIT_PREMISE_MARKERS = {
         "donc", "ainsi", "par conséquent", "dès lors",
         "cela prouve que", "cela montre que", "ce qui démontre que",
         "therefore", "this proves that", "this shows that"
+    ],
+    "injonction_conditionnelle": [
+        "si rien n'est fait",
+        "si rien n’est fait",
+        "si nous ne faisons rien",
+        "si personne n'agit",
+        "si aucune mesure n'est prise",
+        "si rien ne change",
+        "il faut agir",
+        "il faut réagir",
+        "il faut intervenir",
+        "nous devons agir",
+        "nous devons réagir",
+        "agir immédiatement",
+        "réagir immédiatement"
     ]
 }
 
