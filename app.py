@@ -11873,7 +11873,7 @@ al5, al6, al7, al8, = st.columns(4)
 #  Pétition de principe
 # -----------------------------
 with al5:
-    st.markdown("### Confusion descriptif / normatif")
+    st.markdown("### Pétition de principe")
     st.caption("Glissement d’une description vers une injonction sans justification suffisante.")
 
     value = result["descriptive_normative_confusion_score"]
