@@ -2636,7 +2636,7 @@ def compute_discursive_coherence(text: str):
         raw_score = max(raw_score, 7.5)
 
     if contradiction_hits > 1:
-    raw_score -= 1.5
+        raw_score -= 1.5
     
     score = clamp(raw_score, 0.0, 20.0)
 
