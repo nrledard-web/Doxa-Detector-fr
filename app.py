@@ -4834,8 +4834,15 @@ def detect_descriptive_normative_confusion(text: str):
     ]
 
     if (
-        ("crise" in t or "danger" in t or "menace" in t or "dérive" in t)
-        and ("il faut" in t or "nous devons" in t or "on doit" in t)
+        ("crise" in t or "danger" in t or "menace" in t or "dérive" in t or "destruction" in t)
+        and (
+            "il faut" in t
+            or "nous devons" in t
+            or "on doit" in t
+            or "nécessaire d'agir" in t
+            or "nécessaire de" in t
+            or "agir" in t
+        )
     ):
         matches.append("glissement constat → obligation")
 
