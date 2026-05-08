@@ -1051,6 +1051,7 @@ THREAT_AMPLIFICATION_MARKERS = [
     "irréversible",
 ]
 STRONG_CERTAINTY_MARKERS = [
+    # tes marqueurs (gardés)
     "il est absolument certain",
     "il ne fait aucun doute",
     "sans aucun doute",
@@ -1060,6 +1061,23 @@ STRONG_CERTAINTY_MARKERS = [
     "preuve irréfutable",
     "personne ne peut nier",
     "de toute évidence",
+
+    # AJOUTS CRITIQUES
+    "absolument certain",
+    "c'est certain",
+    "c'est évident",
+    "évident",
+    "indiscutable",
+    "indéniable",
+    "aucun doute",
+    "il est clair que",
+    "clairement",
+    "évidemment",
+    "forcément",
+    "inévitable",
+    "inévitablement",
+    "il est impossible que",
+    "cela ne peut pas être faux"
 ]
 def detect_political_patterns(text: str):
     """
