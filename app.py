@@ -4858,6 +4858,7 @@ def detect_descriptive_normative_confusion(text: str):
 
 def detect_aristotelian_fallacies(text: str):
     petition = detect_petition_principii(text)
+    descriptive_normative_confusion = detect_descriptive_normative_confusion(text)
     false_causality = detect_false_causality_basic(text)
     generalization = detect_hasty_generalization(text)
     vague_authority = detect_vague_authority_basic(text)
