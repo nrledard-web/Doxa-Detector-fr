@@ -2905,7 +2905,26 @@ CERTAINTY_TERMS = [
     "il est certain que",
     "personne ne peut nier",
     "il est incontestable",
-    "la preuve que"
+    "la preuve que",
+
+    # ajouts utiles
+    "il est absolument certain",
+    "absolument certain",
+    "aucun doute",
+    "c'est certain",
+    "c'est évident",
+    "évident",
+    "évidemment",
+    "indiscutable",
+    "incontestable",
+    "indéniable",
+    "de toute évidence",
+    "cela prouve que",
+    "preuve irréfutable",
+    "il ne fait aucun doute",
+    "nous allons vers",
+    "inévitablement",
+    "inévitable",
 ]
 
 EMOTIONAL_DICT = {
