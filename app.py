@@ -4835,19 +4835,12 @@ def detect_descriptive_normative_confusion(text: str):
         p for p in DESCRIPTIVE_NORMATIVE_CONFUSION_PATTERNS
         if contains_term(t, p) or p in t
     ]
-
     if (
-        ("crise" in t or "danger" in t or "menace" in t or "dérive" in t or "destruction" in t)
-        and (
-            "il faut" in t
-            or "nous devons" in t
-            or "on doit" in t
-            or "nécessaire d'agir" in t
-            or "nécessaire de" in t
-            or "agir" in t
-        )
+        any(w in t for w in ["crise", "danger", "menace", "dérive", "destruction"])
+        and any(w in t for w in ["il faut", "nous devons", "on doit", "nécessaire"])
     ):
-        matches.append("glissement constat → obligation")
+        if "glissement constat → obligation" not in matches:
+            matches.append("glissement constat → obligation")
 
     matches = unique_keep_order(matches)
 
