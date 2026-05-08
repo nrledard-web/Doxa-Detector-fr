@@ -4813,6 +4813,9 @@ DESCRIPTIVE_NORMATIVE_CONFUSION_PATTERNS = [
     "il faut agir",
     "nous devons agir",
     "il est nécessaire de",
+    "il devient nécessaire de",
+    "il devient nécessaire d",
+    "il est désormais nécessaire de",
     "cela signifie qu'il faut",
     "cela implique que nous devons",
 ]
