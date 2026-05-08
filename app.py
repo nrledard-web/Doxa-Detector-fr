@@ -4439,6 +4439,29 @@ CHERRY_PICKING_OMISSION_MARKERS = [
     "on ne vous dit pas que",
 ]
 
+CHERRY_PICKING_PATTERNS += [
+    "des exemples montrent",
+    "certains exemples montrent",
+    "quelques exemples prouvent",
+    "certains cas récents le prouvent",
+    "certains cas récents le montrent",
+    "plusieurs cas le prouvent",
+    "il suffit de voir",
+    "on le voit avec",
+    "cela se voit avec",
+    "prenons un exemple",
+    "comme par exemple",
+]
+
+CHERRY_PICKING_OMISSION_MARKERS += [
+    "on ignore volontairement",
+    "on passe sous silence",
+    "ce qu'on ne dit jamais",
+    "ce que l'on ne dit jamais",
+    "les chiffres qu'on cache",
+    "les données qu'on oublie",
+]
+
 def detect_cherry_picking(text: str):
     if not text or not text.strip():
         return {
@@ -4448,21 +4471,57 @@ def detect_cherry_picking(text: str):
             "interpretation": "Aucune sélection biaisée saillante détectée."
         }
 
-    text_lower = text.lower()
+    t = normalize_text_for_markers(text)
 
+    # -----------------------------
+    # 1) Exemples sélectionnés
+    # -----------------------------
     matches = [
         p for p in CHERRY_PICKING_PATTERNS
-        if contains_term(text_lower, p) or p in text_lower
+        if contains_term(t, p) or p in t
     ]
 
+    # -----------------------------
+    # 2) Omission / cadrage partiel
+    # -----------------------------
     omission_hits = [
         p for p in CHERRY_PICKING_OMISSION_MARKERS
-        if contains_term(text_lower, p) or p in text_lower
+        if contains_term(t, p) or p in t
     ]
 
-    raw_score = len(matches) * 0.7 + len(omission_hits) * 0.4
+    # -----------------------------
+    # 3) Structure critique (clé)
+    # -----------------------------
+    structural_hits = []
+
+    if (
+        ("un exemple" in t or "un cas" in t or "un témoignage" in t)
+        and ("donc" in t or "cela prouve" in t or "cela montre" in t)
+    ):
+        structural_hits.append("généralisation à partir d’un cas")
+
+    if "comme par exemple" in t and ("donc" in t or "ainsi" in t):
+        structural_hits.append("enchaînement exemple → conclusion")
+
+    # -----------------------------
+    # 4) Fusion
+    # -----------------------------
+    all_markers = unique_keep_order(matches + omission_hits + structural_hits)
+
+    # -----------------------------
+    # 5) Score (pondéré intelligemment)
+    # -----------------------------
+    raw_score = (
+        len(matches) * 0.6 +
+        len(omission_hits) * 0.4 +
+        len(structural_hits) * 1.0
+    )
+
     score = min(raw_score, 1.0)
 
+    # -----------------------------
+    # 6) Interprétation
+    # -----------------------------
     if score < 0.15:
         interpretation = "Peu de sélection biaisée détectée."
     elif score < 0.35:
@@ -4476,6 +4535,8 @@ def detect_cherry_picking(text: str):
         "score": round(score, 3),
         "matches": matches,
         "omission_markers": omission_hits,
+        "structural_markers": structural_hits,
+        "markers": all_markers,
         "interpretation": interpretation,
     }
 
