@@ -2621,15 +2621,25 @@ def compute_discursive_coherence(text: str):
 
 def compute_implicit_premises(text: str):
     if not text or not text.strip():
-        return {"score": 0.0, "details": {}, "markers": [], "interpretation": "Aucune prémisse implicite détectée."}
+        return {
+            "score": 0.0,
+            "details": {},
+            "markers": [],
+            "interpretation": "Aucune prémisse implicite détectée."
+        }
 
-    t = text.lower()
+    t = normalize_text_for_markers(text)
+
     score = 0
     details = {}
     markers = []
 
     for category, terms in IMPLICIT_PREMISE_MARKERS.items():
-        hits = [term for term in terms if contains_term(t, term)]
+        hits = [
+            term for term in terms
+            if contains_term(t, term)
+        ]
+
         details[category] = len(hits)
         markers.extend(hits)
         score += len(hits)
