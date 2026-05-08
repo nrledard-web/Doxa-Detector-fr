@@ -11950,11 +11950,6 @@ with al5:
             "Elle indique que des jugements ou normes sont présentés comme des faits."
         )
 # -----------------------------
-#  Pétition de principe
-# -----------------------------
-with al6:
-
-# -----------------------------
 # Cherry Picking
 # -----------------------------
 with al6:
