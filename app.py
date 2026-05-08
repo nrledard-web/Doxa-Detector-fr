@@ -3482,8 +3482,64 @@ def compute_frame_shift(text: str):
             "interpretation": "Aucun déplacement du cadre argumentatif détecté."
         }
 
-    text_lower = text.lower()
-    hits = [term for term in FRAME_SHIFT_TERMS if contains_term(text_lower, term) or term in text_lower]
+    t = normalize_text_for_markers(text)
+
+    hits = [
+        term for term in FRAME_SHIFT_TERMS
+        if contains_term(t, term) or term in t
+    ]
+
+    # Marqueurs de transition / bascule
+    shift_connectors = [
+        "cependant",
+        "pourtant",
+        "malgré cela",
+        "mais",
+        "toutefois",
+        "néanmoins",
+        "en revanche",
+        "il n'empêche que"
+    ]
+
+    # Marqueurs de nuance
+    nuance_terms = [
+        "nuancer",
+        "prudence",
+        "prudent",
+        "prudente",
+        "restent prudents",
+        "reste prudent",
+        "certains économistes",
+        "certains experts",
+        "pourraient",
+        "semble",
+        "possible"
+    ]
+
+    # Marqueurs de bascule forte
+    certainty_or_threat_terms = [
+        "il est absolument certain",
+        "absolument certain",
+        "crise majeure",
+        "crise sociale majeure",
+        "si rien n'est fait",
+        "immédiatement",
+        "urgence",
+        "danger",
+        "catastrophe",
+        "effondrement"
+    ]
+
+    has_connector = any(term in t for term in shift_connectors)
+    has_nuance = any(term in t for term in nuance_terms)
+    has_certainty_or_threat = any(term in t for term in certainty_or_threat_terms)
+
+    if has_connector and has_nuance and has_certainty_or_threat:
+        hits.append("bascule nuance → certitude/menace")
+
+    elif has_nuance and has_certainty_or_threat:
+        hits.append("coexistence nuance prudente / conclusion forte")
+
     score = min(len(hits) * 0.35, 1.0)
 
     if score < 0.15:
