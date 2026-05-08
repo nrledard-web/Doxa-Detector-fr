@@ -4021,9 +4021,6 @@ def compute_narrative_overdetermination(text: str):
         "interpretation": interpretation,
     }
 
-# -----------------------------
-# Polarisation morale
-# -----------------------------
 MORAL_POLARIZATION_TERMS = [
     "les bons contre les mauvais",
     "le bien contre le mal",
@@ -4032,6 +4029,18 @@ MORAL_POLARIZATION_TERMS = [
     "les purs contre les corrompus",
     "les justes contre les pervers",
     "les innocents contre les coupables",
+
+    # formes souples
+    "le bien",
+    "le mal",
+    "bien est devenu",
+    "mal est toléré",
+    "ce qui est juste",
+    "ce qui est injuste",
+    "moralement juste",
+    "inversion des valeurs",
+    "ordre juste",
+    "défendre ce qui est juste",
 ]
 
 def compute_moral_polarization(text: str):
@@ -4042,9 +4051,24 @@ def compute_moral_polarization(text: str):
             "interpretation": "Aucune polarisation morale saillante détectée."
         }
 
-    text_lower = text.lower()
-    hits = [t for t in MORAL_POLARIZATION_TERMS if contains_term(text_lower, t) or t in text_lower]
-    score = min(len(hits) * 0.35, 1.0)
+    t = normalize_text_for_markers(text)
+
+    hits = [
+        term for term in MORAL_POLARIZATION_TERMS
+        if contains_term(t, term) or term in t
+    ]
+
+    # Bonus si bien + mal apparaissent ensemble
+    if "bien" in t and "mal" in t:
+        hits.append("opposition bien / mal")
+
+    # Bonus si juste + injuste apparaissent ensemble
+    if "juste" in t and "injuste" in t:
+        hits.append("opposition juste / injuste")
+
+    hits = unique_keep_order(hits)
+
+    score = min(len(hits) * 0.20, 1.0)
 
     if score < 0.15:
         interpretation = "Peu de polarisation morale détectée."
