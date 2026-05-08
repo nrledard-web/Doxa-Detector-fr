@@ -4505,12 +4505,30 @@ def detect_false_consensus_strong(text: str):
 
 
 def detect_argument_from_nature(text: str):
-    text_lower = text.lower()
-    matches = [p for p in ARGUMENT_FROM_NATURE_PATTERNS if contains_term(text_lower, p) or p in text_lower]
+    if not text or not text.strip():
+        return {
+            "score": 0.0,
+            "matches": [],
+            "interpretation": "Aucun argument de nature détecté."
+        }
+
+    t = normalize_text_for_markers(text)
+
+    matches = [
+        p for p in ARGUMENT_FROM_NATURE_PATTERNS
+        if contains_term(t, p) or p in t
+    ]
+
+    score = min(len(matches) * 0.35, 1.0)
+
     return {
-        "score": min(len(matches) * 0.4, 1.0),
-        "matches": matches,
-        "interpretation": "Le caractère naturel ou contre-naturel est utilisé comme argument de vérité ou de valeur." if matches else "Aucun argument de nature détecté."
+        "score": round(score, 3),
+        "matches": unique_keep_order(matches),
+        "interpretation": (
+            "Le caractère naturel ou contre-naturel est utilisé comme argument de vérité ou de valeur."
+            if matches else
+            "Aucun argument de nature détecté."
+        )
     }
 
 
