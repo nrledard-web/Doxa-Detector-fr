@@ -3494,11 +3494,24 @@ def compute_binary_opposition(text: str):
     if not text or not text.strip():
         return 0.0, "Aucune opposition binaire significative détectée.", []
 
-    text_lower = text.lower()
+    t = normalize_text_for_markers(text)
 
-    hits = [t for t in BINARY_OPPOSITION_TERMS if contains_term(text_lower, t)]
+    hits = [
+        term for term in BINARY_OPPOSITION_TERMS
+        if contains_term(t, term) or term in t
+    ]
 
-    score = min(len(hits) * 0.30, 1.0)
+    # Bonus structurel : d'un côté / de l'autre
+    if ("d'un côté" in t or "d’un côté" in t) and ("de l'autre" in t or "de l’autre" in t):
+        hits.append("structure d’un côté / de l’autre")
+
+    # Bonus structurel : soit / soit
+    if t.count("soit") >= 2:
+        hits.append("structure soit / soit")
+
+    hits = unique_keep_order(hits)
+
+    score = min(len(hits) * 0.25, 1.0)
 
     if score < 0.15:
         interpretation = "Aucune opposition binaire significative détectée."
