@@ -6384,10 +6384,6 @@ def analyze_article(text: str) -> Dict:
 
         "aristotelian_fallacies_score": aristotelian_fallacies["score"],
 
-        "petition_score": aristotelian_fallacies["petition"]["score"],
-        "petition_markers": aristotelian_fallacies["petition"]["matches"],
-        "petition_interpretation": aristotelian_fallacies["petition"]["interpretation"],
-
         "false_causality_basic_score": aristotelian_fallacies["false_causality"]["score"],
         "false_causality_basic_markers": aristotelian_fallacies["false_causality"]["matches"],
         "false_causality_basic_interpretation": aristotelian_fallacies["false_causality"]["interpretation"],
