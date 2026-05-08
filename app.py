@@ -4744,6 +4744,40 @@ def detect_petition_principii(text: str):
         "interpretation": interpretation
     }
 
+def detect_descriptive_normative_confusion(text: str):
+    if not text or not text.strip():
+        return {
+            "score": 0.0,
+            "matches": [],
+            "markers": [],
+            "interpretation": "Aucune confusion descriptif / normatif détectée."
+        }
+
+    t = normalize_text_for_markers(text)
+
+    matches = [
+        p for p in DESCRIPTIVE_NORMATIVE_CONFUSION_PATTERNS
+        if contains_term(t, p) or p in t
+    ]
+
+    score = min(len(matches) * 0.35, 1.0)
+
+    if score < 0.15:
+        interpretation = "Aucune confusion descriptif / normatif détectée."
+    elif score < 0.35:
+        interpretation = "Le texte contient un léger glissement du constat vers l’injonction."
+    elif score < 0.60:
+        interpretation = "Le texte transforme plusieurs constats en prescriptions."
+    else:
+        interpretation = "Le discours glisse fortement de la description vers l’injonction normative."
+
+    return {
+        "score": round(score, 3),
+        "matches": unique_keep_order(matches),
+        "markers": unique_keep_order(matches),
+        "interpretation": interpretation
+    }
+
 def detect_aristotelian_fallacies(text: str):
     petition = detect_petition_principii(text)
     false_causality = detect_false_causality_basic(text)
