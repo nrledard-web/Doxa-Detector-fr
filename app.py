@@ -3199,6 +3199,18 @@ SEMANTIC_SHIFT_MARKERS = [
     "dérive",
     "ordre juste",
 ]
+SEMANTIC_SHIFT_MARKERS += [
+    "submersion organisée",
+    "médias officiels",
+    "nier l'évidence",
+    "nier l’évidence",
+    "autorités cherchent à cacher",
+    "stratégie globale",
+    "rester dans le déni",
+    "choix simple",
+    "effondrement progressif",
+]
+
 
 def detect_semantic_shift(text: str):
     if not text or not text.strip():
