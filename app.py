@@ -7349,9 +7349,11 @@ Résumé
 # AFFICHAGE
 # =====================================================
     
-    if result:
-        show_gauge_help()
-        show_word_lists_help()
+result = st.session_state.get("last_result")
+
+if not result:
+    st.info("Aucune analyse disponible.")
+    st.stop()
 
 st.markdown("""
 <div style="text-align:center; margin:25px 0; color:#888;">
