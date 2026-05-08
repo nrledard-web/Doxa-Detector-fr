@@ -11953,85 +11953,11 @@ with al5:
 #  Pétition de principe
 # -----------------------------
 with al6:
-    st.markdown("### Pétition de principe")
-    st.caption("Conclusion répétée comme si elle constituait une preuve.")
 
-    value = result["petition_score"]
-
-    if value < 0.15:
-        label, color = "Faible", "#ca8a04"
-    elif value < 0.35:
-        label, color = "Modérée", "#f97316"
-    elif value < 0.60:
-        label, color = "Élevée", "#ea580c"
-    else:
-        label, color = "Très élevée", "#dc2626"
-
-    render_custom_gauge(value, color)
-
-    st.markdown(
-        f"<b style='color:{color}'>{label}</b> — {round(value*100,1)}%",
-        unsafe_allow_html=True
-    )
-
-    st.caption(result["petition_interpretation"])
-
-    with st.expander("🔎 Voir les marqueurs", expanded=False):
-        markers = result.get("petition_markers", [])
-        if not markers:
-            st.info("Aucune pétition de principe notable détectée.")
-        else:
-            for marker in markers:
-                st.warning(marker)
-
-    with st.popover("ℹ️ Comprendre cette jauge"):
-        st.markdown("### Pétition de principe")
-
-        st.write(
-            "Cette jauge détecte les raisonnements circulaires : "
-            "la conclusion est répétée comme si elle constituait elle-même une preuve."
-        )
-
-        st.markdown("**Principe**")
-        st.write(
-            "Le texte est comparé à des marqueurs de circularité argumentative : "
-            "répétition d’une thèse, justification par elle-même, ou conclusion posée comme prémisse."
-        )
-
-        st.markdown("**Formule utilisée**")
-        st.code(
-            "markers = marqueurs de pétition de principe détectés\n"
-            "score = min(len(markers) * coefficient / 10, 1.0)",
-            language="python"
-        )
-
-        markers = result.get("petition_markers", [])
-
-        st.markdown("**Valeur actuelle**")
-        st.write(f"Score : **{round(value * 100, 1)}%**")
-        st.write(f"Niveau : **{label}**")
-        st.write(f"Marqueurs détectés : **{len(markers)}**")
-
-        st.markdown("**Interprétation actuelle**")
-        st.write(result["petition_interpretation"])
-
-        st.markdown("**Lecture**")
-        st.write(
-            "🟢 Faible : raisonnement peu circulaire\n"
-            "🟡 Modérée : circularité légère\n"
-            "🟠 Élevée : conclusion souvent présupposée\n"
-            "🔴 Très élevée : raisonnement fortement circulaire"
-        )
-
-        st.markdown("**Attention**")
-        st.write(
-            "Une pétition de principe élevée ne signifie pas que la conclusion est fausse. "
-            "Elle indique que le texte tend à répéter ou présupposer sa conclusion au lieu de la démontrer."
-        )
 # -----------------------------
 # Cherry Picking
 # -----------------------------
-with al7:
+with al6:
     st.markdown("### Cherry Picking")
     st.caption("Sélection biaisée d’exemples, de cas ou de preuves allant dans un seul sens.")
 
@@ -12123,7 +12049,7 @@ with al7:
 # -----------------------------
 #  Sophismes syllogistiques détectés
 # -----------------------------
-with al8:
+with al7:
     st.markdown("### Sophismes syllogistiques détectés")
     st.caption("Failles formelles ou conclusions invalides dans les raisonnements syllogistiques.")
 
@@ -12191,7 +12117,7 @@ al9, al10, al11, al12 = st.columns(4)
 # -----------------------------
 #  Syllogismes / Enthymèmes détectés
 # -----------------------------
-with al9:
+with al8:
     st.markdown("### Syllogismes / Enthymèmes détectés")
     st.caption("Raisonnements incomplets ou implicites repérés dans le texte.")
 
@@ -12256,7 +12182,7 @@ with al9:
 # -----------------------------
 # Fausse analogie
 # -----------------------------
-with al10:
+with al9:
     st.markdown("### Fausse analogie")
     st.caption("Comparaisons trompeuses qui court-circuitent l’analyse.")
 
@@ -12335,7 +12261,7 @@ with al10:
 # -----------------------------
 #  Surinterprétation factuelle
 # -----------------------------
-with al11:
+with al10:
     st.markdown("### Surinterprétation factuelle")
     st.caption("Conclusions excessives tirées à partir d’indices partiels.")
 
@@ -12415,7 +12341,7 @@ with al11:
 # =============================
 # Fausse causalité (simple)
 # =============================
-with al12:
+with al11:
     st.markdown("### Fausse causalité (simple)")
     st.caption("Lien causal affirmé sans démonstration suffisante.")
 
@@ -12496,7 +12422,7 @@ al13, al14 = st.columns(2)
 # -----------------------------
 #  Généralisation abusive
 # -----------------------------
-with al13:
+with al12:
     st.markdown("### Généralisation abusive")
     st.caption("Simplification du réel par catégories globales.")
 
@@ -12576,7 +12502,7 @@ with al13:
 # =============================
 # Confusion descriptif / normatif
 # =============================
-with al14:
+with al13:
     st.markdown("### Confusion descriptif / normatif")
     st.caption("Glissement d’une description vers une injonction sans justification suffisante.")
 
