@@ -5306,15 +5306,27 @@ def compute_threat_amplification_advanced(text):
 
 
 def compute_strong_certainty(text):
-    sentences = max(len([s for s in re.split(r"[.!?]+", text) if s.strip()]), 1)
-    markers = count_marker_occurrences(text, STRONG_CERTAINTY_MARKERS)
+    t = normalize_text_for_markers(text)
 
-    score = min((markers / sentences) * 3.0, 1)
+    sentences = max(
+        len([s for s in re.split(r"[.!?]+", text) if s.strip()]),
+        1
+    )
+
+    found_markers = [
+        marker for marker in STRONG_CERTAINTY_MARKERS
+        if contains_term(t, marker)
+    ]
+
+    marker_count = len(found_markers)
+
+    score = min((marker_count / sentences) * 3.0, 1)
 
     return {
         "score": round(score, 3),
         "label": label_level(score),
-        "markers": markers,
+        "markers": found_markers,
+        "marker_count": marker_count,
         "interpretation": (
             "Le texte emploie une certitude forte ou verrouillante."
             if score >= 0.4
