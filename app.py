@@ -4235,6 +4235,16 @@ PETITION_PATTERNS = [
     "c'est la vérité",
     "cela prouve que c'est vrai",
     "c'est évident parce que c'est évident",
+
+    # ajouts
+    "si cela dérange, c'est que c'est vrai",
+    "si certaines idées dérangent autant, c'est précisément parce qu'elles sont vraies",
+    "la preuve, c'est que",
+    "cela démontre ce que nous savons déjà",
+    "les signes sont partout",
+    "il suffit d'ouvrir les yeux",
+    "c'est évident",
+    "il est évident que",
 ]
 
 CAUSALITY_PATTERNS = [
