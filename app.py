@@ -723,7 +723,7 @@ def compute_linguistic_suspicion(text: str) -> dict:
         return sum(1 for term in terms if contains_term(t, term))
 
     rhetorical_pressure = count_hits(rhetorical_pressure_terms)
-    absolute_claims = count_hits(absolute_claim_terms)
+    absolute_claims = count_hits(STRONG_CERTAINTY_MARKERS)
     vague_authority = count_hits(vague_authority_terms)
     dramatic_framing = count_hits(dramatic_framing_terms)
     nuance_hits = count_hits(nuance_terms)
