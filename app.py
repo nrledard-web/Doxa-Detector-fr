@@ -6420,9 +6420,13 @@ def analyze_article(text: str) -> Dict:
         "argument_from_nature_markers": aristotelian_fallacies["argument_from_nature"]["matches"],
         "argument_from_nature_interpretation": aristotelian_fallacies["argument_from_nature"]["interpretation"],
 
-        "descriptive_normative_confusion_score": aristotelian_fallacies["descriptive_normative_confusion"]["score"],
-        "descriptive_normative_confusion_markers": aristotelian_fallacies["descriptive_normative_confusion"]["matches"],
-        "descriptive_normative_confusion_interpretation": aristotelian_fallacies["descriptive_normative_confusion"]["interpretation"],
+        "descriptive_normative_confusion_score": descriptive_normative_confusion["score"],
+        "descriptive_normative_confusion_markers": descriptive_normative_confusion["markers"],
+        "descriptive_normative_confusion_interpretation": descriptive_normative_confusion["interpretation"],
+        
+        "petition_score": petition["score"],
+        "petition_markers": petition["markers"],
+        "petition_interpretation": petition["interpretation"],
 
         "scientific_simulation_score": scientific_simulation_analysis["score"],
         "scientific_simulation_markers": scientific_simulation_analysis["markers"],
