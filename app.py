@@ -2657,7 +2657,11 @@ def compute_implicit_premises(text: str):
 
         details[category] = len(hits)
         markers.extend(hits)
-        score += len(hits)
+
+        if category == "injonction_conditionnelle":
+            score += len(hits) * 3
+        else:
+            score += len(hits)
 
     score = min(score * 2, 20)
     ratio = score / 20
