@@ -3274,7 +3274,7 @@ def detect_semantic_shift(text: str):
     # -----------------------------
     # 5) Score
     # -----------------------------
-    score = clamp(len(markers) * 2, 0, 20)
+    score = clamp(len(markers) * 1.2, 0, 20)
     ratio = score / 20
 
     # -----------------------------
