@@ -647,7 +647,6 @@ class Cognition:
             return T["zone_asymptote"]
         return T["out_of_spectrum"]
 
-
 # -----------------------------
 # Exemple
 # -----------------------------
@@ -661,14 +660,38 @@ SAMPLE_ARTICLE = (
     "Il est absolument certain que nous allons vers une crise sociale majeure si rien n'est fait immédiatement."
 )
 
-
-
 # -----------------------------
 # Helpers
 # -----------------------------
 def clamp(n: float, minn: float, maxn: float) -> float:
     return max(min(maxn, n), minn)
 
+INGROUP_TERMS = [
+    "citoyens",
+    "peuple",
+    "gens honnêtes",
+    "honnêtes citoyens",
+    "ceux qui disent la vérité",
+    "ceux qui ouvrent les yeux",
+    "la population",
+    "les travailleurs",
+    "les familles",
+    "les innocents",
+    "les justes",
+]
+
+OUTGROUP_TERMS = [
+    "élites",
+    "système",
+    "médias",
+    "autorités",
+    "oligarchie",
+    "classe dirigeante",
+    "puissants",
+    "dominants",
+    "bureaucrates",
+    "technocrates",
+]
 
 def compute_linguistic_suspicion(text: str) -> dict:
     """
