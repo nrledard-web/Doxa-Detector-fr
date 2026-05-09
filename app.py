@@ -7005,6 +7005,7 @@ def fetch_text_for_textarea(url: str) -> str:
 # TYPE DE DISCOURS DÉTECTÉ
 # =====================================================
 def detect_discourse_type(result):
+
     G = result.get("G", 0)
     N = result.get("N", 0)
     D = result.get("D", 0)
@@ -7013,82 +7014,136 @@ def detect_discourse_type(result):
     rhetorical_pressure = result.get("rhetorical_pressure", 0)
     propaganda = result.get("propaganda_score", 0)
     closure = result.get("cognitive_closure", 0)
-    final_score = result.get("final_credibility_score", result.get("hard_fact_score", 0))
 
-    # Nouveaux marqueurs descriptifs uniquement
+    final_score = result.get(
+        "final_credibility_score",
+        result.get("hard_fact_score", 0)
+    )
+
     domains = result.get("conceptual_domains", {})
 
     journalistic = domains.get("journalistique", 0)
     philosophical = domains.get("philosophique", 0)
     religious = domains.get("religieux", 0)
 
-    # 1) Priorité aux discours fortement orientés
-    if propaganda >= 0.6 or rhetorical_pressure >= 0.7 or closure >= 0.7:
+    # =====================================================
+    # 1) PROPAGANDE (cas extrême)
+    # =====================================================
+    if (
+        propaganda >= 0.65
+        and rhetorical_pressure >= 0.45
+        and closure >= 0.45
+    ):
         return (
             "Discours propagandiste",
-            "Forte pression rhétorique, simplification narrative ou fermeture cognitive."
+            "Le texte combine pression rhétorique, simplification narrative et fermeture cognitive."
         )
 
-    # 2) Discours religieux
+    # =====================================================
+    # 2) RELIGIEUX
+    # =====================================================
     if religious >= 2:
         return (
             "Discours religieux",
             "Le texte mobilise un registre religieux, spirituel ou doctrinal."
         )
 
-    # 3) Discours journalistique interprétatif
-    if journalistic >= 2 and philosophical >= 1 and V >= 4:
-        return (
-            "Discours journalistique interprétatif",
-            "Le texte présente une forme informative tout en mobilisant des notions abstraites ou politiques pour orienter l’analyse."
-        )
-    
-    # 4) Discours philosophique
-    if philosophical >= 3 and journalistic < 2 and religious < 2 and rhetorical_pressure < 0.5:
+    # =====================================================
+    # 3) PHILOSOPHIQUE
+    # =====================================================
+    if (
+        philosophical >= 3
+        and rhetorical_pressure < 0.45
+        and propaganda < 0.45
+    ):
         return (
             "Discours philosophique",
-            "Le texte développe une réflexion conceptuelle ou abstraite sans dépendre principalement d’un cadre d’actualité."
+            "Le texte développe principalement une réflexion conceptuelle ou abstraite."
         )
-    # 5) Discours journalistique
-    if journalistic >= 2 and V >= 4:
+
+    # =====================================================
+    # 4) JOURNALISTIQUE INTERPRÉTATIF
+    # =====================================================
+    if (
+        journalistic >= 2
+        and philosophical >= 1
+        and V >= 4
+    ):
+        return (
+            "Discours journalistique interprétatif",
+            "Le texte combine information, interprétation et lecture analytique."
+        )
+
+    # =====================================================
+    # 5) JOURNALISTIQUE FACTUEL
+    # =====================================================
+    if (
+        journalistic >= 2
+        and G >= 5
+        and V >= 5
+    ):
         return (
             "Discours journalistique",
-            "Le texte présente une forme informative avec attribution, rapport, enquête, étude ou référence médiatique."
-        )
-        
-    # 6) Discours polémique
-    if rhetorical_pressure >= 0.4 or D >= 7:
-        return (
-            "Discours polémique",
-            "Argumentation orientée, certitude élevée ou pression rhétorique notable."
+            "Le texte présente une structure informative fondée sur des éléments vérifiables."
         )
 
-    # 7) Discours factuel
-    if G >= 6 and V >= 6 and final_score >= 13:
+    # =====================================================
+    # 6) FACTUEL
+    # =====================================================
+    if (
+        G >= 6
+        and V >= 6
+        and final_score >= 13
+    ):
         return (
             "Discours factuel",
-            "Raisonnement appuyé sur des éléments vérifiables, des sources ou des faits identifiables."
+            "Le raisonnement repose principalement sur des éléments vérifiables."
         )
 
-    # 8) Ancien cas philosophique, gardé en secours
-    if N >= 7 and G < 4 and V < 5 and rhetorical_pressure < 0.3:
+    # =====================================================
+    # 7) POLÉMIQUE
+    # =====================================================
+    if (
+        rhetorical_pressure >= 0.45
+        or D >= 7
+    ):
         return (
-            "Discours spéculatif / philosophique",
-            "Réflexion conceptuelle cohérente, mais reposant surtout sur des idées générales plutôt que sur des éléments vérifiables."
+            "Discours polémique",
+            "Le texte présente une forte orientation argumentative ou émotionnelle."
         )
 
-    # 9) Discours analytique
-    if N >= 6 and rhetorical_pressure < 0.4:
+    # =====================================================
+    # 8) ANALYTIQUE
+    # =====================================================
+    if (
+        N >= 6
+        and rhetorical_pressure < 0.45
+    ):
         return (
             "Discours analytique",
-            "Raisonnement structuré, mais avec une vérifiabilité ou une démonstration encore partielle."
+            "Le texte développe un raisonnement structuré ou explicatif."
         )
 
+    # =====================================================
+    # 9) SPÉCULATIF
+    # =====================================================
+    if (
+        N >= 6
+        and G < 4
+        and V < 5
+    ):
+        return (
+            "Discours spéculatif",
+            "Le texte repose principalement sur des hypothèses ou des généralisations conceptuelles."
+        )
+
+    # =====================================================
+    # 10) INDÉTERMINÉ
+    # =====================================================
     return (
         "Discours indéterminé",
         "Le texte ne présente pas assez d’indices dominants pour être classé clairement."
     )
-
 
 # =====================================================
 # DÉTECTION PAGE WEB PARASITE
