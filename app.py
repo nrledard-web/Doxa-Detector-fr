@@ -3157,8 +3157,6 @@ def detect_normative_charges(text: str):
         "judgment_markers": marker_hits,
         "interpretation": interpretation,
     }
-
-
 # -----------------------------
 # Glissement sémantique
 # -----------------------------
@@ -3201,6 +3199,11 @@ SEMANTIC_SHIFT_MARKERS += [
     "rester dans le déni",
     "choix simple",
     "effondrement progressif",
+    "présentée comme un progrès inévitable",
+    "présenté comme de la tolérance",
+    "dissolution collective",
+    "malaise identitaire",
+    "transformation culturelle radicale",
 ]
 
 
