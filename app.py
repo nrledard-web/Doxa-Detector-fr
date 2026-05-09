@@ -3851,10 +3851,25 @@ def compute_threat_amplification(text: str):
 # 19) Fausse analogie
 # -----------------------------
 FALSE_ANALOGY_TERMS = [
-    "comme si", "c'est comme", "de la même manière que",
-    "exactement comme", "rien de différent de",
-    "comparable à", "similaire à", "équivalent à",
-    "just like", "exactly like", "similar to", "equivalent to"
+    "comme si", "c'est comme", "c’est comme",
+    "de la même manière que",
+    "exactement comme",
+    "rien de différent de",
+    "comparable à",
+    "similaire à",
+    "équivalent à",
+    "just like",
+    "exactly like",
+    "similar to",
+    "equivalent to",
+
+    # ajouts
+    "comme dans",
+    "comme sous",
+    "exactement le même chemin",
+    "le même chemin",
+    "ce parallèle",
+    "voir ce parallèle",
 ]
 
 def compute_false_analogy(text: str):
@@ -3865,9 +3880,23 @@ def compute_false_analogy(text: str):
             "interpretation": "Aucune fausse analogie saillante détectée."
         }
 
-    text_lower = text.lower()
-    hits = [t for t in FALSE_ANALOGY_TERMS if contains_term(text_lower, t)]
-    score = min(len(hits) * 2.5 / 10, 1.0)
+    t = normalize_text_for_markers(text)
+
+    hits = [
+        term for term in FALSE_ANALOGY_TERMS
+        if contains_term(t, term) or term in t
+    ]
+
+    # Structure analogique historique
+    if (
+        ("comme dans" in t or "comme sous" in t or "même chemin" in t or "parallèle" in t)
+        and ("empire" in t or "rome" in t or "romain" in t or "histoire" in t or "civilisation" in t)
+    ):
+        hits.append("analogie historique simplificatrice")
+
+    hits = unique_keep_order(hits)
+
+    score = min(len(hits) * 0.25, 1.0)
 
     if score < 0.15:
         interpretation = "Peu d’analogies douteuses détectées."
@@ -3883,8 +3912,6 @@ def compute_false_analogy(text: str):
         "markers": hits,
         "interpretation": interpretation,
     }
-
-
 # -----------------------------
 # 20) Surinterprétation factuelle
 # -----------------------------
