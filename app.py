@@ -4927,6 +4927,14 @@ def detect_descriptive_normative_confusion(text: str):
         and any(w in t for w in ["il faut", "nous devons", "on doit", "nécessaire", "agir", "réagir", "si rien n'est fait", "si rien n’est fait"])
     ):
         matches.append("constat alarmiste transformé en obligation")
+        if (
+        "nécessaire d'agir" in t
+        or "nécessaire d’agir" in t
+        or "avant qu'il ne soit trop tard" in t
+        or "avant qu’il ne soit trop tard" in t
+        or "rester passif" in t
+    ):
+        matches.append("injonction issue d’un constat alarmiste")    
 
     matches = unique_keep_order(matches)
 
