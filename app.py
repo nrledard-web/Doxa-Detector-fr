@@ -7211,6 +7211,21 @@ def detect_discourse_type(result):
         )
 
     # =====================================================
+    # PSEUDO-ANALYTIQUE / CIVILISATIONNEL
+    # =====================================================
+    if (
+        result.get("scientific_simulation_score", 0) >= 0.25
+        or result.get("causal_overreach_score", 0) >= 0.25
+        or result.get("argument_from_nature_score", 0) >= 0.25
+        or result.get("false_analogy_score", 0) >= 0.25
+        or result.get("generalization_score", 0) >= 0.4
+    ):
+        return (
+            "Discours pseudo-analytique / civilisationnel",
+            "Le texte adopte une apparence analytique tout en mobilisant des analogies historiques, des arguments de nature, des généralisations ou des causalités fragiles."
+        )
+
+    # =====================================================
     # 7) DISCOURS ORIENTÉ / ALARMISTE
     # =====================================================
     if (
