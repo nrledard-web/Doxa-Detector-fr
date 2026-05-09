@@ -4090,13 +4090,6 @@ def compute_normative_saturation(text: str):
         "markers": hits,
         "interpretation": interpretation,
     }
-    hits = [
-    term for term in SATURATION_NORMATIVE_TERMS
-    if contains_term(t, term) or term in t
-]
-
-score = min(len(hits) * 0.10, 1.0)
-
 
 # -----------------------------
 # 23) Rigidité doxique
