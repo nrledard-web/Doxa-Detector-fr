@@ -6410,9 +6410,9 @@ def analyze_article(text: str) -> Dict:
         "ideological_premise_sophism_markers": aristotelian_fallacies["ideological_premise"]["matches"],
         "ideological_premise_sophism_interpretation": aristotelian_fallacies["ideological_premise"]["interpretation"],
 
-        "false_consensus_strong_score": aristotelian_fallacies["false_consensus_strong"]["score"],
-        "false_consensus_strong_markers": aristotelian_fallacies["false_consensus_strong"]["matches"],
-        "false_consensus_strong_interpretation": aristotelian_fallacies["false_consensus_strong"]["interpretation"],
+        "false_consensus_strong_score": false_consensus_strong_analysis["score"],
+        "false_consensus_strong_markers": false_consensus_strong_analysis["markers"],
+        "false_consensus_strong_interpretation": false_consensus_strong_analysis["interpretation"],
 
         "argument_from_nature_score": aristotelian_fallacies["argument_from_nature"]["score"],
         "argument_from_nature_markers": aristotelian_fallacies["argument_from_nature"]["matches"],
