@@ -12152,36 +12152,35 @@ with al5:
     st.caption(result["petition_interpretation"])
 
     with st.expander("🔎 Voir les marqueurs", expanded=False):
-        markers = markers = result.get("petition_markers", [])
+        markers = result.get("petition_markers", [])
         if not markers:
-            st.info("Aucune confusion descriptif / normatif notable détectée.")
+            st.info("Aucune pétition de principe notable détectée.")
         else:
             for marker in markers:
                 st.warning(marker)
 
     with st.popover("ℹ️ Comprendre cette jauge"):
-        st.markdown("### Confusion descriptif / normatif")
+        st.markdown("### Pétition de principe")
 
         st.write(
-            "Cette jauge détecte les situations où un fait ou une description "
-            "est transformé en jugement, norme ou injonction sans justification."
+            "Cette jauge détecte les raisonnements circulaires : "
+            "la conclusion est répétée ou présupposée comme si elle constituait une preuve."
         )
 
         st.markdown("**Principe**")
         st.write(
-            "Le texte est comparé à des marqueurs de glissement normatif : "
-            "passage du descriptif (« ce qui est ») au normatif (« ce qui doit être ») "
-            "sans étape argumentative explicite."
+            "Le texte est analysé pour repérer les formulations où une idée est tenue pour vraie "
+            "parce qu’elle est répétée, posée comme évidente ou utilisée comme sa propre justification."
         )
 
         st.markdown("**Formule utilisée**")
         st.code(
-            "markers = confusions descriptif/normatif détectées\n"
-            "score = min(len(markers) * coefficient / 10, 1.0)",
+            "markers = marqueurs de pétition de principe détectés\n"
+            "score = min(len(markers) * coefficient, 1.0)",
             language="python"
         )
 
-        markers = result.get("descriptive_normative_confusion_markers", [])
+        markers = result.get("petition_markers", [])
 
         st.markdown("**Valeur actuelle**")
         st.write(f"Score : **{round(value * 100, 1)}%**")
@@ -12189,20 +12188,20 @@ with al5:
         st.write(f"Marqueurs détectés : **{len(markers)}**")
 
         st.markdown("**Interprétation actuelle**")
-        st.write(result["descriptive_normative_confusion_interpretation"])
+        st.write(result["petition_interpretation"])
 
         st.markdown("**Lecture**")
         st.write(
-            "🟢 Faible : distinction claire entre faits et jugements\n"
-            "🟡 Modérée : glissements ponctuels\n"
-            "🟠 Élevée : confusion notable entre description et norme\n"
-            "🔴 Très élevée : injonctions déguisées en faits"
+            "🟢 Faible : peu de circularité argumentative\n"
+            "🟡 Modérée : circularité légère ou évidence présupposée\n"
+            "🟠 Élevée : conclusion souvent posée comme preuve\n"
+            "🔴 Très élevée : raisonnement fortement circulaire"
         )
 
         st.markdown("**Attention**")
         st.write(
-            "Une confusion descriptif / normatif élevée ne signifie pas que le texte est faux. "
-            "Elle indique que des jugements ou normes sont présentés comme des faits."
+            "Une pétition de principe élevée ne signifie pas que la conclusion est fausse. "
+            "Elle indique que le texte tend à présupposer ou répéter sa conclusion au lieu de la démontrer."
         )
 # -----------------------------
 # Cherry Picking
