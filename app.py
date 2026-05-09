@@ -11841,7 +11841,7 @@ al5, al6, al7, al8, = st.columns(4)
 # -----------------------------
 with al5:
     st.markdown("### Pétition de principe")
-    st.caption("Glissement d’une description vers une injonction sans justification suffisante.")
+    st.caption("Conclusion répétée comme si elle constituait une preuve.")
 
     value = result["petition_score"]
 
