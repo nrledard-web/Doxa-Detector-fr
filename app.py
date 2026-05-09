@@ -3896,7 +3896,7 @@ def compute_false_analogy(text: str):
 
     hits = unique_keep_order(hits)
 
-    score = min(len(hits) * 0.25, 1.0)
+    score = min(len(hits) * 0.20, 1.0)
 
     if score < 0.15:
         interpretation = "Peu d’analogies douteuses détectées."
