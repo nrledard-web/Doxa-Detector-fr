@@ -3023,14 +3023,6 @@ CONSENSUS_TERMS += [
     "il suffit d'ouvrir les yeux",
     "tout le monde sait désormais",
 ]
-FALSE_CONSENSUS_STRONG_PATTERNS = [
-    "personne n'ose le dire",
-    "les médias cachent la vérité",
-    "tout le monde sait mais personne ne dit rien",
-    "les experts indépendants alertent",
-    "on nous cache la vérité",
-    "ceux qui ouvrent les yeux comprennent",
-]
 
 # -----------------------------
 # Opposition binaire
