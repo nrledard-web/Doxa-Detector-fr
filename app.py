@@ -4043,7 +4043,22 @@ def compute_internal_dissonance(text: str):
 SATURATION_NORMATIVE_TERMS = [
     "scandaleux", "inacceptable", "honteux", "immoral", "criminel",
     "odieux", "abject", "indigne", "dangereux", "toxique",
-    "scandalous", "unacceptable", "shameful", "immoral", "criminal"
+    "scandalous", "unacceptable", "shameful", "immoral", "criminal",
+
+    # ajouts utiles
+    "dérive",
+    "submersion",
+    "effondrement",
+    "catastrophe",
+    "danger",
+    "déni",
+    "contre le peuple",
+    "civilisation",
+    "stratégie globale",
+    "autorités cherchent à cacher",
+    "médias officiels",
+    "nier l'évidence",
+    "nier l’évidence",
 ]
 
 def compute_normative_saturation(text: str):
@@ -4054,8 +4069,11 @@ def compute_normative_saturation(text: str):
             "interpretation": "Aucune saturation normative saillante détectée."
         }
 
-    text_lower = text.lower()
-    hits = [t for t in SATURATION_NORMATIVE_TERMS if contains_term(text_lower, t)]
+    t = normalize_text_for_markers(text)
+    hits = [
+        term for term in SATURATION_NORMATIVE_TERMS
+        if contains_term(t, term) or term in t
+    ]
     score = min(len(hits) * 2.2 / 10, 1.0)
 
     if score < 0.15:
