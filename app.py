@@ -5990,6 +5990,7 @@ def analyze_article(text: str) -> Dict:
     abstract_enemy_analysis = compute_abstract_enemy(text)
     certainty_analysis = compute_certainty(text)
     false_consensus_analysis = compute_false_consensus(text)
+    false_consensus_strong_analysis = detect_false_consensus_strong(text)
     binary_opposition_analysis = compute_binary_opposition(text)
     threat_amplification_analysis = compute_threat_amplification(text)
     semantic_shift_analysis = detect_semantic_shift(text)
