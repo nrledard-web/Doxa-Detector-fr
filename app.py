@@ -4573,17 +4573,6 @@ def detect_cherry_picking(text: str):
         "markers": all_markers,
         "interpretation": interpretation,
     }
-PETITION_PATTERNS = [
-    "cela prouve que c'est vrai",
-    "c'est vrai parce que c'est évident",
-    "c'est évident parce que c'est vrai",
-    "si cela dérange, c'est que c'est vrai",
-    "si certaines idées dérangent autant, c'est précisément parce qu'elles sont vraies",
-    "la preuve, c'est que",
-    "cela démontre ce que nous savons déjà",
-    "les signes sont partout",
-    "il suffit d'ouvrir les yeux",
-]
 
 def detect_petition_principii(text: str):
     if not text or not text.strip():
