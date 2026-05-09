@@ -4326,7 +4326,13 @@ PETITION_PATTERNS = [
     "nier l’évidence",
     "tout le monde voit",
 ]
-
+PETITION_PATTERNS += [
+    "l'histoire montre toujours la même chose",
+    "l’histoire montre toujours la même chose",
+    "refuser de voir ce parallèle",
+    "ignorer les leçons les plus évidentes du passé",
+    "il est donc évident que",
+]
 CAUSALITY_PATTERNS = [
     "depuis que",
     "à cause de",
@@ -4335,7 +4341,6 @@ CAUSALITY_PATTERNS = [
     "a causé",
     "est la cause de",
 ]
-
 GENERALIZATION_PATTERNS = [
     "tous les",
     "toujours",
@@ -4343,12 +4348,9 @@ GENERALIZATION_PATTERNS = [
     "tout le monde",
     "personne ne",
 ]
-
-
 # -----------------------------
 # Sophismes supplémentaires
 # -----------------------------
-
 AD_HOMINEM_PATTERNS = [
     "cet idiot",
     "cet incapable",
@@ -4356,21 +4358,18 @@ AD_HOMINEM_PATTERNS = [
     "il est ridicule",
     "on ne peut pas faire confiance à",
 ]
-
 IGNORANCE_PATTERNS = [
     "personne n'a prouvé que",
     "on ne peut pas prouver que",
     "il n'existe aucune preuve que",
     "rien ne prouve que le contraire",
 ]
-
 SLIPPERY_SLOPE_PATTERNS = [
     "si on accepte",
     "alors bientôt",
     "cela mènera à",
     "on finira par",
 ]
-
 FEAR_APPEAL_PATTERNS = [
     "danger",
     "menace",
@@ -4378,7 +4377,6 @@ FEAR_APPEAL_PATTERNS = [
     "désastre",
     "nous allons tous subir",
 ]
-
 FALSE_ANALOGY_STRONG_PATTERNS = [
     "c'est comme",
     "exactement comme",
@@ -4399,18 +4397,15 @@ VAGUE_AUTHORITY_PATTERNS = [
     "certains spécialistes",
     "les chercheurs disent",
 ]
-
 FALSE_DILEMMA_PATTERNS = [
     "soit",
     "il n'y a que deux choix",
     "avec nous ou contre nous",
     "vous devez choisir",
 ]
-
 # -----------------------------
 # Sophismes axiologiques / idéologiques
 # -----------------------------
-
 NORMATIVE_QUALIFICATION_PATTERNS = [
     "complotiste",
     "raciste",
@@ -4423,7 +4418,6 @@ NORMATIVE_QUALIFICATION_PATTERNS = [
     "haineux",
     "dangereux",
 ]
-
 IDEOLOGICAL_PREMISE_PATTERNS = [
     "il est évident que",
     "il est clair que",
@@ -4431,7 +4425,6 @@ IDEOLOGICAL_PREMISE_PATTERNS = [
     "il va de soi que",
     "il est largement admis que",
 ]
-
 FALSE_CONSENSUS_STRONG_PATTERNS = [
     "personne n'ose le dire",
     "les médias cachent la vérité",
@@ -4453,7 +4446,6 @@ FALSE_CONSENSUS_STRONG_PATTERNS += [
     "constatent désormais",
     "ceux qui continuent de nier cette réalité",
 ]
-
 ARGUMENT_FROM_NATURE_PATTERNS = [
     "par nature",
     "naturellement",
@@ -4488,7 +4480,6 @@ HISTORICAL_MARKERS = [
     "chronologie", "événement", "date", "archives",
     "historique", "contexte historique"
 ]
-
 def detect_historical_text_mode(text: str):
     if not text or not text.strip():
         return {
@@ -4539,7 +4530,6 @@ CHERRY_PICKING_PATTERNS = [
     "cet exemple démontre",
     "la preuve avec ce cas",
 ]
-
 CHERRY_PICKING_OMISSION_MARKERS = [
     "sans parler du reste",
     "on oublie souvent que",
@@ -4547,7 +4537,6 @@ CHERRY_PICKING_OMISSION_MARKERS = [
     "les médias cachent",
     "on ne vous dit pas que",
 ]
-
 CHERRY_PICKING_PATTERNS += [
     "des exemples montrent",
     "certains exemples montrent",
@@ -4561,7 +4550,6 @@ CHERRY_PICKING_PATTERNS += [
     "prenons un exemple",
     "comme par exemple",
 ]
-
 CHERRY_PICKING_OMISSION_MARKERS += [
     "on ignore volontairement",
     "on passe sous silence",
@@ -4575,7 +4563,6 @@ CHERRY_PICKING_PATTERNS += [
     "quelques cas récents prouvent",
     "quelques cas récents le prouvent",
 ]
-
 def detect_cherry_picking(text: str):
     if not text or not text.strip():
         return {
