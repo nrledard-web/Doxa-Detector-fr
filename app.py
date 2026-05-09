@@ -4852,6 +4852,11 @@ DESCRIPTIVE_NORMATIVE_CONFUSION_PATTERNS = [
     "si rien n'est fait",
     "si rien n’est fait",
 ]
+DESCRIPTIVE_NORMATIVE_CONFUSION_PATTERNS += [
+    "nous devons revenir",
+    "il est donc évident que nous devons",
+    "il est donc évident que nous devons revenir",
+]
 
 def detect_descriptive_normative_confusion(text: str):
     if not text or not text.strip():
