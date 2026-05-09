@@ -7053,6 +7053,89 @@ def detect_discourse_type(result):
     philosophical = domains.get("philosophique", 0)
     religious = domains.get("religieux", 0)
 
+    narrative_score = result.get("narrative_score", 0)
+    scientific_score = result.get("scientific_simulation_score", 0)
+    propaganda_score = result.get("propaganda_score", 0)
+
+    historical_score = domains.get("historique", 0)
+    literary_score = domains.get("litteraire", 0)
+    scientific_domain = domains.get("scientifique", 0)
+    political_score = domains.get("politique", 0)
+
+    # =====================================================
+    # A) ROMANESQUE / NARRATIF
+    # =====================================================
+    if (
+        narrative_score >= 0.5
+        and G < 4
+        and V < 4
+    ):
+        return (
+            "Discours romanesque / narratif",
+            "Le texte repose principalement sur une structure narrative ou fictionnelle."
+        )
+
+    # =====================================================
+    # B) LITTÉRAIRE / POÉTIQUE
+    # =====================================================
+    if (
+        literary_score >= 2
+        and rhetorical_pressure < 0.5
+    ):
+        return (
+            "Discours littéraire / poétique",
+            "Le texte mobilise principalement une recherche stylistique ou expressive."
+        )
+
+    # =====================================================
+    # C) HISTORIQUE
+    # =====================================================
+    if (
+        historical_score >= 2
+        and G >= 4
+    ):
+        return (
+            "Discours historique",
+            "Le texte mobilise principalement des références historiques ou civilisationnelles."
+        )
+
+    # =====================================================
+    # D) SCIENTIFIQUE
+    # =====================================================
+    if (
+        scientific_domain >= 2
+        and G >= 5
+        and V >= 5
+    ):
+        return (
+            "Discours scientifique",
+            "Le texte mobilise principalement des références scientifiques ou analytiques."
+        )
+
+    # =====================================================
+    # E) VULGARISATION SCIENTIFIQUE
+    # =====================================================
+    if (
+        scientific_domain >= 1
+        and scientific_score >= 0.2
+    ):
+        return (
+            "Discours de vulgarisation scientifique",
+            "Le texte adopte une présentation scientifique simplifiée destinée à expliquer ou convaincre."
+        )
+
+    # =====================================================
+    # F) POLITIQUE / IDÉOLOGIQUE
+    # =====================================================
+    if (
+        political_score >= 2
+        or propaganda_score >= 0.35
+    ):
+        return (
+            "Discours politique / idéologique",
+            "Le texte cherche à orienter une lecture sociale, culturelle ou politique du réel."
+        )
+
     # =====================================================
     # 1) PROPAGANDE (cas extrême)
     # =====================================================
