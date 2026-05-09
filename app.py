@@ -4074,7 +4074,7 @@ def compute_normative_saturation(text: str):
         term for term in SATURATION_NORMATIVE_TERMS
         if contains_term(t, term) or term in t
     ]
-    score = min(len(hits) * 2.2 / 10, 1.0)
+    score = min(len(hits) * 0.15, 1.0)
 
     if score < 0.15:
         interpretation = "Le texte reste peu saturé de jugements normatifs."
