@@ -4766,56 +4766,6 @@ def detect_argument_from_nature(text: str):
             "Aucun argument de nature détecté."
         )
     }
-
-def detect_petition_principii(text: str):
-    if not text or not text.strip():
-        return {
-            "score": 0.0,
-            "matches": [],
-            "interpretation": "Aucune pétition de principe saillante détectée."
-        }
-
-    t = normalize_text_for_markers(text)
-
-    matches = [
-        p for p in PETITION_PATTERNS
-        if contains_term(t, p) or p in t
-    ]
-
-    # Structures circulaires typiques
-    if ("c'est vrai" in t or "c’est vrai" in t) and ("parce que" in t or "puisque" in t):
-        matches.append("vérité affirmée comme preuve")
-
-    if ("si certaines idées dérangent" in t or "si cela dérange" in t) and (
-        "c'est parce qu'elles sont vraies" in t or "parce qu'elles sont vraies" in t
-    ):
-        matches.append("ce qui dérange serait vrai parce que cela dérange")
-
-    if ("il est évident" in t or "c'est évident" in t) and (
-        "donc" in t or "cela prouve" in t or "cela montre"
-    ):
-        matches.append("évidence utilisée comme démonstration")
-
-    matches = unique_keep_order(matches)
-
-    score = min(len(matches) * 0.35, 1.0)
-
-    if score < 0.15:
-        interpretation = "Aucune pétition de principe saillante détectée."
-    elif score < 0.35:
-        interpretation = "Le texte contient une circularité argumentative légère."
-    elif score < 0.60:
-        interpretation = "Le texte présente une pétition de principe notable."
-    else:
-        interpretation = "Le raisonnement repose fortement sur une conclusion répétée comme preuve."
-
-    return {
-        "score": round(score, 3),
-        "matches": matches,
-        "markers": matches,
-        "interpretation": interpretation
-    }
-
 DESCRIPTIVE_NORMATIVE_CONFUSION_PATTERNS = [
     "donc il faut",
     "donc nous devons",
