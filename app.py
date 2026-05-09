@@ -7101,6 +7101,20 @@ def detect_discourse_type(result):
         )
 
     # =====================================================
+    # 7) DISCOURS ORIENTÉ / ALARMISTE
+    # =====================================================
+    if (
+        result.get("threat_amplification_score", 0) >= 0.6
+        or result.get("semantic_shift_score", 0) >= 0.6
+        or result.get("binary_opposition_score", 0) >= 0.6
+        or result.get("false_consensus_score", 0) >= 0.4
+    ):
+        return (
+            "Discours orienté / alarmiste",
+            "Le texte mobilise menace, recadrage sémantique, opposition binaire ou consensus supposé pour orienter la lecture."
+        )
+
+    # =====================================================
     # 7) POLÉMIQUE
     # =====================================================
     if (
