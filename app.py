@@ -4355,6 +4355,12 @@ FALSE_ANALOGY_STRONG_PATTERNS = [
     "de la même manière que",
     "tout comme",
 ]
+FALSE_ANALOGY_STRONG_PATTERNS += [
+    "comme dans les dernières années de l'empire romain",
+    "empire romain",
+    "exactement le même chemin",
+    "refuser de voir ce parallèle",
+]
 
 VAGUE_AUTHORITY_PATTERNS = [
     "les experts",
@@ -4411,6 +4417,12 @@ FALSE_CONSENSUS_STRONG_PATTERNS = [
     "les signes sont partout",
     "personne ne peut nier",
 ]
+FALSE_CONSENSUS_STRONG_PATTERNS += [
+    "tous les observateurs lucides",
+    "observateurs lucides",
+    "constatent désormais",
+    "ceux qui continuent de nier cette réalité",
+]
 
 ARGUMENT_FROM_NATURE_PATTERNS = [
     "par nature",
@@ -4427,7 +4439,14 @@ ARGUMENT_FROM_NATURE_PATTERNS = [
     "une société ne peut survivre si elle nie ses propres fondements",
     "tout système finit par se défendre",
 ]
-
+ARGUMENT_FROM_NATURE_PATTERNS += [
+    "structures plus naturelles",
+    "plus naturelles",
+    "fondements biologiques",
+    "fondements biologiques et historiques",
+    "loi presque naturelle",
+    "loi naturelle",
+]
 # -----------------------------
 # Détection texte historique / chronologique
 # -----------------------------
