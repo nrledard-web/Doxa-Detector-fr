@@ -4388,11 +4388,19 @@ IDEOLOGICAL_PREMISE_PATTERNS = [
 ]
 
 FALSE_CONSENSUS_STRONG_PATTERNS = [
-    "tout le monde sait que",
-    "tout le monde comprend que",
-    "personne ne peut nier que",
-    "il est évident pour tous que",
-    "chacun sait que",
+    "personne n'ose le dire",
+    "les médias cachent la vérité",
+    "tout le monde sait mais personne ne dit rien",
+    "les experts indépendants alertent",
+    "on nous cache la vérité",
+    "ceux qui ouvrent les yeux comprennent",
+
+    "tout le monde voit désormais",
+    "tout le monde voit",
+    "nier l'évidence",
+    "nier l’évidence",
+    "les signes sont partout",
+    "personne ne peut nier",
 ]
 
 ARGUMENT_FROM_NATURE_PATTERNS = [
@@ -4731,14 +4739,46 @@ def detect_ideological_premise(text: str):
 
 
 def detect_false_consensus_strong(text: str):
-    text_lower = text.lower()
-    matches = [p for p in FALSE_CONSENSUS_STRONG_PATTERNS if contains_term(text_lower, p) or p in text_lower]
-    return {
-        "score": min(len(matches) * 0.45, 1.0),
-        "matches": matches,
-        "interpretation": "Le texte met en scène un consensus supposé comme preuve." if matches else "Aucun faux consensus renforcé détecté."
-    }
+    if not text or not text.strip():
+        return {
+            "score": 0.0,
+            "matches": [],
+            "markers": [],
+            "interpretation": "Aucun faux consensus renforcé détecté."
+        }
 
+    t = normalize_text_for_markers(text)
+
+    matches = [
+        p for p in FALSE_CONSENSUS_STRONG_PATTERNS
+        if contains_term(t, p) or p in t
+    ]
+
+    if (
+        any(p in t for p in ["tout le monde", "personne ne peut nier", "chacun sait", "les signes sont partout"])
+        and any(p in t for p in ["cela prouve", "ce qui démontre", "preuve", "évidence"])
+    ):
+        matches.append("consensus supposé utilisé comme preuve")
+
+    matches = unique_keep_order(matches)
+
+    score = min(len(matches) * 0.45, 1.0)
+
+    if score < 0.15:
+        interpretation = "Aucun faux consensus renforcé détecté."
+    elif score < 0.35:
+        interpretation = "Le texte suggère un consensus présenté comme évidence."
+    elif score < 0.60:
+        interpretation = "Le texte met en scène un consensus supposé comme preuve."
+    else:
+        interpretation = "Le discours transforme fortement un accord supposé en preuve argumentative."
+
+    return {
+        "score": round(score, 3),
+        "matches": matches,
+        "markers": matches,
+        "interpretation": interpretation
+    }
 
 def detect_argument_from_nature(text: str):
     if not text or not text.strip():
