@@ -4661,7 +4661,7 @@ def detect_petition_principii(text: str):
 
     matches = unique_keep_order(matches)
 
-    score = min(len(matches) * 0.35, 1.0)
+    score = min(len(matches) * 0.25, 1.0)
 
     if score < 0.15:
         interpretation = "Aucune pétition de principe saillante détectée."
