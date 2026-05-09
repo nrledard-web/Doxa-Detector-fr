@@ -727,6 +727,12 @@ def compute_linguistic_suspicion(text: str) -> dict:
     vague_authority = count_hits(vague_authority_terms)
     dramatic_framing = count_hits(dramatic_framing_terms)
     nuance_hits = count_hits(nuance_terms)
+    ingroup_hits = count_hits(INGROUP_TERMS)
+    outgroup_hits = count_hits(OUTGROUP_TERMS)
+    
+    structural_polarization = (
+        2 if ingroup_hits > 0 and outgroup_hits > 0 else 0
+    )
 
     lack_of_nuance = 2 if nuance_hits == 0 else 1 if nuance_hits <= 2 else 0
 
@@ -736,6 +742,7 @@ def compute_linguistic_suspicion(text: str) -> dict:
         + vague_authority
         + dramatic_framing
         + lack_of_nuance
+        + structural_polarization
     )
 
     L = 1.0 + min(raw_score / 8.0, 1.0)
@@ -748,6 +755,7 @@ def compute_linguistic_suspicion(text: str) -> dict:
         "dramatic_framing": dramatic_framing,
         "lack_of_nuance": lack_of_nuance,
         "trigger_count": raw_score,
+        "structural_polarization": structural_polarization,
     }
 
 
