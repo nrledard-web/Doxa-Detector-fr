@@ -3503,6 +3503,7 @@ def detect_propaganda_narrative(text: str):
         "emotional_terms": emotional_hits,
         "interpretation": interpretation,
     }
+
 def compute_causal_overreach(text: str):
     if not text or not text.strip():
         return {
@@ -3530,7 +3531,6 @@ def compute_causal_overreach(text: str):
         "interpretation": interpretation,
     }
 
-
 def compute_vague_authority(text: str):
     if not text or not text.strip():
         return {
@@ -3557,7 +3557,6 @@ def compute_vague_authority(text: str):
         "markers": hits,
         "interpretation": interpretation,
     }
-
 
 def compute_emotional_intensity(text: str):
     if not text or not text.strip():
@@ -3603,7 +3602,6 @@ def compute_generalization(text: str):
 
     return score, interpretation, hits
 
-
 def compute_abstract_enemy(text: str):
 
     text_lower = text.lower()
@@ -3620,7 +3618,6 @@ def compute_abstract_enemy(text: str):
         interpretation = "Le discours construit un adversaire abstrait."
 
     return score, interpretation, hits
-
 
 def compute_certainty(text: str):
 
@@ -3796,7 +3793,6 @@ def compute_victimization(text: str):
         "markers": unique_keep_order(hits),
         "interpretation": interpretation,
     }
-
 # =========================================================
 # FRAME SHIFT
 # =========================================================
@@ -3826,7 +3822,6 @@ def compute_frame_shift(text: str):
         "en revanche",
         "il n'empêche que"
     ]
-
     # Marqueurs de nuance
     nuance_terms = [
         "nuancer",
@@ -3841,7 +3836,6 @@ def compute_frame_shift(text: str):
         "semble",
         "possible"
     ]
-
     # Marqueurs de bascule forte
     certainty_or_threat_terms = [
         "il est absolument certain",
@@ -3855,7 +3849,6 @@ def compute_frame_shift(text: str):
         "catastrophe",
         "effondrement"
     ]
-
     has_connector = any(term in t for term in shift_connectors)
     has_nuance = any(term in t for term in nuance_terms)
     has_certainty_or_threat = any(term in t for term in certainty_or_threat_terms)
@@ -3882,8 +3875,6 @@ def compute_frame_shift(text: str):
         "markers": hits,
         "interpretation": interpretation,
     }
-
-
 # =========================================================
 # ASYMÉTRIE ARGUMENTATIVE
 # =========================================================
@@ -3921,7 +3912,6 @@ def compute_argument_asymmetry(text: str):
         "argument_count": argument_count,
         "interpretation": interpretation,
     }
-
 THREAT_AMPLIFICATION_TERMS = [
     "menace existentielle",
     "danger extrême",
@@ -3959,7 +3949,6 @@ def compute_threat_amplification(text: str):
         interpretation = "Le discours repose fortement sur une amplification dramatique de la menace."
 
     return score, interpretation, hits
-
 
 # -----------------------------
 # 19) Fausse analogie
@@ -4110,7 +4099,6 @@ NUANCE_DISSONANCE_TERMS = [
     "semble",
     "selon certains",
 ]
-
 CERTAINTY_DISSONANCE_TERMS = [
     "il est absolument certain",
     "absolument certain",
@@ -4121,7 +4109,6 @@ CERTAINTY_DISSONANCE_TERMS = [
     "incontestable",
     "personne ne peut nier",
 ]
-
 THREAT_DISSONANCE_TERMS = [
     "crise majeure",
     "crise sociale majeure",
@@ -4180,7 +4167,6 @@ def compute_internal_dissonance(text: str):
         "markers": hits,
         "interpretation": interpretation,
     }
-
 # -----------------------------
 # 22) Saturation normative
 # -----------------------------
@@ -4234,7 +4220,6 @@ def compute_normative_saturation(text: str):
         "markers": hits,
         "interpretation": interpretation,
     }
-
 # -----------------------------
 # 23) Rigidité doxique
 # -----------------------------
@@ -4271,8 +4256,6 @@ def compute_doxic_rigidity(text: str):
         "markers": hits,
         "interpretation": interpretation,
     }
-
-
 # -----------------------------
 # 24) Surdétermination narrative
 # -----------------------------
@@ -4396,8 +4379,6 @@ def compute_moral_polarization(text: str):
         "markers": hits,
         "interpretation": interpretation,
     }
-
-
 # -----------------------------
 # Simplification stratégique
 # -----------------------------
@@ -4438,7 +4419,6 @@ def compute_strategic_simplification(text: str):
         "markers": hits,
         "interpretation": interpretation,
     }
-
 # -----------------------------
 # Sophismes aristotéliciens de base
 # -----------------------------
@@ -4526,7 +4506,6 @@ FALSE_ANALOGY_STRONG_PATTERNS += [
     "exactement le même chemin",
     "refuser de voir ce parallèle",
 ]
-
 VAGUE_AUTHORITY_PATTERNS = [
     "les experts",
     "les scientifiques disent",
@@ -4651,7 +4630,6 @@ def detect_historical_text_mode(text: str):
         "markers": marker_hits + date_hits[:10],
         "interpretation": interpretation
     }
-
 # -----------------------------
 # Cherry Picking / sélection biaisée
 # -----------------------------
@@ -4919,7 +4897,6 @@ def detect_ideological_premise(text: str):
         "interpretation": "Le raisonnement repose sur des prémisses idéologiques implicites." if matches else "Aucune prémisse idéologique implicite détectée."
     }
 
-
 def detect_false_consensus_strong(text: str):
     if not text or not text.strip():
         return {
@@ -5027,7 +5004,6 @@ def detect_descriptive_normative_confusion(text: str):
         p for p in DESCRIPTIVE_NORMATIVE_CONFUSION_PATTERNS
         if contains_term(t, p) or p in t
     ]
-
     # -----------------------------
     # Constat alarmiste → obligation
     # -----------------------------
@@ -5220,7 +5196,6 @@ def compute_brain_indices(result: dict) -> dict:
     # Stabilité / gravité du cerveau DOXA
     # avec impact modulé du mensonge
     # -----------------------------
-
     cognitive_density = clamp01((G + N) / 20)
 
     lie_gauge = result.get("lie_gauge", strategic_index)
