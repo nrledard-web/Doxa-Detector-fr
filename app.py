@@ -1606,7 +1606,7 @@ def search_articles_by_keyword(keyword: str, max_results: int = 10) -> List[Dict
 
             if len(articles) >= max_results:
                 break
-
+                
     except Exception as e:
         st.warning(f"Erreur DDGS : {e}")
 
@@ -1624,7 +1624,6 @@ def compute_lie_gauge(M: float, ME: float):
     M et ME sont d'abord normalisés pour éviter
     qu'un seul indice n'écrase artificiellement l'autre.
     """
-
     # M : spectre théorique approximatif de -10 à +20
     m_norm = max(0.0, min(1.0, (M + 10) / 30))
 
@@ -1691,7 +1690,6 @@ SOURCE_CUES = [
 # -----------------------------
 # Marqueurs propositions aristotéliciennes
 # -----------------------------
-
 SYLLOGISTIC_MARKERS = {
     "A": ["tous", "tout", "chaque"],
     "E": ["aucun", "nul"],
@@ -1701,7 +1699,6 @@ SYLLOGISTIC_MARKERS = {
 # -----------------------------
 # Normalisation pluriels irréguliers
 # -----------------------------
-
 IRREGULAR_NORMALIZATIONS = {
     "animaux": "animal",
     "chevaux": "cheval",
@@ -1714,22 +1711,18 @@ IRREGULAR_NORMALIZATIONS = {
     "mammifères": "mammifère",
     "hommes": "homme",
 }
-
 ABSOLUTIST_WORDS = [
     "toujours", "jamais", "absolument", "certain", "certaine",
     "prouvé", "prouvée", "incontestable", "tous", "aucun",
 ]
-
 EMOTIONAL_WORDS = [
     "choc", "incroyable", "terrible", "peur", "menace",
     "scandale", "révolution", "urgent", "catastrophe", "crise",
 ]
-
 NUANCE_MARKERS = [
     "cependant", "pourtant", "néanmoins", "toutefois", "mais",
     "nuancer", "prudence", "possible", "peut-être", "semble",
 ]
-
 CERTITUDE_PERFORMATIVE = [
     "il est évident",
     "il est clair que",
@@ -1743,7 +1736,6 @@ CERTITUDE_PERFORMATIVE = [
     "without any doubt",
     "there is no doubt"
 ]
-
 AUTORITE_VAGUE = [
     "selon des experts",
     "des sources indiquent",
@@ -1755,7 +1747,6 @@ AUTORITE_VAGUE = [
     "insiders say",
     "many specialists"
 ]
-
 DRAMATISATION = [
     "crise majeure",
     "catastrophe imminente",
@@ -1767,7 +1758,6 @@ DRAMATISATION = [
     "historic threat",
     "major collapse"
 ]
-
 GENERALISATION = [
     "tout le monde sait",
     "les citoyens pensent",
@@ -1777,7 +1767,6 @@ GENERALISATION = [
     "people understand",
     "everyone realizes"
 ]
-
 NATURALISATION = [
     "il n'y a pas d'alternative",
     "c'est la seule solution",
@@ -1787,7 +1776,6 @@ NATURALISATION = [
     "necessary reform",
     "no alternative"
 ]
-
 ENNEMI_ABSTRAIT = [
     "certaines forces",
     "des intérêts puissants",
@@ -1796,7 +1784,6 @@ ENNEMI_ABSTRAIT = [
     "hostile forces",
     "external actors"
 ]
-
 # -----------------------------
 # Helpers pour les nouveaux modules
 # -----------------------------
@@ -1808,7 +1795,6 @@ def unique_keep_order(items):
             seen.add(item)
             out.append(item)
     return out
-
 
 def contains_term(text: str, term: str) -> bool:
     escaped = re.escape(term.lower())
@@ -1883,8 +1869,7 @@ def detect_index_or_multilink_page(text: str, url: str = ""):
         "score": round(score, 3),
         "markers": marker_hits + url_hits[:10],
         "interpretation": interpretation
-    }
-    
+    } 
 # -----------------------------
 # Filtre anti-pages non articles
 # -----------------------------
@@ -1964,9 +1949,6 @@ def normalize_text_for_markers(text: str) -> str:
         .replace("»", '"')
         .replace("\u00a0", " ")
     )
-
-
-
 # -----------------------------
 # Extraction sujet / prédicat
 # -----------------------------
@@ -2025,23 +2007,21 @@ def detect_aristotelian_proposition(sentence: str) -> Optional[str]:
         return "A"
 
     return None
-
-
 # -----------------------------
 # Détection syllogismes simples
 # -----------------------------
 
 def detect_syllogisms_from_claims(claims: List[Claim]) -> List[Dict]:
     syllogisms = []
-
-    conclusion_markers = [
+        conclusion_markers = [
         "donc",
         "par conséquent",
         "ainsi",
         "il s'ensuit que",
         "il s’ensuit que",
         "cela montre que",
-        "cela prouve que"
+        "cela prouve que",
+
     ]
 
     for i in range(len(claims) - 2):
@@ -2189,7 +2169,6 @@ def detect_syllogistic_fallacies(syllogisms: List[Dict]) -> List[Dict]:
 
     return fallacies
 
-
 # -----------------------------
 # Détection enthymèmes
 # -----------------------------
@@ -2205,6 +2184,13 @@ def detect_enthymemes_from_claims(claims: List[Claim]) -> List[Dict]:
         "il s’ensuit que",
         "cela montre que",
         "cela prouve que"
+    ]
+        # ajouts
+        "il devient donc nécessaire",
+        "il devient nécessaire",
+        "il faut donc",
+        "nous devons donc",
+        "rester passif reviendrait",
     ]
 
     for i, c in enumerate(claims):
@@ -2325,7 +2311,6 @@ def classify_claim_type(sentence: str) -> List[str]:
 
     return unique_keep_order(claim_types)
 
-
 def compute_sentence_red_flags(sentence: str) -> List[str]:
     s = sentence.lower()
     flags = []
@@ -2346,7 +2331,6 @@ def compute_sentence_red_flags(sentence: str) -> List[str]:
         flags.append("propaganda")
 
     return unique_keep_order(flags)
-
 
 def small_claim_epistemic_adjustment(sentence: str, claim_types: List[str], sentence_red_flags: List[str], absolutism: int) -> tuple[float, str]:
     words = len(sentence.split())
@@ -2447,7 +2431,6 @@ DISCURSIVE_CONTRADICTION_PATTERNS = [
     r"\bobligatoire\b.*\bfacultatif\b",
     r"\bimpossible\b.*\bpossible\b"
 ]
-
 STOPWORDS_FR_EXTENDED = {
     "le", "la", "les", "un", "une", "des", "du", "de", "d", "et", "ou",
     "à", "au", "aux", "en", "dans", "sur", "pour", "par", "avec", "sans",
@@ -2460,7 +2443,6 @@ STOPWORDS_FR_EXTENDED = {
     "toute", "toutes", "cela", "celui", "celle", "ceux", "celles",
     "ainsi", "alors", "donc", "mais", "or"
 }
-
 IMPLICIT_PREMISE_MARKERS = {
     "generalisation": [
         "toujours", "jamais", "tout le monde", "personne", "tous", "aucun",
@@ -2498,7 +2480,6 @@ IMPLICIT_PREMISE_MARKERS = {
         "réagir immédiatement"
     ]
 }
-
 LOGIC_CONFUSION_MARKERS = {
     "causalite_abusive": [
         "cela prouve que", "cela montre que", "c'est pourquoi",
@@ -2516,7 +2497,6 @@ LOGIC_CONFUSION_MARKERS = {
         "inevitably", "certainly", "it is impossible that"
     ]
 }
-
 SCIENTIFIC_SIMULATION_MARKERS = {
     "references_vagues": [
         "des études montrent", "la science prouve", "les chercheurs disent",
