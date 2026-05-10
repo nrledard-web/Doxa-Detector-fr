@@ -11744,10 +11744,10 @@ with oi7:
         unsafe_allow_html=True
     )
 
-    st.caption(result["ideological_premise_sophism_interpretation"])
+    st.caption(result["ideological_premises_interpretation"])
 
     with st.expander("🔎 Voir les marqueurs", expanded=False):
-        markers = result.get("ideological_premise_sophism_markers", [])
+        markers = result.get("ideological_premises_markers", [])
         if not markers:
             st.info("Aucune prémisse idéologique implicite notable détectée.")
         else:
@@ -11775,7 +11775,7 @@ with oi7:
             language="python"
         )
 
-        markers = result.get("ideological_premise_sophism_markers", [])
+        markers = result.get("ideological_premises_markers", [])
 
         st.markdown("**Valeur actuelle**")
         st.write(f"Score : **{round(value * 100, 1)}%**")
