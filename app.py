@@ -2184,7 +2184,7 @@ def detect_enthymemes_from_claims(claims: List[Claim]) -> List[Dict]:
         "cela montre que",
         "cela prouve que"
     ]
-        # ajouts
+    # ajouts
         "il devient donc nécessaire",
         "il devient nécessaire",
         "il faut donc",
