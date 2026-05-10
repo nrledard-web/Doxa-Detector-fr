@@ -11197,7 +11197,7 @@ with oi1:
     
     propaganda_value = compute_propaganda_gauge(
         lie_gauge=gauge_value,
-        rhetorical_pressure=rhetorical_pressure,
+        rhetorical_pressure=result.get("rhetorical_pressure", 0),
         closure=closure_for_discourse,
     
         false_consensus=result.get("false_consensus_score", 0),
