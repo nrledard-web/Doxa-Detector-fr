@@ -3372,7 +3372,19 @@ IDEOLOGICAL_PREMISE_MARKERS = [
     "scientific consensus",
     "it is clear that",
 ]
-
+IDEOLOGICAL_FRAMING_PATTERNS = [
+    "ceux qui disent la vérité",
+    "les honnêtes citoyens",
+    "les élites corrompues",
+    "le système",
+    "les médias participent",
+    "les autorités ont menti",
+    "ceux qui ouvrent les yeux",
+    "ennemis du système",
+    "notre disparition",
+    "on nous cache",
+    "vérité censurée",
+]
 
 def detect_ideological_premises(text: str):
     if not text or not text.strip():
@@ -3384,9 +3396,18 @@ def detect_ideological_premises(text: str):
 
     t = text.lower()
 
-    hits = unique_keep_order(
-        [m for m in IDEOLOGICAL_PREMISE_MARKERS if contains_term(t, m)]
-    )
+    base_hits = [
+        m for m in IDEOLOGICAL_PREMISE_MARKERS
+        if contains_term(t, m)
+    ]
+    
+    framing_hits = [
+        m for m in IDEOLOGICAL_FRAMING_PATTERNS
+        if contains_term(t, m)
+    ]
+    
+    hits = unique_keep_order(base_hits + framing_hits)
+        )
 
     score = min(len(hits) / 6, 1.0)
 
