@@ -3251,6 +3251,11 @@ SEMANTIC_SHIFT_MARKERS += [
     "dissolution collective",
     "malaise identitaire",
     "transformation culturelle radicale",
+    "manipulation collective",
+    "extrémiste",
+    "ennemis du système",
+    "ceux qui disent la vérité",
+    "ceux qui ouvrent les yeux",
 ]
 
 
