@@ -1110,6 +1110,18 @@ STRONG_CERTAINTY_MARKERS = [
     "il est impossible que",
     "cela ne peut pas être faux"
 ]
+STRONG_CERTAINTY_MARKERS += [
+    "systématiquement",
+    "jamais",
+    "personne ne mentionne",
+    "ceux qui disent la vérité",
+    "ceux qui ouvrent les yeux",
+    "immédiatement",
+    "nécessaire d'agir",
+    "nécessaire d’agir",
+    "avant qu'il ne soit trop tard",
+    "avant qu’il ne soit trop tard",
+]
 def detect_political_patterns(text: str):
     """
     Détecte des manœuvres discursives politiques ou rhétoriques
