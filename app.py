@@ -2013,7 +2013,7 @@ def detect_aristotelian_proposition(sentence: str) -> Optional[str]:
 
 def detect_syllogisms_from_claims(claims: List[Claim]) -> List[Dict]:
     syllogisms = []
-        conclusion_markers = [
+    conclusion_markers = [
         "donc",
         "par conséquent",
         "ainsi",
@@ -2021,7 +2021,6 @@ def detect_syllogisms_from_claims(claims: List[Claim]) -> List[Dict]:
         "il s’ensuit que",
         "cela montre que",
         "cela prouve que",
-
     ]
 
     for i in range(len(claims) - 2):
