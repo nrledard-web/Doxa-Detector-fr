@@ -6055,7 +6055,7 @@ def compute_strong_certainty(text):
 
     found_markers = [
         marker for marker in STRONG_CERTAINTY_MARKERS
-        if contains_term(t, marker)
+        if contains_term(t, marker) or marker in t
     ]
 
     marker_count = len(found_markers)
