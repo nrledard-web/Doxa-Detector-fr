@@ -3308,6 +3308,26 @@ def detect_semantic_shift(text: str):
     ):
         markers.append("recadrage du problème en menace globale")
 
+        # Requalification d’un terme positif en menace
+    if (
+        ("tolérance" in t or "diversité" in t or "ouverture" in t or "progrès" in t)
+        and (
+            "masquer" in t
+            or "dissolution" in t
+            or "destruction" in t
+            or "effondrement" in t
+            or "menace" in t
+        )
+    ):
+        markers.append("requalification d’un terme positif en menace")
+
+    # Structure : X n’est pas Y mais Z
+    if (
+        ("n'est pas" in t or "n’est pas" in t)
+        and ("mais" in t or "en réalité" in t)
+    ):
+        markers.append("renversement interprétatif")
+
     # -----------------------------
     # 4) Nettoyage
     # -----------------------------
