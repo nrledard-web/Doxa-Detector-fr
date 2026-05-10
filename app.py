@@ -11197,9 +11197,15 @@ with oi1:
     
     propaganda_value = compute_propaganda_gauge(
         lie_gauge=gauge_value,
-        rhetorical_pressure=rp,
-        political_pattern_score=result["political_pattern_score"],
-        closure=closure_for_discourse
+        rhetorical_pressure=rhetorical_pressure,
+        closure=closure_for_discourse,
+    
+        false_consensus=result.get("false_consensus_score", 0),
+        moral_polarization=result.get("moral_polarization_score", 0),
+        binary_opposition=result.get("binary_opposition_score", 0),
+        victimization=result.get("victimization_score", 0),
+        semantic_shift=result.get("semantic_shift_score", 0),
+        false_dilemma=result.get("false_dilemma_score", 0),
     )
     
     propaganda_label, propaganda_color, propaganda_text = interpret_propaganda_gauge(propaganda_value)
