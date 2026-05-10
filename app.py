@@ -3053,7 +3053,11 @@ CONSENSUS_TERMS += [
     "tout le monde peut constater",
     "il suffit d'ouvrir les yeux",
     "tout le monde sait désormais",
+    "ceux qui disent la vérité",
+    "ceux qui ouvrent les yeux",
+    "personne ne mentionne",
 ]
+
 
 # -----------------------------
 # Opposition binaire
