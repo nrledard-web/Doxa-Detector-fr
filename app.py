@@ -3407,7 +3407,7 @@ def detect_ideological_premises(text: str):
     ]
     
     hits = unique_keep_order(base_hits + framing_hits)
-        )
+    )
 
     score = min(len(hits) / 6, 1.0)
 
