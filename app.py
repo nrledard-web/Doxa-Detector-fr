@@ -1238,29 +1238,36 @@ def compute_cognitive_gravity(result):
 def compute_propaganda_gauge(
     lie_gauge: float,
     rhetorical_pressure: float,
-    political_pattern_score: int,
-    closure: float
-) -> float:
+    closure: float,
+
+    false_consensus: float,
+    moral_polarization: float,
+    binary_opposition: float,
+    victimization: float,
+    semantic_shift: float,
+    false_dilemma: float,
+):
     """
-    Jauge propagandiste globale entre 0 et 1.
-    Combine :
-    - tension cognitive
-    - pression rhétorique
-    - motifs politiques/idéologiques détectés
-    - fermeture cognitive
+    Jauge propagandiste structurelle.
     """
-    pattern_factor = min(political_pattern_score / 8, 1.0)
-    closure_factor = min(closure / 1.2, 1.0)
+
+    ideological_core = (
+        false_consensus
+        + moral_polarization
+        + binary_opposition
+        + victimization
+        + semantic_shift
+        + false_dilemma
+    ) / 6
 
     score = (
-        0.30 * lie_gauge +
-        0.30 * rhetorical_pressure +
-        0.20 * pattern_factor +
-        0.10 * closure_factor +
-        0.10 * min(rhetorical_pressure * closure_factor, 1.0)
+        0.20 * lie_gauge +
+        0.15 * rhetorical_pressure +
+        0.15 * closure +
+        0.50 * ideological_core
     )
 
-    return min(max(score, 0.0), 1.0)
+    return clamp(score, 0.0, 1.0)
 
 def interpret_propaganda_gauge(value: float):
     """
