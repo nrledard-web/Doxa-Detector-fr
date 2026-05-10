@@ -11236,8 +11236,13 @@ with oi1:
             "propaganda_value = compute_propaganda_gauge(\n"
             "    lie_gauge=gauge_value,\n"
             "    rhetorical_pressure=rp,\n"
-            "    political_pattern_score=political_pattern_score,\n"
-            "    closure=closure_for_discourse\n"
+            "    closure=closure_for_discourse,\n"
+            "    false_consensus=false_consensus_score,\n"
+            "    moral_polarization=moral_polarization_score,\n"
+            "    binary_opposition=binary_opposition_score,\n"
+            "    victimization=victimization_score,\n"
+            "    semantic_shift=semantic_shift_score,\n"
+            "    false_dilemma=false_dilemma_score\n"
             ")",
             language="python"
         )
