@@ -11726,7 +11726,20 @@ with oi7:
     st.markdown("### Prémisse idéologique implicite")
     st.caption("Présupposé idéologique utilisé comme point de départ du raisonnement.")
 
-    value = result["ideological_premise_sophism_score"]
+    value = result.get(
+    "ideological_premises_score",
+    result.get("ideological_premise_sophism_score", 0)
+    )
+
+    interpretation = result.get(
+        "ideological_premises_interpretation",
+        result.get("ideological_premise_sophism_interpretation", "")
+    )
+    
+    markers = result.get(
+        "ideological_premises_markers",
+        result.get("ideological_premise_sophism_markers", [])
+    )
 
     if value < 0.15:
         label, color = "Faible", "#ca8a04"
@@ -11744,8 +11757,8 @@ with oi7:
         unsafe_allow_html=True
     )
 
-    st.caption(result["ideological_premises_interpretation"])
-
+    st.caption(interpretation)
+    
     with st.expander("🔎 Voir les marqueurs", expanded=False):
         markers = result.get("ideological_premises_markers", [])
         if not markers:
@@ -11775,7 +11788,7 @@ with oi7:
             language="python"
         )
 
-        markers = result.get("ideological_premises_markers", [])
+        markers = markers
 
         st.markdown("**Valeur actuelle**")
         st.write(f"Score : **{round(value * 100, 1)}%**")
@@ -11783,7 +11796,7 @@ with oi7:
         st.write(f"Marqueurs détectés : **{len(markers)}**")
 
         st.markdown("**Interprétation actuelle**")
-        st.write(result["ideological_premise_sophism_interpretation"])
+        st.write(interpretation)
 
         st.markdown("**Lecture**")
         st.write(
