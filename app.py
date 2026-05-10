@@ -3595,14 +3595,49 @@ def compute_false_consensus(text: str):
     if not text or not text.strip():
         return 0.0, "Aucun faux consensus significatif détecté.", []
 
-    text_lower = text.lower()
+    t = normalize_text_for_markers(text)
 
-    base_hits = [t for t in CONSENSUS_TERMS if contains_term(text_lower, t)]
-    strong_hits = [t for t in FALSE_CONSENSUS_STRONG_PATTERNS if contains_term(text_lower, t) or t in text_lower]
+    base_hits = [
+        term for term in CONSENSUS_TERMS
+        if contains_term(t, term) or term in t
+    ]
 
-    all_hits = unique_keep_order(base_hits + strong_hits)
+    strong_hits = [
+        term for term in FALSE_CONSENSUS_STRONG_PATTERNS
+        if contains_term(t, term) or term in t
+    ]
 
-    raw_score = len(base_hits) * 0.22 + len(strong_hits) * 0.38
+    structural_hits = []
+
+    # Vérité supposée partagée
+    if (
+        ("ceux qui disent la vérité" in t or "ceux qui ouvrent les yeux" in t)
+        and ("censur" in t or "ridiculis" in t or "exclus" in t or "ennemis du système" in t)
+    ):
+        structural_hits.append("vérité supposée partagée par les lucides")
+
+    # Silence supposé comme preuve
+    if (
+        ("personne ne mentionne" in t or "personne ne parle" in t or "on ne dit jamais" in t)
+        and ("faits" in t or "réalité" in t or "vérité" in t or "conséquences" in t)
+    ):
+        structural_hits.append("silence collectif présenté comme preuve")
+
+    # Groupe lucide contre groupe aveugle
+    if (
+        ("ceux qui ouvrent les yeux" in t or "ceux qui disent la vérité" in t)
+        and ("système" in t or "médias" in t or "autorités" in t)
+    ):
+        structural_hits.append("groupe lucide présenté comme porteur de vérité")
+
+    all_hits = unique_keep_order(base_hits + strong_hits + structural_hits)
+
+    raw_score = (
+        len(base_hits) * 0.22
+        + len(strong_hits) * 0.35
+        + len(structural_hits) * 0.35
+    )
+
     score = min(raw_score, 1.0)
 
     if score < 0.15:
