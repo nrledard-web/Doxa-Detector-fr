@@ -4248,6 +4248,13 @@ MORAL_POLARIZATION_TERMS = [
     "ordre juste",
     "défendre ce qui est juste",
 ]
+MORAL_POLARIZATION_TERMS += [
+    "valeurs saines",
+    "élites corrompues",
+    "honnêtes citoyens",
+    "méprisent le peuple",
+    "protège ceux qui détruisent",
+]
 
 def compute_moral_polarization(text: str):
     if not text or not text.strip():
@@ -4271,6 +4278,22 @@ def compute_moral_polarization(text: str):
     # Bonus si juste + injuste apparaissent ensemble
     if "juste" in t and "injuste" in t:
         hits.append("opposition juste / injuste")
+
+    # Bonus structurel : camp vertueux contre camp corrompu/dominant
+    if (
+        any(term in t for term in INGROUP_TERMS)
+        and any(term in t for term in OUTGROUP_TERMS)
+        and any(w in t for w in [
+            "honnêtes",
+            "valeurs saines",
+            "corrompues",
+            "corrompus",
+            "méprisent",
+            "protège ceux qui détruisent",
+            "détruisent",
+        ])
+    ):
+        hits.append("opposition morale groupe vertueux / groupe corrompu")
 
     hits = unique_keep_order(hits)
 
