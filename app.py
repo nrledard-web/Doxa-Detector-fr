@@ -11191,6 +11191,16 @@ with oi1:
         f"<b style='color:{propaganda_color}'>{propaganda_label}</b> — {round(propaganda_value*100, 1)}%",
         unsafe_allow_html=True
     )
+    if propaganda_value < 0.20:
+        propaganda_interpretation = "Le texte ne présente pas de structure propagandiste marquée."
+    elif propaganda_value < 0.40:
+        propaganda_interpretation = "Le texte présente quelques mécanismes de cadrage idéologique."
+    elif propaganda_value < 0.70:
+        propaganda_interpretation = "Le discours combine plusieurs structures typiques des récits propagandistes."
+    else:
+        propaganda_interpretation = "Le discours semble fortement structuré par des mécanismes propagandistes."
+    
+    st.caption(propaganda_interpretation)
     
     st.caption("Discours peu orienté ⟵⟶ Structure propagandiste")
     st.caption(propaganda_text)
