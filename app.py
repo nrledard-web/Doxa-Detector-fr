@@ -6673,6 +6673,22 @@ def compute_argument_asymmetry(text):
         "interpretation": "Le discours paraît unilatéral ou peu révisable." if score >= 0.4 else "Présence suffisante de nuances ou d'équilibre."
     }
 
+STRATEGIC_REASONING_MARKERS = [
+    "cela commence par",
+    "c’est pourquoi",
+    "nous devons",
+    "cela signifie",
+    "face à",
+    "dans ce contexte",
+    "par conséquent",
+    "à long terme",
+    "capacité à",
+    "cela suppose",
+    "ce qui implique",
+    "nous ne pouvons plus",
+    "il y a la question",
+]
+
 def compute_argument_density(text):
     words = re.findall(r"\b[\wÀ-ÿ'-]+\b", text.lower())
     word_count = max(len(words), 1)
@@ -6680,11 +6696,13 @@ def compute_argument_density(text):
     reason_markers = count_marker_occurrences(text, REASON_MARKERS)
     conclusion_markers = count_marker_occurrences(text, CONCLUSION_MARKERS)
     nuance_markers = count_marker_occurrences(text, NUANCE_MARKERS)
+    strategic_markers = count_marker_occurrences(text, STRATEGIC_REASONING_MARKERS)
 
     argumentative_units = (
         reason_markers
         + conclusion_markers
         + (nuance_markers * 0.35)
+        + (strategic_markers * 0.75)
     )
 
     score = min((argumentative_units / word_count) * 22, 1)
@@ -6700,8 +6718,11 @@ def compute_argument_density(text):
     if nuance_markers > 0:
         markers.append(f"Marqueurs de nuance : {nuance_markers} × 0.35")
 
+    if strategic_markers > 0:
+        markers.append(f"Marqueurs de raisonnement stratégique : {strategic_markers} × 0.75")
+
     if score < 0.15:
-        interpretation = "Le texte affirme davantage qu'il n'argumente."
+        interpretation = "Le texte affirme davantage qu'il n'argumente explicitement."
     elif score < 0.35:
         interpretation = "Le texte contient une densité argumentative limitée."
     elif score < 0.60:
