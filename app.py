@@ -3943,7 +3943,8 @@ def compute_argument_asymmetry(text: str):
         "argument_count": argument_count,
         "interpretation": interpretation,
     }
-THREAT_AMPLIFICATION_TERMS = [
+THREAT_AMPLIFICATION_MARKERS = [
+    # menace extrême
     "menace existentielle",
     "danger extrême",
     "danger mortel",
@@ -3958,6 +3959,21 @@ THREAT_AMPLIFICATION_TERMS = [
     "crise terminale",
     "menace historique",
     "danger absolu",
+
+    # menace froide / stratégique
+    "notre europe est mortelle",
+    "elle peut mourir",
+    "peut mourir",
+    "question de la paix et de la guerre",
+    "paix et de la guerre",
+    "situation d'encerclement",
+    "encerclement",
+    "ce monde-là est fini",
+    "bataille pour notre survie",
+    "notre survie",
+    "le réveil doit être brutal",
+    "réveil brutal",
+    "à un tournant",
 ]
 
 def compute_threat_amplification(text: str):
