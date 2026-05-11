@@ -6900,6 +6900,7 @@ def analyze_article(text: str) -> Dict:
     argument_asymmetry_analysis = compute_argument_asymmetry(text)
     argument_density_analysis = compute_argument_density(text)
     complex_enthymeme_analysis = compute_complex_enthymemes(text)
+    self_validating_analysis = compute_self_validating_narrative(text)
 
     certainty = len(re.findall(r"certain|absolument|prouvé|évident|incontestable", text.lower()))
     emotional = len(re.findall(r"|".join(re.escape(w) for w in EMOTIONAL_WORDS), text.lower()))
