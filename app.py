@@ -5538,6 +5538,74 @@ def compute_advanced_deceptive_coherence(text: str):
         "markers": markers,
         "interpretation": interpretation,
     }
+
+# -----------------------------
+# Enthymèmes implicites complexes
+# -----------------------------
+
+COMPLEX_ENTHYMEME_MARKERS = [
+    "ceux qui disent la vérité",
+    "ceux qui ouvrent les yeux",
+    "il devient donc nécessaire",
+    "nécessaire d'agir",
+    "nécessaire d’agir",
+    "rester passif reviendrait",
+    "cela prouve que",
+    "cela montre que",
+    "donc il faut",
+    "donc nous devons",
+    "il faut agir",
+    "nous devons agir",
+]
+
+def compute_complex_enthymemes(text: str):
+    if not text or not text.strip():
+        return {
+            "score": 0.0,
+            "markers": [],
+            "interpretation": "Aucun enthymème complexe notable détecté."
+        }
+
+    t = normalize_text_for_markers(text)
+
+    markers = [
+        m for m in COMPLEX_ENTHYMEME_MARKERS
+        if contains_term(t, m) or m in t
+    ]
+
+    if (
+        ("censur" in t or "ridiculis" in t or "exclus" in t)
+        and ("vérité" in t or "ouvrir les yeux" in t)
+        and ("agir" in t or "nécessaire" in t)
+    ):
+        markers.append("vérité censurée → nécessité d’agir")
+
+    if (
+        ("système" in t or "médias" in t or "autorités" in t)
+        and ("menti" in t or "manipulation" in t or "cache" in t)
+        and ("donc" in t or "nécessaire" in t or "agir" in t)
+    ):
+        markers.append("système trompeur → action nécessaire")
+
+    markers = unique_keep_order(markers)
+
+    score = min(len(markers) * 0.20, 1.0)
+
+    if score < 0.15:
+        interpretation = "Aucun enthymème complexe notable détecté."
+    elif score < 0.35:
+        interpretation = "Le texte contient quelques raisonnements implicites."
+    elif score < 0.60:
+        interpretation = "Le texte repose partiellement sur des prémisses implicites enchaînées."
+    else:
+        interpretation = "Le discours repose fortement sur des enthymèmes complexes ou des prémisses cachées."
+
+    return {
+        "score": round(score, 3),
+        "markers": markers,
+        "interpretation": interpretation,
+    }
+
     
 def detect_aristotelian_fallacies(text: str):
     petition = detect_petition_principii(text)
