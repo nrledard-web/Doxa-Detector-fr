@@ -7241,8 +7241,11 @@ def analyze_article(text: str) -> Dict:
         "missing_reference_score": missing_reference_analysis["score"],
         "missing_reference_markers": missing_reference_analysis["markers"],
         "missing_reference_interpretation": missing_reference_analysis["interpretation"],
-        
 
+        "advanced_deceptive_coherence_score": advanced_deceptive_coherence_analysis["score"],
+        "advanced_deceptive_coherence_markers": advanced_deceptive_coherence_analysis["markers"],
+        "advanced_deceptive_coherence_interpretation": advanced_deceptive_coherence_analysis["interpretation"],
+        
         "linguistic_trigger_count": ling["trigger_count"],
         "linguistic_pressure_hits": ling["rhetorical_pressure"],
         "absolute_claims": ling["absolute_claims"],
