@@ -13543,14 +13543,13 @@ st.markdown("""
 </div>
 """, unsafe_allow_html=True)
 
-
-sq1, sq2, sq3 = st.columns(3)
-# =============================
-st.subheader("📊 Analyse statistique et quantitative")
-# =============================
 # -----------------------------
 # Manipulation statistique
 # -----------------------------
+sq1, sq2, sq3 = st.columns(3)
+
+st.subheader("📊 Analyse statistique et quantitative")
+
 with sq1:
     st.markdown("### Manipulation statistique")
     st.caption("Usage orienté ou dramatisé des chiffres et statistiques.")
