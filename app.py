@@ -6414,6 +6414,7 @@ def analyze_article(text: str) -> Dict:
 
     conceptual_domains, conceptual_terms = detect_conceptual_domains(text)
     statistical_manipulation_analysis = detect_statistical_manipulation(text)
+    misleading_comparison_analysis = detect_misleading_comparison(text)
 
     # -----------------------------
     # Jauges structurelles avancées
