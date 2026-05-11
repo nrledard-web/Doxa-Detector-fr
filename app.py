@@ -14275,6 +14275,104 @@ with js3:
             "Une certitude forte composée élevée ne signifie pas que le texte est faux. "
             "Elle indique que le discours laisse peu de place à la nuance ou à la remise en question."
         )
+js4, js5, js6 = st.columns(3)
+# =============================
+#  Cohérence trompeuse avancée
+# =============================
+with js4:
+    st.markdown("### Cohérence trompeuse avancée")
+    st.caption(
+        "Discours paraissant très cohérent malgré une base démonstrative fragile ou orientée."
+    )
+
+    value = result["advanced_deceptive_coherence_score"]
+
+    if value < 0.15:
+        label, color = "Faible", "#16a34a"
+    elif value < 0.35:
+        label, color = "Modérée", "#ca8a04"
+    elif value < 0.60:
+        label, color = "Élevée", "#f97316"
+    else:
+        label, color = "Très élevée", "#dc2626"
+
+    render_custom_gauge(value, color)
+
+    st.markdown(
+        f"<b style='color:{color}'>{label}</b> — {round(value * 100, 1)}%",
+        unsafe_allow_html=True
+    )
+
+    st.caption(result["advanced_deceptive_coherence_interpretation"])
+
+    with st.expander("🔎 Voir les marqueurs", expanded=False):
+        markers = result.get("advanced_deceptive_coherence_markers", [])
+
+        if not markers:
+            st.info("Aucune cohérence trompeuse avancée détectée.")
+        else:
+            for marker in markers:
+                st.warning(marker)
+
+    with st.popover("ℹ️ Comprendre cette jauge"):
+
+        st.markdown("### Cohérence trompeuse avancée")
+
+        st.write(
+            "Cette jauge détecte les discours qui donnent une forte impression "
+            "de cohérence logique tout en restant fragiles, peu démonstratifs "
+            "ou fortement orientés."
+        )
+
+        st.markdown("**Principe**")
+
+        st.write(
+            "Le moteur compare la cohérence apparente du raisonnement "
+            "à la solidité réelle des démonstrations, des preuves "
+            "et de la révisabilité du discours."
+        )
+
+        st.markdown("**Formule utilisée**")
+
+        st.code(
+            "score = cohérence_apparente - robustesse_réelle\n"
+            "score += fermeture_cognitive\n"
+            "score += certitude_forte\n"
+            "score += asymétrie_argumentative",
+            language="python"
+        )
+
+        markers = result.get("advanced_deceptive_coherence_markers", [])
+
+        st.markdown("**Valeur actuelle**")
+
+        st.write(f"Score : **{round(value * 100, 1)}%**")
+        st.write(f"Niveau : **{label}**")
+        st.write(f"Marqueurs détectés : **{len(markers)}**")
+
+        st.markdown("**Interprétation actuelle**")
+
+        st.write(
+            result["advanced_deceptive_coherence_interpretation"]
+        )
+
+        st.markdown("**Lecture**")
+
+        st.write(
+            "🟢 Faible : cohérence globalement saine\n"
+            "🟡 Modérée : cohérence partiellement orientée\n"
+            "🟠 Élevée : cohérence persuasive mais fragile\n"
+            "🔴 Très élevée : architecture rhétorique fortement trompeuse"
+        )
+
+        st.markdown("**Attention**")
+
+        st.write(
+            "Une cohérence trompeuse élevée ne signifie pas automatiquement "
+            "que le texte est faux. Elle indique qu’un raisonnement "
+            "peut paraître solide tout en reposant sur des bases fragiles "
+            "ou insuffisamment démontrées."
+        )
         
 st.markdown("""
 <div style="text-align:center; margin:25px 0; color:#888;">
