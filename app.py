@@ -5606,6 +5606,132 @@ def compute_complex_enthymemes(text: str):
         "interpretation": interpretation,
     }
 
+# -----------------------------
+# Auto-validation narrative
+# -----------------------------
+
+SELF_VALIDATING_NARRATIVE_MARKERS = [
+    "si on nous critique",
+    "cela prouve que",
+    "c'est bien la preuve",
+    "c’est bien la preuve",
+    "on cherche à nous faire taire",
+    "les médias censurent",
+    "les autorités mentent",
+    "ils ont peur de la vérité",
+    "ouvrir les yeux",
+    "ceux qui disent la vérité",
+    "vérité dérange",
+    "si cela est censuré",
+    "la preuve qu'ils ont peur",
+    "la preuve qu’ils ont peur",
+    "on veut nous empêcher",
+    "ridiculisés",
+    "censurés",
+]
+
+def compute_self_validating_narrative(text: str):
+
+    if not text or not text.strip():
+        return {
+            "score": 0.0,
+            "markers": [],
+            "interpretation": (
+                "Aucune structure auto-validante détectée."
+            )
+        }
+
+    t = normalize_text_for_markers(text)
+
+    markers = []
+
+    # -----------------------------
+    # 1) Marqueurs directs
+    # -----------------------------
+    for m in SELF_VALIDATING_NARRATIVE_MARKERS:
+        if contains_term(t, m) or m in t:
+            markers.append(m)
+
+    # -----------------------------
+    # 2) Critique devient preuve
+    # -----------------------------
+    if (
+        ("critique" in t or "attaqu" in t or "ridiculis" in t or "censur" in t)
+        and (
+            "preuve" in t
+            or "cela montre" in t
+            or "cela prouve" in t
+        )
+    ):
+        markers.append("critique transformée en validation")
+
+    # -----------------------------
+    # 3) Opposition = confirmation
+    # -----------------------------
+    if (
+        ("système" in t or "élites" in t or "médias" in t)
+        and (
+            "ont peur" in t
+            or "veulent empêcher" in t
+            or "cachent la vérité" in t
+        )
+    ):
+        markers.append("opposition interprétée comme confirmation")
+
+    # -----------------------------
+    # 4) Boucle auto-référentielle
+    # -----------------------------
+    if (
+        ("vérité" in t)
+        and (
+            "censure" in t
+            or "silence" in t
+            or "interdit" in t
+        )
+    ):
+        markers.append("boucle narrative auto-validante")
+
+    # -----------------------------
+    # Nettoyage
+    # -----------------------------
+    markers = unique_keep_order(markers)
+
+    # -----------------------------
+    # Score
+    # -----------------------------
+    score = min(len(markers) * 0.20, 1.0)
+
+    # -----------------------------
+    # Interprétation
+    # -----------------------------
+    if score < 0.15:
+        interpretation = (
+            "Aucune structure auto-validante détectée."
+        )
+
+    elif score < 0.35:
+        interpretation = (
+            "Le texte contient quelques mécanismes d’auto-validation narrative."
+        )
+
+    elif score < 0.60:
+        interpretation = (
+            "Le discours transforme partiellement la contradiction "
+            "ou la critique en validation implicite."
+        )
+
+    else:
+        interpretation = (
+            "Le discours repose fortement sur une logique "
+            "auto-validante ou circulaire."
+        )
+
+    return {
+        "score": round(score, 3),
+        "markers": markers,
+        "interpretation": interpretation,
+    }
+    
     
 def detect_aristotelian_fallacies(text: str):
     petition = detect_petition_principii(text)
