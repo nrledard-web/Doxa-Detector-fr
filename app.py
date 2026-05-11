@@ -14842,6 +14842,103 @@ with js5:
             "demande au lecteur d’accepter plusieurs prémisses "
             "non démontrées."
         )
+
+# =============================
+# Auto-validation narrative
+# =============================
+with js6:
+    st.markdown("### Auto-validation narrative")
+    st.caption(
+        "Le discours transforme les critiques ou oppositions en confirmation implicite."
+    )
+
+    value = result["self_validating_score"]
+
+    if value < 0.15:
+        label, color = "Faible", "#16a34a"
+    elif value < 0.35:
+        label, color = "Modérée", "#ca8a04"
+    elif value < 0.60:
+        label, color = "Élevée", "#f97316"
+    else:
+        label, color = "Très élevée", "#dc2626"
+
+    render_custom_gauge(value, color)
+
+    st.markdown(
+        f"<b style='color:{color}'>{label}</b> — {round(value * 100, 1)}%",
+        unsafe_allow_html=True
+    )
+
+    st.caption(result["self_validating_interpretation"])
+
+    with st.expander("🔎 Voir les marqueurs", expanded=False):
+
+        markers = result.get("self_validating_markers", [])
+
+        if not markers:
+            st.info("Aucune auto-validation narrative détectée.")
+        else:
+            for marker in markers:
+                st.warning(marker)
+
+    with st.popover("ℹ️ Comprendre cette jauge"):
+
+        st.markdown("### Auto-validation narrative")
+
+        st.write(
+            "Cette jauge détecte les discours qui utilisent "
+            "les critiques, oppositions ou censures comme preuve "
+            "de leur propre validité."
+        )
+
+        st.markdown("**Principe**")
+
+        st.write(
+            "Le moteur recherche des structures circulaires où "
+            "la contradiction devient elle-même un argument de confirmation."
+        )
+
+        st.markdown("**Formule utilisée**")
+
+        st.code(
+            "critique → validation implicite\n"
+            "censure → preuve de vérité\n"
+            "opposition → confirmation du récit",
+            language="python"
+        )
+
+        markers = result.get("self_validating_markers", [])
+
+        st.markdown("**Valeur actuelle**")
+
+        st.write(f"Score : **{round(value * 100, 1)}%**")
+        st.write(f"Niveau : **{label}**")
+        st.write(f"Marqueurs détectés : **{len(markers)}**")
+
+        st.markdown("**Interprétation actuelle**")
+
+        st.write(
+            result["self_validating_interpretation"]
+        )
+
+        st.markdown("**Lecture**")
+
+        st.write(
+            "🟢 Faible : discours ouvert à la contradiction\n"
+            "🟡 Modérée : quelques boucles narratives\n"
+            "🟠 Élevée : contradiction absorbée par le récit\n"
+            "🔴 Très élevée : système discursif auto-validant"
+        )
+
+        st.markdown("**Attention**")
+
+        st.write(
+            "Une auto-validation narrative élevée ne signifie pas "
+            "automatiquement que le texte est faux. "
+            "Elle indique que le discours tend à neutraliser "
+            "la contradiction en l’intégrant dans son propre récit."
+        )
         
 st.markdown("""
 <div style="text-align:center; margin:25px 0; color:#888;">
