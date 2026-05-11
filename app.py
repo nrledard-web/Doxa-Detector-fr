@@ -5162,6 +5162,104 @@ def detect_statistical_manipulation(text: str):
         "interpretation": interpretation,
     }
 
+# -----------------------------
+# Comparaison trompeuse
+# -----------------------------
+
+MISLEADING_COMPARISON_MARKERS = [
+    "x fois plus",
+    "deux fois plus",
+    "trois fois plus",
+    "plus que jamais",
+    "moins que jamais",
+    "record historique",
+    "niveau jamais atteint",
+    "explosion comparée à",
+    "comparé à",
+    "par rapport à",
+    "contrairement à",
+    "beaucoup plus que",
+    "bien plus que",
+    "nettement supérieur",
+    "nettement inférieur",
+]
+
+def detect_misleading_comparison(text: str):
+    if not text or not text.strip():
+        return {
+            "score": 0.0,
+            "markers": [],
+            "interpretation": "Aucune comparaison trompeuse notable détectée."
+        }
+
+    t = normalize_text_for_markers(text)
+
+    markers = []
+
+    # -----------------------------
+    # 1) Marqueurs directs
+    # -----------------------------
+    for m in MISLEADING_COMPARISON_MARKERS:
+        if contains_term(t, m) or m in t:
+            markers.append(m)
+
+    # -----------------------------
+    # 2) Comparaisons sans référentiel
+    # -----------------------------
+    comparison_terms = [
+        "plus",
+        "moins",
+        "supérieur",
+        "inférieur",
+        "davantage",
+    ]
+
+    reference_terms = [
+        "en 2020",
+        "en 2021",
+        "en 2022",
+        "par rapport à",
+        "comparé à",
+        "selon",
+        "source",
+        "étude",
+        "moyenne",
+    ]
+
+    comparison_hits = sum(1 for w in comparison_terms if f" {w} " in f" {t} ")
+    reference_hits = sum(1 for w in reference_terms if w in t)
+
+    if comparison_hits >= 2 and reference_hits == 0:
+        markers.append("comparaisons sans base comparative claire")
+
+    # -----------------------------
+    # 3) Amplification comparative
+    # -----------------------------
+    if (
+        any(w in t for w in ["jamais", "historique", "sans précédent"])
+        and any(w in t for w in ["plus", "moins", "hausse", "baisse"])
+    ):
+        markers.append("comparaison amplifiée")
+
+    markers = unique_keep_order(markers)
+
+    score = min(len(markers) * 0.25, 1.0)
+
+    if score < 0.15:
+        interpretation = "Peu de comparaisons problématiques détectées."
+    elif score < 0.35:
+        interpretation = "Quelques comparaisons peuvent orienter la perception."
+    elif score < 0.60:
+        interpretation = "Le texte utilise plusieurs comparaisons fragiles ou insuffisamment contextualisées."
+    else:
+        interpretation = "Le discours repose fortement sur des comparaisons potentiellement trompeuses."
+
+    return {
+        "score": round(score, 3),
+        "markers": markers,
+        "interpretation": interpretation,
+    }
+
 def detect_aristotelian_fallacies(text: str):
     petition = detect_petition_principii(text)
     descriptive_normative_confusion = detect_descriptive_normative_confusion(text)
