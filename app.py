@@ -14614,8 +14614,8 @@ with js2:
 
         st.markdown("**Formule utilisée**")
         st.code(
-            "markers = indicateurs argumentatifs détectés\n"
-            "score = min(len(markers) * coefficient / 10, 1.0)",
+            "argumentative_units = raisons + conclusions + (nuances × 0.35)\n"
+            "score = min((argumentative_units / nombre_de_mots) × 22, 1.0)",
             language="python"
         )
 
