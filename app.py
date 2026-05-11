@@ -5434,6 +5434,26 @@ def compute_advanced_deceptive_coherence(text: str):
     ):
         markers.append("enchaînement logique fortement affirmatif")
 
+    # Projection fortement affirmée
+    if (
+        any(w in t for w in [
+            "va remplacer",
+            "va provoquer",
+            "conduira à",
+            "mènera à",
+            "d'ici",
+            "d’ici",
+            "crise majeure",
+            "révolution sans précédent",
+        ])
+        and (
+            "absolument certain" in t
+            or "certain" in t
+            or "inévitable" in t
+        )
+    ):
+        markers.append("projection persuasive fortement affirmée")
+
     # -----------------------------
     # 3) Auto-validation narrative
     # -----------------------------
