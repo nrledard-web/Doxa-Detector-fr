@@ -7110,7 +7110,10 @@ def analyze_article(text: str) -> Dict:
         "strong_certainty_label": strong_certainty_analysis["label"],
         "strong_certainty_interpretation": strong_certainty_analysis["interpretation"],
         "strong_certainty_markers": strong_certainty_analysis["markers"],
-
+        
+        "missing_reference_score": missing_reference_analysis["score"],
+        "missing_reference_markers": missing_reference_analysis["markers"],
+        "missing_reference_interpretation": missing_reference_analysis["interpretation"],
         
 
         "linguistic_trigger_count": ling["trigger_count"],
