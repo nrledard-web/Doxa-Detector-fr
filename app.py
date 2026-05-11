@@ -5832,6 +5832,12 @@ def compute_brain_indices(result: dict) -> dict:
     def clamp01(x):
         return max(0.0, min(1.0, x))
 
+    emotional_result = compute_emotional_intensity(article)
+    
+    result["emotional_intensity_score"] = emotional_result["score"]
+    result["emotional_intensity_markers"] = emotional_result["markers"]
+    result["emotional_intensity_interpretation"] = emotional_result["interpretation"]  
+
     G = result["G"]
     N = result["N"]
     D = result["D"]
