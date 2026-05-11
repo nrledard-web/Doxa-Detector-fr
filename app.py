@@ -3588,8 +3588,18 @@ def compute_emotional_intensity(text: str):
         }
 
     t = text.lower()
-    hits = unique_keep_order([term for term in EMOTIONAL_INTENSITY_TERMS if contains_term(t, term)])
-    score = min(len(hits) * 2.2 / 10, 1.0)
+
+    markers = []
+    raw_score = 0.0
+
+    for term, weight in EMOTIONAL_DICT.items():
+        if contains_term(t, term):
+            markers.append(term)
+            raw_score += weight
+
+    markers = unique_keep_order(markers)
+
+    score = min(raw_score / 4.0, 1.0)
 
     if score < 0.15:
         interpretation = "Le texte reste peu chargé émotionnellement."
@@ -3602,7 +3612,7 @@ def compute_emotional_intensity(text: str):
 
     return {
         "score": round(score, 3),
-        "markers": hits,
+        "markers": markers,
         "interpretation": interpretation,
     }
 
