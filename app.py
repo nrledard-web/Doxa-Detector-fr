@@ -13930,6 +13930,86 @@ with sq2:
             "Elle indique que la comparaison utilisée peut orienter fortement la perception."
         )
 
+# -----------------------------
+# Données sans référentiel
+# -----------------------------
+with sq3:
+    st.markdown("### Données sans référentiel")
+    st.caption("Chiffres ou projections présentés sans base méthodologique claire.")
+
+    value = result["missing_reference_score"]
+
+    if value < 0.15:
+        label, color = "Faible", "#ca8a04"
+    elif value < 0.35:
+        label, color = "Modérée", "#f97316"
+    elif value < 0.60:
+        label, color = "Élevée", "#ea580c"
+    else:
+        label, color = "Très élevée", "#dc2626"
+
+    render_custom_gauge(value, color)
+
+    st.markdown(
+        f"<b style='color:{color}'>{label}</b> — {round(value * 100, 1)}%",
+        unsafe_allow_html=True
+    )
+
+    st.caption(result["missing_reference_interpretation"])
+
+    with st.expander("🔎 Voir les marqueurs", expanded=False):
+        markers = result.get("missing_reference_markers", [])
+
+        if not markers:
+            st.info("Aucune donnée sans référentiel notable détectée.")
+        else:
+            for marker in markers:
+                st.warning(marker)
+
+    with st.popover("ℹ️ Comprendre cette jauge"):
+        st.markdown("### Données sans référentiel")
+
+        st.write(
+            "Cette jauge détecte les chiffres, statistiques ou projections "
+            "présentés sans source, méthodologie ou contexte suffisamment explicites."
+        )
+
+        st.markdown("**Principe**")
+        st.write(
+            "Le texte est analysé afin d’identifier les données quantitatives "
+            "utilisées sans référentiel clair : absence d’échantillon, de source, "
+            "de période, de modèle ou de méthodologie identifiable."
+        )
+
+        st.markdown("**Formule utilisée**")
+        st.code(
+            "markers = données insuffisamment référencées détectées\n"
+            "score = min(len(markers) * coefficient / 10, 1.0)",
+            language="python"
+        )
+
+        st.markdown("**Valeur actuelle**")
+        st.write(f"Score : **{round(value * 100, 1)}%**")
+        st.write(f"Niveau : **{label}**")
+        st.write(f"Marqueurs détectés : **{len(markers)}**")
+
+        st.markdown("**Interprétation actuelle**")
+        st.write(result["missing_reference_interpretation"])
+
+        st.markdown("**Lecture**")
+        st.write(
+            "🟢 Faible : données bien contextualisées\n"
+            "🟡 Modérée : quelques références méthodologiques manquent\n"
+            "🟠 Élevée : plusieurs données insuffisamment sourcées\n"
+            "🔴 Très élevée : usage massif de chiffres sans référentiel clair"
+        )
+
+        st.markdown("**Attention**")
+        st.write(
+            "Une donnée sans référentiel ne signifie pas nécessairement qu’elle est fausse. "
+            "Elle indique que son cadre méthodologique reste insuffisamment explicité."
+        )
+
 st.divider()
 
 st.markdown("""
