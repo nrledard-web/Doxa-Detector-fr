@@ -3004,31 +3004,53 @@ CERTAINTY_TERMS = [
 ]
 
 EMOTIONAL_DICT = {
-    "scandale": 0.6,
-    "honte": 0.5,
-    "catastrophe": 0.8,
-    "désastre": 0.75,
-    "trahison": 0.6,
-    "danger": 0.5,
-    "peur": 0.6,
-    "menace": 0.5,
-    "crise": 0.5,
-    "urgent": 0.6,
+    # émotion directe
+    "choc": 0.55,
     "incroyable": 0.35,
-    "terrible": 0.5,
-    "révolution": 0.55,
-    "effondrement": 0.7,
-    "panique": 0.7,
-    "massacre": 0.85,
+    "terrible": 0.55,
+    "peur": 0.60,
+    "panique": 0.75,
+    "honte": 0.55,
+    "scandale": 0.65,
+    "trahison": 0.65,
+
+    # menace / crise
+    "menace": 0.55,
+    "danger": 0.55,
+    "crise": 0.50,
+    "urgent": 0.60,
+    "urgence": 0.60,
+    "catastrophe": 0.80,
+    "désastre": 0.75,
+    "effondrement": 0.80,
     "destruction": 0.75,
 
-    # anglais (optionnel)
-    "panic": 0.7,
-    "scandal": 0.6,
-    "outrage": 0.6,
-    "fear": 0.6,
-    "collapse": 0.7,
-    "crisis": 0.5,
+    # émotion géopolitique froide
+    "mortelle": 0.70,
+    "mourir": 0.70,
+    "survie": 0.75,
+    "guerre": 0.65,
+    "paix": 0.35,
+    "encerclement": 0.70,
+    "tournant": 0.45,
+    "réveil brutal": 0.75,
+    "brutal": 0.55,
+
+    # mobilisation collective
+    "bataille": 0.60,
+    "destin": 0.45,
+    "maîtres de notre destin": 0.65,
+    "valeurs": 0.35,
+    "disparaître": 0.70,
+    "disparaîtra": 0.70,
+
+    # anglais optionnel
+    "panic": 0.70,
+    "scandal": 0.60,
+    "outrage": 0.60,
+    "fear": 0.60,
+    "collapse": 0.75,
+    "crisis": 0.50,
 }
 # -----------------------------
 # Faux consensus
