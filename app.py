@@ -5374,6 +5374,132 @@ def detect_missing_reference_data(text: str):
         "markers": markers,
         "interpretation": interpretation,
     }
+
+# -----------------------------
+# Cohérence trompeuse avancée
+# -----------------------------
+
+ADVANCED_DECEPTIVE_COHERENCE_MARKERS = [
+    "ceux qui disent la vérité",
+    "ouvrir les yeux",
+    "le système refuse",
+    "les médias manipulent",
+    "les autorités mentent",
+    "personne ne mentionne",
+    "tout est lié",
+    "on nous cache",
+    "ce n'est pas un hasard",
+    "si on nous critique",
+    "cela prouve que nous avons raison",
+    "la preuve qu'ils ont peur",
+    "on cherche à nous faire taire",
+    "les élites corrompues",
+    "les honnêtes citoyens",
+    "avant qu'il ne soit trop tard",
+    "avant qu’il ne soit trop tard",
+]
+
+def compute_advanced_deceptive_coherence(text: str):
+
+    if not text or not text.strip():
+        return {
+            "score": 0.0,
+            "markers": [],
+            "interpretation": (
+                "Aucune cohérence trompeuse avancée détectée."
+            )
+        }
+
+    t = normalize_text_for_markers(text)
+
+    markers = []
+
+    # -----------------------------
+    # 1) Marqueurs directs
+    # -----------------------------
+    for m in ADVANCED_DECEPTIVE_COHERENCE_MARKERS:
+        if contains_term(t, m) or m in t:
+            markers.append(m)
+
+    # -----------------------------
+    # 2) Cohérence + certitude
+    # -----------------------------
+    if (
+        ("donc" in t or "ainsi" in t or "par conséquent" in t)
+        and (
+            "il est certain" in t
+            or "absolument certain" in t
+            or "évident" in t
+        )
+    ):
+        markers.append("enchaînement logique fortement affirmatif")
+
+    # -----------------------------
+    # 3) Auto-validation narrative
+    # -----------------------------
+    if (
+        ("censur" in t or "ridiculis" in t or "attaqu" in t)
+        and (
+            "preuve" in t
+            or "cela montre" in t
+            or "cela prouve" in t
+        )
+    ):
+        markers.append("récit auto-validant")
+
+    # -----------------------------
+    # 4) Opposition structurante
+    # -----------------------------
+    if (
+        ("eux" in t or "élites" in t or "système" in t)
+        and (
+            "nous" in t
+            or "citoyens" in t
+            or "patriotes" in t
+        )
+    ):
+        markers.append("polarisation cohérente structurante")
+
+    # -----------------------------
+    # Nettoyage
+    # -----------------------------
+    markers = unique_keep_order(markers)
+
+    # -----------------------------
+    # Score
+    # -----------------------------
+    score = min(len(markers) * 0.18, 1.0)
+
+    # -----------------------------
+    # Interprétation
+    # -----------------------------
+    if score < 0.15:
+        interpretation = (
+            "Aucune cohérence trompeuse avancée détectée."
+        )
+
+    elif score < 0.35:
+        interpretation = (
+            "Le texte présente quelques structures cohérentes mais fragiles."
+        )
+
+    elif score < 0.60:
+        interpretation = (
+            "Le discours paraît cohérent tout en reposant partiellement "
+            "sur des mécanismes orientés."
+        )
+
+    else:
+        interpretation = (
+            "Le discours combine plusieurs mécanismes de cohérence "
+            "persuasive pouvant masquer une faible robustesse démonstrative."
+        )
+
+    return {
+        "score": round(score, 3),
+        "markers": markers,
+        "interpretation": interpretation,
+    }
     
 def detect_aristotelian_fallacies(text: str):
     petition = detect_petition_principii(text)
