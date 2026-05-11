@@ -6870,6 +6870,10 @@ def analyze_article(text: str) -> Dict:
         "statistical_manipulation_markers": statistical_manipulation_analysis["markers"],
         "statistical_manipulation_interpretation": statistical_manipulation_analysis["interpretation"],
 
+        "misleading_comparison_score": misleading_comparison_analysis["score"],
+        "misleading_comparison_markers": misleading_comparison_analysis["markers"],
+        "misleading_comparison_interpretation": misleading_comparison_analysis["interpretation"],
+
         "generalization_score": generalization_analysis[0],
         "generalization_interpretation": generalization_analysis[1],
         "generalization_markers": generalization_analysis[2],
