@@ -6767,6 +6767,10 @@ def analyze_article(text: str) -> Dict:
         "emotional_intensity_markers": emotional_intensity_analysis["markers"],
         "emotional_intensity_interpretation": emotional_intensity_analysis["interpretation"],
 
+        "statistical_manipulation_score": statistical_manipulation_analysis["score"],
+        "statistical_manipulation_markers": statistical_manipulation_analysis["markers"],
+        "statistical_manipulation_interpretation": statistical_manipulation_analysis["interpretation"],
+
         "generalization_score": generalization_analysis[0],
         "generalization_interpretation": generalization_analysis[1],
         "generalization_markers": generalization_analysis[2],
