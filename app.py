@@ -13546,9 +13546,9 @@ st.markdown("""
 # -----------------------------
 # Manipulation statistique
 # -----------------------------
-sq1, sq2, sq3 = st.columns(3)
-
 st.subheader("📊 Analyse statistique et quantitative")
+
+sq1, sq2, sq3 = st.columns(3)
 
 with sq1:
     st.markdown("### Manipulation statistique")
