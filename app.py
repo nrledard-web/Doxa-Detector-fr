@@ -5062,6 +5062,106 @@ def detect_descriptive_normative_confusion(text: str):
         "interpretation": interpretation
     }
 
+# -----------------------------
+# Manipulation statistique
+# -----------------------------
+
+STATISTICAL_MANIPULATION_MARKERS = [
+    "les chiffres parlent d'eux-mêmes",
+    "augmentation spectaculaire",
+    "explosion des chiffres",
+    "hausse massive",
+    "effondrement statistique",
+    "les statistiques prouvent",
+    "les données montrent clairement",
+    "les chiffres sont incontestables",
+    "selon les chiffres",
+    "les courbes explosent",
+    "record historique",
+    "jamais vu",
+    "sans précédent",
+    "x fois plus",
+    "%",
+]
+
+def detect_statistical_manipulation(text: str):
+    if not text or not text.strip():
+        return {
+            "score": 0.0,
+            "markers": [],
+            "interpretation": "Aucune manipulation statistique notable détectée."
+        }
+
+    t = normalize_text_for_markers(text)
+
+    markers = []
+
+    # -----------------------------
+    # 1) marqueurs directs
+    # -----------------------------
+    for m in STATISTICAL_MANIPULATION_MARKERS:
+        if contains_term(t, m) or m in t:
+            markers.append(m)
+
+    # -----------------------------
+    # 2) chiffres sans contexte
+    # -----------------------------
+    numbers = re.findall(r"\d+(?:[\.,]\d+)?\s*%?", text)
+
+    context_words = [
+        "source",
+        "étude",
+        "rapport",
+        "selon",
+        "données",
+        "échantillon",
+        "sur",
+        "population",
+        "entre",
+        "depuis",
+        "jusqu'à",
+        "jusqu’a",
+    ]
+
+    has_context = any(w in t for w in context_words)
+
+    if len(numbers) >= 2 and not has_context:
+        markers.append("chiffres sans contexte méthodologique")
+
+    # -----------------------------
+    # 3) pourcentages alarmistes
+    # -----------------------------
+    if "%" in text and any(
+        w in t for w in [
+            "explosion",
+            "catastrophe",
+            "effondrement",
+            "submersion",
+            "invasion",
+            "crise"
+        ]
+    ):
+        markers.append("statistiques utilisées pour dramatisation")
+
+    markers = unique_keep_order(markers)
+
+    score = min(len(markers) * 0.25, 1.0)
+
+    if score < 0.15:
+        interpretation = "Peu d’usage problématique des statistiques détecté."
+    elif score < 0.35:
+        interpretation = "Quelques usages statistiques peuvent orienter la perception."
+    elif score < 0.60:
+        interpretation = "Le texte utilise plusieurs procédés statistiques fragiles ou orientés."
+    else:
+        interpretation = "Le discours s’appuie fortement sur des statistiques présentées de manière orientée."
+
+    return {
+        "score": round(score, 3),
+        "markers": markers,
+        "interpretation": interpretation,
+    }
+
 def detect_aristotelian_fallacies(text: str):
     petition = detect_petition_principii(text)
     descriptive_normative_confusion = detect_descriptive_normative_confusion(text)
