@@ -5259,7 +5259,122 @@ def detect_misleading_comparison(text: str):
         "markers": markers,
         "interpretation": interpretation,
     }
+# -----------------------------
+# Données sans référentiel
+# -----------------------------
 
+MISSING_REFERENCE_MARKERS = [
+    "selon une étude",
+    "selon des chiffres",
+    "les données montrent",
+    "les statistiques montrent",
+    "des experts affirment",
+    "une étude récente",
+    "une étude choc",
+    "des chercheurs affirment",
+    "des spécialistes estiment",
+    "les chiffres prouvent",
+]
+
+def detect_missing_reference_data(text: str):
+    if not text or not text.strip():
+        return {
+            "score": 0.0,
+            "markers": [],
+            "interpretation": "Aucune donnée sans référentiel notable détectée."
+        }
+
+    t = normalize_text_for_markers(text)
+
+    markers = []
+
+    # -----------------------------
+    # 1) Chiffres détectés
+    # -----------------------------
+    numbers = re.findall(r"\d+(?:[\.,]\d+)?\s*%?", text)
+
+    # -----------------------------
+    # 2) Références méthodologiques
+    # -----------------------------
+    methodology_terms = [
+        "source",
+        "méthode",
+        "méthodologie",
+        "échantillon",
+        "rapport",
+        "publication",
+        "université",
+        "revue",
+        "données",
+        "statista",
+        "insee",
+        "ocde",
+        "oms",
+        "who",
+        "étude publiée",
+    ]
+
+    methodology_hits = [
+        m for m in methodology_terms
+        if contains_term(t, m) or m in t
+    ]
+
+    # -----------------------------
+    # 3) Marqueurs vagues
+    # -----------------------------
+    vague_hits = [
+        m for m in MISSING_REFERENCE_MARKERS
+        if contains_term(t, m) or m in t
+    ]
+
+    markers.extend(vague_hits)
+
+    # -----------------------------
+    # 4) Chiffres sans base claire
+    # -----------------------------
+    if len(numbers) >= 2 and len(methodology_hits) <= 1:
+        markers.append("données quantitatives peu contextualisées")
+
+    # -----------------------------
+    # 5) Projection sans modèle
+    # -----------------------------
+    projection_terms = [
+        "d'ici",
+        "d’ici",
+        "vont",
+        "va",
+        "prévoit",
+        "prévision",
+        "projection",
+        "pourrait",
+    ]
+
+    if (
+        any(p in t for p in projection_terms)
+        and len(numbers) >= 1
+        and len(methodology_hits) == 0
+    ):
+        markers.append("projection chiffrée sans méthodologie explicite")
+
+    markers = unique_keep_order(markers)
+
+    score = min(len(markers) * 0.25, 1.0)
+
+    if score < 0.15:
+        interpretation = "Les données semblent suffisamment contextualisées."
+    elif score < 0.35:
+        interpretation = "Certaines données manquent de référentiel ou de contexte."
+    elif score < 0.60:
+        interpretation = "Le texte présente plusieurs données insuffisamment référencées."
+    else:
+        interpretation = "Le discours s’appuie fortement sur des données sans référentiel méthodologique clair."
+
+    return {
+        "score": round(score, 3),
+        "markers": markers,
+        "interpretation": interpretation,
+    }
+    
 def detect_aristotelian_fallacies(text: str):
     petition = detect_petition_principii(text)
     descriptive_normative_confusion = detect_descriptive_normative_confusion(text)
