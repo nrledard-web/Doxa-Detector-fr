@@ -7195,6 +7195,10 @@ def analyze_article(text: str) -> Dict:
         "descriptive_normative_confusion_score": descriptive_normative_confusion["score"],
         "descriptive_normative_confusion_markers": descriptive_normative_confusion["markers"],
         "descriptive_normative_confusion_interpretation": descriptive_normative_confusion["interpretation"],
+
+        "complex_enthymeme_score": complex_enthymeme_analysis["score"],
+        "complex_enthymeme_markers": complex_enthymeme_analysis["markers"],
+        "complex_enthymeme_interpretation": complex_enthymeme_analysis["interpretation"],
         
         "petition_score": petition_analysis["score"],
         "petition_markers": petition_analysis["markers"],
