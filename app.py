@@ -6760,6 +6760,7 @@ def analyze_article(text: str) -> Dict:
     strong_certainty_analysis = compute_strong_certainty(text)
 
     conceptual_domains, conceptual_terms = detect_conceptual_domains(text)
+    
     statistical_manipulation_analysis = detect_statistical_manipulation(text)
     misleading_comparison_analysis = detect_misleading_comparison(text)
     missing_reference_analysis = detect_missing_reference_data(text)
@@ -6772,6 +6773,7 @@ def analyze_article(text: str) -> Dict:
     logical_jump_analysis = compute_logical_jump(text)
     argument_asymmetry_analysis = compute_argument_asymmetry(text)
     argument_density_analysis = compute_argument_density(text)
+    complex_enthymeme_analysis = compute_complex_enthymemes(text)
 
     certainty = len(re.findall(r"certain|absolument|prouvé|évident|incontestable", text.lower()))
     emotional = len(re.findall(r"|".join(re.escape(w) for w in EMOTIONAL_WORDS), text.lower()))
