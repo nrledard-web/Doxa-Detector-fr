@@ -6672,7 +6672,6 @@ def compute_argument_density(text):
     conclusion_markers = count_marker_occurrences(text, CONCLUSION_MARKERS)
     nuance_markers = count_marker_occurrences(text, NUANCE_MARKERS)
 
-    # La nuance soutient l’argumentation, mais ne vaut pas une preuve.
     argumentative_units = (
         reason_markers
         + conclusion_markers
@@ -6680,6 +6679,17 @@ def compute_argument_density(text):
     )
 
     score = min((argumentative_units / word_count) * 22, 1)
+
+    markers = []
+
+    if reason_markers > 0:
+        markers.append(f"Marqueurs de justification : {reason_markers}")
+
+    if conclusion_markers > 0:
+        markers.append(f"Marqueurs de conclusion : {conclusion_markers}")
+
+    if nuance_markers > 0:
+        markers.append(f"Marqueurs de nuance : {nuance_markers} × 0.35")
 
     if score < 0.15:
         interpretation = "Le texte affirme davantage qu'il n'argumente."
@@ -6694,6 +6704,8 @@ def compute_argument_density(text):
         "score": round(score, 3),
         "label": label_level(score),
         "units": round(argumentative_units, 2),
+        "markers": markers,
+        "word_count": word_count,
         "interpretation": interpretation
     }
 
