@@ -5852,7 +5852,16 @@ def compute_brain_indices(result: dict) -> dict:
     
     result["emotional_intensity_score"] = emotional_result["score"]
     result["emotional_intensity_markers"] = emotional_result["markers"]
-    result["emotional_intensity_interpretation"] = emotional_result["interpretation"]  
+    result["emotional_intensity_interpretation"] = emotional_result["interpretation"]
+
+    argument_density_result = compute_argument_density(article)
+
+    result["argument_density_score"] = argument_density_result["score"]
+    result["argument_density_label"] = argument_density_result["label"]
+    result["argument_density_units"] = argument_density_result["units"]
+    result["argument_density_markers"] = argument_density_result["markers"]
+    result["argument_density_word_count"] = argument_density_result["word_count"]
+    result["argument_density_interpretation"] = argument_density_result["interpretation"]
 
     G = result["G"]
     N = result["N"]
