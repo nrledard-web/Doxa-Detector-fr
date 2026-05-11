@@ -5460,6 +5460,24 @@ def compute_advanced_deceptive_coherence(text: str):
     ):
         markers.append("polarisation cohérente structurante")
 
+    # Cohérence catastrophiste fluide
+    if (
+        any(w in t for w in [
+            "crise",
+            "danger",
+            "menace",
+            "inquiétude",
+            "effondrement",
+        ])
+        and (
+            "rapport" in t
+            or "étude" in t
+            or "expert" in t
+            or "selon" in t
+        )
+    ):
+        markers.append("cohérence catastrophiste argumentée")
+
     # -----------------------------
     # Nettoyage
     # -----------------------------
