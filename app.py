@@ -13731,6 +13731,85 @@ with sq1:
             "Une manipulation statistique élevée ne signifie pas que les chiffres sont faux. "
             "Elle indique que leur présentation peut orienter l’interprétation du lecteur."
         )
+# -----------------------------
+# Comparaison trompeuse
+# -----------------------------
+with sq2:
+    st.markdown("### Comparaison trompeuse")
+    st.caption("Comparaisons quantitatives sans référentiel ou contexte suffisant.")
+
+    value = result["misleading_comparison_score"]
+
+    if value < 0.15:
+        label, color = "Faible", "#ca8a04"
+    elif value < 0.35:
+        label, color = "Modérée", "#f97316"
+    elif value < 0.60:
+        label, color = "Élevée", "#ea580c"
+    else:
+        label, color = "Très élevée", "#dc2626"
+
+    render_custom_gauge(value, color)
+
+    st.markdown(
+        f"<b style='color:{color}'>{label}</b> — {round(value * 100, 1)}%",
+        unsafe_allow_html=True
+    )
+
+    st.caption(result["misleading_comparison_interpretation"])
+
+    with st.expander("🔎 Voir les marqueurs", expanded=False):
+        markers = result.get("misleading_comparison_markers", [])
+
+        if not markers:
+            st.info("Aucune comparaison trompeuse notable détectée.")
+        else:
+            for marker in markers:
+                st.warning(marker)
+
+    with st.popover("ℹ️ Comprendre cette jauge"):
+        st.markdown("### Comparaison trompeuse")
+
+        st.write(
+            "Cette jauge détecte les comparaisons quantitatives utilisées sans référentiel clair "
+            "ou de manière potentiellement orientée."
+        )
+
+        st.markdown("**Principe**")
+        st.write(
+            "Le texte est comparé à des marqueurs de comparaison fragile : "
+            "écarts sans base comparative précise, amplifications historiques "
+            "ou formulations quantitatives impressionnistes."
+        )
+
+        st.markdown("**Formule utilisée**")
+        st.code(
+            "markers = comparaisons problématiques détectées\n"
+            "score = min(len(markers) * coefficient / 10, 1.0)",
+            language="python"
+        )
+
+        st.markdown("**Valeur actuelle**")
+        st.write(f"Score : **{round(value * 100, 1)}%**")
+        st.write(f"Niveau : **{label}**")
+        st.write(f"Marqueurs détectés : **{len(markers)}**")
+
+        st.markdown("**Interprétation actuelle**")
+        st.write(result["misleading_comparison_interpretation"])
+
+        st.markdown("**Lecture**")
+        st.write(
+            "🟢 Faible : comparaisons contextualisées\n"
+            "🟡 Modérée : quelques comparaisons fragiles\n"
+            "🟠 Élevée : comparaisons orientées notables\n"
+            "🔴 Très élevée : usage massif de comparaisons potentiellement trompeuses"
+        )
+
+        st.markdown("**Attention**")
+        st.write(
+            "Une comparaison trompeuse élevée ne signifie pas que les données sont fausses. "
+            "Elle indique que la comparaison utilisée peut orienter fortement la perception."
+        )
 
 st.divider()
 
