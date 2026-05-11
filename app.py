@@ -13543,6 +13543,101 @@ st.markdown("""
 </div>
 """, unsafe_allow_html=True)
 
+
+sq1, sq2, sq3 = st.columns(3)
+# =============================
+st.subheader("📊 Analyse statistique et quantitative")
+# =============================
+# -----------------------------
+# Manipulation statistique
+# -----------------------------
+with sq1:
+    st.markdown("### Manipulation statistique")
+    st.caption("Usage orienté ou dramatisé des chiffres et statistiques.")
+
+    value = result["statistical_manipulation_score"]
+
+    if value < 0.15:
+        label, color = "Faible", "#ca8a04"
+    elif value < 0.35:
+        label, color = "Modérée", "#f97316"
+    elif value < 0.60:
+        label, color = "Élevée", "#ea580c"
+    else:
+        label, color = "Très élevée", "#dc2626"
+
+    render_custom_gauge(value, color)
+
+    st.markdown(
+        f"<b style='color:{color}'>{label}</b> — {round(value * 100, 1)}%",
+        unsafe_allow_html=True
+    )
+
+    st.caption(result["statistical_manipulation_interpretation"])
+
+    with st.expander("🔎 Voir les marqueurs", expanded=False):
+        markers = result.get("statistical_manipulation_markers", [])
+
+        if not markers:
+            st.info("Aucune manipulation statistique notable détectée.")
+        else:
+            for marker in markers:
+                st.warning(marker)
+
+    with st.popover("ℹ️ Comprendre cette jauge"):
+        st.markdown("### Manipulation statistique")
+
+        st.write(
+            "Cette jauge détecte les usages orientés, dramatisés ou insuffisamment contextualisés "
+            "des chiffres et statistiques."
+        )
+
+        st.markdown("**Principe**")
+        st.write(
+            "Le texte est comparé à des marqueurs de manipulation statistique : "
+            "pourcentages alarmistes, chiffres sans contexte, amplification quantitative "
+            "ou formulations donnant aux statistiques une apparence de preuve absolue."
+        )
+
+        st.markdown("**Formule utilisée**")
+        st.code(
+            "markers = marqueurs statistiques détectés\n"
+            "score = min(len(markers) * coefficient / 10, 1.0)",
+            language="python"
+        )
+
+        markers = result.get("statistical_manipulation_markers", [])
+
+        st.markdown("**Valeur actuelle**")
+        st.write(f"Score : **{round(value * 100, 1)}%**")
+        st.write(f"Niveau : **{label}**")
+        st.write(f"Marqueurs détectés : **{len(markers)}**")
+
+        st.markdown("**Interprétation actuelle**")
+        st.write(result["statistical_manipulation_interpretation"])
+
+        st.markdown("**Lecture**")
+        st.write(
+            "🟢 Faible : statistiques utilisées avec prudence\n"
+            "🟡 Modérée : quelques usages orientés des chiffres\n"
+            "🟠 Élevée : plusieurs procédés statistiques fragiles ou dramatisés\n"
+            "🔴 Très élevée : chiffres fortement utilisés pour orienter la perception"
+        )
+
+        st.markdown("**Attention**")
+        st.write(
+            "Une manipulation statistique élevée ne signifie pas que les chiffres sont faux. "
+            "Elle indique que leur présentation peut orienter l’interprétation du lecteur."
+        )
+
+st.divider()
+
+st.markdown("""
+<div style="text-align:center; margin:25px 0; color:#888;">
+──── 🧠 ────
+</div>
+""", unsafe_allow_html=True)
+
 # =============================
 # Jauges structurelles avancées
 # =============================
