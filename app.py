@@ -14615,6 +14615,102 @@ with js4:
             "peut paraître solide tout en reposant sur des bases fragiles "
             "ou insuffisamment démontrées."
         )
+
+# =============================
+# Enthymèmes implicites complexes
+# =============================
+with js5:
+    st.markdown("### Enthymèmes implicites complexes")
+    st.caption(
+        "Raisonnements incomplets ou implicites nécessitant des prémisses non formulées."
+    )
+
+    value = result["complex_enthymeme_score"]
+
+    if value < 0.15:
+        label, color = "Faible", "#16a34a"
+    elif value < 0.35:
+        label, color = "Modérée", "#ca8a04"
+    elif value < 0.60:
+        label, color = "Élevée", "#f97316"
+    else:
+        label, color = "Très élevée", "#dc2626"
+
+    render_custom_gauge(value, color)
+
+    st.markdown(
+        f"<b style='color:{color}'>{label}</b> — {round(value * 100, 1)}%",
+        unsafe_allow_html=True
+    )
+
+    st.caption(result["complex_enthymeme_interpretation"])
+
+    with st.expander("🔎 Voir les marqueurs", expanded=False):
+
+        markers = result.get("complex_enthymeme_markers", [])
+
+        if not markers:
+            st.info("Aucun enthymème complexe détecté.")
+        else:
+            for marker in markers:
+                st.warning(marker)
+
+    with st.popover("ℹ️ Comprendre cette jauge"):
+
+        st.markdown("### Enthymèmes implicites complexes")
+
+        st.write(
+            "Cette jauge détecte les raisonnements qui paraissent logiques "
+            "mais dont certaines prémisses restent implicites ou non démontrées."
+        )
+
+        st.markdown("**Principe**")
+
+        st.write(
+            "Le moteur recherche des enchaînements où une conclusion "
+            "semble découler naturellement d’un raisonnement, "
+            "alors que plusieurs étapes logiques restent cachées."
+        )
+
+        st.markdown("**Formule utilisée**")
+
+        st.code(
+            "markers = prémisses implicites + conclusions forcées\n"
+            "score = min(len(markers) * coefficient, 1.0)",
+            language="python"
+        )
+
+        markers = result.get("complex_enthymeme_markers", [])
+
+        st.markdown("**Valeur actuelle**")
+
+        st.write(f"Score : **{round(value * 100, 1)}%**")
+        st.write(f"Niveau : **{label}**")
+        st.write(f"Marqueurs détectés : **{len(markers)}**")
+
+        st.markdown("**Interprétation actuelle**")
+
+        st.write(
+            result["complex_enthymeme_interpretation"]
+        )
+
+        st.markdown("**Lecture**")
+
+        st.write(
+            "🟢 Faible : raisonnement plutôt explicite\n"
+            "🟡 Modérée : quelques prémisses implicites\n"
+            "🟠 Élevée : raisonnement fortement incomplet\n"
+            "🔴 Très élevée : architecture logique largement implicite"
+        )
+
+        st.markdown("**Attention**")
+
+        st.write(
+            "Un enthymème complexe élevé ne signifie pas forcément "
+            "que le texte est faux. Il indique que le raisonnement "
+            "demande au lecteur d’accepter plusieurs prémisses "
+            "non démontrées."
+        )
         
 st.markdown("""
 <div style="text-align:center; margin:25px 0; color:#888;">
