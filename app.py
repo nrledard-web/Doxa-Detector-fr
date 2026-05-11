@@ -7356,6 +7356,10 @@ def analyze_article(text: str) -> Dict:
         "misleading_comparison_markers": misleading_comparison_analysis["markers"],
         "misleading_comparison_interpretation": misleading_comparison_analysis["interpretation"],
 
+        "self_validating_score": self_validating_analysis["score"],
+        "self_validating_markers": self_validating_analysis["markers"],
+        "self_validating_interpretation": self_validating_analysis["interpretation"],
+
         "generalization_score": generalization_analysis[0],
         "generalization_interpretation": generalization_analysis[1],
         "generalization_markers": generalization_analysis[2],
