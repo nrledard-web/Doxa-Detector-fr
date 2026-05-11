@@ -5500,6 +5500,25 @@ def compute_advanced_deceptive_coherence(text: str):
         "markers": markers,
         "interpretation": interpretation,
     }
+    # Projection fortement affirmée
+    if (
+        any(w in t for w in [
+            "va remplacer",
+            "va provoquer",
+            "conduira à",
+            "mènera à",
+            "d'ici",
+            "d’ici",
+            "crise majeure",
+            "révolution sans précédent",
+        ])
+        and (
+            "absolument certain" in t
+            or "certain" in t
+            or "inévitable" in t
+        )
+    ):
+        markers.append("projection persuasive fortement affirmée")    
     
 def detect_aristotelian_fallacies(text: str):
     petition = detect_petition_principii(text)
