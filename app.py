@@ -6315,7 +6315,7 @@ def analyze_article(text: str) -> Dict:
     strong_certainty_analysis = compute_strong_certainty(text)
 
     conceptual_domains, conceptual_terms = detect_conceptual_domains(text)
-
+    statistical_manipulation_analysis = detect_statistical_manipulation(text)
 
     # -----------------------------
     # Jauges structurelles avancées
