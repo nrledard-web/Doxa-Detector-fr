@@ -9518,12 +9518,12 @@ st.info(
     f"{result.get('discourse_explanation_rhetoric', '')}"
 )
 
-st.markdown("### Scores rhétoriques")
+with st.expander("Voir les scores rhétoriques détaillés", expanded=False):
+    st.markdown("#### Scores rhétoriques")
+    st.json(result.get("rhetorical_scores", {}))
 
-st.json(result.get("rhetorical_scores", {}))
-
-st.markdown("### Scores des types de discours")
-st.json(result.get("discourse_scores", {}))
+    st.markdown("#### Scores des types de discours")
+    st.json(result.get("discourse_scores", {}))
 
 st.markdown("""
 <div style="text-align:center; margin:25px 0; color:#888;">
