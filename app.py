@@ -8072,6 +8072,45 @@ def count_markers(text: str, markers: list) -> int:
     return sum(1 for m in markers if contains_term(text, m))
 
 
+def compute_performative_coherence(text: str) -> float:
+    sentences = [
+        s.strip()
+        for s in re.split(r"[.!?;:]+", text)
+        if len(s.strip()) > 8
+    ]
+
+    if len(sentences) < 3:
+        return 0.0
+
+    # Répétitions de débuts de phrases
+    starts = []
+    for s in sentences:
+        words = s.lower().split()
+        if len(words) >= 2:
+            starts.append(" ".join(words[:2]))
+
+    repeated_starts = len(starts) - len(set(starts))
+
+    # Connecteurs d’équilibre / opposition
+    balance_markers = [
+        "mais", "pourtant", "cependant", "alors que",
+        "tandis que", "d'un côté", "de l'autre",
+        "non seulement", "mais encore"
+    ]
+
+    balance_count = count_markers(text, balance_markers)
+
+    # Structures binaires / symétriques simples
+    symmetry_count = len(re.findall(
+        r"\b(de|du|des|la|le|les)\s+\w+\s+(et|ou)\s+\b(de|du|des|la|le|les)\s+\w+",
+        text.lower()
+    ))
+
+    raw = repeated_starts + balance_count + symmetry_count
+
+    return round(min(raw / 6, 1.0), 3)
+
+
 def detect_rhetorical_structures(text: str):
     t = text.lower()
 
@@ -8157,6 +8196,8 @@ def detect_rhetorical_structures(text: str):
         raw = count_markers(t, words)
         scores[family] = min(raw / 6, 1.0)
 
+    scores["coherence_performative"] = compute_performative_coherence(text)
+
     return scores
 
 # =============================
@@ -8177,15 +8218,18 @@ def detect_discourse_type_from_rhetoric(text: str, rhetorical_scores: dict):
 
     scores["pamphlétaire"] += rhetorical_scores.get("attaque", 0) * 1.6
     scores["pamphlétaire"] += rhetorical_scores.get("amplification", 0) * 1.2
+    scores["pamphlétaire"] += rhetorical_scores.get("coherence_performative", 0) * 0.4
 
     scores["politique"] += rhetorical_scores.get("narrativité", 0) * 0.8
     scores["politique"] += rhetorical_scores.get("attaque", 0) * 0.7
 
     scores["philosophique"] += rhetorical_scores.get("abstraction", 0) * 1.5
     scores["philosophique"] += rhetorical_scores.get("implicite", 0) * 0.4
+    scores["philosophique"] += rhetorical_scores.get("coherence_performative", 0) * 0.5
 
     scores["poétique"] += rhetorical_scores.get("poeticite", 0) * 1.4
     scores["poétique"] += rhetorical_scores.get("abstraction", 0) * 0.4
+    scores["poétique"] += rhetorical_scores.get("coherence_performative", 0) * 0.6
 
     scores["scientifique"] += rhetorical_scores.get("technicite", 0) * 1.5
 
