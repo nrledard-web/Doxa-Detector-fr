@@ -6889,7 +6889,6 @@ RELIGIOUS_MARKERS = [
     "péché", "salut", "grâce", "paradis", "enfer",
 ]
 
-
 def detect_conceptual_domains(text: str):
     t = text.lower()
 
@@ -6897,12 +6896,16 @@ def detect_conceptual_domains(text: str):
         "journalistique": 0,
         "philosophique": 0,
         "religieux": 0,
+        "geostrategique": 0,
+        "politique": 0,
     }
 
     terms = {
         "journalistique": [],
         "philosophique": [],
         "religieux": [],
+        "geostrategique": [],
+        "politique": [],
     }
 
     for marker in JOURNALISTIC_MARKERS:
@@ -6919,6 +6922,16 @@ def detect_conceptual_domains(text: str):
         if contains_term(t, marker):
             domains["religieux"] += 1
             terms["religieux"].append(marker)
+
+    for marker in GEOSTRATEGIC_MARKERS:
+        if contains_term(t, marker):
+            domains["geostrategique"] += 1
+            terms["geostrategique"].append(marker)
+
+    for marker in POLITICAL_MARKERS:
+        if contains_term(t, marker):
+            domains["politique"] += 1
+            terms["politique"].append(marker)
 
     return domains, terms
 
