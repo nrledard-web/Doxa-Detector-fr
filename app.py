@@ -8046,6 +8046,7 @@ def detect_discourse_type(result):
     literary_score = domains.get("litteraire", 0)
     scientific_domain = domains.get("scientifique", 0)
     political_score = domains.get("politique", 0)
+    geostrategic_score = domains.get("geostrategique", 0)
 
     # =====================================================
     # A) ROMANESQUE / NARRATIF
@@ -8142,9 +8143,19 @@ def detect_discourse_type(result):
             "Discours religieux",
             "Le texte mobilise un registre religieux, spirituel ou doctrinal."
         )
+    # =====================================================
+    # 3) Geostrategic
+    # =====================================================
+    if geostrategic_score >= 4 or (
+        political_score >= 3 and geostrategic_score >= 2
+    ):
+        return (
+            "Discours politico-stratégique",
+            "Le texte développe principalement une vision géopolitique, institutionnelle ou stratégique."
+        )
 
     # =====================================================
-    # 3) PHILOSOPHIQUE
+    # 4) PHILOSOPHIQUE
     # =====================================================
     if (
         philosophical >= 3
@@ -8157,7 +8168,7 @@ def detect_discourse_type(result):
         )
 
     # =====================================================
-    # 4) JOURNALISTIQUE INTERPRÉTATIF
+    # 5) JOURNALISTIQUE INTERPRÉTATIF
     # =====================================================
     if (
         journalistic >= 2
@@ -8170,7 +8181,7 @@ def detect_discourse_type(result):
         )
 
     # =====================================================
-    # 5) JOURNALISTIQUE FACTUEL
+    # 6) JOURNALISTIQUE FACTUEL
     # =====================================================
     if (
         journalistic >= 2
@@ -8183,7 +8194,7 @@ def detect_discourse_type(result):
         )
 
     # =====================================================
-    # 6) FACTUEL
+    # 7) FACTUEL
     # =====================================================
     if (
         G >= 6
@@ -8211,7 +8222,7 @@ def detect_discourse_type(result):
         )
 
     # =====================================================
-    # 7) DISCOURS ORIENTÉ / ALARMISTE
+    # 8) DISCOURS ORIENTÉ / ALARMISTE
     # =====================================================
     if (
         result.get("threat_amplification_score", 0) >= 0.6
@@ -8225,7 +8236,7 @@ def detect_discourse_type(result):
         )
 
     # =====================================================
-    # 8) PSEUDO-ANALYTIQUE / CIVILISATIONNEL
+    # 9) PSEUDO-ANALYTIQUE / CIVILISATIONNEL
     # =====================================================
     if (
         result.get("scientific_simulation_score", 0) >= 0.25
@@ -8239,7 +8250,7 @@ def detect_discourse_type(result):
         )
 
     # =====================================================
-    # 7) POLÉMIQUE
+    # 10) POLÉMIQUE
     # =====================================================
     if (
         rhetorical_pressure >= 0.45
@@ -8251,7 +8262,7 @@ def detect_discourse_type(result):
         )
 
     # =====================================================
-    # 8) ANALYTIQUE
+    # 11) ANALYTIQUE
     # =====================================================
     if (
         N >= 6
@@ -8263,7 +8274,7 @@ def detect_discourse_type(result):
         )
 
     # =====================================================
-    # 9) SPÉCULATIF
+    # 12) SPÉCULATIF
     # =====================================================
     if (
         N >= 6
@@ -8276,7 +8287,7 @@ def detect_discourse_type(result):
         )
 
     # =====================================================
-    # 10) INDÉTERMINÉ
+    # 13) INDÉTERMINÉ
     # =====================================================
     return (
         "Discours indéterminé",
