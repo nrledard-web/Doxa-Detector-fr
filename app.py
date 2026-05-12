@@ -1066,32 +1066,6 @@ THREAT_AMPLIFICATION_MARKERS = [
     "tout va empirer",
     "irréversible",
 ]
-GEOSTRATEGIC_MARKERS = [
-    "souveraineté",
-    "défense",
-    "sécurité",
-    "frontières",
-    "puissance",
-    "autonomie stratégique",
-    "intérêts",
-    "alliés",
-    "otan",
-    "investissement européen",
-    "industrie",
-    "prospérité",
-    "guerre",
-    "paix",
-    "encerclement",
-    "grandes puissances",
-    "modèle économique",
-    "défense européenne",
-    "sécurité européenne",
-    "puissance européenne",
-    "intelligence artificielle",
-    "biotechnologies",
-    "énergie décarbonée",
-    "espace",
-]
 STRONG_CERTAINTY_MARKERS = [
     # tes marqueurs (gardés)
     "il est absolument certain",
