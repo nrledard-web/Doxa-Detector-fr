@@ -8196,15 +8196,30 @@ def detect_discourse_type_from_rhetoric(text: str, rhetorical_scores: dict):
     scores["argumentatif"] += rhetorical_scores.get("technicite", 0) * 0.6
     scores["argumentatif"] += rhetorical_scores.get("persuasion", 0) * 0.6
 
-    dominant = max(scores, key=scores.get)
-    value = scores[dominant]
-
-    if value < 0.15:
-        return "Discours indéterminé", "Aucune dominante rhétorique claire détectée.", scores
-
-    explanation = f"Dominante détectée par les marqueurs rhétoriques : {dominant}."
-
-    return dominant.capitalize(), explanation, scores
+    sorted_scores = sorted(scores.items(), key=lambda x: x[1], reverse=True)
+    
+    dominant, dominant_value = sorted_scores[0]
+    secondary, secondary_value = sorted_scores[1]
+    
+    if dominant_value < 0.15:
+        return (
+            "Discours indéterminé",
+            "Aucune dominante rhétorique claire détectée.",
+            scores
+        )
+    
+    # Construction hybride
+    if secondary_value >= dominant_value * 0.6:
+        discourse_label = f"{dominant.capitalize()} à dominante {secondary}"
+    else:
+        discourse_label = dominant.capitalize()
+    
+    explanation = (
+        f"Dominante détectée par les marqueurs rhétoriques : "
+        f"{dominant}."
+    )
+    
+    return discourse_label, explanation, scores
 
 # =====================================================
 # TYPE DE DISCOURS DÉTECTÉ
