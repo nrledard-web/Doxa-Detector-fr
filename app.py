@@ -9457,6 +9457,10 @@ disc_type, disc_explanation = detect_discourse_type(result)
 st.markdown("### Type de discours détecté")
 st.info(f"**{disc_type}** — {disc_explanation}")
 
+st.markdown("### Scores rhétoriques")
+
+st.json(result.get("rhetorical_scores", {}))
+
 st.markdown("""
 <div style="text-align:center; margin:25px 0; color:#888;">
 ────────── ✦ ──────────
