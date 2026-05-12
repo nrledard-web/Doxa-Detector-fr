@@ -7021,6 +7021,13 @@ def analyze_article(text: str) -> Dict:
 
     conceptual_domains, conceptual_terms = detect_conceptual_domains(text)
     
+    rhetorical_scores = detect_rhetorical_structures(text)
+    disc_type_rhetoric, disc_explanation_rhetoric, discourse_scores = detect_discourse_type_from_rhetoric(
+        text,
+        rhetorical_scores
+    )
+    statistical_manipulation_analysis = detect_statistical_manipulation(text)
+    
     statistical_manipulation_analysis = detect_statistical_manipulation(text)
     misleading_comparison_analysis = detect_misleading_comparison(text)
     missing_reference_analysis = detect_missing_reference_data(text)
