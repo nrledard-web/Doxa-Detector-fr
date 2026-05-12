@@ -8056,9 +8056,20 @@ def fetch_text_for_textarea(url: str) -> str:
 # Détection rhétorique interne
 # =============================
 
-def count_markers(text, markers):
+def contains_term(text: str, term: str) -> bool:
+    """
+    Détecte un mot ou une expression sans faux positif grossier.
+    Exemple : détecte 'corrompu' dans 'corrompus' ou 'corrompues'.
+    """
     t = text.lower()
-    return sum(1 for m in markers if m in t)
+    term = term.lower().strip()
+
+    pattern = r"\b" + re.escape(term) + r"\w*\b"
+    return re.search(pattern, t) is not None
+
+
+def count_markers(text: str, markers: list) -> int:
+    return sum(1 for m in markers if contains_term(text, m))
 
 
 def detect_rhetorical_structures(text: str):
