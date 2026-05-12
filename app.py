@@ -9511,10 +9511,12 @@ st.markdown(
     unsafe_allow_html=True
 )
 
-disc_type, disc_explanation = detect_discourse_type(result)
-
 st.markdown("### Type de discours détecté")
-st.info(f"**{disc_type}** — {disc_explanation}")
+
+st.info(
+    f"**{result.get('discourse_type_rhetoric', 'Indéterminé')}** — "
+    f"{result.get('discourse_explanation_rhetoric', '')}"
+)
 
 st.markdown("### Scores rhétoriques")
 
