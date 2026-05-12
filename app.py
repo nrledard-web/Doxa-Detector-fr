@@ -8104,6 +8104,52 @@ def detect_rhetorical_structures(text: str):
 
     return scores
 
+# =============================
+# Type de discours enrichi
+# =============================
+
+def detect_discourse_type_from_rhetoric(text: str, rhetorical_scores: dict):
+    scores = {
+        "politique": 0,
+        "pamphlétaire": 0,
+        "philosophique": 0,
+        "religieux": 0,
+        "poétique": 0,
+        "argumentatif": 0,
+        "scientifique": 0,
+        "conspirationniste": 0,
+    }
+
+    scores["pamphlétaire"] += rhetorical_scores.get("attaque", 0) * 1.6
+    scores["pamphlétaire"] += rhetorical_scores.get("amplification", 0) * 1.2
+
+    scores["politique"] += rhetorical_scores.get("narrativité", 0) * 0.8
+    scores["politique"] += rhetorical_scores.get("attaque", 0) * 0.7
+
+    scores["philosophique"] += rhetorical_scores.get("abstraction", 0) * 1.5
+    scores["philosophique"] += rhetorical_scores.get("implicite", 0) * 0.4
+
+    scores["poétique"] += rhetorical_scores.get("poeticite", 0) * 1.4
+    scores["poétique"] += rhetorical_scores.get("abstraction", 0) * 0.4
+
+    scores["scientifique"] += rhetorical_scores.get("technicite", 0) * 1.5
+
+    scores["conspirationniste"] += rhetorical_scores.get("implicite", 0) * 1.5
+    scores["conspirationniste"] += rhetorical_scores.get("amplification", 0) * 0.8
+
+    scores["argumentatif"] += rhetorical_scores.get("technicite", 0) * 0.6
+    scores["argumentatif"] += rhetorical_scores.get("persuasion", 0) * 0.6
+
+    dominant = max(scores, key=scores.get)
+    value = scores[dominant]
+
+    if value < 0.15:
+        return "Discours indéterminé", "Aucune dominante rhétorique claire détectée.", scores
+
+    explanation = f"Dominante détectée par les marqueurs rhétoriques : {dominant}."
+
+    return dominant.capitalize(), explanation, scores
+
 # =====================================================
 # TYPE DE DISCOURS DÉTECTÉ
 # =====================================================
