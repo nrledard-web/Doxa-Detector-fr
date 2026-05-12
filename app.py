@@ -7629,6 +7629,11 @@ def analyze_article(text: str) -> Dict:
         "advanced_deceptive_coherence_score": advanced_deceptive_coherence_analysis["score"],
         "advanced_deceptive_coherence_markers": advanced_deceptive_coherence_analysis["markers"],
         "advanced_deceptive_coherence_interpretation": advanced_deceptive_coherence_analysis["interpretation"],
+
+        "rhetorical_scores": rhetorical_scores,
+        "discourse_type_rhetoric": disc_type_rhetoric,
+        "discourse_explanation_rhetoric": disc_explanation_rhetoric,
+        "discourse_scores": discourse_scores,
         
         "linguistic_trigger_count": ling["trigger_count"],
         "linguistic_pressure_hits": ling["rhetorical_pressure"],
