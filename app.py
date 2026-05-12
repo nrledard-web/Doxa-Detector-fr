@@ -9517,6 +9517,7 @@ st.info(
     f"**{result.get('discourse_type_rhetoric', 'Indéterminé')}** — "
     f"{result.get('discourse_explanation_rhetoric', '')}"
 )
+st.caption(explain_discourse_profile(result))
 
 with st.expander("Voir les scores rhétoriques détaillés", expanded=False):
     st.markdown("#### Scores rhétoriques")
