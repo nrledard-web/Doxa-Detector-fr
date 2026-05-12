@@ -8040,6 +8040,70 @@ def fetch_text_for_textarea(url: str) -> str:
     except Exception:
         return ""
 
+# =============================
+# Détection rhétorique interne
+# =============================
+
+def count_markers(text, markers):
+    t = text.lower()
+    return sum(1 for m in markers if m in t)
+
+
+def detect_rhetorical_structures(text: str):
+    t = text.lower()
+
+    markers = {
+        "amplification": [
+            "jamais", "toujours", "absolument", "totalement", "inévitable",
+            "catastrophe", "effondrement", "historique", "massivement",
+            "extrême", "radical", "terrible", "dramatique"
+        ],
+
+        "implicite": [
+            "on nous cache", "comme par hasard", "tout le monde sait",
+            "inutile de rappeler", "je ne dis pas que", "ce n'est pas un hasard",
+            "il suffit de voir", "chacun sait"
+        ],
+
+        "persuasion": [
+            "il faut", "nous devons", "réveillez-vous", "ouvrez les yeux",
+            "la vérité", "évidemment", "clairement", "sans aucun doute"
+        ],
+
+        "attaque": [
+            "traîtres", "corrompus", "vendus", "menteurs", "hypocrites",
+            "parasites", "criminels", "complices", "collabos"
+        ],
+
+        "abstraction": [
+            "vérité", "être", "néant", "conscience", "raison", "liberté",
+            "justice", "essence", "existence", "morale", "âme", "sens"
+        ],
+
+        "narrativité": [
+            "depuis", "alors", "ensuite", "désormais", "aujourd'hui",
+            "hier", "demain", "histoire", "destin", "peuple", "nation"
+        ],
+
+        "poeticite": [
+            "ombre", "lumière", "silence", "flamme", "ciel", "âme",
+            "souffle", "écho", "chant", "nuit", "soleil", "sang"
+        ],
+
+        "technicite": [
+            "étude", "rapport", "source", "données", "statistique",
+            "méthode", "analyse", "pourcentage", "%", "selon", "chiffres"
+        ],
+    }
+
+    scores = {}
+
+    for family, words in markers.items():
+        raw = count_markers(t, words)
+        scores[family] = min(raw / 6, 1.0)
+
+    return scores
+
 # =====================================================
 # TYPE DE DISCOURS DÉTECTÉ
 # =====================================================
