@@ -8095,7 +8095,9 @@ def detect_rhetorical_structures(text: str):
 
         "attaque": [
             "traîtres", "corrompus", "vendus", "menteurs", "hypocrites",
-            "parasites", "criminels", "complices", "collabos"
+            "parasites", "criminels", "complices", "collabos",
+            "corrompu", "manipulation", "contrôle", "détruisent",
+            "imposent", "culpabilisation", "mensonge", "propagande"
         ],
 
         "abstraction": [
