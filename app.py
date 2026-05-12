@@ -8085,7 +8085,15 @@ def detect_rhetorical_structures(text: str):
         "implicite": [
             "on nous cache", "comme par hasard", "tout le monde sait",
             "inutile de rappeler", "je ne dis pas que", "ce n'est pas un hasard",
-            "il suffit de voir", "chacun sait"
+            "il suffit de voir", "chacun sait",
+        
+            "derrière", "cache", "les mêmes intérêts", "rien d'accidentel",
+            "comme si", "semble", "paraît", "ce qu'ils niaient",
+            "on nous explique", "faire confiance", "ouvrir les yeux",
+        
+            *CAUSALITE_IMPLICITE,
+            *IDEOLOGICAL_PREMISE_MARKERS,
+            *IDEOLOGICAL_FRAMING_PATTERNS,
         ],
 
         "persuasion": [
