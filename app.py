@@ -6862,6 +6862,46 @@ RELIGIOUS_MARKERS = [
     "prophète", "révélation", "évangile", "coran", "bible",
     "péché", "salut", "grâce", "paradis", "enfer",
 ]
+GEOSTRATEGIC_MARKERS = [
+    "souveraineté",
+    "défense",
+    "sécurité",
+    "frontières",
+    "puissance",
+    "autonomie stratégique",
+    "intérêts",
+    "alliés",
+    "otan",
+    "investissement européen",
+    "industrie",
+    "prospérité",
+    "guerre",
+    "paix",
+    "encerclement",
+    "grandes puissances",
+    "modèle économique",
+    "défense européenne",
+    "sécurité européenne",
+    "puissance européenne",
+    "intelligence artificielle",
+    "biotechnologies",
+    "énergie décarbonée",
+    "espace",
+]
+POLITICAL_MARKERS = [
+    "politique",
+    "état",
+    "gouvernement",
+    "démocratie",
+    "république",
+    "nation",
+    "europe",
+    "président",
+    "loi",
+    "institution",
+    "peuple",
+    "économie",
+]
 
 def detect_conceptual_domains(text: str):
     t = text.lower()
