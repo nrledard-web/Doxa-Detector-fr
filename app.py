@@ -8095,6 +8095,28 @@ def detect_rhetorical_structures(text: str):
             *IDEOLOGICAL_PREMISE_MARKERS,
             *IDEOLOGICAL_FRAMING_PATTERNS,
         ],
+                "soupcon_systemique": [
+            "on nous cache",
+            "comme par hasard",
+            "les mêmes intérêts",
+            "ce n'est pas un hasard",
+            "ouvrir les yeux",
+            "vérité cachée",
+            "les médias mentent",
+            "les élites corrompues",
+            "système",
+            "manipulation",
+            "contrôle",
+            "propagande",
+            "mensonge",
+            "ils savaient",
+            "ce qu'ils niaient",
+            "rien d'accidentel",
+            "derrière",
+            "mécanique cachée",
+            "agenda",
+            "censure"
+        ],
 
         "persuasion": [
             "il faut", "nous devons", "réveillez-vous", "ouvrez les yeux",
@@ -8167,8 +8189,9 @@ def detect_discourse_type_from_rhetoric(text: str, rhetorical_scores: dict):
 
     scores["scientifique"] += rhetorical_scores.get("technicite", 0) * 1.5
 
-    scores["conspirationniste"] += rhetorical_scores.get("implicite", 0) * 1.5
-    scores["conspirationniste"] += rhetorical_scores.get("amplification", 0) * 0.8
+    scores["conspirationniste"] += rhetorical_scores.get("soupcon_systemique", 0) * 1.8
+    scores["conspirationniste"] += rhetorical_scores.get("amplification", 0) * 0.6
+    scores["conspirationniste"] += rhetorical_scores.get("narrativité", 0) * 0.4
 
     scores["argumentatif"] += rhetorical_scores.get("technicite", 0) * 0.6
     scores["argumentatif"] += rhetorical_scores.get("persuasion", 0) * 0.6
