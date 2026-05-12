@@ -8221,6 +8221,42 @@ def detect_discourse_type_from_rhetoric(text: str, rhetorical_scores: dict):
     
     return discourse_label, explanation, scores
 
+def explain_discourse_profile(result):
+    rhetorical = result.get("rhetorical_scores", {})
+    discourse = result.get("discourse_scores", {})
+
+    if not rhetorical or not discourse:
+        return "Aucun profil discursif détaillé disponible."
+
+    top_rhetorical = sorted(
+        rhetorical.items(),
+        key=lambda x: x[1],
+        reverse=True
+    )[:3]
+
+    top_discourse = sorted(
+        discourse.items(),
+        key=lambda x: x[1],
+        reverse=True
+    )[:3]
+
+    rhet_text = ", ".join(
+        f"{name.replace('_', ' ')} ({round(score, 2)})"
+        for name, score in top_rhetorical
+        if score > 0
+    )
+
+    disc_text = ", ".join(
+        f"{name} ({round(score, 2)})"
+        for name, score in top_discourse
+        if score > 0
+    )
+
+    return (
+        f"Le profil dominant repose principalement sur : {rhet_text}. "
+        f"Les types discursifs les plus proches sont : {disc_text}."
+    )
+
 # =====================================================
 # TYPE DE DISCOURS DÉTECTÉ
 # =====================================================
