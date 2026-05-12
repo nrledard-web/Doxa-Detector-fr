@@ -780,12 +780,9 @@ def compute_linguistic_suspicion(text: str) -> dict:
         "trigger_count": raw_score,
         "structural_polarization": structural_polarization,
     }
-
-
 # -----------------------------
 # Bibliothèques rhétoriques
 # -----------------------------
-
 VICTIMISATION = [
     "on nous empêche d'agir",
     "on veut nous faire taire",
@@ -802,7 +799,6 @@ VICTIMISATION = [
     "we are being silenced",
     "we are under attack"
 ]
-
 MORALISATION = [
     "c'est une question de responsabilité",
     "c'est notre devoir",
@@ -818,7 +814,6 @@ MORALISATION = [
     "it would be irresponsible",
     "we must protect our children"
 ]
-
 URGENCE = [
     "il faut agir maintenant",
     "il faut agir immédiatement",
@@ -834,7 +829,6 @@ URGENCE = [
     "before it is too late",
     "immediately"
 ]
-
 PROMESSE_EXCESSIVE = [
     "nous allons tout changer",
     "nous allons changer la vie",
@@ -849,7 +843,6 @@ PROMESSE_EXCESSIVE = [
     "we will restore prosperity",
     "we will guarantee security"
 ]
-
 POPULISME_ANTI_ELITE = [
     "les élites ont trahi",
     "les élites méprisent le peuple",
@@ -870,7 +863,6 @@ POPULISME_ANTI_ELITE = [
     "the establishment betrayed the people",
     "the system is rigged"
 ]
-
 PROGRESSISME_IDENTITAIRE = [
     "les dominations systémiques",
     "la violence systémique",
@@ -896,7 +888,6 @@ PROGRESSISME_IDENTITAIRE = [
     "lived experience matters",
     "the personal is political"
 ]
-
 SOCIALISME_COMMUNISME = [
     "les travailleurs exploités",
     "la lutte des classes",
@@ -921,7 +912,6 @@ SOCIALISME_COMMUNISME = [
     "the wealthy must pay",
     "public ownership"
 ]
-
 CONFUSION_DELEGITIMATION = [
     "tout populisme est d'extrême droite",
     "le populisme mène toujours au fascisme",
@@ -937,10 +927,6 @@ CONFUSION_DELEGITIMATION = [
     "any criticism is hate",
     "if you disagree you are on the wrong side of history"
 ]
-
-# -----------------------------
-# Bibliothèques rhétoriques
-# -----------------------------
 AUTORITE_ACADEMIQUE_VAGUE = [
     "selon plusieurs études",
     "selon certaines études",
@@ -973,7 +959,6 @@ AUTORITE_ACADEMIQUE_VAGUE = [
     "experts agree",
     "many specialists"
 ]
-
 DILUTION_RESPONSABILITE = [
     "il ne s'agit pas d'accuser",
     "il ne s'agit pas de blâmer",
@@ -1080,6 +1065,32 @@ THREAT_AMPLIFICATION_MARKERS = [
     "conséquences désastreuses",
     "tout va empirer",
     "irréversible",
+]
+GEOSTRATEGIC_MARKERS = [
+    "souveraineté",
+    "défense",
+    "sécurité",
+    "frontières",
+    "puissance",
+    "autonomie stratégique",
+    "intérêts",
+    "alliés",
+    "otan",
+    "investissement européen",
+    "industrie",
+    "prospérité",
+    "guerre",
+    "paix",
+    "encerclement",
+    "grandes puissances",
+    "modèle économique",
+    "défense européenne",
+    "sécurité européenne",
+    "puissance européenne",
+    "intelligence artificielle",
+    "biotechnologies",
+    "énergie décarbonée",
+    "espace",
 ]
 STRONG_CERTAINTY_MARKERS = [
     # tes marqueurs (gardés)
