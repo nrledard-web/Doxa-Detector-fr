@@ -7635,6 +7635,7 @@ def analyze_article(text: str) -> Dict:
         "discourse_type_rhetoric": disc_type_rhetoric,
         "discourse_explanation_rhetoric": disc_explanation_rhetoric,
         "discourse_scores": discourse_scores,
+        "emotional_registers": emotional_registers,
         
         "linguistic_trigger_count": ling["trigger_count"],
         "linguistic_pressure_hits": ling["rhetorical_pressure"],
