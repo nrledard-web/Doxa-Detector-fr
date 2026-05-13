@@ -9787,6 +9787,9 @@ with st.expander("Voir les scores rhétoriques détaillés", expanded=False):
     st.markdown("#### Scores des types de discours")
     st.json(result.get("discourse_scores", {}))
 
+    st.markdown("#### Registres émotionnels")
+    st.json(result.get("emotional_registers", {}))
+
 st.markdown("""
 <div style="text-align:center; margin:25px 0; color:#888;">
 ────────── ✦ ──────────
