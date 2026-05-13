@@ -8369,7 +8369,7 @@ def explain_discourse_profile(result):
     )[:3]
 
     rhet_text = ", ".join(
-        f"{name.replace('_', ' ').replace('soupcon', 'soupçon').replace('systemique', 'systémique')} ({round(score, 2)})"
+        f"{name.replace('_', ' ').replace('soupcon', 'soupçon').replace('systemique', 'systémique').replace('rhetorique', 'rhétorique')} ({round(score, 2)})"
         for name, score in top_rhetorical
         if score > 0
     )
