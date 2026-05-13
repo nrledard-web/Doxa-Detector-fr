@@ -8282,6 +8282,10 @@ def detect_discourse_type_from_rhetoric(text: str, rhetorical_scores: dict):
     scores["argumentatif"] += rhetorical_scores.get("technicite", 0) * 0.6
     scores["argumentatif"] += rhetorical_scores.get("persuasion", 0) * 0.6
 
+    scores["philosophique"] += rhetorical_scores.get("compression_cognitive", 0) * 0.4
+    scores["pamphlétaire"] += rhetorical_scores.get("compression_cognitive", 0) * 0.3
+    scores["poétique"] += rhetorical_scores.get("compression_cognitive", 0) * 0.4
+
     sorted_scores = sorted(scores.items(), key=lambda x: x[1], reverse=True)
     
     dominant, dominant_value = sorted_scores[0]
