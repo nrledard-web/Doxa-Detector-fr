@@ -8183,7 +8183,7 @@ def compute_rhetorical_saturation(text: str) -> float:
         + exclamation_count * 0.5
     )
 
-    return round(min(raw / 8, 1.0), 3)
+    return round(min(raw / 14, 1.0), 3)
 
 
 def detect_rhetorical_structures(text: str):
