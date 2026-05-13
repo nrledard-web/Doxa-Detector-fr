@@ -8355,7 +8355,7 @@ def detect_discourse_type_from_rhetoric(text: str, rhetorical_scores: dict):
 
     scores["poétique"] += rhetorical_scores.get("poeticite", 0) * 1.4
     scores["poétique"] += rhetorical_scores.get("abstraction", 0) * 0.4
-    scores["poétique"] += rhetorical_scores.get("coherence_performative", 0) * 0.6
+    scores["poétique"] += rhetorical_scores.get("coherence_performative", 0) * 0.10
 
     scores["scientifique"] += rhetorical_scores.get("technicite", 0) * 1.1
     scores["scientifique"] += rhetorical_scores.get("dissimulation_attenuation", 0) * 0.3
@@ -8379,9 +8379,9 @@ def detect_discourse_type_from_rhetoric(text: str, rhetorical_scores: dict):
     scores["argumentatif"] += rhetorical_scores.get("persuasion", 0) * 0.6
     scores["argumentatif"] += rhetorical_scores.get("dissimulation_attenuation", 0) * 0.4
 
-    scores["philosophique"] += rhetorical_scores.get("compression_cognitive", 0) * 0.4
+    scores["philosophique"] += rhetorical_scores.get("compression_cognitive", 0) * 0.08
     scores["pamphlétaire"] += rhetorical_scores.get("compression_cognitive", 0) * 0.3
-    scores["poétique"] += rhetorical_scores.get("compression_cognitive", 0) * 0.4
+    scores["poétique"] += rhetorical_scores.get("compression_cognitive", 0) * 0.05
 
     sorted_scores = sorted(scores.items(), key=lambda x: x[1], reverse=True)
     
