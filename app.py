@@ -8185,6 +8185,49 @@ def compute_rhetorical_saturation(text: str) -> float:
 
     return round(min(raw / 14, 1.0), 3)
 
+def compute_dissimulation_attenuation(text: str) -> float:
+    t = text.lower()
+
+    attenuation_markers = [
+        "incident",
+        "ajustement",
+        "réorganisation",
+        "dommages collatéraux",
+        "mesure exceptionnelle",
+        "situation complexe",
+        "contexte difficile",
+        "malheureusement",
+        "certains effets",
+        "quelques problèmes",
+        "cas isolés",
+        "nécessaire adaptation",
+        "mesure temporaire",
+        "simple opération",
+        "simple procédure",
+        "sans impact majeur",
+        "limité",
+        "partiel",
+        "modéré",
+        "encadré"
+    ]
+
+    euphemism_markers = [
+        "plan social",
+        "optimisation",
+        "rationalisation",
+        "flexibilisation",
+        "réduction d'effectifs",
+        "intervention",
+        "neutralisation",
+        "pacification"
+    ]
+
+    raw = (
+        count_markers(t, attenuation_markers)
+        + count_markers(t, euphemism_markers) * 1.4
+    )
+
+    return round(min(raw / 10, 1.0), 3)
 
 def detect_rhetorical_structures(text: str):
     t = text.lower()
@@ -8274,6 +8317,7 @@ def detect_rhetorical_structures(text: str):
     scores["coherence_performative"] = compute_performative_coherence(text)
     scores["compression_cognitive"] = compute_cognitive_compression(text)
     scores["saturation_rhetorique"] = compute_rhetorical_saturation(text)
+    scores["dissimulation_attenuation"] = compute_dissimulation_attenuation(text)
 
     return scores
 
@@ -8301,6 +8345,7 @@ def detect_discourse_type_from_rhetoric(text: str, rhetorical_scores: dict):
     scores["politique"] += rhetorical_scores.get("narrativité", 0) * 0.8
     scores["politique"] += rhetorical_scores.get("attaque", 0) * 0.7
     scores["politique"] += rhetorical_scores.get("saturation_rhetorique", 0) * 0.3
+    scores["politique"] += rhetorical_scores.get("dissimulation_attenuation", 0) * 0.5
 
     scores["philosophique"] += rhetorical_scores.get("abstraction", 0) * 1.5
     scores["philosophique"] += rhetorical_scores.get("implicite", 0) * 0.4
@@ -8311,6 +8356,7 @@ def detect_discourse_type_from_rhetoric(text: str, rhetorical_scores: dict):
     scores["poétique"] += rhetorical_scores.get("coherence_performative", 0) * 0.6
 
     scores["scientifique"] += rhetorical_scores.get("technicite", 0) * 1.5
+    scores["scientifique"] += rhetorical_scores.get("dissimulation_attenuation", 0) * 0.3
 
     scores["conspirationniste"] += rhetorical_scores.get("soupcon_systemique", 0) * 1.8
     scores["conspirationniste"] += rhetorical_scores.get("amplification", 0) * 0.6
@@ -8319,6 +8365,7 @@ def detect_discourse_type_from_rhetoric(text: str, rhetorical_scores: dict):
 
     scores["argumentatif"] += rhetorical_scores.get("technicite", 0) * 0.6
     scores["argumentatif"] += rhetorical_scores.get("persuasion", 0) * 0.6
+    scores["argumentatif"] += rhetorical_scores.get("dissimulation_attenuation", 0) * 0.4
 
     scores["philosophique"] += rhetorical_scores.get("compression_cognitive", 0) * 0.4
     scores["pamphlétaire"] += rhetorical_scores.get("compression_cognitive", 0) * 0.3
