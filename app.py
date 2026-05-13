@@ -8151,6 +8151,40 @@ def compute_cognitive_compression(text: str) -> float:
 
     return round(min(score, 1.0), 3)
 
+def compute_rhetorical_saturation(text: str) -> float:
+    t = text.lower()
+
+    emotional_markers = [
+        "catastrophe", "chaos", "effondrement", "urgence",
+        "historique", "terrible", "massif", "dramatique",
+        "grave", "dangereux", "inacceptable", "scandale"
+    ]
+
+    repetition_markers = [
+        "toujours", "jamais", "encore", "sans cesse",
+        "tout", "rien", "absolument", "totalement"
+    ]
+
+    exclamation_count = text.count("!")
+
+    emotional_score = count_markers(t, emotional_markers)
+    repetition_score = count_markers(t, repetition_markers)
+
+    # accumulation simple : longues phrases avec nombreuses virgules
+    accumulation_score = sum(
+        1 for s in re.split(r"[.!?]", text)
+        if s.count(",") >= 4
+    )
+
+    raw = (
+        emotional_score * 1.2
+        + repetition_score
+        + accumulation_score
+        + exclamation_count * 0.5
+    )
+
+    return round(min(raw / 8, 1.0), 3)
+
 
 def detect_rhetorical_structures(text: str):
     t = text.lower()
@@ -8239,6 +8273,7 @@ def detect_rhetorical_structures(text: str):
 
     scores["coherence_performative"] = compute_performative_coherence(text)
     scores["compression_cognitive"] = compute_cognitive_compression(text)
+    scores["saturation_rhetorique"] = compute_rhetorical_saturation(text)
 
     return scores
 
@@ -8261,9 +8296,11 @@ def detect_discourse_type_from_rhetoric(text: str, rhetorical_scores: dict):
     scores["pamphlétaire"] += rhetorical_scores.get("attaque", 0) * 1.6
     scores["pamphlétaire"] += rhetorical_scores.get("amplification", 0) * 1.2
     scores["pamphlétaire"] += rhetorical_scores.get("coherence_performative", 0) * 0.4
+    scores["pamphlétaire"] += rhetorical_scores.get("saturation_rhetorique", 0) * 0.8
 
     scores["politique"] += rhetorical_scores.get("narrativité", 0) * 0.8
     scores["politique"] += rhetorical_scores.get("attaque", 0) * 0.7
+    scores["politique"] += rhetorical_scores.get("saturation_rhetorique", 0) * 0.3
 
     scores["philosophique"] += rhetorical_scores.get("abstraction", 0) * 1.5
     scores["philosophique"] += rhetorical_scores.get("implicite", 0) * 0.4
@@ -8278,6 +8315,7 @@ def detect_discourse_type_from_rhetoric(text: str, rhetorical_scores: dict):
     scores["conspirationniste"] += rhetorical_scores.get("soupcon_systemique", 0) * 1.8
     scores["conspirationniste"] += rhetorical_scores.get("amplification", 0) * 0.6
     scores["conspirationniste"] += rhetorical_scores.get("narrativité", 0) * 0.4
+    scores["conspirationniste"] += rhetorical_scores.get("saturation_rhetorique", 0) * 0.5
 
     scores["argumentatif"] += rhetorical_scores.get("technicite", 0) * 0.6
     scores["argumentatif"] += rhetorical_scores.get("persuasion", 0) * 0.6
