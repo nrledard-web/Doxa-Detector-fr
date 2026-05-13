@@ -8229,6 +8229,42 @@ def compute_dissimulation_attenuation(text: str) -> float:
 
     return round(min(raw / 10, 1.0), 3)
 
+def detect_emotional_registers(text: str) -> dict:
+    registers = {
+        "peur": [
+            "peur", "crainte", "menace", "danger", "risque", "panique",
+            "angoisse", "inquiétude", "insécurité", "catastrophe"
+        ],
+        "colere": [
+            "colère", "scandale", "inacceptable", "honte", "trahison",
+            "corrompu", "mensonge", "abus", "révolte", "indignation"
+        ],
+        "urgence": [
+            "immédiatement", "urgent", "urgence", "avant qu'il ne soit trop tard",
+            "il faut agir", "maintenant", "sans délai", "crise majeure"
+        ],
+        "fatalisme": [
+            "inévitable", "tout est perdu", "plus rien", "aucune solution",
+            "condamné", "effondrement", "fin d'un cycle", "basculement"
+        ],
+        "victimisation": [
+            "victimes", "abandonnés", "méprisés", "humiliés", "opprimés",
+            "sacrifiés", "oubliés", "sans défense"
+        ],
+        "exaltation": [
+            "réveil", "libération", "espoir", "victoire", "renaissance",
+            "sursaut", "courage", "grandeur", "héroïque"
+        ],
+    }
+
+    scores = {}
+
+    for register, words in registers.items():
+        raw = count_markers(text, words)
+        scores[register] = round(min(raw / 5, 1.0), 3)
+
+    return scores
+
 def detect_rhetorical_structures(text: str):
     t = text.lower()
 
