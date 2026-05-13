@@ -8110,6 +8110,47 @@ def compute_performative_coherence(text: str) -> float:
 
     return round(min(raw / 6, 1.0), 3)
 
+def compute_cognitive_compression(text: str) -> float:
+    words = re.findall(r"\b[\wà-ÿ'-]+\b", text.lower())
+    sentences = [
+        s.strip()
+        for s in re.split(r"[.!?;:]+", text)
+        if len(s.strip()) > 5
+    ]
+
+    if not words or not sentences:
+        return 0.0
+
+    connectors = [
+        "car", "parce que", "puisque", "donc", "ainsi", "cependant",
+        "pourtant", "mais", "or", "en effet", "toutefois", "néanmoins",
+        "par conséquent", "dès lors", "alors"
+    ]
+
+    connector_count = count_markers(text, connectors)
+
+    avg_sentence_len = len(words) / max(len(sentences), 1)
+
+    short_sentence_ratio = sum(
+        1 for s in sentences
+        if len(s.split()) <= 8
+    ) / len(sentences)
+
+    lexical_density = len([
+        w for w in words
+        if w not in STOPWORDS
+    ]) / len(words)
+
+    low_connector_ratio = 1 - min(connector_count / max(len(sentences), 1), 1)
+
+    score = (
+        lexical_density * 0.45
+        + short_sentence_ratio * 0.25
+        + low_connector_ratio * 0.30
+    )
+
+    return round(min(score, 1.0), 3)
+
 
 def detect_rhetorical_structures(text: str):
     t = text.lower()
@@ -8197,6 +8238,7 @@ def detect_rhetorical_structures(text: str):
         scores[family] = min(raw / 6, 1.0)
 
     scores["coherence_performative"] = compute_performative_coherence(text)
+    scores["compression_cognitive"] = compute_cognitive_compression(text)
 
     return scores
 
