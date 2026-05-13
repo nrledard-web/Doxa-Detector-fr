@@ -7026,6 +7026,7 @@ def analyze_article(text: str) -> Dict:
         text,
         rhetorical_scores
     )
+    emotional_registers = detect_emotional_registers(text)
     statistical_manipulation_analysis = detect_statistical_manipulation(text)
     
     statistical_manipulation_analysis = detect_statistical_manipulation(text)
