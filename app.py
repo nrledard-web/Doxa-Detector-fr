@@ -8322,7 +8322,7 @@ def explain_discourse_profile(result):
         rhetorical.items(),
         key=lambda x: x[1],
         reverse=True
-    )[:3]
+    )[:5]
 
     top_discourse = sorted(
         discourse.items(),
