@@ -793,7 +793,7 @@ VICTIMISATION = [
     "we are being silenced",
     "we are under attack"
 ]
-MORALISATION DISCOURS = [
+MORALISATION_DISCOURS = [
     "c'est une question de responsabilité",
     "c'est notre devoir",
     "nous avons le devoir",
