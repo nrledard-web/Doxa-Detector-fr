@@ -8408,7 +8408,7 @@ def detect_discourse_type_from_rhetoric(text: str, rhetorical_scores: dict):
     scores["argumentatif"] += rhetorical_scores.get("persuasion", 0) * 0.6
     scores["argumentatif"] += rhetorical_scores.get("dissimulation_attenuation", 0) * 0.4
 
-    scores["philosophique"] += rhetorical_scores.get("compression_cognitive", 0) * 0.08
+    scores["philosophique"] += rhetorical_scores.get("compression_cognitive", 0) * 0.03
     scores["pamphlétaire"] += rhetorical_scores.get("compression_cognitive", 0) * 0.3
     scores["poétique"] += rhetorical_scores.get("compression_cognitive", 0) * 0.05
 
