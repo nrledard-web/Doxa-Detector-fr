@@ -1131,7 +1131,6 @@ def detect_political_patterns(text: str):
         "delegitimation": CONFUSION_DELEGITIMATION,
         "dilution": DILUTION_RESPONSABILITE,
         "causalite": CAUSALITE_IMPLICITE,
-        "moralisation_discours": MORALISATION_DISCOURS,
     }
 
     results = {}
