@@ -8380,7 +8380,7 @@ def detect_discourse_type_from_rhetoric(text: str, rhetorical_scores: dict):
 
     scores["philosophique"] += rhetorical_scores.get("abstraction", 0) * 1.5
     scores["philosophique"] += rhetorical_scores.get("implicite", 0) * 0.4
-    scores["philosophique"] += rhetorical_scores.get("coherence_performative", 0) * 0.5
+    scores["philosophique"] += rhetorical_scores.get("coherence_performative", 0) * 0
 
     scores["poétique"] += rhetorical_scores.get("poeticite", 0) * 1.4
     scores["poétique"] += rhetorical_scores.get("abstraction", 0) * 0.4
