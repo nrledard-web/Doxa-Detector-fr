@@ -8370,9 +8370,9 @@ def detect_discourse_type_from_rhetoric(text: str, rhetorical_scores: dict):
     }
 
     scores["pamphlétaire"] += rhetorical_scores.get("attaque", 0) * 1.6
-    scores["pamphlétaire"] += rhetorical_scores.get("amplification", 0) * 1.2
+    scores["pamphlétaire"] += rhetorical_scores.get("amplification", 0) * 0.7
     scores["pamphlétaire"] += rhetorical_scores.get("coherence_performative", 0) * 0.4
-    scores["pamphlétaire"] += rhetorical_scores.get("saturation_rhetorique", 0) * 0.8
+    scores["pamphlétaire"] += rhetorical_scores.get("saturation_rhetorique", 0) * 0.45
 
     scores["politique"] += rhetorical_scores.get("narrativité", 0) * 0.8
     scores["politique"] += rhetorical_scores.get("attaque", 0) * 0.7
@@ -8402,7 +8402,7 @@ def detect_discourse_type_from_rhetoric(text: str, rhetorical_scores: dict):
 
     scores["conspirationniste"] += rhetorical_scores.get("soupcon_systemique", 0) * 1.8
     scores["conspirationniste"] += rhetorical_scores.get("amplification", 0) * 0.6
-    scores["conspirationniste"] += rhetorical_scores.get("narrativité", 0) * 0.4
+    scores["conspirationniste"] += rhetorical_scores.get("narrativité", 0) * 0.15
     scores["conspirationniste"] += rhetorical_scores.get("saturation_rhetorique", 0) * 0.5
 
     scores["argumentatif"] += rhetorical_scores.get("technicite", 0) * 0.6
