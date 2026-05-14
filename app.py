@@ -10394,36 +10394,6 @@ st.markdown("""
 </div>
 """, unsafe_allow_html=True)
 
-# =============================
-# Analyse sémantique du discours
-# =============================
-
-st.subheader("Analyse sémantique du discours")
-st.caption(
-    "Analyse la cohérence du sens et la stabilité conceptuelle du discours afin d’affiner l’évaluation épistémique."
-)
-
-semantic_score = result.get("semantic_score", None)
-
-if st.session_state.get("semantic_mode", False):
-
-    if semantic_score is not None:
-
-        st.progress(semantic_score / 20)
-        st.caption(f"Score sémantique : {semantic_score}/20")
-
-        delta = round(semantic_score - base_score, 1)
-
-        st.metric(
-            "Influence sémantique sur l’évaluation épistémique",
-            f"{delta:+}/20"
-        )
-
-    else:
-        st.info("Analyse sémantique activée, mais aucun score n’est encore calculé.")
-
-else:
-    st.info("Activez l’analyse sémantique pour calculer cette jauge.")
 
 st.markdown("""
 <div style="text-align:center; margin:25px 0; color:#888;">
@@ -10907,6 +10877,36 @@ st.link_button(
     f"mailto:?subject=Analyse DOXA Detector&body={encoded}",
     use_container_width=True
 )
+# =============================
+# Analyse sémantique du discours
+# =============================
+
+st.subheader("Analyse sémantique du discours")
+st.caption(
+    "Analyse la cohérence du sens et la stabilité conceptuelle du discours afin d’affiner l’évaluation épistémique."
+)
+
+semantic_score = result.get("semantic_score", None)
+
+if st.session_state.get("semantic_mode", False):
+
+    if semantic_score is not None:
+
+        st.progress(semantic_score / 20)
+        st.caption(f"Score sémantique : {semantic_score}/20")
+
+        delta = round(semantic_score - base_score, 1)
+
+        st.metric(
+            "Influence sémantique sur l’évaluation épistémique",
+            f"{delta:+}/20"
+        )
+
+    else:
+        st.info("Analyse sémantique activée, mais aucun score n’est encore calculé.")
+
+else:
+    st.info("Activez l’analyse sémantique pour calculer cette jauge.")
 
 # -----------------------------
 # Mode sémantique
