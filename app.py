@@ -11471,23 +11471,45 @@ with pd2:
         )
     
         st.markdown("**Principe**")
+        
         st.write(
-            "Le texte est comparé à une liste de marqueurs émotionnels. "
-            "Chaque terme détecté augmente le score de charge émotionnelle."
+            "La charge émotionnelle mesure l’intensité affective du discours "
+            "à partir de plusieurs registres émotionnels : peur, colère, urgence, "
+            "fatalisme, victimisation et exaltation."
         )
-    
+        
+        st.write(
+            "Chaque registre possède un poids différent selon sa capacité "
+            "à orienter émotionnellement la lecture."
+        )
+        
         st.markdown("**Formule utilisée**")
+        
         st.code(
-            "hits = termes émotionnels détectés\n"
-            "score = min(len(hits) * 2.2 / 10, 1.0)"
+            "score = (\n"
+            " peur × 0.22\n"
+            "+ colere × 0.26\n"
+            "+ urgence × 0.18\n"
+            "+ fatalisme × 0.12\n"
+            "+ victimisation × 0.12\n"
+            "+ exaltation × 0.10\n"
+            ")\n"
+            "score = min(score, 1.0)"
         )
     
         st.markdown("**Valeur actuelle**")
         st.write(f"Score : **{round(emotional_value * 100, 1)}%**")
         st.write(f"Niveau : **{emotional_label}**")
     
+        emotionals = result.get("emotional_registers", {})
+        
         st.code(
-            f"score = min({len(result.get('emotional_intensity_markers', []))} × 2.2 / 10, 1.0)\n"
+            f"peur = {emotionals.get('peur', 0):.2f}\n"
+            f"colere = {emotionals.get('colere', 0):.2f}\n"
+            f"urgence = {emotionals.get('urgence', 0):.2f}\n"
+            f"fatalisme = {emotionals.get('fatalisme', 0):.2f}\n"
+            f"victimisation = {emotionals.get('victimisation', 0):.2f}\n"
+            f"exaltation = {emotionals.get('exaltation', 0):.2f}\n\n"
             f"score = {emotional_value:.3f}"
         )
     
