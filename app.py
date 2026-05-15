@@ -6395,7 +6395,7 @@ def compute_global_penalties(result: dict) -> dict:
     }
 
 def compute_secondary_alert_pressure(result: dict) -> float:
-    signals = [
+    weighted_signals = [
         result.get("propaganda_score", 0) * 1.4,
         result.get("argument_asymmetry_score", 0) * 1.2,
         result.get("emotional_intensity_score", 0) * 1.0,
@@ -6409,7 +6409,13 @@ def compute_secondary_alert_pressure(result: dict) -> float:
         result.get("dissonance_score", 0) * 1.2,
     ]
 
-    pressure = sum(signals) / 12
+    total_weight = (
+        1.4 + 1.2 + 1.0 + 1.1 + 1.1 +
+        1.3 + 1.0 + 1.0 + 1.0 + 0.9 + 1.2
+    )
+
+    pressure = sum(weighted_signals) / total_weight
+
     return round(min(pressure, 1.0), 3)
 
 def compute_doxa_brain(result: dict) -> dict:
