@@ -1319,6 +1319,7 @@ DISCOURSE_MODIFIERS = {
         "strong_certainty_score": 0.45,
         "misleading_comparison_score": 0.45,
         "scientific_simulation_score": 0.60,
+        "frame_shift_score": 0.55,
     },
 
     "technocratique": {
