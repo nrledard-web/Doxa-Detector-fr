@@ -7798,6 +7798,11 @@ def analyze_article(text: str) -> Dict:
     result["emotional_intensity_score"] = emotional_intensity_analysis["score"]
     result["emotional_intensity_markers"] = emotional_intensity_analysis["markers"]
     result["emotional_intensity_interpretation"] = emotional_intensity_analysis["interpretation"]
+
+    # Sécurité asymétrie argumentative
+    if result.get("argument_attack_count", 0) == 0:
+        result["argument_asymmetry_score"] = 0.0
+        result["argument_asymmetry_interpretation"] = "Aucune rhétorique d’attaque dominante détectée."
     
     result["brain"] = brain
     result = classify_cognitive_regime(result)
