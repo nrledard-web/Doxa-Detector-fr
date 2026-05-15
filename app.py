@@ -11668,11 +11668,13 @@ with pd3:
 
         st.markdown("**Formule utilisée**")
         st.code(
-            "if argument_count == 0:\n"
-            "    score = attack_count * 0.25\n"
+            "if attack_count == 0:\n"
+            "    score = 0.0\n"
+            "elif argument_count == 0:\n"
+            "    score = min(attack_count * 0.18, 0.65)\n"
             "else:\n"
-            "    score = (attack_count / argument_count) * 0.25\n\n"
-            "score = min(score, 1.0)",
+            "    ratio = attack_count / argument_count\n"
+            "    score = min(ratio * 0.22, 1.0)",
             language="python"
         )
 
