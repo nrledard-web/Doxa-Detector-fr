@@ -8537,6 +8537,16 @@ def detect_rhetorical_structures(text: str):
             "méthode", "analyse", "pourcentage", "%", "selon", "chiffres"
         ],
     }
+        "economie_politique": [
+            "dette", "dette publique", "déficit", "budget", "budgétaire",
+            "croissance", "inflation", "emprunt", "taux", "intérêts",
+            "refinancement", "recettes publiques", "dépenses",
+            "prélèvements", "fiscalité", "investissement public",
+            "politique industrielle", "protection sociale",
+            "ressources disponibles", "marges de manœuvre",
+            "macroéconomique", "économie", "investisseurs",
+            "charge des intérêts", "modèle de société"
+        ],
 
     scores = {}
 
