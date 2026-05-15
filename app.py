@@ -7895,6 +7895,9 @@ def analyze_article(text: str) -> Dict:
         "emotional_intensity_markers": emotional_intensity_analysis["markers"],
         "emotional_intensity_interpretation": emotional_intensity_analysis["interpretation"],
 
+        "false_dilemma_nuance_count": aristotelian_fallacies["false_dilemma"].get("nuance_count", 0),
+        "false_dilemma_nuance_markers": aristotelian_fallacies["false_dilemma"].get("nuance_markers", []),
+
         "rhetorical_scores": rhetorical_scores,
         "discourse_type_rhetoric": disc_type_rhetoric,
         "discourse_explanation_rhetoric": disc_explanation_rhetoric,
