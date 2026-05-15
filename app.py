@@ -8536,7 +8536,7 @@ def detect_rhetorical_structures(text: str):
             "étude", "rapport", "source", "données", "statistique",
             "méthode", "analyse", "pourcentage", "%", "selon", "chiffres"
         ],
-    }
+        
         "economie_politique": [
             "dette", "dette publique", "déficit", "budget", "budgétaire",
             "croissance", "inflation", "emprunt", "taux", "intérêts",
@@ -8547,7 +8547,7 @@ def detect_rhetorical_structures(text: str):
             "macroéconomique", "économie", "investisseurs",
             "charge des intérêts", "modèle de société"
         ],
-
+    }
     scores = {}
 
     for family, words in markers.items():
