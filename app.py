@@ -12794,13 +12794,20 @@ with oi2:
 
         st.markdown("**Principe**")
         st.write(
-            "Elle combine les anciens marqueurs narratifs — ennemi, urgence, certitude, émotion — avec les nouveaux signaux rhétoriques : saturation, soupçon systémique, attaque, amplification, colère et peur."
-            "désignation d’un ennemi, urgence ou menace, certitude absolue et charge émotionnelle."
+            "Elle combine les anciens marqueurs narratifs — ennemi, urgence, certitude et émotion — "
+            "avec les nouveaux signaux rhétoriques : saturation, soupçon systémique, attaque, "
+            "amplification, colère et peur."
         )
 
         st.markdown("**Formule utilisée**")
         st.code(
-            "score = f(enemy_terms, urgency_terms, certainty_terms, emotional_terms)\n"
+            "score = ancien_score_narratif × 0.35\n"
+            "+ saturation_rhetorique × 0.15\n"
+            "+ soupcon_systemique × 0.15\n"
+            "+ attaque × 0.10\n"
+            "+ amplification × 0.10\n"
+            "+ colere × 0.10\n"
+            "+ peur × 0.05\n"
             "score = min(score, 1.0)",
             language="python"
         )
