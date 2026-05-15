@@ -15558,9 +15558,9 @@ with js3:
 
         st.markdown("**Formule utilisée**")
         st.code(
-            "markers = marqueurs de certitude détectés\n"
-            "score = min(len(markers) * coefficient / 10, 1.0)",
-            language="python"
+            "raw_score = (len(markers) / nombre_de_phrases) × 3.0\n"
+            "hedge_reduction = min(len(marqueurs_de_prudence) × 0.08, 0.45)\n"
+            "score = max(0.0, raw_score - hedge_reduction)"
         )
 
         markers = result.get("strong_certainty_markers", [])
