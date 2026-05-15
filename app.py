@@ -11363,27 +11363,44 @@ with pd1:
         )
 
         st.markdown("**Principe**")
+        
         st.write(
-            "Chaque mécanisme rhétorique détecté — certitude, dramatisation, ennemi, causalité, etc. — "
-            "augmente la pression globale selon un poids spécifique."
+            "La pression rhétorique mesure l’intensité des procédés discursifs "
+            "qui orientent la perception du lecteur sans nécessairement démontrer "
+            "les affirmations avancées."
         )
-
+        
+        st.write(
+            "Le calcul repose sur plusieurs dimensions rhétoriques modernes : "
+            "amplification, saturation rhétorique, persuasion, attaque, implicite, "
+            "soupçon systémique et cohérence performative."
+        )
+        
         st.markdown("**Formule utilisée**")
+        
         st.code(
-            "weighted_score = Σ(occurrences × poids)\n"
-            "pression = min(weighted_score / 10, 1.0)"
+            "pression = (\n"
+            " amplification × 0.18\n"
+            "+ saturation_rhetorique × 0.22\n"
+            "+ persuasion × 0.14\n"
+            "+ attaque × 0.16\n"
+            "+ implicite × 0.10\n"
+            "+ soupcon_systemique × 0.10\n"
+            "+ coherence_performative × 0.10\n"
+            ")\n"
+            "pression = min(pression, 1.0)"
         )
-
+        
         st.markdown("**Poids des mécanismes**")
+        
         st.code(
-            "certitude = 1.2\n"
-            "autorite = 1.0\n"
-            "dramatisation = 1.3\n"
-            "generalisation = 1.1\n"
-            "naturalisation = 1.4\n"
-            "ennemi = 1.5\n"
-            "causalite = 1.4\n"
-            "moralisation = 1.2"
+            "amplification = 0.18\n"
+            "saturation_rhetorique = 0.22\n"
+            "persuasion = 0.14\n"
+            "attaque = 0.16\n"
+            "implicite = 0.10\n"
+            "soupcon_systemique = 0.10\n"
+            "coherence_performative = 0.10"
         )
 
         st.markdown("**Valeur actuelle**")
