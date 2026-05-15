@@ -5029,11 +5029,57 @@ def detect_vague_authority_basic(text: str):
 
 def detect_false_dilemma(text: str):
     text_lower = text.lower()
-    matches = [p for p in FALSE_DILEMMA_PATTERNS if contains_term(text_lower, p) or p in text_lower]
+
+    matches = [
+        p for p in FALSE_DILEMMA_PATTERNS
+        if contains_term(text_lower, p) or p in text_lower
+    ]
+
+    nuance_markers = [
+        "plusieurs options",
+        "plusieurs facteurs",
+        "plusieurs solutions",
+        "doivent être distingués",
+        "ne signifie pas nécessairement",
+        "éviter deux excès",
+        "d'autres options",
+        "d’autres options",
+        "nuancer",
+        "cependant",
+        "toutefois",
+        "néanmoins",
+    ]
+
+    nuance_hits = [
+        marker for marker in nuance_markers
+        if contains_term(text_lower, marker)
+    ]
+
+    raw_score = len(matches) * 0.25
+    nuance_reduction = min(len(nuance_hits) * 0.07, 0.35)
+
+    score = max(0.0, min(raw_score - nuance_reduction, 1.0))
+
+    if score <= 0.05 and matches and nuance_hits:
+        interpretation = (
+            "Des oppositions binaires existent, mais elles sont compensées "
+            "par des marqueurs d’ouverture ou de nuance."
+        )
+    elif score >= 0.60:
+        interpretation = "Réduction forte du réel à deux options."
+    elif score >= 0.35:
+        interpretation = "Réduction artificielle du réel à deux options."
+    elif score >= 0.15:
+        interpretation = "Simplification binaire légère ou partielle."
+    else:
+        interpretation = "Aucun faux dilemme saillant détecté."
+
     return {
-        "score": min(len(matches) * 0.5, 1.0),
+        "score": round(score, 3),
         "matches": matches,
-        "interpretation": "Réduction artificielle du réel à deux options." if matches else "Aucun faux dilemme saillant détecté."
+        "nuance_markers": nuance_hits,
+        "nuance_count": len(nuance_hits),
+        "interpretation": interpretation,
     }
 
 def detect_ad_hominem(text: str):
