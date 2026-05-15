@@ -1363,6 +1363,17 @@ DISCOURSE_MODIFIERS = {
         "false_dilemma_score": 0.60,
         "logical_jump_score": 0.70,
     },
+    
+    "economie_politique": {
+        "false_dilemma_score": 0.40,
+        "logical_jump_score": 0.70,
+        "strong_certainty_score": 0.45,
+        "misleading_comparison_score": 0.65,
+        "scientific_simulation_score": 0.75,
+        "premise_score": 0.70,
+        "propaganda_score": 0.65,
+        "threat_amplification_score": 0.55,
+        "coherence_trompeuse_score": 0.75,
 }
 
 def apply_discourse_modifiers(result: dict):
@@ -1373,6 +1384,8 @@ def apply_discourse_modifiers(result: dict):
         discourse_key = "philosophique"
     elif "technocratique" in discourse:
         discourse_key = "technocratique"
+    elif "economie_politique" in discourse:
+        discourse_key = "economie_politique"
     elif "pamphlétaire" in discourse:
         discourse_key = "pamphlétaire"
     elif "journalistique" in discourse:
