@@ -1316,8 +1316,8 @@ DISCOURSE_MODIFIERS = {
     "philosophique": {
         "false_dilemma_score": 0.45,
         "logical_jump_score": 0.60,
-        "certainty_score": 0.55,
-        "comparison_score": 0.50,
+        "strong_certainty_score": 0.45,
+        "misleading_comparison_score": 0.45,
         "scientific_simulation_score": 0.60,
     },
 
