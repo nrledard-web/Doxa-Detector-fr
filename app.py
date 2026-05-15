@@ -12794,7 +12794,7 @@ with oi2:
 
         st.markdown("**Principe**")
         st.write(
-            "Elle s’appuie sur la détection de quatre types de marqueurs : "
+            "Elle combine les anciens marqueurs narratifs — ennemi, urgence, certitude, émotion — avec les nouveaux signaux rhétoriques : saturation, soupçon systémique, attaque, amplification, colère et peur."
             "désignation d’un ennemi, urgence ou menace, certitude absolue et charge émotionnelle."
         )
 
