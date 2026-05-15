@@ -7637,7 +7637,7 @@ def analyze_article(text: str) -> Dict:
         "political_pattern_score": political_pattern_score,
         "political_results": political_results,
         "matched_terms": matched_terms,
-        "rhetorical_pressure": rhetorical_pressure,
+        "rhetorical_pressure": 0,
         "V": V,
         "R": R,
         "improved": improved,
@@ -7697,7 +7697,7 @@ def analyze_article(text: str) -> Dict:
         "conceptual_domains": conceptual_domains,
         "conceptual_terms": conceptual_terms,
     }
-
+    result["rhetorical_pressure"] = compute_rhetorical_pressure(result)
     result["brain"] = brain
     result = classify_cognitive_regime(result)
 
