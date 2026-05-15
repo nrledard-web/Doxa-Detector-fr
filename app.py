@@ -2591,6 +2591,17 @@ SCIENTIFIC_SIMULATION_MARKERS = {
         "mécanisme", "processus", "paradigme",
         "system", "structure", "dynamics", "model", "mechanism", "process"
     ],
+    "economie_politique": [
+        "dette", "dette publique", "déficit", "budget", "budgétaire",
+        "croissance", "inflation", "emprunt", "taux", "intérêts",
+        "refinancement", "recettes publiques", "dépenses",
+        "prélèvements", "fiscalité", "investissement public",
+        "politique industrielle", "protection sociale",
+        "ressources disponibles", "marges de manœuvre",
+        "macroéconomique", "économie", "investisseurs",
+        "charge des intérêts", "modèle de société"
+    ],
+    
     "chiffres_sans_source": [
         "pour cent",
         "une étude récente",
