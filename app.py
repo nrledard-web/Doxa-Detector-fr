@@ -8399,10 +8399,16 @@ def detect_discourse_type_from_rhetoric(text: str, rhetorical_scores: dict):
     scores["technocratique"] += rhetorical_scores.get("coherence_performative", 0) * 0.2
     scores["technocratique"] += rhetorical_scores.get("compression_cognitive", 0) * 0.2
 
-    scores["conspirationniste"] += rhetorical_scores.get("soupcon_systemique", 0) * 1.8
-    scores["conspirationniste"] += rhetorical_scores.get("amplification", 0) * 0.6
+    scores["conspirationniste"] += rhetorical_scores.get("soupcon_systemique", 0) * 0.6
+    scores["conspirationniste"] += rhetorical_scores.get("implicite", 0) * 0.2
+    scores["conspirationniste"] += rhetorical_scores.get("amplification", 0) * 0.4
     scores["conspirationniste"] += rhetorical_scores.get("narrativité", 0) * 0.15
-    scores["conspirationniste"] += rhetorical_scores.get("saturation_rhetorique", 0) * 0.5
+    
+    if (
+        rhetorical_scores.get("soupcon_systemique", 0) > 0.3
+        and rhetorical_scores.get("implicite", 0) > 0.3
+    ):
+        scores["conspirationniste"] += 0.4
 
     scores["argumentatif"] += rhetorical_scores.get("technicite", 0) * 0.6
     scores["argumentatif"] += rhetorical_scores.get("persuasion", 0) * 0.6
