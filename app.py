@@ -3555,39 +3555,41 @@ def compute_vague_authority(text: str):
         "interpretation": interpretation,
     }
 
-def compute_emotional_intensity(text: str):
-    if not text or not text.strip():
+def compute_emotional_intensity(result: dict):
+    emotions = result.get("emotional_registers", {})
+
+    if not emotions:
         return {
             "score": 0.0,
             "markers": [],
             "interpretation": "Aucune charge émotionnelle saillante détectée."
         }
 
-    t = text.lower()
+    score = (
+        emotions.get("peur", 0) * 0.22
+        + emotions.get("colere", 0) * 0.26
+        + emotions.get("urgence", 0) * 0.18
+        + emotions.get("fatalisme", 0) * 0.12
+        + emotions.get("victimisation", 0) * 0.12
+        + emotions.get("exaltation", 0) * 0.10
+    )
 
-    markers = []
-    raw_score = 0.0
-
-    for term, weight in EMOTIONAL_DICT.items():
-        if contains_term(t, term):
-            markers.append(term)
-            raw_score += weight
-
-    markers = unique_keep_order(markers)
-
-    score = min(raw_score / 4.0, 1.0)
+    markers = [
+        name for name, value in emotions.items()
+        if value > 0
+    ]
 
     if score < 0.15:
         interpretation = "Le texte reste peu chargé émotionnellement."
     elif score < 0.35:
-        interpretation = "Le texte contient quelques marqueurs émotionnels."
+        interpretation = "Le texte contient une charge émotionnelle modérée."
     elif score < 0.60:
         interpretation = "Le texte mobilise une charge émotionnelle notable."
     else:
         interpretation = "Le texte repose fortement sur une intensité émotionnelle orientant la lecture."
 
     return {
-        "score": round(score, 3),
+        "score": round(min(score, 1.0), 3),
         "markers": markers,
         "interpretation": interpretation,
     }
