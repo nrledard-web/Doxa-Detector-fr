@@ -7613,9 +7613,9 @@ def analyze_article(text: str) -> Dict:
         "advanced_deceptive_coherence_markers": advanced_deceptive_coherence_analysis["markers"],
         "advanced_deceptive_coherence_interpretation": advanced_deceptive_coherence_analysis["interpretation"],
 
-        "emotional_intensity_score": 0,
-        "emotional_intensity_markers": [],
-        "emotional_intensity_interpretation": "",
+        "emotional_intensity_score": emotional_intensity_analysis["score"],
+        "emotional_intensity_markers": emotional_intensity_analysis["markers"],
+        "emotional_intensity_interpretation": emotional_intensity_analysis["interpretation"],
 
         "rhetorical_scores": rhetorical_scores,
         "discourse_type_rhetoric": disc_type_rhetoric,
