@@ -1307,6 +1307,57 @@ def interpret_discursive_profile(
     else:
         return "Discours ambigu ou mixte"
 
+# =========================================================
+# MODULATION CONTEXTUELLE DES DISCOURS
+# =========================================================
+
+DISCOURSE_MODIFIERS = {
+
+    "philosophique": {
+        "false_dilemma_score": 0.45,
+        "logical_jump_score": 0.60,
+        "certainty_score": 0.55,
+        "comparison_score": 0.50,
+        "scientific_simulation_score": 0.60,
+    },
+
+    "technocratique": {
+        "scientific_simulation_score": 1.25,
+        "abstraction_score": 1.15,
+        "premise_score": 1.10,
+    },
+
+    "pamphlétaire": {
+        "emotional_intensity_score": 0.75,
+        "propaganda_score": 1.10,
+        "rhetorical_pressure": 1.10,
+    },
+
+    "journalistique": {
+        "scientific_simulation_score": 0.85,
+        "false_dilemma_score": 0.80,
+    },
+
+    "religieux": {
+        "false_dilemma_score": 0.60,
+        "logical_jump_score": 0.70,
+    },
+}
+
+def apply_discourse_modifiers(result: dict):
+
+    discourse = result.get("discourse_type_rhetoric", "").lower()
+
+    modifiers = DISCOURSE_MODIFIERS.get(discourse, {})
+
+    for key, factor in modifiers.items():
+
+        if key in result:
+            result[key] = round(result[key] * factor, 3)
+
+    return result
+    
+
 def interpret_closure_gauge(value: float):
     """
     Traduit la clôture cognitive en étiquette + couleur + commentaire.
