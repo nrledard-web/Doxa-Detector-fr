@@ -7037,7 +7037,17 @@ def compute_strong_certainty(text):
     hedge_reduction = min(len(hedge_hits) * 0.08, 0.45)
 
     score = max(0.0, min(raw_score - hedge_reduction, 1.0))
-
+    
+    if score <= 0.05 and hedge_hits and found_markers:
+        interpretation = (
+            "Des formulations assertives existent, mais elles sont fortement compensées "
+            "par des marqueurs de nuance et de prudence."
+        )
+    elif score >= 0.4:
+        interpretation = "Le texte emploie une certitude forte ou verrouillante."
+    else:
+        interpretation = "Peu de certitude forte composée détectée."
+    
     return {
         "score": round(score, 3),
         "label": label_level(score),
@@ -7045,11 +7055,7 @@ def compute_strong_certainty(text):
         "hedge_markers": hedge_hits,
         "marker_count": marker_count,
         "hedge_count": len(hedge_hits),
-        "interpretation": (
-            "Le texte emploie une certitude forte ou verrouillante."
-            if score >= 0.4
-            else "Peu de certitude forte composée détectée."
-        )
+        "interpretation": interpretation,
     }
 # =====================================================
 # DÉTECTION DES DOMAINES CONCEPTUELS
