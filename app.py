@@ -1347,8 +1347,21 @@ DISCOURSE_MODIFIERS = {
 def apply_discourse_modifiers(result: dict):
 
     discourse = result.get("discourse_type_rhetoric", "").lower()
-
-    modifiers = DISCOURSE_MODIFIERS.get(discourse, {})
+    
+    if "philosophique" in discourse:
+        discourse_key = "philosophique"
+    elif "technocratique" in discourse:
+        discourse_key = "technocratique"
+    elif "pamphlétaire" in discourse:
+        discourse_key = "pamphlétaire"
+    elif "journalistique" in discourse:
+        discourse_key = "journalistique"
+    elif "religieux" in discourse:
+        discourse_key = "religieux"
+    else:
+        discourse_key = discourse
+    
+    modifiers = DISCOURSE_MODIFIERS.get(discourse_key, {})
 
     for key, factor in modifiers.items():
 
