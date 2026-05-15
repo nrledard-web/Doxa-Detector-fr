@@ -1211,56 +1211,56 @@ def compute_cognitive_gravity(result):
 
     return round(min(1, max(0, gravity)), 3)
         
-    def compute_propaganda_gauge(
-        lie_gauge: float,
-        rhetorical_pressure: float,
-        closure: float,
-    
-        false_consensus: float,
-        moral_polarization: float,
-        binary_opposition: float,
-        victimization: float,
-        semantic_shift: float,
-        false_dilemma: float,
-    
-        saturation_rhetorique: float = 0.0,
-        soupcon_systemique: float = 0.0,
-        attaque: float = 0.0,
-        amplification: float = 0.0,
-        colere: float = 0.0,
-        peur: float = 0.0,
-    ):
-        """
-        Jauge propagandiste structurelle modernisée.
-        """
-    
-        ideological_core = (
-            false_consensus
-            + moral_polarization
-            + binary_opposition
-            + victimization
-            + semantic_shift
-            + false_dilemma
-        ) / 6
-    
-        rhetorical_core = (
-            saturation_rhetorique * 0.30
-            + soupcon_systemique * 0.25
-            + attaque * 0.20
-            + amplification * 0.15
-            + colere * 0.07
-            + peur * 0.03
-        )
-    
-        score = (
-            0.18 * lie_gauge +
-            0.18 * rhetorical_pressure +
-            0.12 * closure +
-            0.32 * ideological_core +
-            0.20 * rhetorical_core
-        )
-    
-        return clamp(score, 0.0, 1.0)
+def compute_propaganda_gauge(
+    lie_gauge: float,
+    rhetorical_pressure: float,
+    closure: float,
+
+    false_consensus: float,
+    moral_polarization: float,
+    binary_opposition: float,
+    victimization: float,
+    semantic_shift: float,
+    false_dilemma: float,
+
+    saturation_rhetorique: float = 0.0,
+    soupcon_systemique: float = 0.0,
+    attaque: float = 0.0,
+    amplification: float = 0.0,
+    colere: float = 0.0,
+    peur: float = 0.0,
+):
+    """
+    Jauge propagandiste structurelle modernisée.
+    """
+
+    ideological_core = (
+        false_consensus
+        + moral_polarization
+        + binary_opposition
+        + victimization
+        + semantic_shift
+        + false_dilemma
+    ) / 6
+
+    rhetorical_core = (
+        saturation_rhetorique * 0.30
+        + soupcon_systemique * 0.25
+        + attaque * 0.20
+        + amplification * 0.15
+        + colere * 0.07
+        + peur * 0.03
+    )
+
+    score = (
+        0.18 * lie_gauge +
+        0.18 * rhetorical_pressure +
+        0.12 * closure +
+        0.32 * ideological_core +
+        0.20 * rhetorical_core
+    )
+
+    return clamp(score, 0.0, 1.0)
 
 def interpret_propaganda_gauge(value: float):
     """
