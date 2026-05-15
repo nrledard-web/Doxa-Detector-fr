@@ -1374,6 +1374,7 @@ DISCOURSE_MODIFIERS = {
         "propaganda_score": 0.65,
         "threat_amplification_score": 0.55,
         "coherence_trompeuse_score": 0.75,
+    },
 }
 
 def apply_discourse_modifiers(result: dict):
