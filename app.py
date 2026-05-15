@@ -1298,12 +1298,32 @@ def interpret_discursive_profile(
         return "Discours pseudo-objectif ou pseudo-scientifique"
     elif lie_gauge >= 0.65 and rhetorical_pressure >= 0.45:
         return "Structure discursive manipulatoire probable"
+    
     elif discursive_coherence_score >= 13 and premise_score < 0.20 and logic_confusion_score < 0.20:
         return "Discours plutôt cohérent et peu verrouillant"
+    
+    elif (
+        discursive_coherence_score >= 11
+        and rhetorical_pressure < 0.35
+        and lie_gauge < 0.45
+        and premise_score >= 0.20
+    ):
+        return "Discours analytique ou spéculatif relativement nuancé"
+    
+    elif (
+        scientific_simulation_score < 0.30
+        and logic_confusion_score < 0.30
+        and rhetorical_pressure < 0.30
+        and premise_score >= 0.25
+    ):
+        return "Discours conceptuel ou philosophique"
+    
     elif propaganda_gauge >= 0.45 or rhetorical_pressure >= 0.45:
         return "Discours fortement orienté"
+    
     elif lie_gauge < 0.40 and rhetorical_pressure < 0.35:
         return "Discours plutôt sincère ou peu verrouillant"
+    
     else:
         return "Discours ambigu ou mixte"
 
