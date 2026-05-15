@@ -11465,6 +11465,8 @@ with pd1:
             "+ coherence_performative × 0.10\n"
             ")\n"
             "pression = min(pression, 1.0)"
+            "+ colere × 0.08\n"
+            "+ peur × 0.04\n"
         )
         
         st.markdown("**Poids des mécanismes**")
@@ -11477,6 +11479,8 @@ with pd1:
             "implicite = 0.10\n"
             "soupcon_systemique = 0.10\n"
             "coherence_performative = 0.10"
+            "colere = 0.08\n"
+            "peur = 0.04"
         )
 
         st.markdown("**Valeur actuelle**")
