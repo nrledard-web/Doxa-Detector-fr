@@ -8231,6 +8231,9 @@ def detect_emotional_registers(text: str) -> dict:
         "colere": [
             "colère", "scandale", "inacceptable", "honte", "trahison",
             "corrompu", "mensonge", "abus", "révolte", "indignation"
+            "domination", "confiscation", "contrôle", "censure",
+            "verrouillé", "défiance", "injustice", "oppression",
+            "mépris", "trahison", "privilégiée", "corruption"
         ],
         "urgence": [
             "immédiatement", "urgent", "urgence", "avant qu'il ne soit trop tard",
