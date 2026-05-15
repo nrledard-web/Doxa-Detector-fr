@@ -3501,6 +3501,47 @@ def detect_propaganda_narrative(text: str):
         "interpretation": interpretation,
     }
 
+def compute_modern_propaganda_score(result: dict) -> dict:
+    rhetorical = result.get("rhetorical_scores", {})
+    emotions = result.get("emotional_registers", {})
+
+    base_score = result.get("propaganda_score", 0)
+
+    modern_score = (
+        base_score * 0.35
+        + rhetorical.get("saturation_rhetorique", 0) * 0.15
+        + rhetorical.get("soupcon_systemique", 0) * 0.15
+        + rhetorical.get("attaque", 0) * 0.10
+        + rhetorical.get("amplification", 0) * 0.10
+        + emotions.get("colere", 0) * 0.10
+        + emotions.get("peur", 0) * 0.05
+    )
+
+    if (
+        rhetorical.get("soupcon_systemique", 0) > 0.45
+        and rhetorical.get("saturation_rhetorique", 0) > 0.40
+        and emotions.get("colere", 0) > 0.40
+    ):
+        modern_score += 0.10
+
+    score = round(min(modern_score, 1.0), 3)
+
+    if score < 0.15:
+        interpretation = "Le texte ne présente pas de structure propagandiste marquée."
+    elif score < 0.35:
+        interpretation = "Le texte contient quelques procédés d’orientation narrative ou émotionnelle."
+    elif score < 0.55:
+        interpretation = "Le texte présente une orientation propagandiste modérée."
+    elif score < 0.75:
+        interpretation = "Le texte combine plusieurs mécanismes typiques d’une propagande discursive."
+    else:
+        interpretation = "Le texte est fortement structuré par des mécanismes propagandistes."
+
+    return {
+        "score": score,
+        "interpretation": interpretation,
+    }
+
 def compute_causal_overreach(text: str):
     if not text or not text.strip():
         return {
