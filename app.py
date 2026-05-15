@@ -7932,6 +7932,9 @@ def analyze_article(text: str) -> Dict:
     result["emotional_intensity_markers"] = emotional_intensity_analysis["markers"]
     result["emotional_intensity_interpretation"] = emotional_intensity_analysis["interpretation"]
 
+    result["strong_certainty_hedge_count"] = strong_certainty_analysis.get("hedge_count", 0)
+    result["strong_certainty_hedge_markers"] = strong_certainty_analysis.get("hedge_markers", [])
+
     # Sécurité asymétrie argumentative
     if result.get("argument_attack_count", 0) == 0:
         result["argument_asymmetry_score"] = 0.0
