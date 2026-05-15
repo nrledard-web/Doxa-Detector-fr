@@ -3959,13 +3959,30 @@ def compute_argument_asymmetry(text: str):
 
     text_lower = text.lower()
 
-    attack_count = sum(text_lower.count(term) for term in ATTACK_TERMS)
-    argument_count = sum(text_lower.count(term) for term in ARGUMENT_TERMS)
+    attack_hits = [
+        term for term in ATTACK_TERMS
+        if contains_term(text_lower, term)
+    ]
 
-    if argument_count == 0:
-        score = min(attack_count * 0.25, 1.0)
+    argument_hits = [
+        term for term in ARGUMENT_TERMS
+        if contains_term(text_lower, term)
+    ]
+
+    attack_count = len(unique_keep_order(attack_hits))
+    argument_count = len(unique_keep_order(argument_hits))
+
+    # Sécurité : pas d’asymétrie d’attaque sans attaque réelle.
+    if attack_count == 0:
+        score = 0.0
+
+    # Si le texte attaque mais n’argumente pas, score modéré, pas automatique à 100%.
+    elif argument_count == 0:
+        score = min(attack_count * 0.18, 0.65)
+
     else:
-        score = min((attack_count / argument_count) * 0.25, 1.0)
+        ratio = attack_count / max(argument_count, 1)
+        score = min(ratio * 0.22, 1.0)
 
     if score < 0.15:
         interpretation = "Le texte reste globalement équilibré argumentativement."
