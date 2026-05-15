@@ -13787,53 +13787,53 @@ with al3:
             for marker in markers:
                 st.warning(marker)
 
-        # ℹ️ Explication
-        with st.popover("ℹ️ Comprendre cette jauge"):
-            st.markdown("### Faux dilemme")
-        
-            st.write(
-                "Cette jauge détecte les situations où un problème complexe est réduit "
-                "à deux choix exclusifs, souvent opposés, alors que d’autres options existent."
-            )
-        
-            st.markdown("**Principe**")
-            st.write(
-                "Le texte est comparé à des marqueurs de dichotomisation, mais le score est réduit "
-                "lorsque le texte contient aussi des marqueurs d’ouverture, de nuance ou de pluralité."
-            )
-        
-            st.markdown("**Formule utilisée**")
-            st.code(
-                "raw_score = len(markers) × 0.25\n"
-                "nuance_reduction = min(len(marqueurs_de_nuance) × 0.07, 0.35)\n"
-                "score = max(0.0, raw_score - nuance_reduction)",
-                language="python"
-            )
-        
-            markers = result.get("false_dilemma_markers", [])
-        
-            st.markdown("**Valeur actuelle**")
-            st.write(f"Score : **{round(value * 100, 1)}%**")
-            st.write(f"Niveau : **{label}**")
-            st.write(f"Marqueurs détectés : **{len(markers)}**")
-            st.write(f"Marqueurs de nuance : **{result.get('false_dilemma_nuance_count', 0)}**")
-        
-            st.markdown("**Interprétation actuelle**")
-            st.write(result["false_dilemma_interpretation"])
-        
-            st.markdown("**Lecture**")
-            st.write(
-                "🟢 Faible : alternatives ouvertes\n"
-                "🟡 Modérée : simplification partielle\n"
-                "🟠 Élevée : opposition binaire dominante\n"
-                "🔴 Très élevée : réduction forte du réel à deux choix"
-            )
-        
-            st.markdown("**Attention**")
-            st.write(
-                "Un faux dilemme élevé ne signifie pas que le texte est faux. "
-                "Il indique une simplification excessive qui peut masquer d’autres possibilités."
-            )
+    # ℹ️ Explication
+    with st.popover("ℹ️ Comprendre cette jauge"):
+        st.markdown("### Faux dilemme")
+    
+        st.write(
+            "Cette jauge détecte les situations où un problème complexe est réduit "
+            "à deux choix exclusifs, souvent opposés, alors que d’autres options existent."
+        )
+    
+        st.markdown("**Principe**")
+        st.write(
+            "Le texte est comparé à des marqueurs de dichotomisation, mais le score est réduit "
+            "lorsque le texte contient aussi des marqueurs d’ouverture, de nuance ou de pluralité."
+        )
+    
+        st.markdown("**Formule utilisée**")
+        st.code(
+            "raw_score = len(markers) × 0.25\n"
+            "nuance_reduction = min(len(marqueurs_de_nuance) × 0.07, 0.35)\n"
+            "score = max(0.0, raw_score - nuance_reduction)",
+            language="python"
+        )
+    
+        markers = result.get("false_dilemma_markers", [])
+    
+        st.markdown("**Valeur actuelle**")
+        st.write(f"Score : **{round(value * 100, 1)}%**")
+        st.write(f"Niveau : **{label}**")
+        st.write(f"Marqueurs détectés : **{len(markers)}**")
+        st.write(f"Marqueurs de nuance : **{result.get('false_dilemma_nuance_count', 0)}**")
+    
+        st.markdown("**Interprétation actuelle**")
+        st.write(result["false_dilemma_interpretation"])
+    
+        st.markdown("**Lecture**")
+        st.write(
+            "🟢 Faible : alternatives ouvertes\n"
+            "🟡 Modérée : simplification partielle\n"
+            "🟠 Élevée : opposition binaire dominante\n"
+            "🔴 Très élevée : réduction forte du réel à deux choix"
+        )
+    
+        st.markdown("**Attention**")
+        st.write(
+            "Un faux dilemme élevé ne signifie pas que le texte est faux. "
+            "Il indique une simplification excessive qui peut masquer d’autres possibilités."
+        )
 # -----------------------------
 #  Confusion descriptif / normatif
 # -----------------------------
