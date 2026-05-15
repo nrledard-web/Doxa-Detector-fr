@@ -8577,6 +8577,7 @@ def detect_discourse_type_from_rhetoric(text: str, rhetorical_scores: dict):
         "conspirationniste": 0,
         "journalistique": 0,
         "technocratique": 0,
+        "economie_politique": 0,
     }
 
     scores["pamphlétaire"] += rhetorical_scores.get("attaque", 0) * 1.6
@@ -8588,6 +8589,11 @@ def detect_discourse_type_from_rhetoric(text: str, rhetorical_scores: dict):
     scores["politique"] += rhetorical_scores.get("attaque", 0) * 0.7
     scores["politique"] += rhetorical_scores.get("saturation_rhetorique", 0) * 0.3
     scores["politique"] += rhetorical_scores.get("dissimulation_attenuation", 0) * 0.5
+
+    scores["economie_politique"] += rhetorical_scores.get("economie_politique", 0) * 1.8
+    scores["economie_politique"] += rhetorical_scores.get("technicite", 0) * 0.5
+    scores["economie_politique"] += rhetorical_scores.get("coherence_performative", 0) * 0.3
+    scores["economie_politique"] += rhetorical_scores.get("abstraction", 0) * 0.2
 
     scores["philosophique"] += rhetorical_scores.get("abstraction", 0) * 1.5
     scores["philosophique"] += rhetorical_scores.get("implicite", 0) * 0.4
