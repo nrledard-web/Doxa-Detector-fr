@@ -11505,7 +11505,7 @@ with pd2:
         
         st.code(
             f"peur = {emotionals.get('peur', 0):.2f}\n"
-            f"colere = {emotionals.get('colere', 0):.2f}\n"
+            f"colère = {emotionals.get('colere', 0):.2f}\n"
             f"urgence = {emotionals.get('urgence', 0):.2f}\n"
             f"fatalisme = {emotionals.get('fatalisme', 0):.2f}\n"
             f"victimisation = {emotionals.get('victimisation', 0):.2f}\n"
