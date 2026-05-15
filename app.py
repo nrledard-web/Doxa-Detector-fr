@@ -5529,12 +5529,15 @@ MISSING_REFERENCE_MARKERS = [
     "les chiffres prouvent",
 ]
 
-def detect_missing_reference_data(text: str):
+def detect_misleading_comparison(text: str):
+
     if not text or not text.strip():
         return {
             "score": 0.0,
             "markers": [],
-            "interpretation": "Aucune donnée sans référentiel notable détectée."
+            "interpretation": (
+                "Aucune comparaison trompeuse notable détectée."
+            )
         }
 
     t = normalize_text_for_markers(text)
@@ -5542,89 +5545,146 @@ def detect_missing_reference_data(text: str):
     markers = []
 
     # -----------------------------
-    # 1) Chiffres détectés
+    # 1) Marqueurs réellement orientants
     # -----------------------------
-    numbers = re.findall(r"\d+(?:[\.,]\d+)?\s*%?", text)
+    strong_markers = [
+        "x fois plus",
+        "deux fois plus",
+        "trois fois plus",
+        "plus que jamais",
+        "moins que jamais",
+        "record historique",
+        "niveau jamais atteint",
+        "explosion comparée à",
+        "beaucoup plus que",
+        "bien plus que",
+        "nettement supérieur",
+        "nettement inférieur",
+    ]
+
+    for m in strong_markers:
+        if contains_term(t, m):
+            markers.append(m)
 
     # -----------------------------
-    # 2) Références méthodologiques
+    # 2) Comparaisons sans référentiel
     # -----------------------------
-    methodology_terms = [
+    comparison_terms = [
+        "plus",
+        "moins",
+        "supérieur",
+        "inférieur",
+        "davantage",
+    ]
+
+    reference_terms = [
+        "par rapport à",
+        "comparé à",
+        "selon",
         "source",
-        "méthode",
-        "méthodologie",
-        "échantillon",
-        "rapport",
-        "publication",
-        "université",
-        "revue",
-        "données",
-        "statista",
-        "insee",
-        "ocde",
-        "oms",
-        "who",
-        "étude publiée",
+        "étude",
+        "moyenne",
+        "en 2020",
+        "en 2021",
+        "en 2022",
+        "en 2023",
+        "en 2024",
     ]
 
-    methodology_hits = [
-        m for m in methodology_terms
-        if contains_term(t, m) or m in t
-    ]
+    comparison_hits = sum(
+        1 for w in comparison_terms
+        if f" {w} " in f" {t} "
+    )
+
+    reference_hits = sum(
+        1 for w in reference_terms
+        if contains_term(t, w)
+    )
+
+    if comparison_hits >= 3 and reference_hits == 0:
+        markers.append("comparaisons sans référentiel clair")
 
     # -----------------------------
-    # 3) Marqueurs vagues
+    # 3) Amplification comparative
     # -----------------------------
-    vague_hits = [
-        m for m in MISSING_REFERENCE_MARKERS
-        if contains_term(t, m) or m in t
-    ]
-
-    markers.extend(vague_hits)
-
-    # -----------------------------
-    # 4) Chiffres sans base claire
-    # -----------------------------
-    if len(numbers) >= 2 and len(methodology_hits) <= 1:
-        markers.append("données quantitatives peu contextualisées")
-
-    # -----------------------------
-    # 5) Projection sans modèle
-    # -----------------------------
-    projection_terms = [
-        "d'ici",
-        "d’ici",
-        "vont",
-        "va",
-        "prévoit",
-        "prévision",
-        "projection",
-        "pourrait",
-    ]
-
     if (
-        any(p in t for p in projection_terms)
-        and len(numbers) >= 1
-        and len(methodology_hits) == 0
+        any(w in t for w in [
+            "jamais",
+            "historique",
+            "sans précédent"
+        ])
+        and any(w in t for w in [
+            "plus",
+            "moins",
+            "hausse",
+            "baisse"
+        ])
     ):
-        markers.append("projection chiffrée sans méthodologie explicite")
+        markers.append("comparaison amplifiée")
+
+    # -----------------------------
+    # 4) Réduction par nuance
+    # -----------------------------
+    nuance_markers = [
+        "plusieurs facteurs",
+        "plusieurs options",
+        "doivent être distingués",
+        "ne signifie pas nécessairement",
+        "cependant",
+        "toutefois",
+        "néanmoins",
+        "nuancer",
+        "éviter deux excès",
+    ]
+
+    nuance_hits = [
+        m for m in nuance_markers
+        if contains_term(t, m)
+    ]
 
     markers = unique_keep_order(markers)
 
-    score = min(len(markers) * 0.25, 1.0)
+    raw_score = len(markers) * 0.18
+    nuance_reduction = min(len(nuance_hits) * 0.06, 0.30)
 
-    if score < 0.15:
-        interpretation = "Les données semblent suffisamment contextualisées."
+    score = max(0.0, min(raw_score - nuance_reduction, 1.0))
+
+    # -----------------------------
+    # Interprétation
+    # -----------------------------
+    if score <= 0.05 and markers and nuance_hits:
+        interpretation = (
+            "Certaines comparaisons existent, mais elles sont fortement "
+            "contextualisées ou nuancées."
+        )
+
+    elif score < 0.15:
+        interpretation = (
+            "Peu de comparaisons problématiques détectées."
+        )
+
     elif score < 0.35:
-        interpretation = "Certaines données manquent de référentiel ou de contexte."
+        interpretation = (
+            "Quelques comparaisons peuvent orienter la perception."
+        )
+
     elif score < 0.60:
-        interpretation = "Le texte présente plusieurs données insuffisamment référencées."
+        interpretation = (
+            "Le texte utilise plusieurs comparaisons fragiles "
+            "ou insuffisamment contextualisées."
+        )
+
     else:
-        interpretation = "Le discours s’appuie fortement sur des données sans référentiel méthodologique clair."
+        interpretation = (
+            "Le discours repose fortement sur des comparaisons "
+            "potentiellement trompeuses."
+        )
 
     return {
         "score": round(score, 3),
         "markers": markers,
+        "nuance_markers": nuance_hits,
+        "nuance_count": len(nuance_hits),
         "interpretation": interpretation,
     }
 
