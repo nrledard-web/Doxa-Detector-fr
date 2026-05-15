@@ -7002,25 +7002,55 @@ def compute_strong_certainty(text):
 
     found_markers = [
         marker for marker in STRONG_CERTAINTY_MARKERS
-        if contains_term(t, marker) or marker in t
+        if contains_term(t, marker)
+    ]
+
+    hedge_markers = [
+        "pas nécessairement",
+        "peut",
+        "peuvent",
+        "pourrait",
+        "pourraient",
+        "semble",
+        "semblent",
+        "plusieurs facteurs",
+        "plusieurs options",
+        "doivent être distingués",
+        "à ce stade",
+        "selon",
+        "cependant",
+        "toutefois",
+        "néanmoins",
+        "sans tenir compte",
+        "devrait éviter",
+    ]
+
+    hedge_hits = [
+        marker for marker in hedge_markers
+        if contains_term(t, marker)
     ]
 
     marker_count = len(found_markers)
 
-    score = min((marker_count / sentences) * 3.0, 1)
+    raw_score = (marker_count / sentences) * 3.0
+
+    hedge_reduction = min(len(hedge_hits) * 0.08, 0.45)
+
+    score = max(0.0, min(raw_score - hedge_reduction, 1.0))
 
     return {
         "score": round(score, 3),
         "label": label_level(score),
         "markers": found_markers,
+        "hedge_markers": hedge_hits,
         "marker_count": marker_count,
+        "hedge_count": len(hedge_hits),
         "interpretation": (
             "Le texte emploie une certitude forte ou verrouillante."
             if score >= 0.4
             else "Peu de certitude forte composée détectée."
         )
     }
-
 # =====================================================
 # DÉTECTION DES DOMAINES CONCEPTUELS
 # =====================================================
