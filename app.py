@@ -8405,10 +8405,14 @@ def detect_discourse_type_from_rhetoric(text: str, rhetorical_scores: dict):
     scores["conspirationniste"] += rhetorical_scores.get("narrativité", 0) * 0.15
     
     if (
-        rhetorical_scores.get("soupcon_systemique", 0) > 0.3
-        and rhetorical_scores.get("implicite", 0) > 0.3
+        rhetorical_scores.get("soupcon_systemique", 0) > 0.4
+        and rhetorical_scores.get("implicite", 0) > 0.4
+        and (
+            rhetorical_scores.get("attaque", 0) > 0.3
+            or rhetorical_scores.get("saturation_rhetorique", 0) > 0.5
+        )
     ):
-        scores["conspirationniste"] += 0.4
+        scores["conspirationniste"] += 0.25
 
     scores["argumentatif"] += rhetorical_scores.get("technicite", 0) * 0.6
     scores["argumentatif"] += rhetorical_scores.get("persuasion", 0) * 0.6
