@@ -1647,9 +1647,12 @@ def compute_lie_gauge(M: float, ME: float):
     else:
         label = "Mensonge structurel détecté"
         color = "#991b1b"
-
-    intensity = abs(gauge - 0.5) * 2
-
+    
+    if gauge < 0.5:
+        intensity = (0.5 - gauge) * 0.8
+    else:
+        intensity = (gauge - 0.5) * 2
+    
     return {
         "gauge": round(gauge, 3),
         "label": label,
