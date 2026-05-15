@@ -12813,6 +12813,15 @@ with oi2:
         st.write(f"Urgence : **{len(result.get('propaganda_urgency_terms', []))}**")
         st.write(f"Certitude : **{len(result.get('propaganda_certainty_terms', []))}**")
         st.write(f"Émotion : **{len(result.get('propaganda_emotional_terms', []))}**")
+        rhetorical_scores = result.get("rhetorical_scores", {})
+        emotional_registers = result.get("emotional_registers", {})
+        
+        st.write(f"Saturation rhétorique : **{round(rhetorical_scores.get('saturation_rhetorique', 0) * 100, 1)}%**")
+        st.write(f"Soupçon systémique : **{round(rhetorical_scores.get('soupcon_systemique', 0) * 100, 1)}%**")
+        st.write(f"Attaque : **{round(rhetorical_scores.get('attaque', 0) * 100, 1)}%**")
+        st.write(f"Amplification : **{round(rhetorical_scores.get('amplification', 0) * 100, 1)}%**")
+        st.write(f"Colère : **{round(emotional_registers.get('colere', 0) * 100, 1)}%**")
+        st.write(f"Peur : **{round(emotional_registers.get('peur', 0) * 100, 1)}%**")
 
         st.markdown("**Interprétation actuelle**")
         st.write(result["propaganda_interpretation"])
