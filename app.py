@@ -12616,6 +12616,13 @@ with oi1:
         victimization=result.get("victimization_score", 0),
         semantic_shift=result.get("semantic_shift_score", 0),
         false_dilemma=result.get("false_dilemma_score", 0),
+    
+        saturation_rhetorique=result.get("rhetorical_scores", {}).get("saturation_rhetorique", 0),
+        soupcon_systemique=result.get("rhetorical_scores", {}).get("soupcon_systemique", 0),
+        attaque=result.get("rhetorical_scores", {}).get("attaque", 0),
+        amplification=result.get("rhetorical_scores", {}).get("amplification", 0),
+        colere=result.get("emotional_registers", {}).get("colere", 0),
+        peur=result.get("emotional_registers", {}).get("peur", 0),
     )
     
     propaganda_label, propaganda_color, propaganda_text = interpret_propaganda_gauge(propaganda_value)
@@ -12653,8 +12660,10 @@ with oi1:
     
         st.markdown("**Principe**")
         st.write(
-            "Elle combine quatre dimensions : la jauge de mensonge ou de tension stratégique, "
-            "la pression rhétorique, les manœuvres discursives détectées et la fermeture cognitive."
+            "Elle combine la tension stratégique, la pression rhétorique, "
+            "la fermeture cognitive, les motifs idéologiques classiques, "
+            "ainsi que les nouveaux signaux rhétoriques et émotionnels : "
+            "saturation, soupçon systémique, attaque, amplification, colère et peur."
         )
     
         st.markdown("**Formule utilisée**")
@@ -12663,16 +12672,12 @@ with oi1:
             "    lie_gauge=gauge_value,\n"
             "    rhetorical_pressure=rp,\n"
             "    closure=closure_for_discourse,\n"
-            "    false_consensus=false_consensus_score,\n"
-            "    moral_polarization=moral_polarization_score,\n"
-            "    binary_opposition=binary_opposition_score,\n"
-            "    victimization=victimization_score,\n"
-            "    semantic_shift=semantic_shift_score,\n"
-            "    false_dilemma=false_dilemma_score\n"
+            "    ideological_core=(false_consensus + moral_polarization + binary_opposition + victimization + semantic_shift + false_dilemma) / 6,\n"
+            "    rhetorical_core=(saturation×0.30 + soupcon×0.25 + attaque×0.20 + amplification×0.15 + colere×0.07 + peur×0.03)\n"
             ")",
             language="python"
         )
-    
+            
         st.markdown("**Valeur actuelle**")
         st.write(f"Score : **{round(propaganda_value * 100, 1)}%**")
         st.write(f"Niveau : **{propaganda_label}**")
@@ -12681,6 +12686,16 @@ with oi1:
         st.write(f"Pression rhétorique : **{round(rp * 100, 1)}%**")
         st.write(f"Motifs idéologiques : **{result['political_pattern_score']}**")
         st.write(f"Fermeture cognitive : **{round(closure_for_discourse, 2)}**")
+
+        rhetorical_scores = result.get("rhetorical_scores", {})
+        emotional_registers = result.get("emotional_registers", {})
+        
+        st.write(f"Saturation rhétorique : **{round(rhetorical_scores.get('saturation_rhetorique', 0) * 100, 1)}%**")
+        st.write(f"Soupçon systémique : **{round(rhetorical_scores.get('soupcon_systemique', 0) * 100, 1)}%**")
+        st.write(f"Attaque : **{round(rhetorical_scores.get('attaque', 0) * 100, 1)}%**")
+        st.write(f"Amplification : **{round(rhetorical_scores.get('amplification', 0) * 100, 1)}%**")
+        st.write(f"Colère : **{round(emotional_registers.get('colere', 0) * 100, 1)}%**")
+        st.write(f"Peur : **{round(emotional_registers.get('peur', 0) * 100, 1)}%**")
     
         st.markdown("**Interprétation actuelle**")
         st.write(propaganda_text)
