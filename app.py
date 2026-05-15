@@ -1149,25 +1149,25 @@ def detect_political_patterns(text: str):
 def compute_rhetorical_pressure(results: dict) -> float:
     """
     Calcule une pression rhétorique pondérée entre 0.0 et 1.0
-    à partir des catégories détectées.
+    à partir des scores rhétoriques modernes.
     """
-    weights = {
-        "certitude": 1.2,
-        "autorite": 1.0,
-        "dramatisation": 1.3,
-        "generalisation": 1.1,
-        "naturalisation": 1.4,
-        "ennemi": 1.5,
-        "causalite": 1.4,
-        "moralisation": 1.2,
-    }
 
-    weighted_score = 0.0
+    rhetorical = results.get("rhetorical_scores", {})
 
-    for cat, count in results.items():
-        weighted_score += count * weights.get(cat, 1.0)
+    if not rhetorical:
+        return 0.0
 
-    return min(weighted_score / 10, 1.0)
+    pressure = (
+        rhetorical.get("amplification", 0) * 0.18
+        + rhetorical.get("saturation_rhetorique", 0) * 0.22
+        + rhetorical.get("persuasion", 0) * 0.14
+        + rhetorical.get("attaque", 0) * 0.16
+        + rhetorical.get("implicite", 0) * 0.10
+        + rhetorical.get("soupcon_systemique", 0) * 0.10
+        + rhetorical.get("coherence_performative", 0) * 0.10
+    )
+
+    return round(min(pressure, 1.0), 3)
 
 
 def interpret_rhetorical_pressure(value: float):
