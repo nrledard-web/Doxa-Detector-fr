@@ -5826,7 +5826,16 @@ def compute_brain_indices(result: dict) -> dict:
     def clamp01(x):
         return max(0.0, min(1.0, x))
 
-    emotional_result = compute_emotional_intensity(article)
+    if isinstance(article, dict):
+        emotional_result = compute_emotional_intensity({
+            "emotional_registers": article.get("emotional_registers", {})
+        })
+    else:
+        emotional_result = {
+            "score": 0.0,
+            "markers": [],
+            "interpretation": "Aucune charge émotionnelle saillante détectée."
+        }
     
     result["emotional_intensity_score"] = emotional_result["score"]
     result["emotional_intensity_markers"] = emotional_result["markers"]
