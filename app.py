@@ -11365,15 +11365,15 @@ with pd1:
         st.markdown("**Principe**")
         
         st.write(
-            "La pression rhétorique mesure l’intensité des procédés discursifs "
-            "qui orientent la perception du lecteur sans nécessairement démontrer "
+            "Le calcul repose sur plusieurs dimensions rhétoriques capables "
+            "d’orienter la perception du lecteur sans nécessairement démontrer "
             "les affirmations avancées."
         )
         
         st.write(
-            "Le calcul repose sur plusieurs dimensions rhétoriques modernes : "
-            "amplification, saturation rhétorique, persuasion, attaque, implicite, "
-            "soupçon systémique et cohérence performative."
+            "Le modèle combine notamment l’amplification, la saturation rhétorique, "
+            "la persuasion, l’attaque, les sous-entendus implicites, le soupçon "
+            "systémique et la cohérence performative."
         )
         
         st.markdown("**Formule utilisée**")
