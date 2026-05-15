@@ -7858,6 +7858,9 @@ def analyze_article(text: str) -> Dict:
         result["argument_asymmetry_score"] = 0.0
         result["argument_asymmetry_interpretation"] = "Aucune rhétorique d’attaque dominante détectée."
     
+    # Modulation contextuelle selon le type de discours
+    result = apply_discourse_modifiers(result)
+    
     result["brain"] = brain
     result = classify_cognitive_regime(result)
 
