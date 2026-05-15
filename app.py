@@ -7763,17 +7763,19 @@ def analyze_article(text: str) -> Dict:
         "conceptual_terms": conceptual_terms,
     }
     
+    result["rhetorical_pressure"] = compute_rhetorical_pressure(result)
+    
     modern_propaganda = compute_modern_propaganda_score(result)
-
+    
     result["propaganda_score"] = modern_propaganda["score"]
     result["propaganda_interpretation"] = modern_propaganda["interpretation"]
     
     emotional_intensity_analysis = compute_emotional_intensity(result)
-
+    
     result["emotional_intensity_score"] = emotional_intensity_analysis["score"]
     result["emotional_intensity_markers"] = emotional_intensity_analysis["markers"]
     result["emotional_intensity_interpretation"] = emotional_intensity_analysis["interpretation"]
-    result["rhetorical_pressure"] = compute_rhetorical_pressure(result)
+    
     result["brain"] = brain
     result = classify_cognitive_regime(result)
 
