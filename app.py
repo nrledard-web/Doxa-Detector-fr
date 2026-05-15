@@ -7004,6 +7004,11 @@ def analyze_article(text: str) -> Dict:
         rhetorical_scores
     )
     emotional_registers = detect_emotional_registers(text)
+    temp_result_for_emotion = {
+        "emotional_registers": emotional_registers
+    }
+
+    emotional_intensity_analysis = compute_emotional_intensity(temp_result_for_emotion)
     statistical_manipulation_analysis = detect_statistical_manipulation(text)
     
     statistical_manipulation_analysis = detect_statistical_manipulation(text)
