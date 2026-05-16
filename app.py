@@ -15787,10 +15787,9 @@ with js4:
         st.markdown("**Formule utilisée**")
 
         st.code(
-            "score = cohérence_apparente - robustesse_réelle\n"
-            "score += fermeture_cognitive\n"
-            "score += certitude_forte\n"
-            "score += asymétrie_argumentative",
+            "raw_score = len(markers) × 0.18\n"
+            "nuance_reduction = min(len(marqueurs_de_nuance) × 0.04, 0.25)\n"
+            "score = max(0.0, raw_score - nuance_reduction)",
             language="python"
         )
 
