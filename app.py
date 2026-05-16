@@ -7310,6 +7310,55 @@ def detect_conceptual_domains(text: str):
 
     return domains, terms
 
+# -----------------------------
+# Discours rapporté / citations
+# -----------------------------
+def compute_reported_speech_ratio(text: str) -> dict:
+    if not text:
+        return {
+            "score": 0.0,
+            "ratio": 0.0,
+            "markers": [],
+            "interpretation": "Aucun discours rapporté détecté."
+        }
+
+    t = text.lower()
+    words = re.findall(r"\b[\wÀ-ÿ'-]+\b", text)
+    word_count = max(len(words), 1)
+
+    quote_segments = re.findall(r"[«“\"](.+?)[»”\"]", text, flags=re.DOTALL)
+    quote_words = sum(len(re.findall(r"\b[\wÀ-ÿ'-]+\b", q)) for q in quote_segments)
+
+    reporting_markers = [
+        "déclare", "déclarait", "affirme", "affirmait", "estime", "estimait",
+        "explique", "expliquait", "souligne", "soulignait", "rappelle", "rappelait",
+        "selon", "d'après", "pour", "interrogé", "invitée", "invité",
+        "a jugé", "a précisé", "a déclaré", "avait déclaré", "considère"
+    ]
+
+    markers = [m for m in reporting_markers if m in t]
+
+    quote_ratio = quote_words / word_count
+    marker_ratio = min(len(markers) / 10, 1.0)
+
+    score = min((quote_ratio * 1.8) + (marker_ratio * 0.5), 1.0)
+
+    if score < 0.15:
+        interpretation = "Le texte rapporte peu de propos extérieurs."
+    elif score < 0.35:
+        interpretation = "Le texte contient quelques éléments de discours rapporté."
+    elif score < 0.60:
+        interpretation = "Le texte rapporte fortement des propos ou positions extérieures."
+    else:
+        interpretation = "Le texte est largement structuré par des citations ou discours rapportés."
+
+    return {
+        "score": round(score, 3),
+        "ratio": round(quote_ratio, 3),
+        "markers": markers[:15],
+        "interpretation": interpretation
+    }
+
 def analyze_article(text: str) -> Dict:
     words = text.split()
     sentences = [s.strip() for s in re.split(r"[.!?]+", text) if len(s.strip()) > 10]
@@ -7384,6 +7433,7 @@ def analyze_article(text: str) -> Dict:
     missing_reference_analysis = detect_missing_reference_data(text)
     advanced_deceptive_coherence_analysis = compute_advanced_deceptive_coherence(text)
     descriptive_normative_confusion_analysis = detect_descriptive_normative_confusion(text)
+    reported_speech = compute_reported_speech_ratio(text)
 
     # -----------------------------
     # Jauges structurelles avancées
