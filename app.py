@@ -16236,7 +16236,7 @@ else:
     
 st.markdown("""
 <div style="text-align:center; margin:25px 0; color:#888;">
-──── 🧠 ────
+st.markdown("──── 🧠 ────")
 </div>
 """, unsafe_allow_html=True)
 
@@ -16315,7 +16315,7 @@ else:
 st.divider()
 st.markdown("""
 <div style="text-align:center; margin:25px 0; color:#888;">
-──── 🧠 ────
+st.markdown("──── 🧠 ────")
 </div>
 """, unsafe_allow_html=True)
 
@@ -16359,7 +16359,7 @@ if st.session_state.get("article_source") == "paste":
         
 st.markdown("""
 <div style="text-align:center; margin:25px 0; color:#888;">
-──── 🧠 ────
+st.markdown("──── 🧠 ────")
 </div>
 """, unsafe_allow_html=True)
 
@@ -16383,7 +16383,7 @@ if show_method:
 )
 st.markdown("""
 <div style="text-align:center; margin:25px 0; color:#888;">
-──── 🧠 ────
+st.markdown("──── 🧠 ────")
 </div>
 """, unsafe_allow_html=True)
 
