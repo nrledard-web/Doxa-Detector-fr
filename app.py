@@ -7753,6 +7753,8 @@ def analyze_article(text: str) -> Dict:
         "descriptive_normative_confusion_score": descriptive_normative_confusion["score"],
         "descriptive_normative_confusion_markers": descriptive_normative_confusion["markers"],
         "descriptive_normative_confusion_interpretation": descriptive_normative_confusion["interpretation"],
+        "descriptive_normative_confusion_nuance_count": descriptive_normative_confusion_analysis.get("nuance_count", 0),
+        "descriptive_normative_confusion_nuance_markers": descriptive_normative_confusion_analysis.get("nuance_markers", []),
 
         "complex_enthymeme_score": complex_enthymeme_analysis["score"],
         "complex_enthymeme_markers": complex_enthymeme_analysis["markers"],
