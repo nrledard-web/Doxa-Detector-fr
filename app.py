@@ -5226,6 +5226,9 @@ DESCRIPTIVE_NORMATIVE_CONFUSION_PATTERNS = [
     "il faut agir",
     "nous devons agir",
     "il est nécessaire de",
+    "il est nécessaire d'agir"
+    "il est nécessaire d’interdire"
+    "il est nécessaire d’imposer"
     "il devient nécessaire de",
     "il devient nécessaire d",
     "il est désormais nécessaire de",
@@ -5247,6 +5250,8 @@ def detect_descriptive_normative_confusion(text: str):
             "score": 0.0,
             "matches": [],
             "markers": [],
+            "nuance_markers": [],
+            "nuance_count": 0,
             "interpretation": "Aucune confusion descriptif / normatif détectée."
         }
 
@@ -5256,36 +5261,19 @@ def detect_descriptive_normative_confusion(text: str):
         p for p in DESCRIPTIVE_NORMATIVE_CONFUSION_PATTERNS
         if contains_term(t, p) or p in t
     ]
-    # -----------------------------
-    # Constat alarmiste → obligation
-    # -----------------------------
+
     if (
         any(w in t for w in [
-            "crise",
-            "danger",
-            "menace",
-            "dérive",
-            "destruction",
-            "catastrophe",
-            "effondrement",
-            "submersion"
+            "crise", "danger", "menace", "dérive", "destruction",
+            "catastrophe", "effondrement", "submersion"
         ])
         and any(w in t for w in [
-            "il faut",
-            "nous devons",
-            "on doit",
-            "nécessaire",
-            "agir",
-            "réagir",
-            "si rien n'est fait",
-            "si rien n’est fait"
+            "il faut", "nous devons", "on doit", "nécessaire",
+            "agir", "réagir", "si rien n'est fait", "si rien n’est fait"
         ])
     ):
         matches.append("constat alarmiste transformé en obligation")
 
-    # -----------------------------
-    # Injonction alarmiste implicite
-    # -----------------------------
     if (
         "nécessaire d'agir" in t
         or "nécessaire d’agir" in t
@@ -5295,11 +5283,41 @@ def detect_descriptive_normative_confusion(text: str):
     ):
         matches.append("injonction issue d’un constat alarmiste")
 
+    analytical_nuance_markers = [
+        "plusieurs facteurs",
+        "plusieurs options",
+        "doivent être distingués",
+        "ne signifie pas nécessairement",
+        "peut rester",
+        "analyse rigoureuse",
+        "comprendre",
+        "à quel coût",
+        "avec quelles perspectives",
+        "selon quelle stratégie",
+        "cependant",
+        "toutefois",
+        "néanmoins",
+        "éviter deux excès",
+    ]
+
+    nuance_hits = [
+        m for m in analytical_nuance_markers
+        if contains_term(t, m)
+    ]
+
     matches = unique_keep_order(matches)
 
-    score = min(len(matches) * 0.35, 1.0)
+    raw_score = len(matches) * 0.30
+    nuance_reduction = min(len(nuance_hits) * 0.06, 0.35)
 
-    if score < 0.15:
+    score = max(0.0, min(raw_score - nuance_reduction, 1.0))
+
+    if score <= 0.05 and matches and nuance_hits:
+        interpretation = (
+            "Un passage du descriptif vers le normatif est repéré, mais il est "
+            "fortement compensé par des marqueurs d’analyse, de nuance ou de méthode."
+        )
+    elif score < 0.15:
         interpretation = "Aucune confusion descriptif / normatif détectée."
     elif score < 0.35:
         interpretation = "Le texte contient un léger glissement du constat vers l’injonction."
@@ -5312,6 +5330,8 @@ def detect_descriptive_normative_confusion(text: str):
         "score": round(score, 3),
         "matches": matches,
         "markers": matches,
+        "nuance_markers": nuance_hits,
+        "nuance_count": len(nuance_hits),
         "interpretation": interpretation
     }
 
