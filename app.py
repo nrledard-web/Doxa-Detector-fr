@@ -9683,6 +9683,10 @@ if not st.session_state.get("direct_search_result_mode"):
         st.session_state["debate_text_input"] = ""
         st.session_state["clear_debate_text_next_run"] = False
 
+    if st.session_state.get("clear_article_next_run"):
+        st.session_state["article"] = ""
+        st.session_state["clear_article_next_run"] = False
+
 
 # =====================================================
 # FORMULAIRE PRINCIPAL
@@ -9723,16 +9727,15 @@ if not st.session_state.get("direct_search_result_mode") and mode == "Analyse si
 
     if st.button("🔄 Rafraîchir le texte", use_container_width=True):
 
-        st.session_state["article"] = ""
+        st.session_state["clear_article_next_run"] = True
         st.session_state["last_result"] = None
         st.session_state["last_article"] = ""
+        st.session_state["analysis_done"] = False
         st.session_state["article_source"] = "paste"
 
-        if "loaded_url" in st.session_state:
-            del st.session_state["loaded_url"]
-
-        if "loaded_article_title" in st.session_state:
-            del st.session_state["loaded_article_title"]
+        for key in ["loaded_url", "loaded_article_title"]:
+            if key in st.session_state:
+                del st.session_state[key]
 
         st.rerun()
 
