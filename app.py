@@ -12017,27 +12017,36 @@ with pd2:
         )
         
 with pd3:
-
     st.markdown("### Discours rapporté / citations")
+    st.caption("Détecte si le texte rapporte des propos extérieurs plutôt qu’une thèse directement assumée.")
 
-    with st.popover("ℹ️ Explication"):
+    value = result.get("reported_speech_score", 0)
 
-        st.markdown("""
-Cette jauge détecte si le texte rapporte des propos extérieurs plutôt que d’affirmer directement une thèse.
+    if value < 0.15:
+        label, color = "Faible", "#16a34a"
+    elif value < 0.35:
+        label, color = "Présent", "#ca8a04"
+    elif value < 0.60:
+        label, color = "Élevé", "#f97316"
+    else:
+        label, color = "Très élevé", "#dc2626"
 
-Elle repère notamment :
+    render_custom_gauge(value, color)
 
-- les citations entre guillemets ;
-- les verbes de parole : déclare, affirme, estime, explique, souligne ;
-- les marqueurs d’attribution : selon, d’après, pour, interrogé, invité.
+    st.markdown(
+        f"<b style='color:{color}'>{label}</b> — {round(value * 100, 1)}%",
+        unsafe_allow_html=True
+    )
 
-### Formule simplifiée
+    st.caption(result.get("reported_speech_interpretation", ""))
 
-```python
-quote_ratio = mots_dans_citations / mots_totaux
-marker_ratio = nombre_marqueurs / 10
-
-score = min((quote_ratio * 1.8) + (marker_ratio * 0.5), 1.0)
+    with st.expander("🔎 Voir les marqueurs", expanded=False):
+        markers = result.get("reported_speech_markers", [])
+        if not markers:
+            st.info("Aucun marqueur de discours rapporté détecté.")
+        else:
+            for marker in markers:
+                st.warning(marker)
     
     
 with pd4:
