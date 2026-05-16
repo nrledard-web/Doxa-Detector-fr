@@ -8044,6 +8044,11 @@ def analyze_article(text: str) -> Dict:
         "false_dilemma_nuance_count": aristotelian_fallacies["false_dilemma"].get("nuance_count", 0),
         "false_dilemma_nuance_markers": aristotelian_fallacies["false_dilemma"].get("nuance_markers", []),
 
+        "reported_speech_score": reported_speech["score"],
+        "reported_speech_ratio": reported_speech["ratio"],
+        "reported_speech_markers": reported_speech["markers"],
+        "reported_speech_interpretation": reported_speech["interpretation"],
+
         "rhetorical_scores": rhetorical_scores,
         "discourse_type_rhetoric": disc_type_rhetoric,
         "discourse_explanation_rhetoric": disc_explanation_rhetoric,
@@ -8146,6 +8151,25 @@ def analyze_article(text: str) -> Dict:
     
     result["brain"] = brain
     result = classify_cognitive_regime(result)
+
+    # -----------------------------
+    # Modérateur discours rapporté / citations
+    # -----------------------------
+    reported_speech_score = result.get("reported_speech_score", 0)
+
+    reported_speech_reduction = 1 - min(reported_speech_score * 0.35, 0.35)
+
+    for key in [
+        "propaganda_score",
+        "normative_score",
+        "certainty_score",
+        "binary_opposition_score",
+        "threat_amplification_score",
+        "doxic_rigidity_score",
+    ]:
+        result[key] = round(result.get(key, 0) * reported_speech_reduction, 3)
+        
+    result["reported_speech_reduction"] = round(reported_speech_reduction, 3)
 
     # -----------------------------
     # Pénalité des jauges affichées
