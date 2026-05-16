@@ -7668,6 +7668,7 @@ def analyze_article(text: str) -> Dict:
     # Calcul du cerveau global
     # -----------------------------
     brain = compute_brain_indices({
+        "text": text,
         "G": G,
         "N": N,
         "D": D,
