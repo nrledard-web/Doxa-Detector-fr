@@ -16152,11 +16152,7 @@ with js6:
             "la contradiction en l’intégrant dans son propre récit."
         )
         
-st.markdown("""
-<div style="text-align:center; margin:25px 0; color:#888;">
-────────── 🧠 ──────────
-</div>
-""", unsafe_allow_html=True)
+st.caption("────────── 🧠 ──────────")
 
 st.subheader("Structure cognitive du texte analysé")
 st.info(T["llm_intro"])
