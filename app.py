@@ -16195,11 +16195,7 @@ st.caption("Ouverture cognitive ⟵⟶ Clôture cognitive")
 st.caption(closure_text)
 st.markdown(f"**{T['interpretation']} :** {cog.interpret()}")
 
-st.markdown("""
-<div style="text-align:center; margin:25px 0; color:#888;">
-────────── 🧠 ──────────
-</div>
-""", unsafe_allow_html=True)
+st.caption("────────── 🧠 ──────────")
 
 st.subheader(T["hard_fact_checking_by_claim"])
 claims_df = pd.DataFrame(
@@ -16229,11 +16225,7 @@ if not claims_df.empty:
 else:
     st.info(T["paste_longer_text"])
     
-st.markdown("""
-<div style="text-align:center; margin:25px 0; color:#888;">
-────────── 🧠 ──────────
-</div>
-""", unsafe_allow_html=True)
+st.caption("────────── 🧠 ──────────")
 
 st.divider()
 st.subheader("Analyse syllogistique")
@@ -16308,11 +16300,7 @@ else:
     st.info("Aucun sophisme syllogistique détecté.")
 
 st.divider()
-st.markdown("""
-<div style="text-align:center; margin:25px 0; color:#888;">
-────────── 🧠 ──────────
-</div>
-""", unsafe_allow_html=True)
+st.caption("────────── 🧠 ──────────")
 
 st.subheader(T["ai_module"])
 st.caption(T["ai_module_caption"])
@@ -16352,11 +16340,7 @@ if st.session_state.get("article_source") == "paste":
     else:
         st.info(T["no_corroboration_found"])
         
-st.markdown("""
-<div style="text-align:center; margin:25px 0; color:#888;">
 st.caption("────────── 🧠 ──────────")
-</div>
-""", unsafe_allow_html=True)
 
 # -----------------------------
 # Méthode
@@ -16376,11 +16360,7 @@ if show_method:
         f"- **{T['cognitive_closure']}** : `(D * S) / (G + N)`\n\n"
         f"{T['disclaimer']}"
 )
-st.markdown("""
-<div style="text-align:center; margin:25px 0; color:#888;">
 st.caption("────────── 🧠 ──────────")
-</div>
-""", unsafe_allow_html=True)
 
 # -----------------------------
 # Laboratoire interactif
