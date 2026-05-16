@@ -9280,7 +9280,6 @@ if use_sample:
     st.session_state.article_source = "paste"
     st.session_state.loaded_url = ""
 
-
 # -----------------------------
 # Analyse multi-articles
 # -----------------------------
@@ -9290,21 +9289,24 @@ if not st.session_state.get("direct_search_result_mode"):
     keyword = st.text_input(T["topic"], placeholder=T["topic_placeholder"])
 
     if st.button(T["analyze_topic"], key="analyze_topic"):
+
         if keyword.strip():
+
             st.warning(
                 "⏳ Analyse multi-sources en cours : extraction, parsing et vérification des articles. "
                 "Le traitement peut durer entre 10 et 15 secondes pour les textes longs ou "
                 "mobilisant de nombreuses jauges heuristiques."
-        )
+            )
+
             st.info(T["searching"])
-            st.session_state.multi_results = analyze_multiple_articles(keyword.strip(), max_results=10)
+
+            st.session_state.multi_results = analyze_multiple_articles(
+                keyword.strip(),
+                max_results=10
+            )
+
             st.session_state.last_keyword = keyword.strip()
-        else:
-            st.session_state.multi_results = []
-            st.warning(T["enter_keyword_first"])
-            st.info(T["searching"])
-            st.session_state.multi_results = analyze_multiple_articles(keyword.strip(), max_results=10)
-            st.session_state.last_keyword = keyword.strip()
+
         else:
             st.session_state.multi_results = []
             st.warning(T["enter_keyword_first"])
