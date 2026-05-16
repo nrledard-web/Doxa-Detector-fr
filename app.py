@@ -10904,11 +10904,7 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 
-st.markdown("""
-<div style="text-align:center; margin:25px 0; color:#888;">
-──── 🧠 ────
-</div>
-""", unsafe_allow_html=True)
+st.caption("────────── 🧠 ──────────")
 
 life_score = round((result.get("hard_fact_score", 0) / 20) * 100, 1)
 
@@ -11802,11 +11798,7 @@ st.caption(
     "stratégiques permettant d’identifier certaines formes de manipulation argumentative."
 )
 
-st.markdown("""
-<div style="text-align:center; margin:25px 0; color:#888;">
-──── 🧠 ────
-</div>
-""", unsafe_allow_html=True)
+st.caption("────────── 🧠 ──────────")
 
 # =============================
 # 🗣️ 2. PRESSIONS DISCURSIVES
@@ -12452,11 +12444,7 @@ with pd8:
         
     st.divider()
     
-st.markdown("""
-<div style="text-align:center; margin:25px 0; color:#888;">
-st.markdown("──── 🧠 ────")
-</div>
-""", unsafe_allow_html=True)
+st.caption("────────── 🧠 ──────────")
 
 # =============================
 # 🧩 3. STRUCTURE DU RAISONNEMENT
@@ -13034,11 +13022,7 @@ with sr7:
 
 st.divider()
     
-st.markdown("""
-<div style="text-align:center; margin:25px 0; color:#888;">
-st.markdown("──── 🧠 ────")
-</div>
-""", unsafe_allow_html=True)
+st.caption("────────── 🧠 ──────────")
 
 # =============================
 # 🧭 4. ORIENTATION IDÉOLOGIQUE
@@ -13783,11 +13767,7 @@ with oi8:
             "ce qui peut renforcer la polarisation et la clôture cognitive."
         )
 st.divider()
-st.markdown("""
-<div style="text-align:center; margin:25px 0; color:#888;">
-st.markdown("──── 🧠 ────")
-</div>
-""", unsafe_allow_html=True)
+st.caption("────────── 🧠 ──────────")
 
 # =============================
 # ⚖️ 5. ANALYSE LOGIQUE
@@ -14753,11 +14733,7 @@ with al12:
         )
 
 st.divider()
-st.markdown("""
-<div style="text-align:center; margin:25px 0; color:#888;">
 st.caption("────────── 🧠 ──────────")
-</div>
-""", unsafe_allow_html=True)
 
 # =============================
 # 🧪 6. BIAIS DE FORMULATION
@@ -15341,11 +15317,7 @@ with bf7:
         )
 st.divider()
 
-st.markdown("""
-<div style="text-align:center; margin:25px 0; color:#888;">
 st.caption("────────── 🧠 ──────────")
-</div>
-""", unsafe_allow_html=True)
 
 # -----------------------------
 # Manipulation statistique
@@ -15594,11 +15566,7 @@ with sq3:
 
 st.divider()
 
-st.markdown("""
-<div style="text-align:center; margin:25px 0; color:#888;">
 st.caption("────────── 🧠 ──────────")
-</div>
-""", unsafe_allow_html=True)
 
 # =============================
 # Jauges structurelles avancées
@@ -16278,6 +16246,7 @@ else:
     st.info("Aucun enthymème détecté.")
 
 st.divider()
+
 st.subheader("Sophismes syllogistiques")
 
 if result.get("fallacies"):
@@ -16299,7 +16268,7 @@ if result.get("fallacies"):
 else:
     st.info("Aucun sophisme syllogistique détecté.")
 
-st.divider()
+st.divider()  
 st.caption("────────── 🧠 ──────────")
 
 st.subheader(T["ai_module"])
