@@ -9640,9 +9640,24 @@ if "pending_editor_version" not in st.session_state:
 # SÉLECTEUR PARTICIPANT AVANT MICRO
 # =====================================================
 if not st.session_state.get("direct_search_result_mode") and mode == "Débat dynamique":
+
+    participant_count = st.selectbox(
+        "Nombre de participants",
+        [2, 3, 4, 5, 6],
+        index=0,
+        key="debate_participant_count"
+    )
+
+    debate_participants = [
+        f"Participant {chr(65 + i)}"
+        for i in range(participant_count)
+    ]
+
+    st.session_state["debate_participants"] = debate_participants
+
     st.session_state["debate_speaker_choice"] = st.radio(
         "Participant pour la prochaine intervention",
-        ["Participant A", "Participant B"],
+        debate_participants,
         horizontal=True,
         key="debate_speaker_radio"
     )
