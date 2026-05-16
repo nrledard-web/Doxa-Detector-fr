@@ -12031,13 +12031,13 @@ with pd3:
     value = result.get("reported_speech_score", 0)
 
     if value < 0.15:
-        label, color = "Faible", "#16a34a"
+        label, color = "Faible", "#ca8a04"
     elif value < 0.35:
-        label, color = "Présent", "#ca8a04"
+        label, color = "Présent", "#84cc16"
     elif value < 0.60:
-        label, color = "Élevé", "#f97316"
+        label, color = "Élevé", "#16a34a"
     else:
-        label, color = "Très élevé", "#dc2626"
+        label, color = "Très élevé", "#15803d"
 
     render_custom_gauge(value, color)
 
