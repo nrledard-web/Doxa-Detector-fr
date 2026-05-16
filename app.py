@@ -12056,7 +12056,7 @@ with pd3:
             for marker in markers:
                 st.warning(marker)
 
-    with st.popover("ℹ️ Explication"):
+    with st.popover("ℹ️ Comprendre cette jauge"):
 
         st.write(
             "Cette jauge détecte si le texte rapporte principalement "
