@@ -13917,8 +13917,9 @@ with al4:
 
         st.markdown("**Formule utilisée**")
         st.code(
-            "markers = confusions descriptif/normatif détectées\n"
-            "score = min(len(markers) * coefficient / 10, 1.0)",
+            "raw_score = len(markers) × 0.30\n"
+            "nuance_reduction = min(len(marqueurs_de_nuance) × 0.06, 0.35)\n"
+            "score = max(0.0, raw_score - nuance_reduction)",
             language="python"
         )
 
@@ -13928,6 +13929,9 @@ with al4:
         st.write(f"Score : **{round(value * 100, 1)}%**")
         st.write(f"Niveau : **{label}**")
         st.write(f"Marqueurs détectés : **{len(markers)}**")
+        st.write(
+            f"Marqueurs de nuance : **{result.get('descriptive_normative_confusion_nuance_count', 0)}**"
+        )
 
         st.markdown("**Interprétation actuelle**")
         st.write(result["descriptive_normative_confusion_interpretation"])
