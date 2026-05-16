@@ -16340,6 +16340,7 @@ if st.session_state.get("article_source") == "paste":
     else:
         st.info(T["no_corroboration_found"])
         
+st.divider()        
 st.caption("────────── 🧠 ──────────")
 
 # -----------------------------
@@ -16360,6 +16361,8 @@ if show_method:
         f"- **{T['cognitive_closure']}** : `(D * S) / (G + N)`\n\n"
         f"{T['disclaimer']}"
     )
+
+st.divider()    
 st.caption("────────── 🧠 ──────────")
 
 # -----------------------------
