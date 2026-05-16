@@ -5858,6 +5858,8 @@ def compute_advanced_deceptive_coherence(text: str):
     return {
         "score": round(score, 3),
         "markers": markers,
+        "nuance_markers": nuance_hits,
+        "nuance_count": len(nuance_hits),
         "interpretation": interpretation,
     }
 
