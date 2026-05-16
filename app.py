@@ -1986,10 +1986,11 @@ BAD_ARTICLE_WORDS = [
     "royalty free",
     "banque d'images",
     "current page requires javascript",
-    "enable javascript",
-    "please enable javascript",
-    "créez un compte pour continuer",
-    "abonnez-vous pour continuer",
+    "javascript",
+    "connexion",
+    "créez un compte",
+    "tarifs",
+    "vidéos",
     "musique et sons",
 ]
 
@@ -1999,11 +2000,11 @@ def is_bad_article_candidate(url: str = "", title: str = "", snippet: str = "") 
     if any(domain in raw for domain in BAD_ARTICLE_DOMAINS):
         return True
 
-    for word in BAD_ARTICLE_WORDS:
-        if word in raw:
-            return True
+    if any(word in raw for word in BAD_ARTICLE_WORDS):
+        return True
 
     return False
+
 
 # -----------------------------
 # Normalisation des termes
