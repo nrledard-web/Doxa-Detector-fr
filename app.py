@@ -16322,7 +16322,7 @@ if show_method:
     method_text = f"""
 ### {T['original_formula']}
 
-`M = (G + N) − D`
+`M = (G + N) - D`
 
 - {T['articulated_knowledge_density']}
 - {T['integration']}
