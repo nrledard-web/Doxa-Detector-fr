@@ -14,6 +14,8 @@ from newspaper import Article
 import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d.art3d import Poly3DCollection
 import math
+import re
+from typing import Optional
 
 NEGATIONS = {"pas", "aucun", "jamais", "ni", "rien"}
 ATTENUATORS = {"peut-être", "semble", "probable", "possible"}
