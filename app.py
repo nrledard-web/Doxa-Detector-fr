@@ -9485,14 +9485,6 @@ if (
     st.markdown("### 📰 Texte chargé")
     st.success("Le texte est prêt à être analysé.")
 
-    with st.expander("Voir le texte chargé", expanded=True):
-        st.text_area(
-            "Texte extrait",
-            value=st.session_state.get("article", ""),
-            height=260,
-            disabled=True,
-            key="page_article_preview"
-        )
 
 # =============================
 # Mode résultat direct depuis recherche
