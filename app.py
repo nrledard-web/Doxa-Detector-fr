@@ -5763,32 +5763,72 @@ def compute_advanced_deceptive_coherence(text: str):
         markers.append("polarisation cohérente structurante")
 
     # Cohérence catastrophiste fluide
-    if (
-        any(w in t for w in [
-            "crise",
-            "danger",
-            "menace",
-            "inquiétude",
-            "effondrement",
-        ])
-        and (
-            "rapport" in t
-            or "étude" in t
-            or "expert" in t
-            or "selon" in t
-        )
-    ):
+    catastrophe_terms = [
+        "danger",
+        "menace",
+        "effondrement",
+        "catastrophe",
+        "chaos",
+        "désastre",
+        "submersion",
+        "invasion",
+    ]
+    
+    method_terms = [
+        "rapport",
+        "étude",
+        "expert",
+        "selon",
+    ]
+    
+    nuance_terms = [
+        "ne signifie pas nécessairement",
+        "plusieurs facteurs",
+        "plusieurs options",
+        "doivent être distingués",
+        "peut rester",
+        "analyse rigoureuse",
+        "cependant",
+        "toutefois",
+        "néanmoins",
+        "éviter deux excès",
+    ]
+    
+    has_catastrophe = any(w in t for w in catastrophe_terms)
+    has_method = any(w in t for w in method_terms)
+    has_nuance = any(w in t for w in nuance_terms)
+    
+    if has_catastrophe and has_method and not has_nuance:
         markers.append("cohérence catastrophiste argumentée")
 
     # -----------------------------
     # Nettoyage
     # -----------------------------
     markers = unique_keep_order(markers)
-
+    
+    nuance_hits = [
+        m for m in [
+            "ne signifie pas nécessairement",
+            "plusieurs facteurs",
+            "plusieurs options",
+            "doivent être distingués",
+            "peut rester",
+            "analyse rigoureuse",
+            "cependant",
+            "toutefois",
+            "néanmoins",
+            "éviter deux excès",
+        ]
+        if contains_term(t, m)
+    ]
+    
     # -----------------------------
     # Score
     # -----------------------------
-    score = min(len(markers) * 0.18, 1.0)
+    raw_score = len(markers) * 0.18
+    nuance_reduction = min(len(nuance_hits) * 0.04, 0.25)
+    
+    score = max(0.0, min(raw_score - nuance_reduction, 1.0))
 
     # -----------------------------
     # Interprétation
