@@ -1507,10 +1507,10 @@ def apply_discourse_modifiers(result: dict):
         discourse_key = "technocratique"
     elif "economie_politique" in discourse:
         discourse_key = "economie_politique"
-    elif "pamphlétaire" in discourse:
-        discourse_key = "pamphlétaire"
     elif "journalistique" in discourse:
         discourse_key = "journalistique"
+    elif "pamphlétaire" in discourse:
+        discourse_key = "pamphlétaire"
     elif "religieux" in discourse:
         discourse_key = "religieux"
     else:
@@ -1519,7 +1519,6 @@ def apply_discourse_modifiers(result: dict):
     modifiers = DISCOURSE_MODIFIERS.get(discourse_key, {})
 
     for key, factor in modifiers.items():
-
         if key in result:
             result[key] = round(result[key] * factor, 3)
 
