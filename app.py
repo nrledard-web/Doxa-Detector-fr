@@ -11814,7 +11814,7 @@ st.markdown("""
 st.subheader("🗣️ Pressions discursives")
 st.caption("Forces rhétoriques influençant la perception et l’interprétation du discours.")
 
-pd1, pd2, pd3 = st.columns(3)
+pd1, pd2, pd3, pd4 = st.columns(4)
 
 with pd1:
     st.markdown("### Pression rhétorique")
@@ -12023,8 +12023,30 @@ with pd2:
             "Une charge émotionnelle élevée ne signifie pas que le texte est faux. "
             "Elle indique seulement que le discours agit fortement sur l’affect du lecteur."
         )
-    
+        
 with pd3:
+    st.markdown("### Discours rapporté / citations")
+    st.caption("Détecte si le texte rapporte des propos extérieurs plutôt que d’affirmer directement une thèse.")
+    
+    score = result.get("reported_speech_score", 0)
+    
+    if score < 0.15:
+        label = "Faible"
+    elif score < 0.35:
+        label = "Présent"
+    elif score < 0.60:
+        label = "Élevé"
+    else:
+        label = "Très élevé"
+    
+    st.write(f"**{label}** — {round(score * 100, 1)}%")
+    st.caption(result.get("reported_speech_interpretation", ""))
+    
+    with st.expander("Voir les marqueurs"):
+        st.write(result.get("reported_speech_markers", []))
+    
+    
+with pd4:
     st.markdown("### Asymétrie argumentative")
     st.caption("Le texte attaque davantage qu’il ne démontre.")
 
@@ -12110,7 +12132,7 @@ pd4, pd5, pd6, pd7 = st.columns(4)
 # -----------------------------
 #  Certitude absolue
 # -----------------------------
-with pd4:
+with pd5:
     st.markdown("### Certitude absolue")
     st.caption("Rigidité rhétorique et fermeture interprétative.")
 
@@ -12189,7 +12211,7 @@ with pd4:
 # -----------------------------
 # Amplification de menace
 # -----------------------------
-with pd5:
+with pd6:
     st.markdown("### Amplification de menace")
     st.caption("Exagération dramatique du danger ou de la gravité.")
     
@@ -12269,7 +12291,7 @@ with pd5:
 # -----------------------------
 # Rigidité doxique
 # -----------------------------
-with pd6:
+with pd7:
     st.markdown("### Rigidité doxique")
     st.caption("Degré de fermeture du texte par excès de certitude partagée.")
 
@@ -12349,7 +12371,7 @@ with pd6:
 # -----------------------------
 # Victimisation stratégique
 # -----------------------------
-with pd7:
+with pd8:
     st.markdown("### Victimisation stratégique")
     st.caption("Mise en scène d’une persécution ou d’un empêchement de dire.")
 
