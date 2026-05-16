@@ -12127,7 +12127,7 @@ with pd4:
             "Elle indique seulement que le discours attaque davantage qu’il ne démontre."
         )
             
-pd4, pd5, pd6, pd7 = st.columns(4)
+pd5, pd6, pd7, pd8 = st.columns(4)
 
 # -----------------------------
 #  Certitude absolue
