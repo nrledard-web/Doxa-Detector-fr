@@ -12025,25 +12025,27 @@ with pd2:
         )
         
 with pd3:
+
     st.markdown("### Discours rapporté / citations")
-    st.caption("Détecte si le texte rapporte des propos extérieurs plutôt que d’affirmer directement une thèse.")
-    
-    score = result.get("reported_speech_score", 0)
-    
-    if score < 0.15:
-        label = "Faible"
-    elif score < 0.35:
-        label = "Présent"
-    elif score < 0.60:
-        label = "Élevé"
-    else:
-        label = "Très élevé"
-    
-    st.write(f"**{label}** — {round(score * 100, 1)}%")
-    st.caption(result.get("reported_speech_interpretation", ""))
-    
-    with st.expander("Voir les marqueurs"):
-        st.write(result.get("reported_speech_markers", []))
+
+    with st.popover("ℹ️ Explication"):
+
+        st.markdown("""
+Cette jauge détecte si le texte rapporte des propos extérieurs plutôt que d’affirmer directement une thèse.
+
+Elle repère notamment :
+
+- les citations entre guillemets ;
+- les verbes de parole : déclare, affirme, estime, explique, souligne ;
+- les marqueurs d’attribution : selon, d’après, pour, interrogé, invité.
+
+### Formule simplifiée
+
+```python
+quote_ratio = mots_dans_citations / mots_totaux
+marker_ratio = nombre_marqueurs / 10
+
+score = min((quote_ratio * 1.8) + (marker_ratio * 0.5), 1.0)
     
     
 with pd4:
