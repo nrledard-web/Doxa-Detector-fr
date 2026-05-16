@@ -7322,6 +7322,7 @@ def analyze_article(text: str) -> Dict:
     misleading_comparison_analysis = detect_misleading_comparison(text)
     missing_reference_analysis = detect_missing_reference_data(text)
     advanced_deceptive_coherence_analysis = compute_advanced_deceptive_coherence(text)
+    descriptive_normative_confusion_analysis = detect_descriptive_normative_confusion(text)
 
     # -----------------------------
     # Jauges structurelles avancées
