@@ -16316,21 +16316,29 @@ st.caption("────────── 🧠 ──────────")
 # Méthode
 # -----------------------------
 if show_method:
-    st.subheader(T["method"])
-    st.markdown(
-        f"### {T['original_formula']}\n"
-        f"`M = (G + N) − D`\n"
-        f"- {T['articulated_knowledge_density']}\n"
-        f"- {T['integration']}\n"
-        f"- {T['assertive_rigidity']}\n\n"
-        f"### {T['llm_metrics']}\n"
-        f"- **{T['overconfidence']}** : `D - (G + N)`\n"
-        f"- **{T['calibration']}** : `D / (G + N)`\n"
-        f"- **{T['revisability']}** : `(G + N + V) - D`\n"
-        f"- **{T['cognitive_closure']}** : `(D * S) / (G + N)`\n\n"
-        f"{T['disclaimer']}"
-    )
 
+    st.subheader(T["method"])
+
+    method_text = f"""
+### {T['original_formula']}
+
+`M = (G + N) − D`
+
+- {T['articulated_knowledge_density']}
+- {T['integration']}
+- {T['assertive_rigidity']}
+
+### {T['llm_metrics']}
+
+- **{T['overconfidence']}** : `D - (G + N)`
+- **{T['calibration']}** : `D / (G + N)`
+- **{T['revisability']}** : `(G + N + V) - D`
+- **{T['cognitive_closure']}** : `(D * S) / (G + N)`
+
+{T['disclaimer']}
+"""
+
+    st.markdown(method_text)
 st.divider()    
 st.caption("────────── 🧠 ──────────")
 
