@@ -10904,7 +10904,11 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 
-st.caption("────────── 🧠 ──────────")
+st.markdown("""
+<div style="text-align:center; margin:25px 0; color:#888;">
+──── 🧠 ────
+</div>
+""", unsafe_allow_html=True)
 
 life_score = round((result.get("hard_fact_score", 0) / 20) * 100, 1)
 
@@ -11798,7 +11802,11 @@ st.caption(
     "stratégiques permettant d’identifier certaines formes de manipulation argumentative."
 )
 
-st.caption("────────── 🧠 ──────────")
+st.markdown("""
+<div style="text-align:center; margin:25px 0; color:#888;">
+──── 🧠 ────
+</div>
+""", unsafe_allow_html=True)
 
 # =============================
 # 🗣️ 2. PRESSIONS DISCURSIVES
@@ -12453,7 +12461,11 @@ with pd8:
         
     st.divider()
     
-st.caption("────────── 🧠 ──────────")
+st.markdown("""
+<div style="text-align:center; margin:25px 0; color:#888;">
+──── 🧠 ────
+</div>
+""", unsafe_allow_html=True)
 
 # =============================
 # 🧩 3. STRUCTURE DU RAISONNEMENT
@@ -13031,7 +13043,11 @@ with sr7:
 
 st.divider()
     
-st.caption("────────── 🧠 ──────────")
+st.markdown("""
+<div style="text-align:center; margin:25px 0; color:#888;">
+──── 🧠 ────
+</div>
+""", unsafe_allow_html=True)
 
 # =============================
 # 🧭 4. ORIENTATION IDÉOLOGIQUE
@@ -13776,7 +13792,11 @@ with oi8:
             "ce qui peut renforcer la polarisation et la clôture cognitive."
         )
 st.divider()
-st.caption("────────── 🧠 ──────────")
+st.markdown("""
+<div style="text-align:center; margin:25px 0; color:#888;">
+──── 🧠 ────
+</div>
+""", unsafe_allow_html=True)
 
 # =============================
 # ⚖️ 5. ANALYSE LOGIQUE
@@ -14742,7 +14762,11 @@ with al12:
         )
 
 st.divider()
-st.caption("────────── 🧠 ──────────")
+st.markdown("""
+<div style="text-align:center; margin:25px 0; color:#888;">
+──── 🧠 ────
+</div>
+""", unsafe_allow_html=True)
 
 # =============================
 # 🧪 6. BIAIS DE FORMULATION
@@ -15326,7 +15350,11 @@ with bf7:
         )
 st.divider()
 
-st.caption("────────── 🧠 ──────────")
+st.markdown("""
+<div style="text-align:center; margin:25px 0; color:#888;">
+──── 🧠 ────
+</div>
+""", unsafe_allow_html=True)
 
 # -----------------------------
 # Manipulation statistique
@@ -15575,7 +15603,11 @@ with sq3:
 
 st.divider()
 
-st.caption("────────── 🧠 ──────────")
+st.markdown("""
+<div style="text-align:center; margin:25px 0; color:#888;">
+──── 🧠 ────
+</div>
+""", unsafe_allow_html=True)
 
 # =============================
 # Jauges structurelles avancées
@@ -16129,7 +16161,11 @@ with js6:
             "la contradiction en l’intégrant dans son propre récit."
         )
         
-st.caption("────────── 🧠 ──────────")
+st.markdown("""
+<div style="text-align:center; margin:25px 0; color:#888;">
+──── 🧠 ────
+</div>
+""", unsafe_allow_html=True)
 
 st.subheader("Structure cognitive du texte analysé")
 st.info(T["llm_intro"])
@@ -16172,7 +16208,11 @@ st.caption("Ouverture cognitive ⟵⟶ Clôture cognitive")
 st.caption(closure_text)
 st.markdown(f"**{T['interpretation']} :** {cog.interpret()}")
 
-st.caption("────────── 🧠 ──────────")
+st.markdown("""
+<div style="text-align:center; margin:25px 0; color:#888;">
+──── 🧠 ────
+</div>
+""", unsafe_allow_html=True)
 
 st.subheader(T["hard_fact_checking_by_claim"])
 claims_df = pd.DataFrame(
@@ -16202,7 +16242,11 @@ if not claims_df.empty:
 else:
     st.info(T["paste_longer_text"])
     
-st.caption("────────── 🧠 ──────────")
+st.markdown("""
+<div style="text-align:center; margin:25px 0; color:#888;">
+──── 🧠 ────
+</div>
+""", unsafe_allow_html=True)
 
 st.divider()
 st.subheader("Analyse syllogistique")
@@ -16278,7 +16322,11 @@ else:
     st.info("Aucun sophisme syllogistique détecté.")
 
 st.divider()  
-st.caption("────────── 🧠 ──────────")
+st.markdown("""
+<div style="text-align:center; margin:25px 0; color:#888;">
+──── 🧠 ────
+</div>
+""", unsafe_allow_html=True)
 
 st.subheader(T["ai_module"])
 st.caption(T["ai_module_caption"])
@@ -16319,7 +16367,11 @@ if st.session_state.get("article_source") == "paste":
         st.info(T["no_corroboration_found"])
         
 st.divider()        
-st.caption("────────── 🧠 ──────────")
+st.markdown("""
+<div style="text-align:center; margin:25px 0; color:#888;">
+──── 🧠 ────
+</div>
+""", unsafe_allow_html=True)
 
 # -----------------------------
 # Méthode
@@ -16349,7 +16401,11 @@ if show_method:
 
     st.markdown(method_text)
 st.divider()    
-st.caption("────────── 🧠 ──────────")
+st.markdown("""
+<div style="text-align:center; margin:25px 0; color:#888;">
+──── 🧠 ────
+</div>
+""", unsafe_allow_html=True)
 
 # -----------------------------
 # Laboratoire interactif
