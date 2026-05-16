@@ -16370,7 +16370,7 @@ st.markdown(
         font-size:1.3rem;
         font-weight:700;
     ">
-        M = ({g_game:.1f} + {n_game:.1f}) − {d_game:.1f} =
+        M = ({g_game:.1f} + {n_game:.1f}) - {d_game:.1f}
         <span style="color:#0b6e4f;">{m_game:.1f}</span>
     </div>
     """,
