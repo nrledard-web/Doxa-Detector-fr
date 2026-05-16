@@ -12056,8 +12056,8 @@ with pd3:
             for marker in markers:
                 st.warning(marker)
 
-        with st.popover("ℹ️ Explication"):
-    
+    with st.popover("ℹ️ Explication"):
+
         st.write(
             "Cette jauge détecte si le texte rapporte principalement "
             "des propos, citations ou positions extérieures."
