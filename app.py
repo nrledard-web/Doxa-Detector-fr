@@ -9719,6 +9719,23 @@ if not st.session_state.get("direct_search_result_mode"):
             use_container_width=True
         )
 
+if not st.session_state.get("direct_search_result_mode") and mode == "Analyse simple":
+
+    if st.button("🔄 Rafraîchir le texte", use_container_width=True):
+
+        st.session_state["article"] = ""
+        st.session_state["last_result"] = None
+        st.session_state["last_article"] = ""
+        st.session_state["article_source"] = "paste"
+
+        if "loaded_url" in st.session_state:
+            del st.session_state["loaded_url"]
+
+        if "loaded_article_title" in st.session_state:
+            del st.session_state["loaded_article_title"]
+
+        st.rerun()
+
 
 # =====================================================
 # MODE DÉBAT — TEXTE ÉCRIT MIS EN ATTENTE
