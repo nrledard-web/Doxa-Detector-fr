@@ -6158,7 +6158,7 @@ def compute_brain_indices(result: dict) -> dict:
     result["emotional_intensity_markers"] = emotional_result["markers"]
     result["emotional_intensity_interpretation"] = emotional_result["interpretation"]
 
-    argument_density_result = compute_argument_density(result)
+    argument_density_result = compute_argument_density(result.get("text", ""))
 
     result["argument_density_score"] = argument_density_result["score"]
     result["argument_density_label"] = argument_density_result["label"]
