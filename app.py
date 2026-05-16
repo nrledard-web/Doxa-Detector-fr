@@ -15801,6 +15801,9 @@ with js4:
         st.write(f"Score : **{round(value * 100, 1)}%**")
         st.write(f"Niveau : **{label}**")
         st.write(f"Marqueurs détectés : **{len(markers)}**")
+        st.write(
+            f"Marqueurs de nuance : **{result.get('advanced_deceptive_coherence_nuance_count', 0)}**"
+        )
 
         st.markdown("**Interprétation actuelle**")
 
