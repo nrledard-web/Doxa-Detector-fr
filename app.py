@@ -12055,6 +12055,24 @@ with pd3:
         else:
             for marker in markers:
                 st.warning(marker)
+
+    with st.popover("ℹ️ Explication"):
+
+    st.write(
+        "Cette jauge détecte si le texte rapporte principalement "
+        "des propos, citations ou positions extérieures."
+    )
+
+    st.write(
+        "Elle agit aussi comme modérateur : un texte qui cite "
+        "des propos sans les assumer directement est légèrement "
+        "moins pénalisé sur certaines jauges rhétoriques."
+    )
+
+    st.code(
+        "score = citations + verbes_de_parole + marqueurs_d_attribution",
+        language="python"
+    )
     
     
 with pd4:
