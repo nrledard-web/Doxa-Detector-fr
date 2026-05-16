@@ -16202,7 +16202,7 @@ st.markdown(f"**{T['interpretation']} :** {cog.interpret()}")
 
 st.markdown("""
 <div style="text-align:center; margin:25px 0; color:#888;">
-st.caption("────────── 🧠 ──────────")
+────────── 🧠 ──────────
 </div>
 """, unsafe_allow_html=True)
 
@@ -16236,7 +16236,7 @@ else:
     
 st.markdown("""
 <div style="text-align:center; margin:25px 0; color:#888;">
-st.caption("────────── 🧠 ──────────")
+────────── 🧠 ──────────
 </div>
 """, unsafe_allow_html=True)
 
@@ -16315,7 +16315,7 @@ else:
 st.divider()
 st.markdown("""
 <div style="text-align:center; margin:25px 0; color:#888;">
-st.caption("────────── 🧠 ──────────")
+────────── 🧠 ──────────
 </div>
 """, unsafe_allow_html=True)
 
