@@ -12057,21 +12057,72 @@ with pd3:
                 st.warning(marker)
 
     with st.popover("ℹ️ Comprendre cette jauge"):
-
+    
+        st.markdown("#### Discours rapporté / citations")
+    
         st.write(
-            "Cette jauge détecte si le texte rapporte principalement "
-            "des propos, citations ou positions extérieures."
+            "Cette jauge détecte si le texte rapporte des propos "
+            "extérieurs plutôt que d’affirmer directement une thèse."
         )
     
         st.write(
-            "Elle agit aussi comme modérateur : un texte qui cite "
-            "des propos sans les assumer directement est légèrement "
-            "moins pénalisé sur certaines jauges rhétoriques."
+            "Elle repère notamment :"
         )
+    
+        st.markdown("""
+    - les citations entre guillemets ;
+    - les verbes de parole : déclare, affirme, estime, explique ;
+    - les marqueurs d’attribution : selon, d’après, pour.
+    """)
+    
+        st.markdown("#### Formule utilisée")
     
         st.code(
-            "score = citations + verbes_de_parole + marqueurs_d_attribution",
+            """quote_ratio = mots_dans_citations / mots_totaux
+    marker_ratio = nombre_marqueurs / 10
+    
+    score = min(
+        (quote_ratio * 1.8) +
+        (marker_ratio * 0.5),
+        1.0
+    )""",
             language="python"
+        )
+    
+        st.markdown("#### Valeur actuelle")
+    
+        st.write(f"Score : {round(score * 100, 1)}%")
+        st.write(f"Niveau : {label}")
+    
+        markers = result.get("reported_speech_markers", [])
+    
+        st.write(f"Marqueurs détectés : {len(markers)}")
+    
+        st.markdown("#### Interprétation actuelle")
+    
+        st.write(
+            result.get(
+                "reported_speech_interpretation",
+                "Aucune interprétation disponible."
+            )
+        )
+    
+        st.markdown("#### Lecture")
+    
+        st.markdown("""
+    🟢 Faible : discours principalement assumé directement  
+    🟡 Présent : citations ou attributions ponctuelles  
+    🟠 Élevé : forte présence de discours rapporté  
+    🔴 Très élevé : texte majoritairement composé de citations ou positions externes
+    """)
+    
+        st.markdown("#### Attention")
+    
+        st.write(
+            "Un score élevé ne signifie pas manipulation ou mensonge. "
+            "Cette jauge sert aussi de modérateur afin d’éviter de "
+            "surpénaliser les textes journalistiques ou analytiques "
+            "rapportant des propos extérieurs."
         )
     
     
