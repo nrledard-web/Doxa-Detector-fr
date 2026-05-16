@@ -7964,6 +7964,8 @@ def analyze_article(text: str) -> Dict:
         "advanced_deceptive_coherence_score": advanced_deceptive_coherence_analysis["score"],
         "advanced_deceptive_coherence_markers": advanced_deceptive_coherence_analysis["markers"],
         "advanced_deceptive_coherence_interpretation": advanced_deceptive_coherence_analysis["interpretation"],
+        "advanced_deceptive_coherence_nuance_count": advanced_deceptive_coherence_analysis.get("nuance_count", 0),
+        "advanced_deceptive_coherence_nuance_markers": advanced_deceptive_coherence_analysis.get("nuance_markers", []),
 
         "emotional_intensity_score": emotional_intensity_analysis["score"],
         "emotional_intensity_markers": emotional_intensity_analysis["markers"],
