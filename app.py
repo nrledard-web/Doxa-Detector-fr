@@ -9494,17 +9494,6 @@ if (
             key="page_article_preview"
         )
 
-if st.button("🔎 Analyser ce texte maintenant", use_container_width=True):
-    st.session_state.last_result = analyze_article(st.session_state.article)
-    st.session_state.last_article = st.session_state.article
-    st.session_state.analysis_done = True
-
-    # On garde la fenêtre URL visible
-    st.session_state.article_loaded_from_search = True
-    st.session_state.article_source = "page_url"
-
-    st.rerun()
-
 # =============================
 # Mode résultat direct depuis recherche
 # =============================
