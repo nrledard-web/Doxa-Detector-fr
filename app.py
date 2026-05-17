@@ -749,10 +749,6 @@ class Cognition:
             return T["zone_asymptote"]
         return T["out_of_spectrum"]
 
-class Cognition:
-    ...
-        return T["out_of_spectrum"]
-
 
 # =====================================================
 # Mécroyance contextuelle selon le régime discursif
