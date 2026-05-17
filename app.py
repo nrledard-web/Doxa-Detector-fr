@@ -7353,6 +7353,232 @@ POLITICAL_MARKERS = [
     "économie",
 ]
 
+# =========================================================
+# ENCYCLOPÉDIQUE
+# =========================================================
+
+ENCYCLOPEDIC_MARKERS = [
+
+    "désigne",
+    "correspond à",
+    "se définit comme",
+    "est défini comme",
+    "est un concept",
+    "est une théorie",
+    "fait référence à",
+    "est caractérisé par",
+    "désigne le fait de",
+    "on appelle",
+    "définit comme",
+    "consiste en",
+    "est composé de",
+    "est constitué de",
+    "est une notion",
+    "renvoie à",
+    "correspond au terme",
+    "selon la définition",
+    "dans ce contexte",
+    "au sens de",
+    "is defined as",
+    "refers to",
+    "consists of",
+]
+
+# =========================================================
+# DÉFINITIONNEL / PÉDAGOGIQUE
+# =========================================================
+
+DEFINITION_MARKERS = [
+
+    "par exemple",
+    "en résumé",
+    "en d'autres termes",
+    "autrement dit",
+    "on distingue",
+    "on appelle",
+    "il existe plusieurs",
+    "se caractérise par",
+    "peut être défini",
+    "permet de comprendre",
+    "vise à expliquer",
+    "dans ce cas",
+    "ce phénomène",
+    "ce mécanisme",
+    "explication",
+    "définition",
+    "notion",
+    "concept",
+    "pédagogique",
+]
+
+# =========================================================
+# GÉOPOLITIQUE
+# =========================================================
+
+GEOPOLITICAL_MARKERS = [
+
+    "bloc occidental",
+    "bloc de l'est",
+    "sphère d'influence",
+    "équilibre des puissances",
+    "relations internationales",
+    "ordre mondial",
+    "puissance régionale",
+    "monde multipolaire",
+    "civilisation",
+    "territoire",
+    "frontière",
+    "migration",
+    "soft power",
+    "hard power",
+    "alliance stratégique",
+    "axe géopolitique",
+    "expansion territoriale",
+    "tensions internationales",
+    "zone d'influence",
+    "monde occidental",
+    "bloc eurasiatique",
+    "world order",
+    "geopolitical",
+]
+
+# =========================================================
+# ÉCOLOGIQUE
+# =========================================================
+
+ECOLOGICAL_MARKERS = [
+
+    "réchauffement climatique",
+    "biodiversité",
+    "empreinte carbone",
+    "transition énergétique",
+    "écosystème",
+    "effondrement climatique",
+    "neutralité carbone",
+    "développement durable",
+    "émissions de carbone",
+    "catastrophe climatique",
+    "écologie",
+    "climat",
+    "pollution",
+    "gaz à effet de serre",
+    "dérèglement climatique",
+    "planète",
+    "ressources naturelles",
+    "énergie renouvelable",
+    "extinction des espèces",
+    "climate change",
+    "carbon emissions",
+]
+
+# =========================================================
+# SOCIAL / SOCIOLOGIQUE
+# =========================================================
+
+SOCIAL_MARKERS = [
+
+    "inégalités sociales",
+    "classes sociales",
+    "mobilité sociale",
+    "violence sociale",
+    "exclusion",
+    "marginalisation",
+    "discrimination",
+    "cohésion sociale",
+    "fracture sociale",
+    "justice sociale",
+    "milieu social",
+    "conditions de vie",
+    "minorité",
+    "majorité",
+    "société",
+    "communauté",
+    "groupe social",
+    "précarité",
+    "social inequality",
+    "social exclusion",
+]
+
+# =========================================================
+# BIOGRAPHIQUE
+# =========================================================
+
+BIOGRAPHICAL_MARKERS = [
+
+    "né en",
+    "née en",
+    "mort en",
+    "morte en",
+    "décédé en",
+    "décédée en",
+    "sa vie",
+    "son œuvre",
+    "son parcours",
+    "sa carrière",
+    "il grandit",
+    "elle grandit",
+    "il devient",
+    "elle devient",
+    "biographie",
+    "autobiographie",
+    "mémoires",
+    "parcours de vie",
+    "portrait de",
+    "figure historique",
+]
+
+# =========================================================
+# FICTIONNEL / NARRATIF
+# =========================================================
+
+FICTION_MARKERS = [
+
+    "roman",
+    "personnage",
+    "intrigue",
+    "chapitre",
+    "récit",
+    "narrateur",
+    "héros",
+    "héroïne",
+    "conte",
+    "fiction",
+    "nouvelle",
+    "univers fictif",
+    "histoire imaginaire",
+    "scène",
+    "dialogue",
+    "protagoniste",
+    "antagoniste",
+    "quête",
+    "drame",
+    "aventure",
+]
+
+# =========================================================
+# MYTHIQUE / SYMBOLIQUE
+# =========================================================
+
+MYTHIC_MARKERS = [
+
+    "mythe",
+    "légende",
+    "symbole",
+    "archétype",
+    "quête initiatique",
+    "rite",
+    "destin",
+    "héritage spirituel",
+    "cosmique",
+    "sacré",
+    "divinité",
+    "oracle",
+    "prophétie",
+    "monde invisible",
+    "transcendance",
+    "initiation",
+]
+
 def detect_conceptual_domains(text: str):
     t = text.lower()
 
@@ -7362,6 +7588,14 @@ def detect_conceptual_domains(text: str):
         "religieux": 0,
         "geostrategique": 0,
         "politique": 0,
+        "encyclopedique": 0,
+        "definitionnel": 0,
+        "geopolitique": 0,
+        "ecologique": 0,
+        "social": 0,
+        "biographique": 0,
+        "fictionnel": 0,
+        "mythique": 0,
     }
 
     terms = {
@@ -7370,8 +7604,17 @@ def detect_conceptual_domains(text: str):
         "religieux": [],
         "geostrategique": [],
         "politique": [],
+    
+        "encyclopedique": [],
+        "definitionnel": [],
+        "geopolitique": [],
+        "ecologique": [],
+        "social": [],
+        "biographique": [],
+        "fictionnel": [],
+        "mythique": [],
     }
-
+    
     for marker in JOURNALISTIC_MARKERS:
         if contains_term(t, marker):
             domains["journalistique"] += 1
