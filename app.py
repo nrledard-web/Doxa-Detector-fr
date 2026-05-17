@@ -25,18 +25,6 @@ NEGATIONS = {"pas", "aucun", "jamais", "ni", "rien"}
 ATTENUATORS = {"peut-être", "semble", "probable", "possible"}
 INTENSIFIERS = {"grave", "extrême", "massif", "violent"}
 
-st.write("APP OK")
-
-try:
-    with DDGS() as ddgs:
-        test = list(ddgs.text("actualité France", max_results=3))
-
-    st.write("DDGS OK :", len(test))
-    st.write(test[:1])
-
-except Exception as e:
-    st.error(f"DDGS BUG : {type(e).__name__} — {e}")
-
 def tokenize(text):
     return re.findall(r"\b[\wà-ÿ'-]+\b", text.lower())
 
