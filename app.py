@@ -7658,6 +7658,46 @@ def detect_conceptual_domains(text: str):
             domains["politique"] += 1
             terms["politique"].append(marker)
 
+    for marker in ENCYCLOPEDIC_MARKERS:
+    if contains_term(t, marker):
+        domains["encyclopedique"] += 1
+        terms["encyclopedique"].append(marker)
+
+    for marker in DEFINITION_MARKERS:
+        if contains_term(t, marker):
+            domains["definitionnel"] += 1
+            terms["definitionnel"].append(marker)
+    
+    for marker in GEOPOLITICAL_MARKERS:
+        if contains_term(t, marker):
+            domains["geopolitique"] += 1
+            terms["geopolitique"].append(marker)
+    
+    for marker in ECOLOGICAL_MARKERS:
+        if contains_term(t, marker):
+            domains["ecologique"] += 1
+            terms["ecologique"].append(marker)
+    
+    for marker in SOCIAL_MARKERS:
+        if contains_term(t, marker):
+            domains["social"] += 1
+            terms["social"].append(marker)
+    
+    for marker in BIOGRAPHICAL_MARKERS:
+        if contains_term(t, marker):
+            domains["biographique"] += 1
+            terms["biographique"].append(marker)
+    
+    for marker in FICTION_MARKERS:
+        if contains_term(t, marker):
+            domains["fictionnel"] += 1
+            terms["fictionnel"].append(marker)
+    
+    for marker in MYTHIC_MARKERS:
+        if contains_term(t, marker):
+            domains["mythique"] += 1
+            terms["mythique"].append(marker)
+
     return domains, terms
 
 # -----------------------------
