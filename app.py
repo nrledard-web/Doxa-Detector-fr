@@ -7659,9 +7659,9 @@ def detect_conceptual_domains(text: str):
             terms["politique"].append(marker)
 
     for marker in ENCYCLOPEDIC_MARKERS:
-    if contains_term(t, marker):
-        domains["encyclopedique"] += 1
-        terms["encyclopedique"].append(marker)
+        if contains_term(t, marker):
+            domains["encyclopedique"] += 1
+            terms["encyclopedique"].append(marker)
 
     for marker in DEFINITION_MARKERS:
         if contains_term(t, marker):
