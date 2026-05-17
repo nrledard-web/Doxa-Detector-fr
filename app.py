@@ -9424,8 +9424,8 @@ def detect_discourse_type_from_rhetoric(text: str, rhetorical_scores: dict):
     anger = rhetorical_scores.get("colere", 0)
     suspicion = rhetorical_scores.get("soupcon_systemique", 0)
     
-    if attack == 0 and anger == 0 and suspicion == 0:
-        scores["pamphlétaire"] = round(scores["pamphlétaire"] * 0.65, 3)
+    if attack < 0.15 and anger < 0.15 and suspicion < 0.15:
+        scores["pamphlétaire"] = round(scores["pamphlétaire"] * 0.45, 3)
 
     sorted_scores = sorted(scores.items(), key=lambda x: x[1], reverse=True)
     
