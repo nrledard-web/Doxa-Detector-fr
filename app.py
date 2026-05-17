@@ -9358,7 +9358,10 @@ def detect_discourse_type_from_rhetoric(text: str, rhetorical_scores: dict):
     # Encyclopédique
     # =====================================================
     
-    scores["encyclopedique"] += rhetorical_scores.get("encyclopedique", 0) * 1.2
+    scores["encyclopedique"] += rhetorical_scores.get("definitionnel", 0) * 0.8
+    scores["encyclopedique"] += rhetorical_scores.get("encyclopedique", 0) * 1.8
+    scores["encyclopedique"] += rhetorical_scores.get("technicite", 0) * 0.3
+    scores["encyclopedique"] += rhetorical_scores.get("coherence_performative", 0) * 0.1
     
     # =====================================================
     # Définitionnel
@@ -9397,8 +9400,13 @@ def detect_discourse_type_from_rhetoric(text: str, rhetorical_scores: dict):
     # Fictionnel
     # =====================================================
     
-    scores["fictionnel"] += rhetorical_scores.get("fictionnel", 0) * 1.5
-    scores["fictionnel"] += rhetorical_scores.get("poeticite", 0) * 0.2
+    if (
+        rhetorical_scores.get("poeticite", 0) > 0.15
+        or rhetorical_scores.get("narrativité", 0) > 0.30
+    ):
+    
+        scores["fictionnel"] += rhetorical_scores.get("fictionnel", 0) * 0.7
+        scores["fictionnel"] += rhetorical_scores.get("poeticite", 0) * 0.15
     
     # =====================================================
     # Mythique
