@@ -9144,7 +9144,8 @@ def detect_rhetorical_structures(text: str):
             *IDEOLOGICAL_PREMISE_MARKERS,
             *IDEOLOGICAL_FRAMING_PATTERNS,
         ],
-                "soupcon_systemique": [
+        
+            "soupcon_systemique": [
             "on nous cache",
             "comme par hasard",
             "les mêmes intérêts",
@@ -9240,6 +9241,16 @@ def detect_discourse_type_from_rhetoric(text: str, rhetorical_scores: dict):
         "journalistique": 0,
         "technocratique": 0,
         "economie_politique": 0,
+    
+        # Nouveaux régimes
+        "encyclopedique": 0,
+        "definitionnel": 0,
+        "geopolitique": 0,
+        "ecologique": 0,
+        "social": 0,
+        "biographique": 0,
+        "fictionnel": 0,
+        "mythique": 0,
     }
 
     scores["pamphlétaire"] += rhetorical_scores.get("attaque", 0) * 1.6
@@ -9282,6 +9293,8 @@ def detect_discourse_type_from_rhetoric(text: str, rhetorical_scores: dict):
     scores["conspirationniste"] += rhetorical_scores.get("implicite", 0) * 0.2
     scores["conspirationniste"] += rhetorical_scores.get("amplification", 0) * 0.4
     scores["conspirationniste"] += rhetorical_scores.get("narrativité", 0) * 0.15
+
+    
     
     if (
         rhetorical_scores.get("soupcon_systemique", 0) > 0.4
@@ -9296,6 +9309,59 @@ def detect_discourse_type_from_rhetoric(text: str, rhetorical_scores: dict):
     scores["argumentatif"] += rhetorical_scores.get("technicite", 0) * 0.6
     scores["argumentatif"] += rhetorical_scores.get("persuasion", 0) * 0.6
     scores["argumentatif"] += rhetorical_scores.get("dissimulation_attenuation", 0) * 0.4
+
+    # =====================================================
+    # Encyclopédique
+    # =====================================================
+    
+    scores["encyclopedique"] += rhetorical_scores.get("encyclopedique", 0) * 1.2
+    
+    # =====================================================
+    # Définitionnel
+    # =====================================================
+    
+    scores["definitionnel"] += rhetorical_scores.get("definitionnel", 0) * 1.1
+    
+    # =====================================================
+    # Géopolitique
+    # =====================================================
+    
+    scores["geopolitique"] += rhetorical_scores.get("geopolitique", 0) * 1.3
+    scores["geopolitique"] += rhetorical_scores.get("technicite", 0) * 0.2
+    
+    # =====================================================
+    # Écologique
+    # =====================================================
+    
+    scores["ecologique"] += rhetorical_scores.get("ecologique", 0) * 1.3
+    scores["ecologique"] += rhetorical_scores.get("amplification", 0) * 0.15
+    
+    # =====================================================
+    # Social
+    # =====================================================
+    
+    scores["social"] += rhetorical_scores.get("social", 0) * 1.2
+    scores["social"] += rhetorical_scores.get("narrativité", 0) * 0.1
+    
+    # =====================================================
+    # Biographique
+    # =====================================================
+    
+    scores["biographique"] += rhetorical_scores.get("biographique", 0) * 1.4
+    
+    # =====================================================
+    # Fictionnel
+    # =====================================================
+    
+    scores["fictionnel"] += rhetorical_scores.get("fictionnel", 0) * 1.5
+    scores["fictionnel"] += rhetorical_scores.get("poeticite", 0) * 0.2
+    
+    # =====================================================
+    # Mythique
+    # =====================================================
+    
+    scores["mythique"] += rhetorical_scores.get("mythique", 0) * 1.3
+    scores["mythique"] += rhetorical_scores.get("abstraction", 0) * 0.15
 
     scores["philosophique"] += rhetorical_scores.get("compression_cognitive", 0) * 0.03
     scores["pamphlétaire"] += rhetorical_scores.get("compression_cognitive", 0) * 0.3
