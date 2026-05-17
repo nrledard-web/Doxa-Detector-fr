@@ -749,6 +749,28 @@ class Cognition:
             return T["zone_asymptote"]
         return T["out_of_spectrum"]
 
+class Cognition:
+    ...
+        return T["out_of_spectrum"]
+
+
+# =====================================================
+# Mécroyance contextuelle selon le régime discursif
+# =====================================================
+def compute_contextual_mecroyance(G, N, D, discourse_type=""):
+    discourse = discourse_type.lower()
+
+    if "fiction" in discourse or "romanesque" in discourse or "narratif" in discourse:
+        return (G + N) - (D * 0.3)
+
+    if "poétique" in discourse or "littéraire" in discourse:
+        return (G + N) - (D * 0.5)
+
+    if "religieux" in discourse or "mythique" in discourse:
+        return (G + N) - (D * 0.7)
+
+    return (G + N) - D
+
 # -----------------------------
 # Exemple
 # -----------------------------
