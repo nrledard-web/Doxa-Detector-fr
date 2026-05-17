@@ -9221,6 +9221,14 @@ def detect_rhetorical_structures(text: str):
     scores["compression_cognitive"] = compute_cognitive_compression(text)
     scores["saturation_rhetorique"] = compute_rhetorical_saturation(text)
     scores["dissimulation_attenuation"] = compute_dissimulation_attenuation(text)
+    scores["encyclopedique"] = min(encyclopedic_count * 0.12, 1.0)
+    scores["definitionnel"] = min(definition_count * 0.12, 1.0)
+    scores["geopolitique"] = min(geopolitical_count * 0.12, 1.0)
+    scores["ecologique"] = min(ecological_count * 0.12, 1.0)
+    scores["social"] = min(social_count * 0.12, 1.0)
+    scores["biographique"] = min(biographical_count * 0.12, 1.0)
+    scores["fictionnel"] = min(fiction_count * 0.12, 1.0)
+    scores["mythique"] = min(mythic_count * 0.12, 1.0)
 
     return scores
 
