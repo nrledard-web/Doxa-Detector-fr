@@ -9221,6 +9221,42 @@ def detect_rhetorical_structures(text: str):
     scores["compression_cognitive"] = compute_cognitive_compression(text)
     scores["saturation_rhetorique"] = compute_rhetorical_saturation(text)
     scores["dissimulation_attenuation"] = compute_dissimulation_attenuation(text)
+    
+    # =========================================================
+    # Comptage des nouveaux régimes discursifs
+    # =========================================================
+    
+    encyclopedic_count = sum(
+        1 for m in ENCYCLOPEDIC_MARKERS if contains_term(t, m)
+    )
+    
+    definition_count = sum(
+        1 for m in DEFINITION_MARKERS if contains_term(t, m)
+    )
+    
+    geopolitical_count = sum(
+        1 for m in GEOPOLITICAL_MARKERS if contains_term(t, m)
+    )
+    
+    ecological_count = sum(
+        1 for m in ECOLOGICAL_MARKERS if contains_term(t, m)
+    )
+    
+    social_count = sum(
+        1 for m in SOCIAL_MARKERS if contains_term(t, m)
+    )
+    
+    biographical_count = sum(
+        1 for m in BIOGRAPHICAL_MARKERS if contains_term(t, m)
+    )
+    
+    fiction_count = sum(
+        1 for m in FICTION_MARKERS if contains_term(t, m)
+    )
+    
+    mythic_count = sum(
+        1 for m in MYTHIC_MARKERS if contains_term(t, m)
+    )
     scores["encyclopedique"] = min(encyclopedic_count * 0.12, 1.0)
     scores["definitionnel"] = min(definition_count * 0.12, 1.0)
     scores["geopolitique"] = min(geopolitical_count * 0.12, 1.0)
