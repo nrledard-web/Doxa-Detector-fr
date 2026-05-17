@@ -9032,30 +9032,30 @@ def detect_discourse_type_from_rhetoric(text: str, rhetorical_scores: dict):
             scores
         )
     
-# Construction hybride
-if secondary_value >= dominant_value * 0.6:
-
-    if dominant == "journalistique" and secondary == "pamphlétaire":
-        discourse_label = "Journalistique à coloration polémique"
-
-    elif dominant == "journalistique" and secondary == "politique":
-        discourse_label = "Journalistique à coloration politique"
-
-    elif dominant == "scientifique" and secondary == "technocratique":
-        discourse_label = "Scientifique à coloration technocratique"
-
+    # Construction hybride
+    if secondary_value >= dominant_value * 0.6:
+    
+        if dominant == "journalistique" and secondary == "pamphlétaire":
+            discourse_label = "Journalistique à coloration polémique"
+    
+        elif dominant == "journalistique" and secondary == "politique":
+            discourse_label = "Journalistique à coloration politique"
+    
+        elif dominant == "scientifique" and secondary == "technocratique":
+            discourse_label = "Scientifique à coloration technocratique"
+    
+        else:
+            discourse_label = f"{dominant.capitalize()} à dominante {secondary}"
+    
     else:
-        discourse_label = f"{dominant.capitalize()} à dominante {secondary}"
-
-else:
-    discourse_label = dominant.capitalize()
-
-explanation = (
-    f"Dominante détectée par les marqueurs rhétoriques : "
-    f"{dominant}."
-)
-
-return discourse_label, explanation, scores
+        discourse_label = dominant.capitalize()
+    
+    explanation = (
+        f"Dominante détectée par les marqueurs rhétoriques : "
+        f"{dominant}."
+    )
+    
+    return discourse_label, explanation, scores
 
 def explain_discourse_profile(result):
     rhetorical = result.get("rhetorical_scores", {})
