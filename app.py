@@ -1501,6 +1501,18 @@ DISCOURSE_MODIFIERS = {
         "threat_amplification_score": 0.55,
         "coherence_trompeuse_score": 0.75,
     },
+    "encyclopedique": {
+        "saturation_rhetorique": 0.25,
+        "coherence_performative": 0.35,
+        "compression_cognitive": 0.55,
+        "propaganda_score": 0.35,
+        "rhetorical_pressure": 0.45,
+    },
+    
+    "definitionnel": {
+        "saturation_rhetorique": 0.45,
+        "coherence_performative": 0.55,
+    },
 }
 
 def apply_discourse_modifiers(result: dict):
