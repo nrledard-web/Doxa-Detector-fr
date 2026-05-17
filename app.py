@@ -9011,6 +9011,14 @@ def detect_discourse_type_from_rhetoric(text: str, rhetorical_scores: dict):
     scores["philosophique"] += rhetorical_scores.get("compression_cognitive", 0) * 0.03
     scores["pamphlétaire"] += rhetorical_scores.get("compression_cognitive", 0) * 0.3
     scores["poétique"] += rhetorical_scores.get("compression_cognitive", 0) * 0.05
+    
+    # Sécurité : pas de pamphlétaire fort sans agressivité réelle
+    attack = rhetorical_scores.get("attaque", 0)
+    anger = rhetorical_scores.get("colere", 0)
+    suspicion = rhetorical_scores.get("soupcon_systemique", 0)
+    
+    if attack == 0 and anger == 0 and suspicion == 0:
+        scores["pamphlétaire"] = round(scores["pamphlétaire"] * 0.65, 3)
 
     sorted_scores = sorted(scores.items(), key=lambda x: x[1], reverse=True)
     
