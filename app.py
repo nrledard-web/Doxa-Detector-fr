@@ -7773,6 +7773,191 @@ def compute_reported_speech_ratio(text: str) -> dict:
         "interpretation": interpretation
     }
 
+# =============================
+# Ancrage au réel
+# =============================
+
+REAL_ANCHOR_EMPIRY = [
+    "expérience", "expérimentation", "mesure", "mesuré", "observation",
+    "observé", "test", "testé", "données", "protocole", "benchmark",
+    "résultat", "validation", "validé", "détecté", "reproduit",
+    "statistiquement significatif", "échantillon", "essai clinique",
+    "simulation validée"
+]
+
+REAL_ANCHOR_REPRODUCIBILITY = [
+    "méthode", "paramètres", "reproductible", "reproductibilité",
+    "réplication", "répliqué", "protocole détaillé", "dataset",
+    "jeu de données", "open source", "code source", "doi", "arxiv",
+    "publication", "revue par les pairs", "littérature scientifique"
+]
+
+REAL_ANCHOR_FALSIFIABILITY = [
+    "hypothèse", "modèle partiel", "approximation", "sous certaines conditions",
+    "pourrait être faux", "pourrait être réfuté", "compatible avec",
+    "marge d’erreur", "marge d'erreur", "résultats préliminaires",
+    "selon les données actuelles", "limite du modèle"
+]
+
+REAL_ANCHOR_LIMITS = [
+    "nous ne savons pas", "reste incomplet", "interprétation débattue",
+    "hypothèse de travail", "limite actuelle", "nécessite validation",
+    "nécessite davantage de recherches", "cadre spécifique",
+    "dans cette classe de systèmes", "conditions de validité",
+    "limites de cette approche"
+]
+
+SPECULATIVE_INFLATION_MARKERS = [
+    "explique tout", "théorie du tout", "théorie unifiée",
+    "structure cachée", "structure fondamentale du réel",
+    "clé fondamentale", "clé de l’univers", "tout découle de",
+    "aucune exception", "preuve finale", "preuve définitive",
+    "révolution complète", "erreur historique majeure",
+    "la vraie structure", "enfin expliqué", "peut enfin être expliqué",
+    "description complète", "sans nouveaux paramètres",
+    "tous les systèmes", "chaque système", "toujours", "jamais",
+    "inévitablement", "nécessairement"
+]
+
+
+def count_markers(text, markers):
+    t = text.lower()
+    found = []
+
+    for marker in markers:
+        if marker.lower() in t:
+            found.append(marker)
+
+    return found
+
+
+def normalize_component(count, divisor=4):
+    """
+    Transforme un nombre de marqueurs en score 0–5.
+    """
+    return min(5.0, count / divisor * 5)
+
+
+def detect_real_anchor(text, result=None):
+    """
+    Mesure l'ancrage au réel d'un discours.
+
+    A = (E + R + F + L) - S
+    E = empirie
+    R = reproductibilité
+    F = falsifiabilité
+    L = limites explicites
+    S = spéculation extrapolative
+
+    Score final normalisé sur 20.
+    """
+
+    empirical_markers = count_markers(text, REAL_ANCHOR_EMPIRY)
+    reproducibility_markers = count_markers(text, REAL_ANCHOR_REPRODUCIBILITY)
+    falsifiability_markers = count_markers(text, REAL_ANCHOR_FALSIFIABILITY)
+    limits_markers = count_markers(text, REAL_ANCHOR_LIMITS)
+    speculation_markers = count_markers(text, SPECULATIVE_INFLATION_MARKERS)
+
+    E = normalize_component(len(empirical_markers), divisor=5)
+    R = normalize_component(len(reproducibility_markers), divisor=4)
+    F = normalize_component(len(falsifiability_markers), divisor=3)
+    L = normalize_component(len(limits_markers), divisor=3)
+    S = normalize_component(len(speculation_markers), divisor=4)
+
+    # Bonus prudent si le texte contient des références académiques explicites
+    academic_bonus = 0
+
+    t = text.lower()
+    if "doi" in t or "arxiv" in t or "revue par les pairs" in t:
+        academic_bonus += 1.0
+
+    if "protocole" in t and ("données" in t or "dataset" in t):
+        academic_bonus += 0.8
+
+    if "limite" in t or "hypothèse" in t:
+        academic_bonus += 0.5
+
+    raw_score = (E + R + F + L + academic_bonus) - S
+
+    # Normalisation sur 20
+    anchor_score = max(0, min(20, raw_score / 21 * 20))
+
+    if anchor_score < 5:
+        label = "Très faible"
+        interpretation = (
+            "Le discours est faiblement contraint par le réel : peu d’expérience, "
+            "peu de reproductibilité ou forte extrapolation spéculative."
+        )
+    elif anchor_score < 10:
+        label = "Fragile"
+        interpretation = (
+            "Le discours contient quelques appuis réels, mais ils restent insuffisants "
+            "face à la portée des affirmations."
+        )
+    elif anchor_score < 15:
+        label = "Modéré"
+        interpretation = (
+            "Le discours présente un ancrage partiel : certains éléments sont vérifiables, "
+            "mais la démonstration reste incomplète."
+        )
+    elif anchor_score < 18:
+        label = "Fort"
+        interpretation = (
+            "Le discours est fortement relié à des éléments empiriques, méthodologiques "
+            "ou reproductibles."
+        )
+    else:
+        label = "Très fort"
+        interpretation = (
+            "Le discours paraît fortement contraint par le réel : données, méthode, "
+            "révisabilité et reproductibilité sont bien représentées."
+        )
+
+    # Couplage avec M et spéculation si result existe
+    M = 0
+    if result:
+        M = result.get("M", 0)
+
+    delta_reality = round((M + S) - anchor_score, 2)
+
+    if delta_reality <= -5:
+        delta_label = "Structure fortement ancrée"
+        delta_interpretation = (
+            "L’ancrage au réel domine nettement la spéculation et la mécroyance."
+        )
+    elif delta_reality <= 2:
+        delta_label = "Zone révisable"
+        delta_interpretation = (
+            "Le discours conserve un équilibre entre cohérence, spéculation et contrainte du réel."
+        )
+    else:
+        delta_label = "Cohérence autoporteuse possible"
+        delta_interpretation = (
+            "La cohérence ou la spéculation semblent dépasser l’ancrage empirique disponible."
+        )
+
+    return {
+        "real_anchor_score": round(anchor_score, 2),
+        "real_anchor_label": label,
+        "real_anchor_interpretation": interpretation,
+
+        "real_anchor_E": round(E, 2),
+        "real_anchor_R": round(R, 2),
+        "real_anchor_F": round(F, 2),
+        "real_anchor_L": round(L, 2),
+        "real_anchor_S": round(S, 2),
+
+        "real_anchor_empirical_markers": empirical_markers,
+        "real_anchor_reproducibility_markers": reproducibility_markers,
+        "real_anchor_falsifiability_markers": falsifiability_markers,
+        "real_anchor_limits_markers": limits_markers,
+        "real_anchor_speculation_markers": speculation_markers,
+
+        "delta_reality": delta_reality,
+        "delta_reality_label": delta_label,
+        "delta_reality_interpretation": delta_interpretation,
+    }
+
 def analyze_article(text: str) -> Dict:
     words = text.split()
     sentences = [s.strip() for s in re.split(r"[.!?]+", text) if len(s.strip()) > 10]
