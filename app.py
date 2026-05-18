@@ -9496,6 +9496,30 @@ def detect_discourse_type_from_rhetoric(text: str, rhetorical_scores: dict):
     if attack < 0.15 and anger < 0.15 and suspicion < 0.15:
         scores["pamphlétaire"] = round(scores["pamphlétaire"] * 0.45, 3)
 
+    # =====================================================
+    # Priorité structurelle : encyclopédique / définitionnel
+    # =====================================================
+    
+    encyclopedic_strength = (
+        scores.get("encyclopedique", 0)
+        + scores.get("definitionnel", 0)
+    )
+    
+    direct_aggression = (
+        rhetorical_scores.get("attaque", 0)
+        + rhetorical_scores.get("persuasion", 0)
+        + rhetorical_scores.get("amplification", 0)
+    )
+    
+    if encyclopedic_strength >= 0.45 and direct_aggression < 0.25:
+    
+        scores["pamphlétaire"] = round(scores.get("pamphlétaire", 0) * 0.30, 3)
+        scores["conspirationniste"] = round(scores.get("conspirationniste", 0) * 0.40, 3)
+        scores["politique"] = round(scores.get("politique", 0) * 0.65, 3)
+    
+        scores["encyclopedique"] = round(scores.get("encyclopedique", 0) * 1.45, 3)
+        scores["definitionnel"] = round(scores.get("definitionnel", 0) * 1.25, 3)
+
     sorted_scores = sorted(scores.items(), key=lambda x: x[1], reverse=True)
     
     dominant, dominant_value = sorted_scores[0]
