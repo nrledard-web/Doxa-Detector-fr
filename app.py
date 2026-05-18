@@ -9373,14 +9373,14 @@ def detect_discourse_type_from_rhetoric(text: str, rhetorical_scores: dict):
     scores["economie_politique"] += rhetorical_scores.get("coherence_performative", 0) * 0.3
     scores["economie_politique"] += rhetorical_scores.get("abstraction", 0) * 0.2
 
-# =====================================================
-# Philosophique
-# =====================================================
-
-if (
-    rhetorical_scores.get("implicite", 0) > 0.15
-    or rhetorical_scores.get("abstraction", 0) > 0.45
-):
+    # =====================================================
+    # Philosophique
+    # =====================================================
+    
+    if (
+        rhetorical_scores.get("implicite", 0) > 0.15
+        or rhetorical_scores.get("abstraction", 0) > 0.45
+    ):
 
     scores["philosophique"] += rhetorical_scores.get("abstraction", 0) * 0.9
     scores["philosophique"] += rhetorical_scores.get("implicite", 0) * 1.1
