@@ -9569,6 +9569,16 @@ def detect_discourse_type_from_rhetoric(text: str, rhetorical_scores: dict):
     
         scores["encyclopedique"] = round(scores.get("encyclopedique", 0) * 1.45, 3)
         scores["definitionnel"] = round(scores.get("definitionnel", 0) * 1.25, 3)
+        
+        scores["encyclopedique"] += rhetorical_scores.get("encyclopedique", 0) * 1.8
+        scores["definitionnel"] += rhetorical_scores.get("definitionnel", 0) * 1.6
+        scores["geopolitique"] += rhetorical_scores.get("geopolitique", 0) * 1.5
+        scores["ecologique"] += rhetorical_scores.get("ecologique", 0) * 1.4
+        scores["social"] += rhetorical_scores.get("social", 0) * 1.4
+        scores["biographique"] += rhetorical_scores.get("biographique", 0) * 1.5
+        scores["fictionnel"] += rhetorical_scores.get("fictionnel", 0) * 1.7
+        scores["mythique"] += rhetorical_scores.get("mythique", 0) * 1.6
+    
 
     sorted_scores = sorted(scores.items(), key=lambda x: x[1], reverse=True)
     
