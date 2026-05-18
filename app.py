@@ -8972,22 +8972,33 @@ def compute_performative_coherence(text: str) -> float:
     ))
 
     raw = repeated_starts + balance_count + symmetry_count
-
-    encyclopedic_factor = (
-        result.get("encyclopedique", 0)
-        + result.get("definitionnel", 0)
+    
+    score = min(raw / 6, 1.0)
+    
+    encyclopedic_markers = [
+        "is defined as",
+        "refers to",
+        "this article is about",
+        "see also",
+        "references",
+        "citations",
+        "background",
+        "analysis",
+        "according to",
+        "scholars",
+        "concept",
+        "theory",
+    ]
+    
+    encyclopedic_hits = sum(
+        1 for m in encyclopedic_markers
+        if m in text.lower()
     )
     
-    reported_factor = result.get("reported_speech_score", 0)
+    if encyclopedic_hits >= 4:
+        score *= 0.55
     
-    reduction = min(
-        (encyclopedic_factor * 0.35) + (reported_factor * 0.25),
-        0.65
-    )
-    
-    score *= (1 - reduction)
-
-    return round(min(raw / 6, 1.0), 3)
+    return round(score, 3)
 
 def compute_cognitive_compression(text: str) -> float:
     words = re.findall(r"\b[\wà-ÿ'-]+\b", text.lower())
