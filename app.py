@@ -9360,6 +9360,25 @@ def detect_rhetorical_structures(text: str):
         3
     )
     # =====================================================
+    # Contrepoids : encyclopédique mais fortement orienté
+    # =====================================================
+    
+    orientation_pressure = (
+        scores.get("attaque", 0)
+        + scores.get("soupcon_systemique", 0)
+        + scores.get("amplification", 0)
+        + scores.get("implicite", 0)
+    )
+    
+    if orientation_pressure > 0.55:
+        reported_discourse_factor *= 0.45
+    elif orientation_pressure > 0.35:
+        reported_discourse_factor *= 0.65
+    
+    reported_discourse_factor = round(reported_discourse_factor, 3)
+    scores["reported_discourse_factor"] = reported_discourse_factor
+
+    # =====================================================
     # Réduction des faux positifs idéologiques
     # =====================================================
     
