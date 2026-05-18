@@ -9377,6 +9377,23 @@ def detect_rhetorical_structures(text: str):
             scores[key] *= (1 - reduction * factor)
             scores[key] = round(scores[key], 3)
 
+    # =====================================================
+    # Réduction structurelle documentaire
+    # =====================================================
+    
+    for key, factor in {
+        "coherence_performative": 0.35,
+        "compression_cognitive": 0.25,
+        "soupcon_systemique": 0.45,
+        "implicite": 0.30,
+        "attaque": 0.25,
+        "amplification": 0.25,
+    }.items():
+    
+        if key in scores:
+            scores[key] *= (1 - reduction * factor)
+            scores[key] = round(scores[key], 3)
+
     return scores
 
 # =============================
