@@ -8823,6 +8823,12 @@ def analyze_article(text: str) -> Dict:
     else:
         result["final_credibility_note"] = ""
 
+    # -----------------------------
+    # Ancrage au réel
+    # -----------------------------
+    real_anchor = detect_real_anchor(article, result)
+    result.update(real_anchor)
+
     result["cognitive_gravity"] = compute_cognitive_gravity(result)
     result["doxa_brain"] = compute_doxa_brain(result)
 
