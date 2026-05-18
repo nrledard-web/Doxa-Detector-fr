@@ -9327,6 +9327,44 @@ def detect_rhetorical_structures(text: str):
     scores["fictionnel"] = min(fiction_count * 0.12, 1.0)
     scores["mythique"] = min(mythic_count * 0.12, 1.0)
 
+    # =====================================================
+    # Facteur de discours rapporté / documentaire
+    # =====================================================
+    
+    reported_discourse_factor = (
+        scores.get("reported_speech_score", 0)
+        + scores.get("encyclopedique", 0)
+        + scores.get("definitionnel", 0)
+        + scores.get("journalistique", 0) * 0.5
+    )
+    
+    reported_discourse_factor = min(
+        reported_discourse_factor / 3,
+        1.0
+    )
+    
+    scores["reported_discourse_factor"] = round(
+        reported_discourse_factor,
+        3
+    )
+    # =====================================================
+    # Réduction des faux positifs idéologiques
+    # =====================================================
+    
+    reduction = reported_discourse_factor
+    
+    for key, factor in {
+        "propaganda_score": 0.45,
+        "rhetorical_pressure": 0.35,
+        "conspirationniste": 0.55,
+        "pamphlétaire": 0.50,
+        "saturation_rhetorique": 0.30,
+    }.items():
+    
+        if key in scores:
+            scores[key] *= (1 - reduction * factor)
+            scores[key] = round(scores[key], 3)
+
     return scores
 
 # =============================
