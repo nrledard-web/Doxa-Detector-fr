@@ -17206,6 +17206,119 @@ st.caption("Ouverture cognitive ⟵⟶ Clôture cognitive")
 st.caption(closure_text)
 st.markdown(f"**{T['interpretation']} :** {cog.interpret()}")
 
+# =============================
+# Ancrage au réel
+# =============================
+
+st.markdown("──── 🧪 ────")
+st.subheader("Ancrage au réel")
+
+st.caption(
+    "Cette jauge mesure dans quelle mesure le discours reste contraint "
+    "par l’expérience, la reproductibilité, la falsifiabilité et "
+    "la reconnaissance explicite de ses limites."
+)
+
+anchor_score = result.get("real_anchor_score", 0)
+anchor_label = result.get("real_anchor_label", "Non calculé")
+anchor_text = result.get("real_anchor_interpretation", "")
+
+if anchor_score < 5:
+    anchor_color = "#dc2626"
+
+elif anchor_score < 10:
+    anchor_color = "#f97316"
+
+elif anchor_score < 15:
+    anchor_color = "#ca8a04"
+
+else:
+    anchor_color = "#16a34a"
+
+render_custom_gauge(anchor_score / 20, anchor_color)
+
+st.markdown(
+    f"<b style='color:{anchor_color}'>{anchor_label}</b> — {anchor_score}/20",
+    unsafe_allow_html=True
+)
+
+st.caption(anchor_text)
+
+st.caption("Spéculation libre ⟵⟶ Contrainte du réel")
+
+# =============================
+# Composantes
+# =============================
+
+st.markdown("### Composantes de l’ancrage")
+
+c1, c2 = st.columns(2)
+c3, c4 = st.columns(2)
+c5, _ = st.columns(2)
+
+c1.metric("Empirie", result.get("real_anchor_E", 0))
+c2.metric("Reproductibilité", result.get("real_anchor_R", 0))
+c3.metric("Falsifiabilité", result.get("real_anchor_F", 0))
+c4.metric("Limites", result.get("real_anchor_L", 0))
+c5.metric("Spéculation", result.get("real_anchor_S", 0))
+
+# =============================
+# Delta réalité / mécroyance
+# =============================
+
+st.markdown("### Tension réalité / cohérence")
+
+delta = result.get("delta_reality", 0)
+delta_label = result.get("delta_reality_label", "Non calculé")
+delta_text = result.get("delta_reality_interpretation", "")
+
+if delta <= -5:
+    delta_color = "#16a34a"
+
+elif delta <= 2:
+    delta_color = "#ca8a04"
+
+else:
+    delta_color = "#dc2626"
+
+st.markdown(
+    f"<b style='color:{delta_color}'>{delta_label}</b> — Δ = {delta}",
+    unsafe_allow_html=True
+)
+
+st.caption(delta_text)
+
+# =============================
+# Marqueurs détectés
+# =============================
+
+with st.expander("Voir les marqueurs d’ancrage", expanded=False):
+
+    st.write(
+        "**Empirie :**",
+        result.get("real_anchor_empirical_markers", [])
+    )
+
+    st.write(
+        "**Reproductibilité :**",
+        result.get("real_anchor_reproducibility_markers", [])
+    )
+
+    st.write(
+        "**Falsifiabilité :**",
+        result.get("real_anchor_falsifiability_markers", [])
+    )
+
+    st.write(
+        "**Limites explicites :**",
+        result.get("real_anchor_limits_markers", [])
+    )
+
+    st.write(
+        "**Spéculation extrapolative :**",
+        result.get("real_anchor_speculation_markers", [])
+    )
+
 st.markdown("""
 <div style="text-align:center; margin:25px 0; color:#888;">
 ──── 🧠 ────
