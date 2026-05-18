@@ -9044,12 +9044,26 @@ def compute_rhetorical_saturation(text: str) -> float:
         "tout", "rien", "absolument", "totalement"
     ]
 
+    encyclopedic_markers = [
+        "is defined as",
+        "refers to",
+        "this article is about",
+        "see also",
+        "references",
+        "citations",
+        "background",
+        "analysis",
+        "according to",
+        "scholars",
+        "concept",
+        "theory",
+    ]
+
     exclamation_count = text.count("!")
 
     emotional_score = count_markers(t, emotional_markers)
     repetition_score = count_markers(t, repetition_markers)
 
-    # accumulation simple : longues phrases avec nombreuses virgules
     accumulation_score = sum(
         1 for s in re.split(r"[.!?]", text)
         if s.count(",") >= 4
@@ -9062,7 +9076,17 @@ def compute_rhetorical_saturation(text: str) -> float:
         + exclamation_count * 0.5
     )
 
-    return round(min(raw / 14, 1.0), 3)
+    score = min(raw / 14, 1.0)
+
+    encyclopedic_hits = sum(
+        1 for m in encyclopedic_markers
+        if m in t
+    )
+
+    if encyclopedic_hits >= 4:
+        score *= 0.45
+
+    return round(score, 3)
 
 def compute_dissimulation_attenuation(text: str) -> float:
     t = text.lower()
