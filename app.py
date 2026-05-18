@@ -7820,7 +7820,7 @@ SPECULATIVE_INFLATION_MARKERS = [
 ]
 
 
-def count_markers(text, markers):
+def count_real_anchor_markers(text, markers):
     t = text.lower()
     found = []
 
@@ -7852,11 +7852,11 @@ def detect_real_anchor(text, result=None):
     Score final normalisé sur 20.
     """
 
-    empirical_markers = count_markers(text, REAL_ANCHOR_EMPIRY)
-    reproducibility_markers = count_markers(text, REAL_ANCHOR_REPRODUCIBILITY)
-    falsifiability_markers = count_markers(text, REAL_ANCHOR_FALSIFIABILITY)
-    limits_markers = count_markers(text, REAL_ANCHOR_LIMITS)
-    speculation_markers = count_markers(text, SPECULATIVE_INFLATION_MARKERS)
+    empirical_markers = count_real_anchor_markers(text, REAL_ANCHOR_EMPIRY)
+    reproducibility_markers = count_real_anchor_markers(text, REAL_ANCHOR_REPRODUCIBILITY)
+    falsifiability_markers = count_real_anchor_markers(text, REAL_ANCHOR_FALSIFIABILITY)
+    limits_markers = count_real_anchor_markers(text, REAL_ANCHOR_LIMITS)
+    speculation_markers = count_real_anchor_markers(text, SPECULATIVE_INFLATION_MARKERS)
 
     E = normalize_component(len(empirical_markers), divisor=5)
     R = normalize_component(len(reproducibility_markers), divisor=4)
