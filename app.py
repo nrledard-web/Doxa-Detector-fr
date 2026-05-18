@@ -731,6 +731,18 @@ class Cognition:
         return max(min_val, min(max_val, value))
 
     def compute_mecroyance(self) -> float:
+    
+        discourse = getattr(self, "discourse_type", "").lower()
+    
+        if "fictionnel" in discourse or "mythique" in discourse:
+            return (self.G + self.N) - (self.D * 0.3)
+    
+        if "poétique" in discourse or "littéraire" in discourse:
+            return (self.G + self.N) - (self.D * 0.5)
+    
+        if "religieux" in discourse:
+            return (self.G + self.N) - (self.D * 0.7)
+    
         return (self.G + self.N) - self.D
 
     def interpret(self) -> str:
