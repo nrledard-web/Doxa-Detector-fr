@@ -6382,7 +6382,6 @@ def detect_aristotelian_fallacies(text: str):
             lie_impact * 0.15 +
             real_anchor_penalty * 0.25
         )
-)
     )
     secondary_pressure = compute_secondary_alert_pressure(result)
     
