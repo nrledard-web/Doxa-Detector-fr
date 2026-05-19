@@ -8832,12 +8832,16 @@ def analyze_article(text: str) -> Dict:
     # -----------------------------
     # Ancrage au réel
     # -----------------------------
+    
     real_anchor = detect_real_anchor(article, result)
     result.update(real_anchor)
-
-    result["cognitive_gravity"] = compute_cognitive_gravity(result)
-    result["doxa_brain"] = compute_doxa_brain(result)
-
+    
+    if "compute_cognitive_gravity" in globals():
+        result["cognitive_gravity"] = compute_cognitive_gravity(result)
+    
+    if "compute_doxa_brain" in globals():
+        result["doxa_brain"] = compute_doxa_brain(result)
+    
     return result
 
 # -----------------------------
