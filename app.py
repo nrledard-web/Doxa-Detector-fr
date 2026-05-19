@@ -1308,12 +1308,20 @@ def compute_rhetorical_pressure(results: dict) -> float:
         + emotions.get("peur", 0) * 0.04
     )
 
-    reported_speech = results.get("reported_speech_score", 0)
+    # -----------------------------
+    # Modération du discours rapporté
+    # -----------------------------
+    reported_speech = max(
+        results.get("reported_speech_score", 0),
+        results.get("reported_speech_ratio", 0),
+        results.get("reported_speech", 0),
+        results.get("reported_speech_gauge", 0),
+    )
 
     if reported_speech > 0.45:
-        pressure *= 0.75
+        pressure *= 0.65
     elif reported_speech > 0.25:
-        pressure *= 0.88
+        pressure *= 0.80
 
     return round(min(max(pressure, 0), 1.0), 3)
     
