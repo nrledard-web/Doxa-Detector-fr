@@ -17278,23 +17278,23 @@ anchor_label = result.get("real_anchor_label", "Non calculé")
 anchor_text = result.get("real_anchor_interpretation", "")
 
 if anchor_score < 3:
-    anchor_color = "#dc2626"
+    anchor_color = "#7f1d1d"   # rouge sombre
     anchor_label = "Très faible"
 
 elif anchor_score < 7:
-    anchor_color = "#f97316"
+    anchor_color = "#b45309"   # cuivre
     anchor_label = "Fragile"
 
 elif anchor_score < 12:
-    anchor_color = "#ca8a04"
+    anchor_color = "#a16207"   # ambre
     anchor_label = "Modéré"
 
 elif anchor_score < 16:
-    anchor_color = "#65a30d"
+    anchor_color = "#57534e"   # pierre / neutre
     anchor_label = "Fort"
 
 else:
-    anchor_color = "#16a34a"
+    anchor_color = "#334155"   # bleu acier
     anchor_label = "Très fort"
 
 render_custom_gauge(anchor_score / 20, anchor_color)
@@ -17307,6 +17307,13 @@ st.markdown(
 st.caption(anchor_text)
 
 st.caption("Spéculation libre ⟵⟶ Contrainte du réel")
+
+st.caption(
+    "Contrairement aux jauges morales classiques, cette palette ne récompense "
+    "pas une supposée vérité. Elle visualise la tension entre spéculation libre "
+    "et contrainte du réel. Les couleurs froides et minérales indiquent "
+    "une structure davantage stabilisée par l’expérience et la reproductibilité."
+)
 
 # =============================
 # Composantes
