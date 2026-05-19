@@ -15416,9 +15416,9 @@ with al6:
             "markers = exemples isolés détectés\n"
             "omissions = indices d’omission stratégique\n"
             "structural = structures exemple → conclusion\n"
-            "score = min((len(markers)*0.6 + "
-            "len(omissions)*0.4 + "
-            "len(structural)) , 1.0)",
+            "score = min((len(markers)*0.25 + "
+            "len(omissions)*0.35 + "
+            "len(structural)*0.35), 1.0)",
             language="python"
         )
 
