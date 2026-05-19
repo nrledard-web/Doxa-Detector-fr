@@ -11728,6 +11728,7 @@ st.markdown("""
 # Barre de crédibilité finale
 # =============================
 final_score = result.get("final_credibility_score", score)
+final_score = max(0, min(final_score, 20))
 
 if final_score < 6:
     couleur_c = "🔴"
