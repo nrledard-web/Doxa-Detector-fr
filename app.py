@@ -9485,6 +9485,54 @@ def detect_rhetorical_structures(text: str):
     scores["compression_cognitive"] = compute_cognitive_compression(text)
     scores["saturation_rhetorique"] = compute_rhetorical_saturation(text)
     scores["dissimulation_attenuation"] = compute_dissimulation_attenuation(text)
+
+    # =============================
+    # Amplification structurelle
+    # =============================
+    
+    compression = scores.get("compression_cognitive", 0)
+    
+    if compression > 0.45:
+    
+        # -----------------------------
+        # Abstraction
+        # -----------------------------
+        scores["abstraction"] = min(
+            1.0,
+            scores.get("abstraction", 0) + compression * 0.35
+        )
+    
+        # -----------------------------
+        # Technicité
+        # -----------------------------
+        scores["technicite"] = min(
+            1.0,
+            scores.get("technicite", 0) + compression * 0.45
+        )
+    
+        # -----------------------------
+        # Cohérence performative
+        # -----------------------------
+        scores["coherence_performative"] = min(
+            1.0,
+            scores.get("coherence_performative", 0) + compression * 0.30
+        )
+    
+        # -----------------------------
+        # Scientificité rhétorique
+        # -----------------------------
+        scores["scientificite_rhetorique"] = min(
+            1.0,
+            scores.get("scientificite_rhetorique", 0) + compression * 0.40
+        )
+    
+        # -----------------------------
+        # Saturation rhétorique légère
+        # -----------------------------
+        scores["saturation_rhetorique"] = min(
+            1.0,
+            scores.get("saturation_rhetorique", 0) + compression * 0.12
+        )
     
     # =========================================================
     # Comptage des nouveaux régimes discursifs
