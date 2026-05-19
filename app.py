@@ -11774,7 +11774,7 @@ st.markdown(f"""
         border:1px solid #cbd5e1;
     ">
         <div style="
-            width:{min(final_score / 20, 1) * 100}%;
+            width:{max(min(final_score / 20, 1) * 100, 3)}%;
             height:100%;
             background:{color_c};
             transition:width 0.4s ease;
