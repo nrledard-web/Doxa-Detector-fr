@@ -6759,7 +6759,57 @@ def compute_secondary_alert_pressure(result: dict) -> float:
     return round(min(pressure, 1.0), 3)
 
 def compute_brain_indices(result: dict) -> dict:
-    return {}
+    """
+    Calcul intermédiaire du cerveau DOXA.
+    Produit gravité, stabilité et profil cognitif.
+    """
+
+    gravity = compute_cognitive_gravity(result)
+    gravity = max(0, min(gravity, 1))
+
+    stability = round(1 - gravity, 3)
+    stability = max(0, min(stability, 1))
+
+    M = result.get("M", 0)
+    ME = result.get("ME", 0)
+
+    if gravity < 0.20:
+        profile = "Discours équilibré"
+
+    elif gravity < 0.40:
+        if M > ME:
+            profile = "Mécroyance probable"
+        else:
+            profile = "Structure sous tension"
+
+    elif gravity < 0.60:
+        if result.get("rhetorical_pressure", 0) > 0.45:
+            profile = "Manipulation rhétorique"
+        else:
+            profile = "Structure instable"
+
+    elif gravity < 0.80:
+        if ME > M:
+            profile = "Mensonge stratégique"
+        else:
+            profile = "Structure critique"
+
+    else:
+        profile = "Alerte cognitive maximale"
+
+    return {
+        # compatibilité ancien code
+        "gravity": round(gravity, 3),
+        "stability": round(stability, 3),
+
+        # clés cerveau DOXA
+        "cognitive_gravity": round(gravity, 3),
+        "cognitive_stability": round(stability, 3),
+
+        # régime
+        "brain_profile": profile,
+        "dominant_regime": profile,
+    }
 
 def compute_doxa_brain(result: dict) -> dict:
     """
