@@ -1286,8 +1286,8 @@ def detect_political_patterns(text: str):
 
 def compute_rhetorical_pressure(results: dict) -> float:
     """
-    Calcule une pression rhétorique pondérée entre 0.0 et 1.0
-    à partir des scores rhétoriques modernes et des registres émotionnels.
+    Calcule une pression rhétorique pondérée entre 0.0 et 1.0.
+    Modère la pression lorsque le texte rapporte des propos plutôt qu'il ne les assume.
     """
 
     rhetorical = results.get("rhetorical_scores", {})
@@ -1308,8 +1308,15 @@ def compute_rhetorical_pressure(results: dict) -> float:
         + emotions.get("peur", 0) * 0.04
     )
 
-    return round(min(pressure, 1.0), 3)
+    reported_speech = results.get("reported_speech_score", 0)
 
+    if reported_speech > 0.45:
+        pressure *= 0.75
+    elif reported_speech > 0.25:
+        pressure *= 0.88
+
+    return round(min(max(pressure, 0), 1.0), 3)
+    
 
 def interpret_rhetorical_pressure(value: float):
     """
