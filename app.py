@@ -8756,8 +8756,8 @@ def analyze_article(text: str) -> Dict:
     
     result = classify_cognitive_regime(result)
 
-    brain_indices = compute_brain_indices(result)
-    result.update(brain_indices)
+    # brain_indices = compute_brain_indices(result)
+    # result.update(brain_indices)
     
     result["doxa_brain"] = compute_doxa_brain(result)
     result.update(result["doxa_brain"])
