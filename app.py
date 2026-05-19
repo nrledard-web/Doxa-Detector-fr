@@ -8797,6 +8797,18 @@ def analyze_article(text: str) -> Dict:
     if result.get("argument_attack_count", 0) == 0:
         result["argument_asymmetry_score"] = 0.0
         result["argument_asymmetry_interpretation"] = "Aucune rhétorique d’attaque dominante détectée."
+
+    # -----------------------------
+    # Cherry Picking
+    # -----------------------------
+    cherry_picking = detect_cherry_picking(article)
+    
+    result["cherry_picking_score"] = cherry_picking["score"]
+    result["cherry_picking_markers"] = cherry_picking["markers"]
+    result["cherry_picking_matches"] = cherry_picking["matches"]
+    result["cherry_picking_omission_markers"] = cherry_picking["omission_markers"]
+    result["cherry_picking_structural_markers"] = cherry_picking["structural_markers"]
+    result["cherry_picking_interpretation"] = cherry_picking["interpretation"]
     
     # Modulation contextuelle selon le type de discours
     result = apply_discourse_modifiers(result)
