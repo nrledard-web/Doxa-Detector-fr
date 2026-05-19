@@ -12907,17 +12907,19 @@ with pd1:
         
         st.code(
             "pression = (\n"
-            " amplification × 0.18\n"
-            "+ saturation_rhetorique × 0.22\n"
-            "+ persuasion × 0.14\n"
-            "+ attaque × 0.16\n"
-            "+ implicite × 0.10\n"
+            " amplification × 0.16\n"
+            "+ saturation_rhetorique × 0.20\n"
+            "+ persuasion × 0.12\n"
+            "+ attaque × 0.14\n"
+            "+ implicite × 0.08\n"
             "+ soupcon_systemique × 0.10\n"
-            "+ coherence_performative × 0.10\n"
-            ")\n"
-            "pression = min(pression, 1.0)"
+            "+ coherence_performative × 0.08\n"
             "+ colere × 0.08\n"
             "+ peur × 0.04\n"
+            ")\n\n"
+            "si discours_rapporté > 0.45 : pression × 0.75\n"
+            "si discours_rapporté > 0.25 : pression × 0.88\n"
+            "pression = min(max(pression, 0), 1.0)"
         )
         
         st.markdown("**Poids des mécanismes**")
