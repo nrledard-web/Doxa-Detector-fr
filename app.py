@@ -6779,6 +6779,9 @@ def compute_secondary_alert_pressure(result: dict) -> float:
 
     return round(min(pressure, 1.0), 3)
 
+def compute_brain_indices(result: dict) -> dict:
+    return {}
+
 def compute_doxa_brain(result: dict) -> dict:
     """
     Synthèse finale du cerveau DOXA.
