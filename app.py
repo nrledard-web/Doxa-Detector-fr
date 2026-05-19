@@ -6355,7 +6355,11 @@ def detect_aristotelian_fallacies(text: str):
     # Stabilité / gravité du cerveau DOXA
     # avec impact modulé du mensonge
     # -----------------------------
+    
     cognitive_density = clamp01((G + N) / 20)
+
+    real_anchor = result.get("real_anchor_score", 10)
+    real_anchor_penalty = 1 - min(real_anchor / 20, 1)
 
     lie_gauge = result.get("lie_gauge", strategic_index)
     if lie_gauge > 1:
