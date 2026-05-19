@@ -9105,7 +9105,9 @@ def analyze_multiple_articles(keyword: str, max_results: int = 10) -> List[Dict]
                         "URL": art["url"],
                     }
                 )
-        except Exception:
+                
+        except Exception as e:
+            st.warning(f"Article ignoré : {type(e).__name__} — {e}")
             continue
 
     return results   
