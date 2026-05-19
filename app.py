@@ -7782,7 +7782,9 @@ REAL_ANCHOR_EMPIRY = [
     "observé", "test", "testé", "données", "protocole", "benchmark",
     "résultat", "validation", "validé", "détecté", "reproduit",
     "statistiquement significatif", "échantillon", "essai clinique",
-    "simulation validée"
+    "simulation validée", "étude", "rapport", "chiffres", "pourcentage",
+    "%", "selon", "économistes", "expert", "secteurs", "postes", "créés", 
+    "emplois", "finance", "santé"
 ]
 
 REAL_ANCHOR_REPRODUCIBILITY = [
@@ -7796,7 +7798,8 @@ REAL_ANCHOR_FALSIFIABILITY = [
     "hypothèse", "modèle partiel", "approximation", "sous certaines conditions",
     "pourrait être faux", "pourrait être réfuté", "compatible avec",
     "marge d’erreur", "marge d'erreur", "résultats préliminaires",
-    "selon les données actuelles", "limite du modèle"
+    "selon les données actuelles", "limite du modèle", "pourraient", "pourrait", 
+    "certains", "restent prudents", "il faut nuancer", "nuancer", "cependant"
 ]
 
 REAL_ANCHOR_LIMITS = [
@@ -7816,7 +7819,10 @@ SPECULATIVE_INFLATION_MARKERS = [
     "la vraie structure", "enfin expliqué", "peut enfin être expliqué",
     "description complète", "sans nouveaux paramètres",
     "tous les systèmes", "chaque système", "toujours", "jamais",
-    "inévitablement", "nécessairement"
+    "inévitablement", "nécessairement", "va remplacer", 
+    "il est absolument certain", "crise sociale majeure", 
+    "si rien n'est fait immédiatement", "révolution sans précédent", 
+    "étude choc"
 ]
 
 
