@@ -6265,25 +6265,16 @@ def detect_aristotelian_fallacies(text: str):
         "argument_from_nature": argument_from_nature,
         "descriptive_normative_confusion": descriptive_normative_confusion,
     }
-
-    return {
-        "descriptive_normative_confusion": descriptive_normative_confusion,
-    }
-
-def compute_brain_indices(result: dict) -> dict:
-    def clamp01(x):
-        return max(0.0, min(1.0, x))
-
-    if isinstance(result, dict):
-        emotional_result = compute_emotional_intensity({
-            "emotional_registers": result.get("emotional_registers", {})
-        })
-    else:
-        emotional_result = {
-            "score": 0.0,
-            "markers": [],
-            "interpretation": "Aucune charge émotionnelle saillante détectée."
-        }
+    
+    gravity = result.get("cognitive_gravity", 0)
+    stability = result.get("cognitive_stability", round(1 - gravity, 3))
+    
+    regime = (
+        result.get("brain_profile")
+        or result.get("dominant_regime")
+        or result.get("cognitive_regime")
+        or "Non déterminé"
+    )
     
     result["emotional_intensity_score"] = emotional_result["score"]
     result["emotional_intensity_markers"] = emotional_result["markers"]
@@ -6791,16 +6782,25 @@ def compute_secondary_alert_pressure(result: dict) -> float:
 def compute_doxa_brain(result: dict) -> dict:
     """
     Synthèse finale du cerveau DOXA.
-    Agrège la gravité, la stabilité et le régime cognitif.
+    Habillage final des indices déjà calculés.
     """
 
-    gravity = result.get("cognitive_gravity", 0)
-    stability = round(1 - gravity, 3)
+    gravity = result.get("cognitive_gravity", result.get("gravity", 0))
+    gravity = max(0, min(gravity, 1))
+
+    stability = result.get("cognitive_stability", result.get("stability", 1 - gravity))
+    stability = max(0, min(stability, 1))
 
     M = result.get("M", 0)
     ME = result.get("ME", 0)
     hard_fact = result.get("hard_fact_score", 0)
-    regime = result.get("cognitive_regime", "Non classé")
+
+    regime = (
+        result.get("brain_profile")
+        or result.get("dominant_regime")
+        or result.get("cognitive_regime")
+        or "Non déterminé"
+    )
 
     if gravity < 0.20:
         brain_state = "Stable"
@@ -6827,7 +6827,8 @@ def compute_doxa_brain(result: dict) -> dict:
         "brain_state": brain_state,
         "brain_verdict": verdict,
         "brain_advice": advice,
-        "cognitive_stability": stability,
+        "cognitive_gravity": round(gravity, 3),
+        "cognitive_stability": round(stability, 3),
         "dominant_regime": regime,
         "brain_summary": (
             f"État : {brain_state} | "
@@ -6837,7 +6838,6 @@ def compute_doxa_brain(result: dict) -> dict:
             f"M={M:.2f}, ME={ME:.2f}, Factuel={hard_fact:.1f}/20"
         )
     }
-
 def compute_mecroyance_penalties(result: dict) -> dict:
     penalty = 0.0
     lie_boost = 0.0
@@ -8754,8 +8754,13 @@ def analyze_article(text: str) -> Dict:
     # Modulation contextuelle selon le type de discours
     result = apply_discourse_modifiers(result)
     
-    result["brain"] = brain
     result = classify_cognitive_regime(result)
+
+    brain_indices = compute_brain_indices(result)
+    result.update(brain_indices)
+    
+    result["doxa_brain"] = compute_doxa_brain(result)
+    result.update(result["doxa_brain"])
 
     # -----------------------------
     # Modérateur discours rapporté / citations
