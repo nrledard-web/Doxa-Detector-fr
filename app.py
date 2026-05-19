@@ -17277,17 +17277,25 @@ anchor_score = result.get("real_anchor_score", 0)
 anchor_label = result.get("real_anchor_label", "Non calculé")
 anchor_text = result.get("real_anchor_interpretation", "")
 
-if anchor_score < 5:
+if anchor_score < 3:
     anchor_color = "#dc2626"
+    anchor_label = "Très faible"
 
-elif anchor_score < 10:
+elif anchor_score < 7:
     anchor_color = "#f97316"
+    anchor_label = "Fragile"
 
-elif anchor_score < 15:
+elif anchor_score < 12:
     anchor_color = "#ca8a04"
+    anchor_label = "Modéré"
+
+elif anchor_score < 16:
+    anchor_color = "#65a30d"
+    anchor_label = "Fort"
 
 else:
     anchor_color = "#16a34a"
+    anchor_label = "Très fort"
 
 render_custom_gauge(anchor_score / 20, anchor_color)
 
