@@ -6368,19 +6368,21 @@ def detect_aristotelian_fallacies(text: str):
     lie_impact = lie_gauge * (1 - cognitive_density)
 
     gravity = clamp01(
-        strategic_index * 0.35 +
-        closure_index * 0.30 +
-        IR * 0.20 +
-        lie_impact * 0.40
+        strategic_index * 0.28 +
+        closure_index * 0.22 +
+        IR * 0.16 +
+        lie_impact * 0.22 +
+        real_anchor_penalty * 0.22
     )
 
     stability = clamp01(
-        1 -
-        (
-            gravity * 0.60 +
-            closure_index * 0.25 +
-            lie_impact * 0.30
+        1 - (
+            gravity * 0.55 +
+            closure_index * 0.20 +
+            lie_impact * 0.15 +
+            real_anchor_penalty * 0.25
         )
+)
     )
     secondary_pressure = compute_secondary_alert_pressure(result)
     
