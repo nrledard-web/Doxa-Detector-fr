@@ -15327,9 +15327,19 @@ with al5:
 # -----------------------------
 with al6:
     st.markdown("### Cherry Picking")
-    st.caption("Sélection biaisée d’exemples, de cas ou de preuves allant dans un seul sens.")
+    st.caption(
+        "Sélection biaisée d’exemples, de cas ou de preuves allant dans un seul sens."
+    )
 
-    value = result["cherry_picking_score"]
+    value = result.get("cherry_picking_score", 0.0)
+
+    markers = result.get("cherry_picking_markers", [])
+    omissions = result.get("cherry_picking_omission_markers", [])
+    structural = result.get("cherry_picking_structural_markers", [])
+
+    # Sécurité : impossible d'avoir 100 % sans preuve
+    if not markers and not omissions and not structural:
+        value = 0.0
 
     if value < 0.15:
         label, color = "Faible", "#ca8a04"
@@ -15350,12 +15360,12 @@ with al6:
     st.caption(result["cherry_picking_interpretation"])
 
     with st.expander("🔎 Voir les marqueurs", expanded=False):
-        markers = result.get("cherry_picking_markers", [])
-        omissions = result.get("cherry_picking_omission_markers", [])
 
-        if not markers and not omissions:
+        if not markers and not omissions and not structural:
             st.info("Aucune sélection biaisée notable détectée.")
+
         else:
+
             if markers:
                 st.markdown("**Exemples isolés / preuves uniques**")
                 for marker in markers:
@@ -15366,7 +15376,13 @@ with al6:
                 for marker in omissions:
                     st.error(marker)
 
+            if structural:
+                st.markdown("**Structures exemple → conclusion**")
+                for marker in structural:
+                    st.warning(marker)
+
     with st.popover("ℹ️ Comprendre cette jauge"):
+
         st.markdown("### Cherry Picking")
 
         st.write(
@@ -15375,32 +15391,50 @@ with al6:
         )
 
         st.markdown("**Principe**")
+
         st.write(
-            "Le texte est comparé à deux familles de signaux : les exemples isolés ou preuves uniques, "
+            "Le texte est comparé à deux familles de signaux : "
+            "les exemples isolés ou preuves uniques, "
             "et les indices d’omission stratégique."
         )
 
         st.markdown("**Formule utilisée**")
+
         st.code(
-            "markers = exemples isolés ou preuves uniques détectés\n"
-            "omissions = indices d’omission stratégique détectés\n"
-            "score = min((len(markers) + len(omissions) * poids_omission) * coefficient / 10, 1.0)",
+            "markers = exemples isolés détectés\n"
+            "omissions = indices d’omission stratégique\n"
+            "structural = structures exemple → conclusion\n"
+            "score = min((len(markers)*0.6 + "
+            "len(omissions)*0.4 + "
+            "len(structural)) , 1.0)",
             language="python"
         )
 
-        markers = result.get("cherry_picking_markers", [])
-        omissions = result.get("cherry_picking_omission_markers", [])
-
         st.markdown("**Valeur actuelle**")
+
         st.write(f"Score : **{round(value * 100, 1)}%**")
         st.write(f"Niveau : **{label}**")
-        st.write(f"Exemples / preuves uniques : **{len(markers)}**")
-        st.write(f"Omissions stratégiques : **{len(omissions)}**")
+
+        st.write(
+            f"Exemples / preuves uniques : **{len(markers)}**"
+        )
+
+        st.write(
+            f"Omissions stratégiques : **{len(omissions)}**"
+        )
+
+        st.write(
+            f"Structures détectées : **{len(structural)}**"
+        )
 
         st.markdown("**Interprétation actuelle**")
-        st.write(result["cherry_picking_interpretation"])
+
+        st.write(
+            result["cherry_picking_interpretation"]
+        )
 
         st.markdown("**Lecture**")
+
         st.write(
             "🟢 Faible : sélection peu biaisée\n"
             "🟡 Modérée : quelques exemples orientés\n"
@@ -15409,6 +15443,7 @@ with al6:
         )
 
         st.markdown("**Attention**")
+
         st.write(
             "Un score élevé ne signifie pas que les exemples cités sont faux. "
             "Il indique que le texte peut choisir certains éléments favorables "
