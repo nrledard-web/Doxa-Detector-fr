@@ -8628,55 +8628,6 @@ def analyze_article(text: str) -> Dict:
     claims = [analyze_claim(sentence) for sentence in sentences[:15]]
 
     # -----------------------------
-    # Calcul du cerveau global
-    # -----------------------------
-    brain = compute_brain_indices({
-        "text": text,
-        "G": G,
-        "N": N,
-        "D": D,
-        "M": M,
-        "ME": ME,
-        "normative_score": normative_analysis["score"],
-        "propaganda_score": propaganda_analysis["score"],
-        "emotional_intensity_score": emotional_intensity_analysis["score"],
-        "certainty_score": certainty_analysis[0],
-        "false_consensus_score": false_consensus_analysis[0],
-        "binary_opposition_score": binary_opposition_analysis[0],
-        "threat_amplification_score": threat_amplification_analysis[0],
-        "vague_authority_score": vague_authority_analysis["score"],
-        "logic_confusion_score": logic_confusion_analysis["score"],
-        "causal_overreach_score": causal_overreach_analysis["score"],
-        "factual_overinterpretation_score": factual_overinterpretation_analysis["score"],
-        "false_analogy_score": false_analogy_analysis["score"],
-        "internal_dissonance_score": internal_dissonance_analysis["score"],
-        "aristotelian_fallacies_score": aristotelian_fallacies["score"],
-        "petition_score": aristotelian_fallacies["petition"]["score"],
-        "petition_markers": aristotelian_fallacies["petition"]["matches"],
-        "petition_interpretation": aristotelian_fallacies["petition"]["interpretation"],
-        "false_causality_basic_score": aristotelian_fallacies["false_causality"]["score"],
-        "false_causality_basic_markers": aristotelian_fallacies["false_causality"]["matches"],
-        "false_causality_basic_interpretation": aristotelian_fallacies["false_causality"]["interpretation"],
-        "hasty_generalization_score": aristotelian_fallacies["generalization"]["score"],
-        "hasty_generalization_markers": aristotelian_fallacies["generalization"]["matches"],
-        "hasty_generalization_interpretation": aristotelian_fallacies["generalization"]["interpretation"],
-        "vague_authority_basic_score": aristotelian_fallacies["vague_authority"]["score"],
-        "vague_authority_basic_markers": aristotelian_fallacies["vague_authority"]["matches"],
-        "vague_authority_basic_interpretation": aristotelian_fallacies["vague_authority"]["interpretation"],
-        "false_dilemma_score": aristotelian_fallacies["false_dilemma"]["score"],
-        "false_dilemma_markers": aristotelian_fallacies["false_dilemma"]["matches"],
-        "false_dilemma_interpretation": aristotelian_fallacies["false_dilemma"]["interpretation"],
-        "scientific_simulation_score": scientific_simulation_analysis["score"],
-        "premise_score": premise_analysis["score"],
-        "ideological_premise_score": ideological_premise_analysis["score"],
-        "semantic_shift_score": semantic_shift_analysis["score"],
-        "doxic_rigidity_score": doxic_rigidity_analysis["score"],
-        "narrative_overdetermination_score": narrative_overdetermination_analysis["score"],
-        "argument_asymmetry_score": argument_asymmetry_analysis["score"],
-        "coherence_trompeuse_score": 0,
-        "dissonance_score": internal_dissonance_analysis["score"],
-    })
-    # -----------------------------
     # Score analogique du raisonnement
     # -----------------------------
     logical_connectors = len(re.findall(
