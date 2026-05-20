@@ -12391,6 +12391,11 @@ Même si la stabilité est élevée, le régime dominant peut signaler une fragi
 # 👉 utiliser la gravité corrigée déjà calculée
 # NE PAS relire result ici
 # gravity est déjà modifiée plus haut
+# Synchronisation finale cerveau DOXA
+result["cognitive_gravity"] = gravity
+result["cognitive_stability"] = stability
+result["gravity"] = gravity
+result["stability"] = stability
 gravity_pct = round(gravity * 100, 1)
 
 if gravity < 0.2:
