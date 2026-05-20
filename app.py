@@ -8027,6 +8027,103 @@ def detect_real_anchor(text, result=None):
         "delta_reality_interpretation": delta_interpretation,
     }
 
+def compute_cognitive_bonus(result: dict):
+    """
+    Module bonus :
+    compense partiellement les pénalités
+    lorsqu'un texte reste ouvert,
+    cohérent et ancré au réel.
+    """
+
+    def clamp01(x):
+        return max(0.0, min(1.0, x))
+
+    # -----------------------------
+    # 1) Ancrage au réel
+    # -----------------------------
+    anchor = result.get("real_anchor_score", 10) / 20
+
+    # -----------------------------
+    # 2) Révisabilité
+    # -----------------------------
+    nuance = min(
+        len(result.get("nuance_markers", [])) / 10,
+        1.0
+    )
+
+    uncertainty = min(
+        len(result.get("uncertainty_markers", [])) / 10,
+        1.0
+    )
+
+    counter = min(
+        len(result.get("counter_argument_markers", [])) / 8,
+        1.0
+    )
+
+    closure = result.get("closure_index", 0)
+
+    revisability = clamp01(
+        (
+            nuance * 0.35 +
+            uncertainty * 0.25 +
+            counter * 0.25
+        )
+        -
+        closure * 0.25
+    )
+
+    # -----------------------------
+    # 3) Cohérence discursive
+    # -----------------------------
+    coherence = clamp01(
+        (
+            result.get("argument_density_score", 0) * 0.35
+            +
+            (
+                1 -
+                result.get(
+                    "internal_dissonance_score",
+                    0
+                )
+            ) * 0.35
+            +
+            (
+                result.get(
+                    "reasoning_score",
+                    result.get(
+                        "hard_fact_score",
+                        10
+                    ) / 20
+                )
+            ) * 0.30
+        )
+    )
+
+    # -----------------------------
+    # Bonus final
+    # -----------------------------
+    bonus = clamp01(
+        anchor * 0.45
+        +
+        revisability * 0.30
+        +
+        coherence * 0.25
+    )
+
+    return {
+        "bonus_anchor": round(anchor, 3),
+        "bonus_revisability": round(revisability, 3),
+        "bonus_coherence": round(coherence, 3),
+
+        "cognitive_bonus": round(bonus, 3),
+
+        "bonus_interpretation":
+            "Compensation par ancrage réel, révisabilité et cohérence."
+    }
+
+
+
 def analyze_article(text: str) -> Dict:
     words = text.split()
     sentences = [s.strip() for s in re.split(r"[.!?]+", text) if len(s.strip()) > 10]
