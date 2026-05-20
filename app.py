@@ -12667,7 +12667,7 @@ brain_summary = (
     f"M={result.get('M', 0):.2f}, "
     f"ME={result.get('ME', 0):.2f}, "
     f"Factuel={result.get('hard_fact_score', 0):.1f}/20"
-)
+) 
     
 with st.expander("📊 Résumé détaillé du cerveau DOXA"):
     st.write(brain_summary)
