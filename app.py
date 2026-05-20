@@ -2668,13 +2668,13 @@ LOGICAL_CONNECTORS = [
 ]
 
 DISCURSIVE_CONTRADICTION_PATTERNS = [
-    r"\btoujours\b.*\bjamais\b",
-    r"\bjamais\b.*\btoujours\b",
-    r"\btout\b.*\bsauf\b",
-    r"\brien\b.*\bmais\b",
-    r"\baucun\b.*\bmais\b",
-    r"\bobligatoire\b.*\bfacultatif\b",
-    r"\bimpossible\b.*\bpossible\b"
+    r"\btoujours\b.{0,120}\bjamais\b",
+    r"\bjamais\b.{0,120}\btoujours\b",
+    r"\btout\b.{0,120}\bsauf\b",
+    r"\brien\b.{0,120}\bmais\b",
+    r"\baucun\b.{0,120}\bmais\b",
+    r"\bobligatoire\b.{0,120}\bfacultatif\b",
+    r"\bimpossible\b.{0,120}\bpossible\b"
 ]
 STOPWORDS_FR_EXTENDED = {
     "le", "la", "les", "un", "une", "des", "du", "de", "d", "et", "ou",
