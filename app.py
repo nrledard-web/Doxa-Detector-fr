@@ -8927,6 +8927,9 @@ def analyze_article(text: str) -> Dict:
     result = apply_discourse_modifiers(result)
     
     result = classify_cognitive_regime(result)
+    
+    bonus = compute_cognitive_bonus(result)
+    result.update(bonus)
 
     # brain_indices = compute_brain_indices(result)
     # result.update(brain_indices)
