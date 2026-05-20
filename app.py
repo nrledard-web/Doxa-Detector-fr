@@ -4430,14 +4430,14 @@ def compute_factual_overinterpretation(text: str):
 # 21) Dissonance interne
 # -----------------------------
 INTERNAL_DISSONANCE_PATTERNS = [
-    r"\bil n'y a pas de preuve\b.*\bc'est certain\b",
-    r"\bon ne sait pas\b.*\bil est évident\b",
-    r"\bjamais\b.*\btoujours\b",
-    r"\btoujours\b.*\bjamais\b",
-    r"\baucun\b.*\btous\b",
-    r"\btous\b.*\baucun\b",
-    r"\bimpossible\b.*\bpossible\b",
-    r"\bpossible\b.*\bimpossible\b",
+    r"\bil n'y a pas de preuve\b.{0,180}\bc'est certain\b",
+    r"\bon ne sait pas\b.{0,180}\bil est évident\b",
+    r"\bjamais\b.{0,120}\btoujours\b",
+    r"\btoujours\b.{0,120}\bjamais\b",
+    r"\baucun\b.{0,120}\btous\b",
+    r"\btous\b.{0,120}\baucun\b",
+    r"\bimpossible\b.{0,120}\bpossible\b",
+    r"\bpossible\b.{0,120}\bimpossible\b",
 ]
 
 NUANCE_DISSONANCE_TERMS = [
@@ -4483,36 +4483,43 @@ def compute_internal_dissonance(text: str):
         }
 
     t = normalize_text_for_markers(text)
-    hits = []
-
+    strong_hits = []
+    tension_hits = []
+    
     for pattern in INTERNAL_DISSONANCE_PATTERNS:
         if re.search(pattern, t, flags=re.DOTALL):
-            hits.append(pattern)
-
+            strong_hits.append(pattern)
+    
     has_nuance = any(term in t for term in NUANCE_DISSONANCE_TERMS)
     has_certainty = any(term in t for term in CERTAINTY_DISSONANCE_TERMS)
     has_threat = any(term in t for term in THREAT_DISSONANCE_TERMS)
-
+    
     if has_nuance and has_certainty:
-        hits.append("tension nuance / certitude absolue")
-
+        tension_hits.append("tension nuance / certitude absolue")
+    
     if has_nuance and has_threat:
-        hits.append("tension prudence / dramatisation de menace")
-
+        tension_hits.append("tension prudence / dramatisation de menace")
+    
     if "sans précédent" in t and ("comme" in t or "similaire" in t):
-        hits.append("tension sans précédent / comparaison historique")
-
+        tension_hits.append("tension sans précédent / comparaison historique")
+    
     if "urgence" in t and ("calme" in t or "calmement" in t):
-        hits.append("tension urgence / calme")
+        tension_hits.append("tension urgence / calme")
+    
+    hits = unique_keep_order(strong_hits + tension_hits)
+    
+    score = min(
+        len(strong_hits) * 0.28 +
+        len(tension_hits) * 0.12,
+        1.0
+    )
 
-    score = min(len(hits) * 0.30, 1.0)
-
-    if score < 0.15:
-        interpretation = "Peu de contradictions internes détectées."
-    elif score < 0.35:
-        interpretation = "Le texte contient quelques tensions internes."
-    elif score < 0.60:
-        interpretation = "Le texte présente plusieurs contradictions ou incohérences."
+    if score < 0.20:
+        interpretation = "Peu de tensions internes détectées."
+    elif score < 0.45:
+        interpretation = "Le discours présente quelques tensions internes."
+    elif score < 0.70:
+        interpretation = "Le discours présente des contradictions ou tensions notables."
     else:
         interpretation = "Le discours est fortement traversé par des contradictions internes."
 
