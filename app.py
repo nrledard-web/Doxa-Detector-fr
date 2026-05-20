@@ -6999,15 +6999,7 @@ def compute_doxa_brain(result: dict) -> dict:
                 "Non déterminée"
             ),
     
-        "brain_summary": (
-            f"État : {brain_state} | "
-            f"Stabilité : {stability:.2f} | "
-            f"Gravité : {gravity:.2f} | "
-            f"Régime dominant : {regime} | "
-            f"M={M:.2f}, "
-            f"ME={ME:.2f}, "
-            f"Factuel={hard_fact:.1f}/20"
-        )
+        "brain_summary": None
     }
 
 def compute_mecroyance_penalties(result: dict) -> dict:
