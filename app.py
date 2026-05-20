@@ -6773,9 +6773,13 @@ def compute_brain_indices(result: dict) -> dict:
     # -----------------------------
     # 2) Pression discursive
     # -----------------------------
+    propaganda = g("propaganda_score")
+    if propaganda > 1:
+        propaganda = propaganda / 10
+    
     discursive_pressure = clamp01(
         g("rhetorical_pressure") * 0.30 +
-        g("propaganda_score") * 0.25 +
+        propaganda * 0.25 +
         g("emotional_intensity_score") * 0.15 +
         g("strong_certainty_score") * 0.15 +
         g("narrative_propaganda_score") * 0.15
