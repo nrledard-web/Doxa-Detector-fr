@@ -12668,7 +12668,15 @@ st.caption(
 st.divider()
     
 with st.expander("📊 Résumé détaillé du cerveau DOXA"):
-    st.write(brain_summary)
+    st.write(
+    f"État : {result.get('brain_state', 'Non déterminé')} | "
+    f"Stabilité : {result.get('cognitive_stability', 0):.2f} | "
+    f"Gravité : {result.get('cognitive_gravity', 0):.2f} | "
+    f"Régime dominant : {result.get('dominant_regime', 'Non déterminé')} | "
+    f"M={result.get('M', 0):.2f}, "
+    f"ME={result.get('ME', 0):.2f}, "
+    f"Factuel={result.get('hard_fact_score', 0):.1f}/20"
+)
 
     col1, col2, col3, col4 = st.columns(4)
 
