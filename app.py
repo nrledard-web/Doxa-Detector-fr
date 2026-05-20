@@ -14214,14 +14214,27 @@ with oi1:
         soupcon_systemique=result.get("rhetorical_scores", {}).get("soupcon_systemique", 0),
         attaque=result.get("rhetorical_scores", {}).get("attaque", 0),
         amplification=result.get("rhetorical_scores", {}).get("amplification", 0),
+
         colere=result.get("emotional_registers", {}).get("colere", 0),
         peur=result.get("emotional_registers", {}).get("peur", 0),
+
+        reported_speech=max(
+            result.get("reported_speech_score", 0),
+            result.get("reported_speech_ratio", 0),
+            result.get("reported_speech", 0),
+            result.get("reported_speech_gauge", 0),
+        ),
     )
-    
-    propaganda_label, propaganda_color, propaganda_text = interpret_propaganda_gauge(propaganda_value)
-    
-    render_custom_gauge(propaganda_value, propaganda_color)
-    
+
+    propaganda_label, propaganda_color, propaganda_text = interpret_propaganda_gauge(
+        propaganda_value
+    )
+
+    render_custom_gauge(
+        propaganda_value,
+        propaganda_color
+    )
+
     st.markdown(
         f"<b style='color:{propaganda_color}'>{propaganda_label}</b> — {round(propaganda_value*100, 1)}%",
         unsafe_allow_html=True
