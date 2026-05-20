@@ -1359,11 +1359,20 @@ def compute_propaganda_gauge(
     amplification: float = 0.0,
     colere: float = 0.0,
     peur: float = 0.0,
+    reported_speech: float = 0.0,
 ):
     """
     Jauge propagandiste structurelle modernisée.
     """
-
+    # Modération émotionnelle si le texte rapporte surtout des propos extérieurs
+    
+    if reported_speech > 0.45:
+        colere *= 0.65
+        peur *= 0.65
+    elif reported_speech > 0.25:
+        colere *= 0.80
+        peur *= 0.80
+        
     ideological_core = (
         false_consensus
         + moral_polarization
