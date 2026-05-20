@@ -6777,12 +6777,20 @@ def compute_brain_indices(result: dict) -> dict:
     if propaganda > 1:
         propaganda = propaganda / 10
     
+    certainty = g("strong_certainty_score")
+    if certainty > 1:
+        certainty = certainty / 100
+    
+    narrative_propaganda = g("narrative_propaganda_score")
+    if narrative_propaganda > 1:
+        narrative_propaganda = narrative_propaganda / 100
+    
     discursive_pressure = clamp01(
         g("rhetorical_pressure") * 0.30 +
         propaganda * 0.25 +
         g("emotional_intensity_score") * 0.15 +
-        g("strong_certainty_score") * 0.15 +
-        g("narrative_propaganda_score") * 0.15
+        certainty * 0.15 +
+        narrative_propaganda * 0.15
     )
 
     # -----------------------------
