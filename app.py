@@ -11512,12 +11512,6 @@ st.markdown("""
 </div>
 """, unsafe_allow_html=True)
 
-st.markdown(
-    """
-    <div id="scroll-analyse-target"></div>
-    """,
-    unsafe_allow_html=True
-)
 
 st.markdown("### Type de discours détecté")
 
