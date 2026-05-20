@@ -8238,6 +8238,7 @@ def compute_cognitive_bonus(result: dict):
 
 
 def analyze_article(text: str) -> Dict:
+    article = text
     words = text.split()
     sentences = [s.strip() for s in re.split(r"[.!?]+", text) if len(s.strip()) > 10]
     article_length = len(words)
