@@ -12182,12 +12182,28 @@ background:linear-gradient(135deg, rgba(15,23,42,0.06), rgba(30,41,59,0.03));
 )
 
 # Variables principales
-stability = brain.get("cognitive_stability", 0)
-gravity = brain.get("cognitive_gravity", 1 - stability)
+stability = result.get("cognitive_stability", 0)
+gravity = result.get("cognitive_gravity", 1 - stability)
 
-dominant_regime = brain.get("dominant_regime", "Non déterminé")
-brain_summary = brain.get("brain_summary", "Aucun résumé disponible.")
-brain_advice = brain.get("brain_advice", "")
+dominant_regime = result.get(
+    "dominant_regime",
+    "Non déterminé"
+)
+
+brain_advice = result.get(
+    "brain_advice",
+    ""
+)
+
+brain_summary = (
+    f"État : {result.get('brain_state', 'Non déterminé')} | "
+    f"Stabilité : {stability:.2f} | "
+    f"Gravité : {gravity:.2f} | "
+    f"Régime dominant : {dominant_regime} | "
+    f"M={result.get('M', 0):.2f}, "
+    f"ME={result.get('ME', 0):.2f}, "
+    f"Factuel={result.get('hard_fact_score', 0):.1f}/20"
+)
 
 # ✅ Correction dynamique avec jauges secondaires
 secondary_pressure = compute_secondary_alert_pressure(result)
