@@ -12357,7 +12357,7 @@ Dans cette analyse :
 
 ### Lecture globale
 
-{brain_summary}
+{result.get("brain_summary", "")}
 
 Même si la stabilité est élevée, le régime dominant peut signaler une fragilité particulière, comme du **pseudo-savoir**, une **mécroyance probable** ou une **orientation rhétorique**.
 """)
