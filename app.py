@@ -12450,32 +12450,40 @@ La jauge combine plusieurs indicateurs détectés dans le texte :
 
 Ces signaux sont agrégés pour produire un **diagnostic global de santé cognitive du discours**.
 
-### Formule heuristique
+### Formule heuristique actuelle
 
-La gravité cognitive est calculée à partir de plusieurs composantes combinées :
+La gravité cognitive est calculée par familles de pression :
 
-- indice stratégique (tension entre mécroyance et mensonge)
-- fermeture cognitive (déséquilibre entre G, N et D)
-- pression discursive (rhétorique, émotion, simplification)
-- impact du mensonge potentiel
-- pression secondaire (accumulation des jauges activées)
+- noyau cognitif : M, ME, Hard Fact, clôture
+- pression discursive : rhétorique, propagande, émotion, certitude
+- fragilité logique : dissonance, cohérence trompeuse, fausses causalités, analogies
+- cadrage idéologique : prémisses, consensus, opposition binaire, glissements sémantiques
+- ancrage réel fragile : faiblesse de l’ancrage au réel, statistiques, référentiels manquants
 
 Formule simplifiée :
 
 gravité =
-    (indice stratégique × 0.35)
-  + (fermeture cognitive × 0.30)
-  + (pression discursive × 0.20)
-  + (impact du mensonge × 0.40)
-
-Puis ajustement :
-
-gravité = gravité + (pression secondaire × 0.45)
+    (noyau_cognitif × 0.28)
+  + (pression_discursive × 0.22)
+  + (fragilité_logique × 0.20)
+  + (cadrage_idéologique × 0.18)
+  + (ancrage_réel_fragile × 0.12)
+  − (bonus_cognitif × 0.12)
 
 Le score final est borné entre 0 et 1.
 
+#### Valeurs de cette analyse
+
+- Noyau cognitif : {round(result.get("core_pressure",0)*100,1)}%
+- Pression discursive : {round(result.get("discursive_pressure_brain",0)*100,1)}%
+- Fragilité logique : {round(result.get("reasoning_pressure_brain",0)*100,1)}%
+- Cadrage idéologique : {round(result.get("ideological_pressure_brain",0)*100,1)}%
+- Ancrage réel fragile : {round(result.get("reality_pressure_brain",0)*100,1)}%
+- Bonus cognitif : {round(result.get("cognitive_bonus",0)*100,1)}%
+
 #### Interprétation
-0 → discours sain
+
+0 → discours cognitivement stable  
 1 → dérive cognitive maximale
 """)
 
