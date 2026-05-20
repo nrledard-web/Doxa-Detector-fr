@@ -11160,35 +11160,12 @@ if analyze_submitted:
     st.session_state.last_result = analyze_article(article)
     st.session_state.last_article = article
 
-result = st.session_state.last_result
-article_for_analysis = st.session_state.last_article
+result = st.session_state.get("last_result")
+article_for_analysis = st.session_state.get("last_article", "")
 
 if not result:
     st.stop()
 
-import streamlit.components.v1 as components
-
-if st.session_state.get("auto_scroll_to_analysis", False):
-    components.html(
-        """
-        <script>
-        setTimeout(() => {
-            const target = window.parent.document.getElementById("scroll-analyse-target");
-            if (target) {
-                target.scrollIntoView({
-                    behavior: "smooth",
-                    block: "start"
-                });
-            }
-        }, 800);
-        </script>
-        """,
-        height=0
-    )
-
-    st.session_state["auto_scroll_to_analysis"] = False
-
-if result:
 # =====================================================
 # AIDE DE LECTURE DES JAUGES
 # =====================================================
