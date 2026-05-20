@@ -16346,9 +16346,10 @@ with bf5:
     # Autorité vague (simple)
     # =============================
     with bf6:
-        st.markdown("### Autorité vague (simple)")
-        st.caption("Autorité invoquée sans source clairement traçable.")
-    
+        st.markdown("### Autorité déclarative")
+        st.caption(
+            "Détection brute des appels à une autorité évoquée sans référence explicite."
+        )
         value = result["vague_authority_basic_score"]
     
         if value < 0.15:
@@ -16372,16 +16373,16 @@ with bf5:
         with st.expander("🔎 Voir les marqueurs", expanded=False):
             markers = result.get("vague_authority_basic_markers", [])
             if not markers:
-                st.info("Aucune autorité vague simple notable détectée.")
+                st.info("Aucune autorité déclarative notable détectée.")
             else:
                 for marker in markers:
                     st.warning(marker)
     
         with st.popover("ℹ️ Comprendre cette jauge"):
-            st.markdown("### Autorité vague (simple)")
+            st.markdown("### Autorité déclarative")
     
             st.write(
-                "Cette jauge détecte les appels à une autorité non précisée : "
+                "Cette jauge détecte uniquement les formulations déclaratives invoquant une autorité sans référence explicite."
                 "experts, études ou sources évoqués sans référence vérifiable."
             )
     
