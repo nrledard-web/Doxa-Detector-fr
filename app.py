@@ -6937,11 +6937,9 @@ def compute_doxa_brain(result: dict) -> dict:
     ME = result.get("ME", 0)
     hard_fact = result.get("hard_fact_score", 0)
 
-    regime = (
-        result.get("brain_profile")
-        or result.get("dominant_regime")
-        or result.get("cognitive_regime")
-        or "Non déterminé"
+    regime = result.get(
+        "dominant_regime",
+        "Non déterminé"
     )
 
     if gravity < 0.20:
