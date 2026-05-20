@@ -12628,6 +12628,55 @@ Une vitalité cognitive de **{life_score}%** indique une vitalité **{life_label
 
 {life_text}
 """)
+
+# =============================
+# Familles de pression DOXA
+# =============================
+
+st.markdown("### 🧠 Familles de pression DOXA")
+
+c1, c2, c3 = st.columns(3)
+
+c1.metric(
+    "Noyau cognitif",
+    f"{round(result.get('core_pressure',0)*100,1)}%"
+)
+
+c2.metric(
+    "Pression discursive",
+    f"{round(result.get('discursive_pressure_brain',0)*100,1)}%"
+)
+
+c3.metric(
+    "Fragilité logique",
+    f"{round(result.get('reasoning_pressure_brain',0)*100,1)}%"
+)
+
+c4, c5, c6 = st.columns(3)
+
+c4.metric(
+    "Cadrage idéologique",
+    f"{round(result.get('ideological_pressure_brain',0)*100,1)}%"
+)
+
+c5.metric(
+    "Ancrage réel fragile",
+    f"{round(result.get('reality_pressure_brain',0)*100,1)}%"
+)
+
+c6.metric(
+    "Famille dominante",
+    result.get(
+        "brain_dominant_family",
+        "Non déterminée"
+    )
+)
+
+st.caption(
+    "Le cerveau DOXA agrège les grandes familles de pression qui influencent le diagnostic global."
+)
+
+st.divider()
     
 with st.expander("📊 Résumé détaillé du cerveau DOXA"):
     st.write(brain_summary)
