@@ -6994,17 +6994,61 @@ def compute_doxa_brain(result: dict) -> dict:
         "brain_state": brain_state,
         "brain_verdict": verdict,
         "brain_advice": advice,
+    
+        # conserver les valeurs déjà calculées
+        "gravity": round(gravity, 3),
+        "stability": round(stability, 3),
+    
         "cognitive_gravity": round(gravity, 3),
         "cognitive_stability": round(stability, 3),
+    
         "dominant_regime": regime,
+    
+        # préserver familles DOXA
+        "core_pressure":
+            result.get("core_pressure", 0),
+    
+        "discursive_pressure_brain":
+            result.get(
+                "discursive_pressure_brain",
+                0
+            ),
+    
+        "reasoning_pressure_brain":
+            result.get(
+                "reasoning_pressure_brain",
+                0
+            ),
+    
+        "ideological_pressure_brain":
+            result.get(
+                "ideological_pressure_brain",
+                0
+            ),
+    
+        "reality_pressure_brain":
+            result.get(
+                "reality_pressure_brain",
+                0
+            ),
+    
+        "brain_dominant_family":
+            result.get(
+                "brain_dominant_family",
+                "Non déterminée"
+            ),
+    
         "brain_summary": (
             f"État : {brain_state} | "
             f"Stabilité : {stability:.2f} | "
             f"Gravité : {gravity:.2f} | "
             f"Régime dominant : {regime} | "
-            f"M={M:.2f}, ME={ME:.2f}, Factuel={hard_fact:.1f}/20"
+            f"M={M:.2f}, "
+            f"ME={ME:.2f}, "
+            f"Factuel={hard_fact:.1f}/20"
         )
     }
+
 def compute_mecroyance_penalties(result: dict) -> dict:
     penalty = 0.0
     lie_boost = 0.0
