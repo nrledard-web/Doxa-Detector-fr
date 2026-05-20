@@ -6791,53 +6791,157 @@ def compute_secondary_alert_pressure(result: dict) -> float:
 
 def compute_brain_indices(result: dict) -> dict:
     """
-    Calcul intermédiaire du cerveau DOXA.
-    Produit gravité, stabilité et profil cognitif.
+    Cerveau DOXA v2 — agrégation générale des jauges.
+    Calcule gravité, stabilité et profil dominant.
     """
 
-    gravity = compute_cognitive_gravity(result)
-    gravity = max(0, min(gravity, 1))
+    def clamp01(x):
+        return max(0.0, min(1.0, x))
 
-    stability = round(1 - gravity, 3)
-    stability = max(0, min(stability, 1))
+    def g(key, default=0.0):
+        return result.get(key, default) or 0.0
 
-    M = result.get("M", 0)
-    ME = result.get("ME", 0)
+    # -----------------------------
+    # 1) Noyau cognitif
+    # -----------------------------
+    M = g("M")
+    ME = g("ME")
+    hard_fact = g("hard_fact_score", 10)
+
+    fact_fragility = 1 - clamp01(hard_fact / 20)
+    lie_pressure = clamp01(g("lie_gauge", ME / 20))
+
+    closure = clamp01(
+        max(
+            g("cognitive_closure") / 10 if g("cognitive_closure") > 1 else g("cognitive_closure"),
+            g("closure_index")
+        )
+    )
+
+    core_pressure = clamp01(
+        fact_fragility * 0.35 +
+        lie_pressure * 0.35 +
+        closure * 0.30
+    )
+
+    # -----------------------------
+    # 2) Pression discursive
+    # -----------------------------
+    discursive_pressure = clamp01(
+        g("rhetorical_pressure") * 0.30 +
+        g("propaganda_score") * 0.25 +
+        g("emotional_intensity_score") * 0.15 +
+        g("strong_certainty_score") * 0.15 +
+        g("narrative_propaganda_score") * 0.15
+    )
+
+    # -----------------------------
+    # 3) Raisonnement / logique
+    # -----------------------------
+    reasoning_pressure = clamp01(
+        g("internal_dissonance_score") * 0.15 +
+        g("misleading_coherence_score") * 0.20 +
+        g("advanced_misleading_coherence_score") * 0.15 +
+        g("logic_confusion_score") * 0.12 +
+        g("causal_overreach_score") * 0.12 +
+        g("false_analogy_score") * 0.12 +
+        g("logical_jump_score") * 0.07 +
+        g("cherry_picking_score") * 0.07
+    )
+
+    # -----------------------------
+    # 4) Idéologie / cadrage
+    # -----------------------------
+    ideological_pressure = clamp01(
+        g("premise_score") * 0.15 +
+        g("ideological_premise_score") * 0.12 +
+        g("semantic_shift_score") * 0.12 +
+        g("false_consensus_score") * 0.10 +
+        g("false_consensus_strong_score") * 0.10 +
+        g("binary_opposition_score") * 0.10 +
+        g("moral_polarization_score") * 0.08 +
+        g("victimization_score") * 0.06 +
+        g("narrative_overdetermination_score") * 0.07 +
+        g("normative_qualification_score") * 0.10 +
+        g("scientificity_rhetoric_score") * 0.10
+    )
+
+    # -----------------------------
+    # 5) Réalité / statistiques
+    # -----------------------------
+    real_anchor_score = g("real_anchor_score", 10)
+    weak_anchor = 1 - clamp01(real_anchor_score / 20)
+
+    reality_pressure = clamp01(
+        weak_anchor * 0.40 +
+        g("statistical_manipulation_score") * 0.25 +
+        g("misleading_comparison_score") * 0.15 +
+        g("missing_reference_score") * 0.10 +
+        g("data_without_reference_score") * 0.10
+    )
+
+    # -----------------------------
+    # 6) Bonus compensateur
+    # -----------------------------
+    bonus = clamp01(g("cognitive_bonus"))
+
+    # -----------------------------
+    # Gravité finale
+    # -----------------------------
+    gravity = clamp01(
+        core_pressure * 0.28 +
+        discursive_pressure * 0.22 +
+        reasoning_pressure * 0.20 +
+        ideological_pressure * 0.18 +
+        reality_pressure * 0.12
+        - bonus * 0.12
+    )
+
+    stability = clamp01(1 - gravity)
+
+    # -----------------------------
+    # Profil dominant
+    # -----------------------------
+    pressures = {
+        "Pression cognitive": core_pressure,
+        "Pression discursive": discursive_pressure,
+        "Fragilité logique": reasoning_pressure,
+        "Cadrage idéologique": ideological_pressure,
+        "Faible ancrage réel": reality_pressure,
+    }
+
+    dominant_family = max(pressures, key=pressures.get)
 
     if gravity < 0.20:
         profile = "Discours équilibré"
-
-    elif gravity < 0.40:
-        if M > ME:
-            profile = "Mécroyance probable"
-        else:
-            profile = "Structure sous tension"
-
-    elif gravity < 0.60:
-        if result.get("rhetorical_pressure", 0) > 0.45:
-            profile = "Manipulation rhétorique"
-        else:
-            profile = "Structure instable"
-
-    elif gravity < 0.80:
-        if ME > M:
-            profile = "Mensonge stratégique"
-        else:
-            profile = "Structure critique"
-
+    elif dominant_family == "Pression discursive" and discursive_pressure > 0.45:
+        profile = "Manipulation rhétorique"
+    elif dominant_family == "Fragilité logique" and reasoning_pressure > 0.45:
+        profile = "Raisonnement instable"
+    elif dominant_family == "Cadrage idéologique" and ideological_pressure > 0.45:
+        profile = "Cadrage idéologique dominant"
+    elif dominant_family == "Faible ancrage réel" and reality_pressure > 0.45:
+        profile = "Cohérence autoporteuse fragile"
+    elif ME > M:
+        profile = "Mensonge stratégique possible"
+    elif M >= ME:
+        profile = "Mécroyance dominante"
     else:
-        profile = "Alerte cognitive maximale"
+        profile = "Structure mixte ou ambiguë"
 
     return {
-        # compatibilité ancien code
+        "core_pressure": round(core_pressure, 3),
+        "discursive_pressure_brain": round(discursive_pressure, 3),
+        "reasoning_pressure_brain": round(reasoning_pressure, 3),
+        "ideological_pressure_brain": round(ideological_pressure, 3),
+        "reality_pressure_brain": round(reality_pressure, 3),
+        "brain_dominant_family": dominant_family,
+
         "gravity": round(gravity, 3),
         "stability": round(stability, 3),
-
-        # clés cerveau DOXA
         "cognitive_gravity": round(gravity, 3),
         "cognitive_stability": round(stability, 3),
 
-        # régime
         "brain_profile": profile,
         "dominant_regime": profile,
     }
