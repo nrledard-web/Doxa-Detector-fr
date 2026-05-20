@@ -9348,24 +9348,28 @@ def analyze_multiple_articles(keyword: str, max_results: int = 10) -> List[Dict]
     for art in articles:
         try:
             full_text = extract_article_from_url(art["url"])
-            if len(full_text) > 120:
-                analysis = analyze_article(full_text)
-                results.append(
-                    {
-                        "Source": art["source"],
-                        "Titre": art["title"],
-                        "Score classique": analysis["M"],
-                        "Hard Fact Score": analysis["hard_fact_score"],
-                        "Verdict": analysis["verdict"],
-                        "URL": art["url"],
-                    }
-                )
-                
+
+            if not full_text or len(full_text.strip()) <= 120:
+                continue
+
+            analysis = analyze_article(full_text)
+
+            results.append(
+                {
+                    "Source": art["source"],
+                    "Titre": art["title"],
+                    "Score classique": analysis["M"],
+                    "Hard Fact Score": analysis["hard_fact_score"],
+                    "Verdict": analysis["verdict"],
+                    "URL": art["url"],
+                }
+            )
+
         except Exception as e:
             st.warning(f"Article ignoré : {type(e).__name__} — {e}")
             continue
 
-    return results   
+    return results 
     
 @st.cache_data(show_spinner=False, ttl=1800)
 def fetch_text_for_textarea(url: str) -> str:
