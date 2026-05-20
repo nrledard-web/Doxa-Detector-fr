@@ -1569,12 +1569,26 @@ def interpret_closure_gauge(value: float):
 def generate_share_block(result):
 
     credibility = result.get("hard_fact_score", 0)
-    gravity = result.get("cognitive_gravity", 0)
 
-    brain = result.get("doxa_brain", {})
-    stability = brain.get("cognitive_stability", 0)
-    regime = brain.get("dominant_regime", "")
-    verdict = brain.get("brain_verdict", "")
+    gravity = result.get(
+        "cognitive_gravity",
+        0
+    )
+
+    stability = result.get(
+        "cognitive_stability",
+        0
+    )
+
+    regime = result.get(
+        "dominant_regime",
+        ""
+    )
+
+    verdict = result.get(
+        "brain_verdict",
+        ""
+    )
 
     # -----------------------------
     # Red flags lisibles
