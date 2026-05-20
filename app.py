@@ -9114,7 +9114,24 @@ def analyze_article(text: str) -> Dict:
     
     real_anchor = detect_real_anchor(text, result)
     result.update(real_anchor)
-        
+    
+    # -----------------------------
+    # Bonus cognitif
+    # -----------------------------
+    
+    bonus = compute_cognitive_bonus(result)
+    result.update(bonus)
+    
+    # -----------------------------
+    # Cerveau DOXA FINAL
+    # -----------------------------
+    
+    brain = compute_brain_indices(result)
+    result.update(brain)
+    
+    result["doxa_brain"] = compute_doxa_brain(result)
+    result.update(result["doxa_brain"])
+    
     return result
 
 # -----------------------------
