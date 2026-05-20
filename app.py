@@ -9367,7 +9367,9 @@ def analyze_multiple_articles(keyword: str, max_results: int = 10) -> List[Dict]
             )
 
         except Exception as e:
+            import traceback
             st.warning(f"Article ignoré : {type(e).__name__} — {e}")
+            st.code(traceback.format_exc())
             continue
 
     return results 
