@@ -6356,60 +6356,6 @@ def detect_aristotelian_fallacies(text: str):
     else:
         profile = "Structure mixte ou ambiguë"
 
-    # -----------------------------
-    # Stabilité / gravité du cerveau DOXA
-    # avec impact modulé du mensonge
-    # -----------------------------
-    
-    cognitive_density = clamp01((G + N) / 20)
-
-    real_anchor = result.get("real_anchor_score", 10)
-    real_anchor_penalty = 1 - min(real_anchor / 20, 1)
-
-    lie_gauge = result.get("lie_gauge", strategic_index)
-    if lie_gauge > 1:
-        lie_gauge = lie_gauge / 100
-
-    lie_impact = lie_gauge * (1 - cognitive_density)
-
-    gravity = clamp01(
-        strategic_index * 0.28 +
-        closure_index * 0.22 +
-        IR * 0.16 +
-        lie_impact * 0.22 +
-        real_anchor_penalty * 0.22
-    )
-
-    stability = clamp01(
-        1 - (
-            gravity * 0.55 +
-            closure_index * 0.20 +
-            lie_impact * 0.15 +
-            real_anchor_penalty * 0.25
-        )
-    )
-    secondary_pressure = compute_secondary_alert_pressure(result)
-    
-    gravity = min(1.0, gravity + secondary_pressure * 0.45)
-    stability = max(0.0, stability - secondary_pressure * 0.35)
-
-    return {
-        "IR": round(IR, 3),
-        "IL": round(IL, 3),
-        "IC": round(IC, 3),
-        "strategic_index": round(strategic_index, 3),
-        "closure_index": round(closure_index, 3),
-        "lie_impact": round(lie_impact, 3),
-    
-        # anciennes clés si utilisées ailleurs
-        "gravity": round(gravity, 3),
-        "stability": round(stability, 3),
-    
-        "cognitive_gravity": round(gravity, 3),
-        "cognitive_stability": round(stability, 3),
-    
-        "brain_profile": profile,
-    }
       
 def analyze_claim(sentence: str) -> Claim:
     s = sentence.lower()
