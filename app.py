@@ -14590,8 +14590,9 @@ with oi4:
 
         st.markdown("**Formule utilisée**")
         st.code(
-            "markers = dissonances internes détectées\n"
-            "score = min(len(markers) * coefficient / 10, 1.0)",
+            "contradictions = contradictions fortes détectées\n"
+            "tensions = tensions internes faibles détectées\n"
+            "score = min(len(contradictions)*0.28 + len(tensions)*0.12, 1.0)",
             language="python"
         )
 
@@ -14601,6 +14602,7 @@ with oi4:
         st.write(f"Score : **{round(value * 100, 1)}%**")
         st.write(f"Niveau : **{label}**")
         st.write(f"Marqueurs détectés : **{len(markers)}**")
+        st.caption("Les tensions faibles pèsent moins que les contradictions formelles.")
 
         st.markdown("**Interprétation actuelle**")
         st.write(result["internal_dissonance_interpretation"])
