@@ -11117,7 +11117,6 @@ if analyze_submitted:
     if len(semantic_words) < 3:
         st.session_state.last_result = None
         st.session_state.last_article = article
-        st.session_state["auto_scroll_to_analysis"] = False
 
         st.warning("⚠️ Analyse impossible")
         st.caption("Le texte est trop court pour permettre une analyse fiable.")
