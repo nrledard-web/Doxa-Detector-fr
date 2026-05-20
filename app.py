@@ -12187,16 +12187,6 @@ brain_advice = result.get(
     ""
 )
 
-brain_summary = (
-    f"État : {result.get('brain_state', 'Non déterminé')} | "
-    f"Stabilité : {stability:.2f} | "
-    f"Gravité : {gravity:.2f} | "
-    f"Régime dominant : {dominant_regime} | "
-    f"M={result.get('M', 0):.2f}, "
-    f"ME={result.get('ME', 0):.2f}, "
-    f"Factuel={result.get('hard_fact_score', 0):.1f}/20"
-)
-
 # ✅ Correction dynamique avec jauges secondaires
 secondary_pressure = compute_secondary_alert_pressure(result)
 
