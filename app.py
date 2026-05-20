@@ -6951,11 +6951,14 @@ def compute_doxa_brain(result: dict) -> dict:
     Synthèse finale du cerveau DOXA.
     Habillage final des indices déjà calculés.
     """
-
+    
     gravity = result.get("cognitive_gravity", result.get("gravity", 0))
     gravity = max(0, min(gravity, 1))
-
-    stability = result.get("cognitive_stability", result.get("stability", 1 - gravity))
+    
+    stability = result.get(
+        "cognitive_stability",
+        result.get("stability", 1 - gravity)
+    )
     stability = max(0, min(stability, 1))
 
     M = result.get("M", 0)
