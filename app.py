@@ -18075,9 +18075,9 @@ with st.form("feedback_form"):
         height=160
     )
 
-    submitted = st.form_submit_button("Envoyer le feedback")
+    feedback_submitted = st.form_submit_button("Envoyer le feedback")
 
-if submitted:
+if feedback_submitted:
     if not message.strip():
         st.warning("Veuillez écrire un message avant d’envoyer.")
     else:
