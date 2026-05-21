@@ -9025,54 +9025,38 @@ def analyze_article(text: str) -> Dict:
     # Pénalité des jauges affichées
     # -----------------------------
     display_gauge_penalty = compute_display_gauge_penalty(result)
-
     result["display_gauge_penalty"] = display_gauge_penalty
-
-    result["credibility_penalty"] = round(
-        result.get("credibility_penalty", 0) + display_gauge_penalty,
+    
+    # On ajoute les jauges affichées au total général
+    total_credibility_penalty = round(
+        total_credibility_penalty + display_gauge_penalty,
         2
     )
-
-    result["final_credibility_score"] = round(
-        max(0, result["final_credibility_score"] - display_gauge_penalty),
-        1
-    )
-
+    
     # -----------------------------
     # Pénalités finales
     # -----------------------------
     result["credibility_penalty"] = total_credibility_penalty
+    
     result["penalty_details"] = {
         "red_flag_penalties": penalties,
         "mecroyance_penalties": mecroyance_penalties,
+        "display_gauge_penalty": display_gauge_penalty,
     }
+    
     result["penalty_index"] = total_credibility_penalty
-
-    result["hard_fact_score_penalized"] = result["final_credibility_score"]
-
-    result["improved_penalized"] = round(
-        max(0, result["improved"] - penalties["credibility_penalty"]),
+    
+    result["final_credibility_score"] = round(
+        max(0, result["hard_fact_score"] - total_credibility_penalty),
         1
     )
-
-    if result.get("historical_mode"):
-        result["hard_fact_score"] = max(result["hard_fact_score"], 10.0)
-        result["hard_fact_score_penalized"] = max(result["hard_fact_score_penalized"], 10.0)
-        result["final_credibility_note"] = (
-            "Régime historique détecté : le score est protégé contre une pénalisation "
-            "excessive liée aux énumérations chronologiques."
-        )
-
-    elif result.get("index_page_mode"):
-        result["hard_fact_score"] = max(result["hard_fact_score"], 9.0)
-        result["hard_fact_score_penalized"] = max(result["hard_fact_score_penalized"], 9.0)
-        result["final_credibility_note"] = (
-            "Page index détectée : le contenu semble composé majoritairement de titres "
-            "ou de liens. L'analyse de crédibilité est ajustée."
-        )
-
-    else:
-        result["final_credibility_note"] = ""
+    
+    result["hard_fact_score_penalized"] = result["final_credibility_score"]
+    
+    result["improved_penalized"] = round(
+        max(0, result["improved"] - total_credibility_penalty),
+        1
+    )
 
     # -----------------------------
     # Ancrage au réel
