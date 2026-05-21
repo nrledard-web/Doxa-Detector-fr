@@ -1895,18 +1895,26 @@ def compute_lie_gauge(M: float, ME: float):
     if gauge < 0.20:
         label = "Mécroyance forte"
         color = "#a16207"
+    
     elif gauge < 0.40:
         label = "Mécroyance modérée"
         color = "#ca8a04"
+    
     elif gauge < 0.60:
         label = "Zone ambiguë"
         color = "#f59e0b"
-    elif gauge < 0.80:
-        label = "Mensonge probable"
+    
+    elif gauge < 0.75:
+        label = "Manipulation probable"
+        color = "#f97316"
+    
+    elif gauge < 0.92:
+        label = "Manipulation forte probable"
         color = "#dc2626"
+    
     else:
-        label = "Mensonge structurel détecté"
-        color = "#991b1b"
+        label = "Mensonge probable"
+        color = "#7f1d1d"
     
     if gauge < 0.5:
         intensity = (0.5 - gauge) * 0.8
