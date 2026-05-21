@@ -7190,6 +7190,7 @@ def compute_display_gauge_penalty(result: dict) -> float:
     }
 
     penalty = 0.0
+    details = []
 
     for key, weight in gauges.items():
 
@@ -7201,7 +7202,19 @@ def compute_display_gauge_penalty(result: dict) -> float:
         v = normalize_display_value(value)
 
         if v >= 0.25:
-            penalty += v * weight
+
+            p = round(v * weight, 2)
+
+            penalty += p
+
+            details.append({
+                "gauge": key,
+                "score": round(v, 3),
+                "weight": weight,
+                "penalty": p,
+            })
+
+    result["display_gauge_penalty_details"] = details
 
     return round(min(penalty, 5.0), 2)
 
