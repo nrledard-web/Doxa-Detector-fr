@@ -8346,17 +8346,6 @@ def compute_cognitive_bonus(result: dict):
         "agitent le chiffon rouge",
     ]
     
-    SEMANTIC_SHIFT_MARKERS += [
-        "énergie dite décarbonée",
-        "petite musique",
-        "orchestrée par les promoteurs",
-        "ce n'est pas pour autant une énergie propre",
-        "ce n’est pas pour autant une énergie propre",
-        "en réalité",
-        "recyclables",
-        "pas officiellement comptabilisées",
-    ]
-    
     THREAT_AMPLIFICATION_MARKERS += [
         "danger nucléaire",
         "excessivement dangereuse",
