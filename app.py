@@ -3211,7 +3211,6 @@ FRAME_SHIFT_TERMS += [
     "sécurité économique",
     "indépendance nationale",
     "au-delà de l'électricité",
-    "au-delà de l’électricité",
     "idées reçues",
     "réalités factuelles",
 ]
@@ -3392,7 +3391,6 @@ BINARY_OPPOSITION_TERMS = [
     "soit on",
     "soit nous",
     "il n'y a pas de position intermédiaire",
-    "il n’y a pas de position intermédiaire",
     "pas de position intermédiaire",
     "refuser de choisir",
     "c'est déjà choisir",
