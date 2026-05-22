@@ -2768,7 +2768,7 @@ SCIENTIFIC_SIMULATION_MARKERS["technicite_rhetorique"] += [
     "artificialisation des sols",
     "production stable",
     "production prévisible",
-],
+]
 }
 
 def tokenize_words(text: str):
