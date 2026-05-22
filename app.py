@@ -8255,7 +8255,102 @@ def compute_cognitive_bonus(result: dict):
         "bonus_interpretation":
             "Compensation par ancrage réel, révisabilité et cohérence."
     }
-
+    # -----------------------------
+    # Ajouts nucléaire / discours écologico-technocratique
+    # -----------------------------
+    
+    QUALIFICATIONS_NORMATIVES += [
+        "fléau",
+        "véritable fléau",
+        "démesuré",
+        "démesurée",
+        "démesurées",
+        "excessivement dangereux",
+        "excessivement dangereuse",
+        "énergie propre",
+        "plus propres",
+        "plus sûres",
+        "plus compétitives",
+        "pas propre",
+        "peste",
+        "choléra",
+        "remplacer la peste par le choléra",
+    ]
+    
+    EMOTIONAL_DICT.update({
+        "fléau": 0.65,
+        "véritable fléau": 0.75,
+        "peste": 0.70,
+        "choléra": 0.70,
+        "danger nucléaire": 0.65,
+        "excessivement dangereuse": 0.65,
+        "fatidique": 0.45,
+        "malin plaisir": 0.55,
+        "chiffon rouge": 0.50,
+    })
+    
+    ATTACK_TERMS += [
+        "petite musique",
+        "orchestrée",
+        "orchestré",
+        "promoteurs",
+        "promoteurs de l'industrie nucléaire",
+        "promoteurs de l’industrie nucléaire",
+        "prennent un malin plaisir",
+        "agitent le chiffon rouge",
+        "chiffon rouge",
+    ]
+    
+    FRAME_SHIFT_TERMS += [
+        "ce n'est pas pour autant",
+        "ce n’est pas pour autant",
+        "en réalité",
+        "et ce n'est pas tout",
+        "et ce n’est pas tout",
+        "le problème ?",
+    ]
+    
+    BINARY_OPPOSITION_TERMS += [
+        "gaz à effet de serre ou déchets nucléaires",
+        "dérèglement du climat ou danger nucléaire",
+        "plutôt que les énergies fossiles",
+        "proposer l'énergie nucléaire plutôt que",
+        "proposer l’énergie nucléaire plutôt que",
+        "remplacer un problème par un autre",
+        "alors que les énergies renouvelables",
+    ]
+    
+    NARRATIVE_PRESSURE_MARKERS += [
+        "véritable fléau",
+        "quantités démesurées",
+        "plusieurs milliers d'années",
+        "plusieurs milliers d’années",
+        "générations futures",
+        "peste par le choléra",
+        "remplacer la peste par le choléra",
+        "prennent un malin plaisir",
+        "agitent le chiffon rouge",
+    ]
+    
+    SEMANTIC_SHIFT_MARKERS += [
+        "énergie dite décarbonée",
+        "petite musique",
+        "orchestrée par les promoteurs",
+        "ce n'est pas pour autant une énergie propre",
+        "ce n’est pas pour autant une énergie propre",
+        "en réalité",
+        "recyclables",
+        "pas officiellement comptabilisées",
+    ]
+    
+    THREAT_AMPLIFICATION_MARKERS += [
+        "danger nucléaire",
+        "excessivement dangereuse",
+        "véritable fléau",
+        "plusieurs milliers d'années",
+        "plusieurs milliers d’années",
+        "générations futures",
+    ]
 
 
 def analyze_article(text: str) -> Dict:
