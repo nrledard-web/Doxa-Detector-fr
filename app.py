@@ -8389,8 +8389,7 @@ def analyze_article(text: str) -> Dict:
 
     G = clamp(source_markers * 1.1 + citation_like * 0.2, 0, 10)
     N = clamp(nuance_markers * 1.4 + (article_length / 140), 0, 10)
-
-    normative_analysis = detect_normative_charges(text)
+    
     discursive_analysis = compute_discursive_coherence(text)
     premise_analysis = compute_implicit_premises(text)
     logic_confusion_analysis = compute_logic_confusion(text)
