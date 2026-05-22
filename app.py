@@ -3194,6 +3194,16 @@ FRAME_SHIFT_TERMS = [
     "la question n'est pas là",
 ]
 
+FRAME_SHIFT_TERMS += [
+    "souveraineté énergétique",
+    "sécurité économique",
+    "indépendance nationale",
+    "au-delà de l'électricité",
+    "au-delà de l’électricité",
+    "idées reçues",
+    "réalités factuelles",
+]
+
 ATTACK_TERMS = [
     "mensonge",
     "manipulation",
