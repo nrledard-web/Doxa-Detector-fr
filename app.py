@@ -3522,12 +3522,6 @@ NARRATIVE_PRESSURE_MARKERS += [
     "agitent le chiffon rouge",
 ]
 
-THREAT_AMPLIFICATION_MARKERS += [
-    "danger nucléaire",
-    "excessivement dangereuse",
-    "véritable fléau",
-]
-
 
 def detect_normative_charges(text: str):
     if not text or not text.strip():
@@ -4414,6 +4408,11 @@ THREAT_AMPLIFICATION_MARKERS = [
     "le réveil doit être brutal",
     "réveil brutal",
     "à un tournant",
+
+THREAT_AMPLIFICATION_MARKERS += [
+    "danger nucléaire",
+    "excessivement dangereuse",
+    "véritable fléau",
 ]
 
 def compute_threat_amplification(text: str):
