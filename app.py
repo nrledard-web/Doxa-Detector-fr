@@ -3321,15 +3321,20 @@ EMOTIONAL_DICT = {
     "valeurs": 0.35,
     "disparaître": 0.70,
     "disparaîtra": 0.70,
-
-    # anglais optionnel
-    "panic": 0.70,
-    "scandal": 0.60,
-    "outrage": 0.60,
-    "fear": 0.60,
-    "collapse": 0.75,
-    "crisis": 0.50,
 }
+
+# -----------------------------
+# Ajouts émotionnels
+# -----------------------------
+EMOTIONAL_DICT.update({
+    "indispensable": 0.35,
+    "souveraineté": 0.40,
+    "sécurité": 0.35,
+    "indépendance nationale": 0.45,
+    "solution concrète": 0.35,
+    "énergie du passé": 0.35,
+})
+
 # -----------------------------
 # Faux consensus
 # -----------------------------
