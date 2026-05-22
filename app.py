@@ -4408,12 +4408,12 @@ THREAT_AMPLIFICATION_MARKERS = [
     "le réveil doit être brutal",
     "réveil brutal",
     "à un tournant",
+]
 
 THREAT_AMPLIFICATION_MARKERS += [
     "danger nucléaire",
     "excessivement dangereuse",
     "véritable fléau",
-    ]
 ]
 
 def compute_threat_amplification(text: str):
