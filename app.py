@@ -8363,7 +8363,6 @@ def compute_cognitive_bonus(result: dict):
         "véritable fléau",
         "quantités démesurées",
         "plusieurs milliers d'années",
-        "plusieurs milliers d’années",
         "générations futures",
         "peste par le choléra",
         "remplacer la peste par le choléra",
@@ -8375,9 +8374,6 @@ def compute_cognitive_bonus(result: dict):
         "danger nucléaire",
         "excessivement dangereuse",
         "véritable fléau",
-        "plusieurs milliers d'années",
-        "plusieurs milliers d’années",
-        "générations futures",
     ]
 
 
