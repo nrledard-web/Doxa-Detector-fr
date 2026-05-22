@@ -8717,7 +8717,7 @@ def analyze_article(text: str) -> Dict:
     ME_base = max(0, (2 * D) - (G + N))
 
     discursive_boost = sum([
-        normative_analysis["score"] * 2.0,
+        0,
         premise_analysis["score"] * 1.5,
         logic_confusion_analysis["score"] * 1.6,
         aristotelian_fallacies["score"] * 2.0,
