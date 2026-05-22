@@ -2742,12 +2742,27 @@ SCIENTIFIC_SIMULATION_MARKERS = {
     "references_vagues": [
         "des études montrent", "la science prouve", "les chercheurs disent",
         "les scientifiques ont démontré", "plusieurs recherches montrent",
-        "according to studies", "science proves", "research shows"
-    ],
-    "technicite_rhetorique": [
+
+        "technicite_rhetorique": [
         "système", "structure", "dynamique", "modèle",
         "mécanisme", "processus", "paradigme",
         "system", "structure", "dynamics", "model", "mechanism", "process"
+    ],
+        
+        SCIENTIFIC_SIMULATION_MARKERS["technicite_rhetorique"] += [
+        "cycle de vie",
+        "empreinte carbone",
+        "kilowattheure",
+        "neutralité carbone",
+        "stockage à long terme",
+        "recyclage partiel",
+        "combustibles usés",
+        "circuit fermé",
+        "rejets thermiques",
+        "biodiversité",
+        "artificialisation des sols",
+        "production stable",
+        "production prévisible",
     ],
     
     "chiffres_sans_source": [
