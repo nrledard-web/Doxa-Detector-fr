@@ -855,13 +855,6 @@ def compute_linguistic_suspicion(text: str) -> dict:
         "toujours", "jamais", "tout le monde", "personne", "tous", "aucun"
     ]
 
-    vague_authority_terms = [
-        "experts say", "sources say", "insiders say", "many specialists",
-        "according to sources", "internal sources", "reports confirm",
-        "les experts disent", "des sources affirment", "selon des sources",
-        "des spécialistes", "des rapports confirment", "sources internes"
-    ]
-
     dramatic_framing_terms = [
         "shocking truth", "what they don't want you to know", "unbelievable",
         "hidden truth", "explosive revelation", "scandalous",
