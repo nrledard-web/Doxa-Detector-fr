@@ -4221,10 +4221,10 @@ def compute_frame_shift(text: str):
 
     t = normalize_text_for_markers(text)
 
-    hits = [
+    hits = unique_keep_order([
         term for term in FRAME_SHIFT_TERMS
-        if contains_term(t, term) or term in t
-    ]
+        if contains_term(t, term)
+    ])
 
     # Marqueurs de transition / bascule
     shift_connectors = [
@@ -4274,7 +4274,8 @@ def compute_frame_shift(text: str):
     elif has_nuance and has_certainty_or_threat:
         hits.append("coexistence nuance prudente / conclusion forte")
 
-    score = min(len(hits) * 0.35, 1.0)
+    hits = unique_keep_order(hits)
+    score = min(len(hits) * 0.15, 1.0)
 
     if score < 0.15:
         interpretation = "Peu de déplacement du cadre argumentatif."
