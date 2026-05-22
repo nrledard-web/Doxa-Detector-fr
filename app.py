@@ -2769,7 +2769,6 @@ SCIENTIFIC_SIMULATION_MARKERS["technicite_rhetorique"] += [
     "production stable",
     "production prévisible",
 ]
-}
 
 def tokenize_words(text: str):
     return re.findall(r"\b[\wÀ-ÿ'-]+\b", text.lower())
