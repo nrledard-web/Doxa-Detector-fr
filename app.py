@@ -3134,7 +3134,24 @@ VAGUE_AUTHORITY_TERMS = [
     "studies show",
     "research suggests",
     "scientific consensus",
+    "les experts disent", 
+    "des sources affirment", 
+    "selon des sources",
+    "des spécialistes", 
+    "des rapports confirment", 
+    "sources internes"
 ]
+
+VAGUE_AUTHORITY_TERMS += [
+    "les études montrent",
+    "les scénarios de transition énergétique montrent",
+    "les scénarios établis par",
+    "l'agence internationale de l'énergie",
+    "l’agence internationale de l’énergie",
+    "réseau de transport d'électricité",
+    "réseau de transport d’électricité",
+]
+
 # -----------------------------
 # Généralisation abusive
 # -----------------------------
