@@ -4413,6 +4413,7 @@ THREAT_AMPLIFICATION_MARKERS += [
     "danger nucléaire",
     "excessivement dangereuse",
     "véritable fléau",
+    ]
 ]
 
 def compute_threat_amplification(text: str):
