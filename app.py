@@ -2751,7 +2751,7 @@ SCIENTIFIC_SIMULATION_MARKERS = {
         "des statistiques montrent",
         "recent study",
         "statistics show",
-    ],
+    ]
 }
 
 SCIENTIFIC_SIMULATION_MARKERS["technicite_rhetorique"] += [
