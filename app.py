@@ -4275,7 +4275,7 @@ def compute_frame_shift(text: str):
         hits.append("coexistence nuance prudente / conclusion forte")
 
     hits = unique_keep_order(hits)
-    score = min(len(hits) * 0.15, 1.0)
+    score = min(len(hits) * 0.12, 1.0)
 
     if score < 0.15:
         interpretation = "Peu de déplacement du cadre argumentatif."
