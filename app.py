@@ -3451,20 +3451,12 @@ ASSERTION_MARKERS = [
 # -----------------------------
 
 QUALIFICATIONS_NORMATIVES += [
-    "fléau",
+  
     "véritable fléau",
-    "démesuré",
-    "démesurée",
-    "démesurées",
     "excessivement dangereux",
     "excessivement dangereuse",
-    "énergie propre",
-    "plus propres",
     "plus sûres",
-    "plus compétitives",
     "pas propre",
-    "peste",
-    "choléra",
     "remplacer la peste par le choléra",
 ]
 
