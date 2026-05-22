@@ -9108,10 +9108,13 @@ def analyze_article(text: str) -> Dict:
     result["emotional_intensity_interpretation"] = emotional_intensity_analysis["interpretation"]
 
     normative_analysis = detect_normative_charges(text)
-
+    
+    st.write("DEBUG NORMATIVE")
+    st.write(normative_analysis)
+    
     result["normative_charge_score"] = normative_analysis["score"]
     result["normative_score"] = normative_analysis["score"]
-
+    
     result["normative_terms"] = normative_analysis["normative_terms"]
     result["normative_judgment_markers"] = normative_analysis["judgment_markers"]
     result["normative_interpretation"] = normative_analysis["interpretation"]
