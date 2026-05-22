@@ -16423,7 +16423,7 @@ with bf2:
     st.markdown("### Qualification normative")
     st.caption("Jugements de valeur présentés comme des faits.")
 
-    normative_value = result["normative_score"]
+    normative_value = result.get("normative_charge_score", 0)
 
     if normative_value < 0.20:
         normative_label, normative_color = "Faible", "#ca8a04"
