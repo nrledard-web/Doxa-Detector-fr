@@ -3101,11 +3101,6 @@ CAUSAL_OVERREACH_TERMS = [
     "ce qui entraîne",
     "ce qui conduit à",
     "ce qui provoque",
-    "therefore",
-    "this proves that",
-    "this shows that",
-    "this leads to",
-    "which explains",
 ]
 
 VAGUE_AUTHORITY_TERMS = [
@@ -3131,11 +3126,6 @@ VAGUE_AUTHORITY_TERMS = [
     "les données montrent",
     "les données indiquent",
     "le consensus scientifique",
-    "according to experts",
-    "experts say",
-    "studies show",
-    "research suggests",
-    "scientific consensus",
     "les experts disent", 
     "des sources affirment", 
     "selon des sources",
@@ -3456,6 +3446,88 @@ ASSERTION_MARKERS = [
     "est", "sont", "doit", "doivent", "va", "vont",
     "toujours", "jamais", "aucun", "tous", "personne"
 ]
+# -----------------------------
+# Ajouts nucléaire / discours écologico-technocratique
+# -----------------------------
+
+QUALIFICATIONS_NORMATIVES += [
+    "fléau",
+    "véritable fléau",
+    "démesuré",
+    "démesurée",
+    "démesurées",
+    "excessivement dangereux",
+    "excessivement dangereuse",
+    "énergie propre",
+    "plus propres",
+    "plus sûres",
+    "plus compétitives",
+    "pas propre",
+    "peste",
+    "choléra",
+    "remplacer la peste par le choléra",
+]
+
+EMOTIONAL_DICT.update({
+    "fléau": 0.65,
+    "véritable fléau": 0.75,
+    "peste": 0.70,
+    "choléra": 0.70,
+    "danger nucléaire": 0.65,
+    "excessivement dangereuse": 0.65,
+    "fatidique": 0.45,
+    "malin plaisir": 0.55,
+    "chiffon rouge": 0.50,
+})
+
+ATTACK_TERMS += [
+    "petite musique",
+    "orchestrée",
+    "orchestré",
+    "promoteurs",
+    "promoteurs de l'industrie nucléaire",
+    "promoteurs de l’industrie nucléaire",
+    "prennent un malin plaisir",
+    "agitent le chiffon rouge",
+    "chiffon rouge",
+]
+
+FRAME_SHIFT_TERMS += [
+    "ce n'est pas pour autant",
+    "ce n’est pas pour autant",
+    "en réalité",
+    "et ce n'est pas tout",
+    "et ce n’est pas tout",
+    "le problème ?",
+]
+
+BINARY_OPPOSITION_TERMS += [
+    "gaz à effet de serre ou déchets nucléaires",
+    "dérèglement du climat ou danger nucléaire",
+    "plutôt que les énergies fossiles",
+    "proposer l'énergie nucléaire plutôt que",
+    "proposer l’énergie nucléaire plutôt que",
+    "remplacer un problème par un autre",
+    "alors que les énergies renouvelables",
+]
+
+NARRATIVE_PRESSURE_MARKERS += [
+    "véritable fléau",
+    "quantités démesurées",
+    "plusieurs milliers d'années",
+    "générations futures",
+    "peste par le choléra",
+    "remplacer la peste par le choléra",
+    "prennent un malin plaisir",
+    "agitent le chiffon rouge",
+]
+
+THREAT_AMPLIFICATION_MARKERS += [
+    "danger nucléaire",
+    "excessivement dangereuse",
+    "véritable fléau",
+]
+
 
 def detect_normative_charges(text: str):
     if not text or not text.strip():
@@ -8294,87 +8366,6 @@ def compute_cognitive_bonus(result: dict):
         "bonus_interpretation":
             "Compensation par ancrage réel, révisabilité et cohérence."
     }
-    # -----------------------------
-    # Ajouts nucléaire / discours écologico-technocratique
-    # -----------------------------
-    
-    QUALIFICATIONS_NORMATIVES += [
-        "fléau",
-        "véritable fléau",
-        "démesuré",
-        "démesurée",
-        "démesurées",
-        "excessivement dangereux",
-        "excessivement dangereuse",
-        "énergie propre",
-        "plus propres",
-        "plus sûres",
-        "plus compétitives",
-        "pas propre",
-        "peste",
-        "choléra",
-        "remplacer la peste par le choléra",
-    ]
-    
-    EMOTIONAL_DICT.update({
-        "fléau": 0.65,
-        "véritable fléau": 0.75,
-        "peste": 0.70,
-        "choléra": 0.70,
-        "danger nucléaire": 0.65,
-        "excessivement dangereuse": 0.65,
-        "fatidique": 0.45,
-        "malin plaisir": 0.55,
-        "chiffon rouge": 0.50,
-    })
-    
-    ATTACK_TERMS += [
-        "petite musique",
-        "orchestrée",
-        "orchestré",
-        "promoteurs",
-        "promoteurs de l'industrie nucléaire",
-        "promoteurs de l’industrie nucléaire",
-        "prennent un malin plaisir",
-        "agitent le chiffon rouge",
-        "chiffon rouge",
-    ]
-    
-    FRAME_SHIFT_TERMS += [
-        "ce n'est pas pour autant",
-        "ce n’est pas pour autant",
-        "en réalité",
-        "et ce n'est pas tout",
-        "et ce n’est pas tout",
-        "le problème ?",
-    ]
-    
-    BINARY_OPPOSITION_TERMS += [
-        "gaz à effet de serre ou déchets nucléaires",
-        "dérèglement du climat ou danger nucléaire",
-        "plutôt que les énergies fossiles",
-        "proposer l'énergie nucléaire plutôt que",
-        "proposer l’énergie nucléaire plutôt que",
-        "remplacer un problème par un autre",
-        "alors que les énergies renouvelables",
-    ]
-    
-    NARRATIVE_PRESSURE_MARKERS += [
-        "véritable fléau",
-        "quantités démesurées",
-        "plusieurs milliers d'années",
-        "générations futures",
-        "peste par le choléra",
-        "remplacer la peste par le choléra",
-        "prennent un malin plaisir",
-        "agitent le chiffon rouge",
-    ]
-    
-    THREAT_AMPLIFICATION_MARKERS += [
-        "danger nucléaire",
-        "excessivement dangereuse",
-        "véritable fléau",
-    ]
 
 
 def analyze_article(text: str) -> Dict:
