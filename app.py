@@ -4414,7 +4414,20 @@ def compute_threat_amplification(text: str):
         if contains_term(text_lower, marker)
     ]
 
-    score = min(len(hits) * 3 / 10, 1.0)
+    hits = unique_keep_order(hits)
+
+    # Évite le double comptage : "danger" + "danger nucléaire"
+    hits = [
+        h for h in hits
+        if not any(h != other and h in other for other in hits)
+    ]
+
+    weak_markers = {"danger", "urgence", "menace", "grave"}
+    strong_hits = [h for h in hits if h not in weak_markers]
+    weak_hits = [h for h in hits if h in weak_markers]
+
+    raw_score = len(strong_hits) * 0.16 + len(weak_hits) * 0.05
+    score = min(raw_score, 1.0)
 
     if score < 0.15:
         interpretation = "Aucune amplification de menace significative détectée."
@@ -4425,7 +4438,7 @@ def compute_threat_amplification(text: str):
     else:
         interpretation = "Le discours repose fortement sur une amplification dramatique de la menace."
 
-    return score, interpretation, hits
+    return round(score, 3), interpretation, hits
 
 # -----------------------------
 # 19) Fausse analogie
