@@ -13486,7 +13486,7 @@ with col_center:
 
 st.divider()
 
-    st.markdown("""
+st.markdown("""
 <div style="text-align:center; margin:25px 0; color:#888;">
 ──── 🧠 ────
 </div>
