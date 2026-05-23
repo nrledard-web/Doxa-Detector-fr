@@ -7188,6 +7188,141 @@ def compute_baratinage_score(result):
         "baratinage_interpretation": interpretation,
     }
 
+# -----------------------------
+# Effet placebo étendu
+# -----------------------------
+def compute_extended_placebo_effect(N: float, D: float, G: float):
+    """
+    Effet placebo étendu :
+    mesure le risque qu'une expérience vécue (N), renforcée par
+    une forte certitude (D), produise une conviction auto-validée
+    que le savoir articulé disponible (G) ne suffit plus à corriger.
+
+    Formule :
+    M_placebo = (N + 2D) - G
+    """
+
+    raw_score = (N + (2 * D)) - G
+
+    # Normalisation prudente sur 0..20
+    score = max(0.0, min(20.0, raw_score))
+    normalized = score / 20
+
+    if normalized < 0.25:
+        label = "Faible"
+        color = "#16a34a"
+        interpretation = (
+            "L'expérience vécue ne semble pas produire de conviction auto-validée excessive."
+        )
+    elif normalized < 0.50:
+        label = "Modéré"
+        color = "#ca8a04"
+        interpretation = (
+            "Le discours peut transformer partiellement une expérience vécue en preuve subjective."
+        )
+    elif normalized < 0.75:
+        label = "Élevé"
+        color = "#f97316"
+        interpretation = (
+            "L'expérience vécue paraît fortement renforcer une certitude que le savoir disponible corrige peu."
+        )
+    else:
+        label = "Très élevé"
+        color = "#dc2626"
+        interpretation = (
+            "Le discours semble convertir l'effet vécu en preuve auto-validante, avec forte clôture interprétative."
+        )
+
+    return {
+        "extended_placebo_raw": round(raw_score, 2),
+        "extended_placebo_score": round(normalized, 3),
+        "extended_placebo_label": label,
+        "extended_placebo_color": color,
+        "extended_placebo_interpretation": interpretation,
+    }
+
+# -----------------------------
+# Indice d’omission stratégique
+# -----------------------------
+def compute_omission_score(result):
+
+    # Facteurs augmentant l'indice
+    CP = result.get("cherry_picking_score", 0)
+    DR = result.get("data_without_reference_score", 0)
+    PI = result.get("implicit_premise_score", 0)
+    AA = result.get("argument_asymmetry_score", 0)
+    CF = result.get("strong_certainty_score", 0)
+    CC = result.get("cognitive_closure_score", 0)
+
+    # Facteurs réduisant l'indice
+    LM = result.get("limits_score", 0)
+    RV = result.get("revisability_score", 0)
+    AR = result.get("reality_anchor_score", 0)
+    PX = result.get("precision_score", 0)
+    CA = result.get("counter_argument_score", 0)
+
+    raw = (
+        CP
+        + DR
+        + PI
+        + AA
+        + CF
+        + CC
+    ) - (
+        LM
+        + RV
+        + AR
+        + PX
+        + CA
+    )
+
+    score = max(0.0, min(raw / 20, 1.0))
+
+    if score < 0.25:
+
+        label = "Faible"
+        color = "#22c55e"
+
+        interpretation = (
+            "Le contexte présenté paraît relativement complet."
+        )
+
+    elif score < 0.50:
+
+        label = "Modéré"
+        color = "#eab308"
+
+        interpretation = (
+            "Quelques éléments semblent peu contextualisés."
+        )
+
+    elif score < 0.75:
+
+        label = "Élevé"
+        color = "#f97316"
+
+        interpretation = (
+            "Le discours paraît sélectionner certains éléments "
+            "au détriment du contexte."
+        )
+
+    else:
+
+        label = "Très élevé"
+        color = "#dc2626"
+
+        interpretation = (
+            "Le discours semble fortement orienté "
+            "par sélection du contexte."
+        )
+
+    return {
+        "omission_score": round(score, 3),
+        "omission_label": label,
+        "omission_color": color,
+        "omission_interpretation": interpretation,
+    }
+
 def compute_doxa_brain(result: dict) -> dict:
     """
     Synthèse finale du cerveau DOXA.
