@@ -14858,7 +14858,7 @@ st.markdown("""
 st.subheader("🧭 Orientation idéologique")
 st.caption("Détection des structures narratives orientées ou propagandistes.")
 
-oi1, oi2, oi3 = st.columns(3)
+oi1, oi2, oi3, oi4 = st.columns(4)
 
 with oi1:
     
@@ -15206,7 +15206,7 @@ with oi3:
             "Un score élevé ne signifie pas que le texte est faux. "
             "Il indique que le discours tend à construire un adversaire global, abstrait ou peu spécifié."
         )
-oi4, oi5, oi6 = st.columns(3)
+
 # -----------------------------
 # Dissonance interne
 # -----------------------------
@@ -15288,6 +15288,7 @@ with oi4:
             "Une dissonance interne élevée ne signifie pas que tout le texte est faux. "
             "Elle indique que certaines parties du discours semblent entrer en tension ou se contredire."
         )
+oi5, oi6, oi7, oi8 = st.columns(4)
 # -----------------------------
 # Polarisation morale
 # -----------------------------
@@ -15447,7 +15448,6 @@ with oi6:
             "Un faux consensus renforcé élevé ne signifie pas que l’idée est fausse. "
             "Il indique que le texte transforme un accord supposé en preuve argumentative."
         )
-oi7, oi8, oi9 = st.columns(3)
 
 # =============================
 # Argument de nature
