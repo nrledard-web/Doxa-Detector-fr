@@ -12220,22 +12220,6 @@ La certitude paraît plus forte que les preuves disponibles, mais les signaux ne
     
 else:
     pass
-    
-st.markdown("""
-<div style="text-align:center; margin:25px 0; color:#888;">
-────────── ✦ ──────────
-</div>
-""", unsafe_allow_html=True)
-
-st.markdown("""
-<h3 style="text-align:center;">VERDICT FINAL</h3>
-""", unsafe_allow_html=True)
-
-st.markdown("""
-<div style="text-align:center; margin:25px 0; color:#888;">
-────────── ✦ ──────────
-</div>
-""", unsafe_allow_html=True)
 
 # =============================
 # Indice de baratinage
@@ -12314,6 +12298,20 @@ Avec les facteurs qui le réduisent :
 - explicitation du raisonnement.
 
 ---
+st.markdown("""
+---
+
+### Formule utilisée
+
+```python
+IB = (
+    CF + CA + DA + IR + AB + CC
+) - (
+    PR + AR + LM + RV + PX + ER
+)
+
+score = max(0.0, min(IB / 20, 1.0))
+---
 
 ### Lecture
 
@@ -12331,6 +12329,23 @@ Un score élevé ne signifie pas que le texte est faux ou que l’auteur ment.
 Il indique seulement que la force perçue du discours semble davantage venir de sa forme que de sa démonstration explicite.
 """)
     
+st.markdown("""
+<div style="text-align:center; margin:25px 0; color:#888;">
+────────── ✦ ──────────
+</div>
+""", unsafe_allow_html=True)
+
+st.markdown("""
+<h3 style="text-align:center;">VERDICT FINAL</h3>
+""", unsafe_allow_html=True)
+
+st.markdown("""
+<div style="text-align:center; margin:25px 0; color:#888;">
+────────── ✦ ──────────
+</div>
+""", unsafe_allow_html=True)    
+
+
 # =============================
 # Barre de crédibilité finale
 # =============================
