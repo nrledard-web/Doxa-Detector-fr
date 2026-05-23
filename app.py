@@ -4129,46 +4129,10 @@ def compute_binary_opposition(text: str):
 
     hits = unique_keep_order(hits)
 
-    strong_terms = {
-        "eux contre nous",
-        "nous contre eux",
-        "le peuple contre",
-        "les élites contre",
-        "les patriotes contre",
-        "les traîtres",
-        "les ennemis du peuple",
-        "gaz à effet de serre ou déchets nucléaires",
-        "dérèglement du climat ou danger nucléaire",
-        "remplacer un problème par un autre",
-        "structure d’un côté / de l’autre",
-        "structure soit / soit",
-    }
-
-    weak_terms = {
-        "plutôt que les énergies fossiles",
-        "proposer l'énergie nucléaire plutôt que",
-        "proposer l’énergie nucléaire plutôt que",
-        "alors que les énergies renouvelables",
-    }
-
-    strong_hits = [h for h in hits if h in strong_terms]
-    weak_hits = [h for h in hits if h in weak_terms]
-
-    other_hits = [
-        h for h in hits
-        if h not in strong_terms and h not in weak_terms
-    ]
-
-    weighted_hits = (
-        len(strong_hits) * 1.0
-        + len(weak_hits) * 0.5
-        + len(other_hits) * 0.7
-    )
-
     word_count = max(len(t.split()), 1)
     length_factor = max(1.0, word_count / 250)
 
-    density = weighted_hits / length_factor
+    density = len(hits) / length_factor
 
     score = min(density * 0.18, 1.0)
 
