@@ -9421,6 +9421,15 @@ def analyze_article(text: str) -> Dict:
     bonus = compute_cognitive_bonus(result)
     result.update(bonus)
 
+    # -----------------------------
+    # Indice d’omission stratégique
+    # -----------------------------
+    omission = compute_omission_score(result)
+    result.update(omission)
+
+    # -----------------------------
+    # Cerveau DOXA
+    # -----------------------------
     # brain_indices = compute_brain_indices(result)
     # result.update(brain_indices)
     
