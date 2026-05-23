@@ -11934,6 +11934,269 @@ Un score de **{round(score, 1)}/20** indique une solidité argumentative **{etiq
 {message_r}
 """)
 
+# =============================
+# 🧠 1. DÉRIVES COGNITIVES FONDAMENTALES
+# =============================
+st.subheader("🧠 Dérives cognitives fondamentales")
+st.caption("Dérives internes du raisonnement liées à l’équilibre entre connaissance (G), compréhension (N) et certitude (D).")
+
+
+# -----------------------------
+# Pseudo-savoir
+# -----------------------------
+st.markdown("### Pseudo-savoir")
+st.caption("Accumulation de savoirs mal intégrés ou mal compris.")
+
+value = min(result["drift_pseudo_savoir"] / 10, 1.0)
+
+if result["drift_pseudo_savoir"] < 1:
+    label, color = "Faible", "#16a34a"
+elif result["drift_pseudo_savoir"] < 3:
+    label, color = "Modérée", "#ca8a04"
+elif result["drift_pseudo_savoir"] < 6:
+    label, color = "Élevée", "#f97316"
+else:
+    label, color = "Très élevée", "#dc2626"
+
+render_custom_gauge(value, color)
+
+st.markdown(
+    f"<b style='color:{color}'>{label}</b> — {result['drift_pseudo_savoir']}",
+    unsafe_allow_html=True
+)
+
+with st.popover("ℹ️ Comprendre cette jauge"):
+    st.markdown("### Pseudo-savoir")
+
+    st.write(
+        "Cette jauge mesure un déséquilibre où le texte accumule du savoir apparent "
+        "ou des éléments de connaissance, mais sans compréhension suffisamment intégrée."
+    )
+
+    st.markdown("**Formule utilisée**")
+    st.code("Pseudo-savoir = max(0, (G + D) - N)")
+
+    st.markdown("**Avec les valeurs actuelles**")
+    st.write(
+        f"G = {result['G']:.2f} | "
+        f"D = {result['D']:.2f} | "
+        f"N = {result['N']:.2f}"
+    )
+
+    st.code(
+        f"max(0, ({result['G']:.2f} + {result['D']:.2f}) - {result['N']:.2f}) "
+        f"= {result['drift_pseudo_savoir']:.2f}"
+    )
+
+    st.markdown("**Interprétation**")
+    st.write(
+        "Plus ce score est élevé, plus le texte donne une impression de savoir "
+        "sans que ce savoir soit suffisamment digéré, relié ou compris."
+    )
+
+    st.markdown("**Normalisation graphique**")
+    st.code("value = min(drift_pseudo_savoir / 10, 1.0)")
+
+st.divider()
+
+# -----------------------------
+# Intuition dogmatique
+# -----------------------------
+st.markdown("### Intuition dogmatique")
+st.caption("Conviction forte sans base de savoir suffisante.")
+
+value = min(result["drift_intuition_dogmatique"] / 10, 1.0)
+
+if result["drift_intuition_dogmatique"] < 1:
+    label, color = "Faible", "#16a34a"
+elif result["drift_intuition_dogmatique"] < 3:
+    label, color = "Modérée", "#ca8a04"
+elif result["drift_intuition_dogmatique"] < 6:
+    label, color = "Élevée", "#f97316"
+else:
+    label, color = "Très élevée", "#dc2626"
+
+render_custom_gauge(value, color)
+
+st.markdown(
+    f"<b style='color:{color}'>{label}</b> — {result['drift_intuition_dogmatique']}",
+    unsafe_allow_html=True
+)
+
+with st.popover("ℹ️ Comprendre cette jauge"):
+    st.markdown("### Intuition dogmatique")
+
+    st.write(
+        "Cette jauge mesure un déséquilibre où l’intuition ou la compréhension apparente "
+        "s’allie à une certitude forte, mais sans base de savoir suffisamment articulée."
+    )
+
+    st.markdown("**Formule utilisée**")
+    st.code("Intuition dogmatique = max(0, (N + D) - G)")
+
+    st.markdown("**Avec les valeurs actuelles**")
+    st.write(
+        f"N = {result['N']:.2f} | "
+        f"D = {result['D']:.2f} | "
+        f"G = {result['G']:.2f}"
+    )
+
+    st.code(
+        f"max(0, ({result['N']:.2f} + {result['D']:.2f}) - {result['G']:.2f}) "
+        f"= {result['drift_intuition_dogmatique']:.2f}"
+    )
+
+    st.markdown("**Interprétation**")
+    st.write(
+        "Plus ce score est élevé, plus le texte semble reposer sur une intuition affirmée "
+        "ou une compréhension subjective, mais insuffisamment soutenue par des éléments de savoir."
+    )
+
+    st.markdown("**Normalisation graphique**")
+    st.code("value = min(drift_intuition_dogmatique / 10, 1.0)")
+
+
+st.divider()
+
+# -----------------------------
+# Fermeture cognitive
+# -----------------------------
+st.markdown("### Fermeture cognitive")
+st.caption("Excès de certitude par rapport au savoir et à la compréhension.")
+
+value = min(result["drift_mecroyance"] / 10, 1.0)
+
+if result["drift_mecroyance"] < 1:
+    label, color = "Faible", "#16a34a"
+elif result["drift_mecroyance"] < 3:
+    label, color = "Modérée", "#ca8a04"
+elif result["drift_mecroyance"] < 6:
+    label, color = "Élevée", "#f97316"
+else:
+    label, color = "Très élevée", "#dc2626"
+
+render_custom_gauge(value, color)
+
+st.markdown(
+    f"<b style='color:{color}'>{label}</b> — {result['drift_mecroyance']}",
+    unsafe_allow_html=True
+)
+
+with st.popover("ℹ️ Comprendre cette jauge"):
+    st.markdown("### Fermeture cognitive")
+
+    st.write(
+        "Cette jauge mesure un déséquilibre où la certitude affirmée dépasse "
+        "le savoir articulé et la compréhension intégrée."
+    )
+
+    st.markdown("**Formule utilisée**")
+    st.code("Fermeture cognitive = max(0, D - (G + N))")
+
+    st.markdown("**Avec les valeurs actuelles**")
+    st.write(
+        f"D = {result['D']:.2f} | "
+        f"G = {result['G']:.2f} | "
+        f"N = {result['N']:.2f}"
+    )
+
+    st.code(
+        f"max(0, {result['D']:.2f} - ({result['G']:.2f} + {result['N']:.2f})) "
+        f"= {result['drift_mecroyance']:.2f}"
+    )
+
+    st.markdown("**Interprétation**")
+    st.write(
+        "Plus ce score est élevé, plus le texte affirme avec certitude alors que "
+        "les bases de savoir et de compréhension restent insuffisantes."
+    )
+
+    st.markdown("**Normalisation graphique**")
+    st.code("value = min(drift_mecroyance / 10, 1.0)")
+
+st.divider()
+
+# -----------------------------
+# Indice global de dérive cognitive
+# -----------------------------
+st.markdown("### Indice global de dérive cognitive")
+st.caption("Synthèse des trois dérives cognitives.")
+
+global_score = result["global_cognitive_drift"]
+global_value = min(global_score / 10, 1.0)
+
+if global_score < 1:
+    global_label, global_color = "Faible", "#16a34a"
+elif global_score < 3:
+    global_label, global_color = "Modérée", "#ca8a04"
+elif global_score < 6:
+    global_label, global_color = "Élevée", "#f97316"
+else:
+    global_label, global_color = "Très élevée", "#dc2626"
+
+render_custom_gauge(global_value, global_color)
+
+st.markdown(
+    f"<b style='color:{global_color}'>{global_label}</b> — {global_score}",
+    unsafe_allow_html=True
+)
+
+st.caption(result["cognitive_drift_interpretation"])
+
+
+with st.popover("ℹ️ Comprendre cette jauge", use_container_width=True):
+    st.markdown("### Indice global de dérive cognitive")
+
+    st.write(
+        "Cette jauge synthétise les trois dérives cognitives fondamentales. "
+        "Elle ne dit pas si le texte est vrai ou faux : elle mesure le degré de déséquilibre "
+        "entre savoir, compréhension et certitude."
+    )
+
+    st.markdown("**Formule fondatrice**")
+    st.code("M = (G + N) - D")
+
+    st.markdown("**Dérives utilisées**")
+
+    st.code("Fermeture cognitive = max(0, -M)")
+    st.code("Pseudo-savoir = max(0, (G + D) - N)")
+    st.code("Intuition dogmatique = max(0, (N + D) - G)")
+
+    st.markdown("**Formule de synthèse**")
+    st.code(
+        "dominant_value = max(fermeture, pseudo_savoir, intuition)\n"
+        "average_value = (fermeture + pseudo_savoir + intuition) / 3\n"
+        "global_drift = dominant_value * 0.6 + average_value * 0.4"
+    )
+
+    st.markdown("**Valeurs actuelles**")
+    st.write(
+        f"Fermeture cognitive = {result['drift_mecroyance']:.2f} | "
+        f"Pseudo-savoir = {result['drift_pseudo_savoir']:.2f} | "
+        f"Intuition dogmatique = {result['drift_intuition_dogmatique']:.2f}"
+    )
+
+    st.code(
+        f"dominant_value = {max(result['drift_mecroyance'], result['drift_pseudo_savoir'], result['drift_intuition_dogmatique']):.2f}\n"
+        f"average_value = {((result['drift_mecroyance'] + result['drift_pseudo_savoir'] + result['drift_intuition_dogmatique']) / 3):.2f}\n"
+        f"global_drift = {global_score:.2f}"
+    )
+
+    st.markdown("**Résultat actuel**")
+    st.write(f"Score : **{global_score:.2f}**")
+    st.write(f"Niveau : **{global_label}**")
+    st.write(result["cognitive_drift_interpretation"])
+
+    st.markdown("**Lecture**")
+    st.write(
+        "Plus l’indice est élevé, plus une dérive cognitive domine la structure du texte. "
+        "Le poids de 60 % donné à la dérive dominante évite qu’un signal fort soit noyé "
+        "par deux signaux faibles."
+    )
+
+    st.markdown("**Échelle**")
+    st.write("🟢 Faible < 1 | 🟡 Modérée < 3 | 🟠 Élevée < 6 | 🔴 Très élevée ≥ 6")
+
 st.markdown("""
 <div style="text-align:center; margin:25px 0; color:#888;">
 ────────── ✦ ──────────
@@ -13220,268 +13483,7 @@ with col_center:
     fig_triangle = plot_cognitive_triangle_3d(result["G"], result["N"], result["D"])
     st.pyplot(fig_triangle, use_container_width=True)
 
-    # =============================
-    # 🧠 1. DÉRIVES COGNITIVES FONDAMENTALES
-    # =============================
-    st.subheader("🧠 Dérives cognitives fondamentales")
-    st.caption("Dérives internes du raisonnement liées à l’équilibre entre connaissance (G), compréhension (N) et certitude (D).")
-    
 
-    # -----------------------------
-    # Pseudo-savoir
-    # -----------------------------
-    st.markdown("### Pseudo-savoir")
-    st.caption("Accumulation de savoirs mal intégrés ou mal compris.")
-
-    value = min(result["drift_pseudo_savoir"] / 10, 1.0)
-
-    if result["drift_pseudo_savoir"] < 1:
-        label, color = "Faible", "#16a34a"
-    elif result["drift_pseudo_savoir"] < 3:
-        label, color = "Modérée", "#ca8a04"
-    elif result["drift_pseudo_savoir"] < 6:
-        label, color = "Élevée", "#f97316"
-    else:
-        label, color = "Très élevée", "#dc2626"
-
-    render_custom_gauge(value, color)
-
-    st.markdown(
-        f"<b style='color:{color}'>{label}</b> — {result['drift_pseudo_savoir']}",
-        unsafe_allow_html=True
-    )
-
-    with st.popover("ℹ️ Comprendre cette jauge"):
-        st.markdown("### Pseudo-savoir")
-
-        st.write(
-            "Cette jauge mesure un déséquilibre où le texte accumule du savoir apparent "
-            "ou des éléments de connaissance, mais sans compréhension suffisamment intégrée."
-        )
-
-        st.markdown("**Formule utilisée**")
-        st.code("Pseudo-savoir = max(0, (G + D) - N)")
-
-        st.markdown("**Avec les valeurs actuelles**")
-        st.write(
-            f"G = {result['G']:.2f} | "
-            f"D = {result['D']:.2f} | "
-            f"N = {result['N']:.2f}"
-        )
-
-        st.code(
-            f"max(0, ({result['G']:.2f} + {result['D']:.2f}) - {result['N']:.2f}) "
-            f"= {result['drift_pseudo_savoir']:.2f}"
-        )
-
-        st.markdown("**Interprétation**")
-        st.write(
-            "Plus ce score est élevé, plus le texte donne une impression de savoir "
-            "sans que ce savoir soit suffisamment digéré, relié ou compris."
-        )
-
-        st.markdown("**Normalisation graphique**")
-        st.code("value = min(drift_pseudo_savoir / 10, 1.0)")
-    
-    st.divider()
-
-    # -----------------------------
-    # Intuition dogmatique
-    # -----------------------------
-    st.markdown("### Intuition dogmatique")
-    st.caption("Conviction forte sans base de savoir suffisante.")
-
-    value = min(result["drift_intuition_dogmatique"] / 10, 1.0)
-
-    if result["drift_intuition_dogmatique"] < 1:
-        label, color = "Faible", "#16a34a"
-    elif result["drift_intuition_dogmatique"] < 3:
-        label, color = "Modérée", "#ca8a04"
-    elif result["drift_intuition_dogmatique"] < 6:
-        label, color = "Élevée", "#f97316"
-    else:
-        label, color = "Très élevée", "#dc2626"
-
-    render_custom_gauge(value, color)
-
-    st.markdown(
-        f"<b style='color:{color}'>{label}</b> — {result['drift_intuition_dogmatique']}",
-        unsafe_allow_html=True
-    )
-
-    with st.popover("ℹ️ Comprendre cette jauge"):
-        st.markdown("### Intuition dogmatique")
-
-        st.write(
-            "Cette jauge mesure un déséquilibre où l’intuition ou la compréhension apparente "
-            "s’allie à une certitude forte, mais sans base de savoir suffisamment articulée."
-        )
-
-        st.markdown("**Formule utilisée**")
-        st.code("Intuition dogmatique = max(0, (N + D) - G)")
-
-        st.markdown("**Avec les valeurs actuelles**")
-        st.write(
-            f"N = {result['N']:.2f} | "
-            f"D = {result['D']:.2f} | "
-            f"G = {result['G']:.2f}"
-        )
-
-        st.code(
-            f"max(0, ({result['N']:.2f} + {result['D']:.2f}) - {result['G']:.2f}) "
-            f"= {result['drift_intuition_dogmatique']:.2f}"
-        )
-
-        st.markdown("**Interprétation**")
-        st.write(
-            "Plus ce score est élevé, plus le texte semble reposer sur une intuition affirmée "
-            "ou une compréhension subjective, mais insuffisamment soutenue par des éléments de savoir."
-        )
-
-        st.markdown("**Normalisation graphique**")
-        st.code("value = min(drift_intuition_dogmatique / 10, 1.0)")
-
-
-    st.divider()
-
-    # -----------------------------
-    # Fermeture cognitive
-    # -----------------------------
-    st.markdown("### Fermeture cognitive")
-    st.caption("Excès de certitude par rapport au savoir et à la compréhension.")
-
-    value = min(result["drift_mecroyance"] / 10, 1.0)
-
-    if result["drift_mecroyance"] < 1:
-        label, color = "Faible", "#16a34a"
-    elif result["drift_mecroyance"] < 3:
-        label, color = "Modérée", "#ca8a04"
-    elif result["drift_mecroyance"] < 6:
-        label, color = "Élevée", "#f97316"
-    else:
-        label, color = "Très élevée", "#dc2626"
-
-    render_custom_gauge(value, color)
-
-    st.markdown(
-        f"<b style='color:{color}'>{label}</b> — {result['drift_mecroyance']}",
-        unsafe_allow_html=True
-    )
-
-    with st.popover("ℹ️ Comprendre cette jauge"):
-        st.markdown("### Fermeture cognitive")
-
-        st.write(
-            "Cette jauge mesure un déséquilibre où la certitude affirmée dépasse "
-            "le savoir articulé et la compréhension intégrée."
-        )
-
-        st.markdown("**Formule utilisée**")
-        st.code("Fermeture cognitive = max(0, D - (G + N))")
-
-        st.markdown("**Avec les valeurs actuelles**")
-        st.write(
-            f"D = {result['D']:.2f} | "
-            f"G = {result['G']:.2f} | "
-            f"N = {result['N']:.2f}"
-        )
-
-        st.code(
-            f"max(0, {result['D']:.2f} - ({result['G']:.2f} + {result['N']:.2f})) "
-            f"= {result['drift_mecroyance']:.2f}"
-        )
-
-        st.markdown("**Interprétation**")
-        st.write(
-            "Plus ce score est élevé, plus le texte affirme avec certitude alors que "
-            "les bases de savoir et de compréhension restent insuffisantes."
-        )
-
-        st.markdown("**Normalisation graphique**")
-        st.code("value = min(drift_mecroyance / 10, 1.0)")
-
-    st.divider()
-
-    # -----------------------------
-    # Indice global de dérive cognitive
-    # -----------------------------
-    st.markdown("### Indice global de dérive cognitive")
-    st.caption("Synthèse des trois dérives cognitives.")
-    
-    global_score = result["global_cognitive_drift"]
-    global_value = min(global_score / 10, 1.0)
-    
-    if global_score < 1:
-        global_label, global_color = "Faible", "#16a34a"
-    elif global_score < 3:
-        global_label, global_color = "Modérée", "#ca8a04"
-    elif global_score < 6:
-        global_label, global_color = "Élevée", "#f97316"
-    else:
-        global_label, global_color = "Très élevée", "#dc2626"
-    
-    render_custom_gauge(global_value, global_color)
-    
-    st.markdown(
-        f"<b style='color:{global_color}'>{global_label}</b> — {global_score}",
-        unsafe_allow_html=True
-    )
-    
-    st.caption(result["cognitive_drift_interpretation"])
-    
-    
-    with st.popover("ℹ️ Comprendre cette jauge", use_container_width=True):
-        st.markdown("### Indice global de dérive cognitive")
-    
-        st.write(
-            "Cette jauge synthétise les trois dérives cognitives fondamentales. "
-            "Elle ne dit pas si le texte est vrai ou faux : elle mesure le degré de déséquilibre "
-            "entre savoir, compréhension et certitude."
-        )
-    
-        st.markdown("**Formule fondatrice**")
-        st.code("M = (G + N) - D")
-    
-        st.markdown("**Dérives utilisées**")
-    
-        st.code("Fermeture cognitive = max(0, -M)")
-        st.code("Pseudo-savoir = max(0, (G + D) - N)")
-        st.code("Intuition dogmatique = max(0, (N + D) - G)")
-    
-        st.markdown("**Formule de synthèse**")
-        st.code(
-            "dominant_value = max(fermeture, pseudo_savoir, intuition)\n"
-            "average_value = (fermeture + pseudo_savoir + intuition) / 3\n"
-            "global_drift = dominant_value * 0.6 + average_value * 0.4"
-        )
-    
-        st.markdown("**Valeurs actuelles**")
-        st.write(
-            f"Fermeture cognitive = {result['drift_mecroyance']:.2f} | "
-            f"Pseudo-savoir = {result['drift_pseudo_savoir']:.2f} | "
-            f"Intuition dogmatique = {result['drift_intuition_dogmatique']:.2f}"
-        )
-    
-        st.code(
-            f"dominant_value = {max(result['drift_mecroyance'], result['drift_pseudo_savoir'], result['drift_intuition_dogmatique']):.2f}\n"
-            f"average_value = {((result['drift_mecroyance'] + result['drift_pseudo_savoir'] + result['drift_intuition_dogmatique']) / 3):.2f}\n"
-            f"global_drift = {global_score:.2f}"
-        )
-    
-        st.markdown("**Résultat actuel**")
-        st.write(f"Score : **{global_score:.2f}**")
-        st.write(f"Niveau : **{global_label}**")
-        st.write(result["cognitive_drift_interpretation"])
-    
-        st.markdown("**Lecture**")
-        st.write(
-            "Plus l’indice est élevé, plus une dérive cognitive domine la structure du texte. "
-            "Le poids de 60 % donné à la dérive dominante évite qu’un signal fort soit noyé "
-            "par deux signaux faibles."
-        )
-    
-        st.markdown("**Échelle**")
-        st.write("🟢 Faible < 1 | 🟡 Modérée < 3 | 🟠 Élevée < 6 | 🔴 Très élevée ≥ 6")
         st.divider()
 
         st.markdown("""
