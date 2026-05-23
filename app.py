@@ -9299,6 +9299,11 @@ def analyze_article(text: str) -> Dict:
         total_credibility_penalty + display_gauge_penalty,
         2
     )
+    # -----------------------------
+    # Indice de baratinage
+    # -----------------------------
+    baratinage = compute_baratinage_score(result)
+    result.update(baratinage)
     
     # -----------------------------
     # Pénalités finales
