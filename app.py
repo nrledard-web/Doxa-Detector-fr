@@ -4155,12 +4155,34 @@ def compute_binary_opposition(text: str):
 
     hits = unique_keep_order(hits)
 
+    strong_hits = [
+        h for h in hits
+        if h in BINARY_OPPOSITION_STRONG_TERMS
+    ]
+
+    weak_hits = [
+        h for h in hits
+        if h in BINARY_OPPOSITION_WEAK_TERMS
+    ]
+
+    other_hits = [
+        h for h in hits
+        if h not in BINARY_OPPOSITION_STRONG_TERMS
+        and h not in BINARY_OPPOSITION_WEAK_TERMS
+    ]
+
+    weighted_hits = (
+        len(strong_hits) * 1.0
+        + len(weak_hits) * 0.5
+        + len(other_hits) * 0.7
+    )
+
     word_count = max(len(t.split()), 1)
     length_factor = max(1.0, word_count / 250)
 
-    density = len(hits) / length_factor
+    density = weighted_hits / length_factor
 
-    score = min(density * 0.18, 1.0)
+    score = min(density * 0.25, 1.0)
 
     if score < 0.15:
         interpretation = "Aucune opposition binaire significative détectée."
