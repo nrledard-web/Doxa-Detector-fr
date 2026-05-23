@@ -3351,8 +3351,6 @@ CONSENSUS_TERMS += [
     "ceux qui ouvrent les yeux",
     "personne ne mentionne",
 ]
-
-
 # -----------------------------
 # Opposition binaire
 # -----------------------------
@@ -3385,9 +3383,37 @@ BINARY_OPPOSITION_TERMS = [
     "ceux qui ouvrent les yeux",
     "ceux qui refusent de voir",
     "ceux qui veulent préserver",
-    "ceux qui participent"
+    "ceux qui participent",
+
+    # cas comparatifs / oppositions thématiques
+    "gaz à effet de serre ou déchets nucléaires",
+    "dérèglement du climat ou danger nucléaire",
+    "plutôt que les énergies fossiles",
+    "proposer l'énergie nucléaire plutôt que",
+    "proposer l’énergie nucléaire plutôt que",
+    "remplacer un problème par un autre",
+    "alors que les énergies renouvelables",
 ]
 
+BINARY_OPPOSITION_STRONG_TERMS = [
+    "eux contre nous",
+    "nous contre eux",
+    "le peuple contre",
+    "les élites contre",
+    "les patriotes contre",
+    "les traîtres",
+    "les ennemis du peuple",
+    "gaz à effet de serre ou déchets nucléaires",
+    "dérèglement du climat ou danger nucléaire",
+    "remplacer un problème par un autre",
+]
+
+BINARY_OPPOSITION_WEAK_TERMS = [
+    "plutôt que les énergies fossiles",
+    "proposer l'énergie nucléaire plutôt que",
+    "proposer l’énergie nucléaire plutôt que",
+    "alors que les énergies renouvelables",
+]
 # -----------------------------
 # Qualifications normatives
 # -----------------------------
