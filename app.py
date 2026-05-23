@@ -7503,7 +7503,6 @@ def compute_deceptive_coherence(G, N, D, rhetorical_pressure, propaganda_score, 
 # =========================================================
 # 🎨 Étalonnage visuel unifié des jauges
 # =========================================================
-
 def normalize_display_value(value: float) -> float:
     """Ramène une valeur 0–1 ou 0–20 vers 0–1."""
     if value is None:
@@ -7523,7 +7522,6 @@ def color_scale_risk(value: float) -> tuple[str, str]:
     else:
         return "#dc2626", "🔴 Critique"
 
-
 def color_scale_quality(value: float) -> tuple[str, str]:
     v = normalize_display_value(value)
 
@@ -7536,7 +7534,6 @@ def color_scale_quality(value: float) -> tuple[str, str]:
     else:
         return "#16a34a", "🟢 Robuste"
         
-
 def color_scale_warning_risk(value: float) -> tuple[str, str]:
     """
     Pour les jauges de risque sensible :
@@ -7553,12 +7550,10 @@ def color_scale_warning_risk(value: float) -> tuple[str, str]:
     else:
         return "#dc2626", "🔴 Critique"
 
-
 def interpret_generic_risk_gauge(label: str, value: float) -> str:
     v = normalize_display_value(value)
     color, level = color_scale_risk(v)
     return f"<b style='color:{color}'>{label}</b> — {level} ({round(v * 100, 1)}%)"
-
 
 def interpret_generic_quality_gauge(label: str, value: float) -> str:
     v = normalize_display_value(value)
@@ -7573,7 +7568,6 @@ def interpret_warning_risk_gauge(label: str, value: float) -> str:
 # -------------------------------------------------
 # Pénalité des jauges affichées
 # -------------------------------------------------
-
 def compute_display_gauge_penalty(result: dict) -> float:
 
     gauges = {
@@ -7662,7 +7656,6 @@ def label_level(score):
     else:
         return "Très élevée"
 
-
 def compute_narrative_pressure(text):
     sentences = max(len(re.split(r"[.!?]+", text)), 1)
     markers = count_marker_occurrences(text, NARRATIVE_PRESSURE_MARKERS)
@@ -7675,7 +7668,6 @@ def compute_narrative_pressure(text):
         "markers": markers,
         "interpretation": "Le texte exerce une pression vers une conclusion." if score >= 0.4 else "Pression narrative limitée."
     }
-
 
 def compute_logical_jump(text):
     conclusions = count_marker_occurrences(text, CONCLUSION_MARKERS)
@@ -7691,7 +7683,6 @@ def compute_logical_jump(text):
         "reasons": reasons,
         "interpretation": "Conclusion possiblement insuffisamment démontrée." if score >= 0.4 else "Enchaînement logique relativement progressif."
     }
-
 
 def compute_argument_asymmetry(text):
     assertions = count_marker_occurrences(text, ASSERTION_MARKERS)
@@ -7834,7 +7825,6 @@ def compute_absolute_prediction(text):
         )
     }
 
-
 def compute_threat_amplification_advanced(text):
     sentences = max(len([s for s in re.split(r"[.!?]+", text) if s.strip()]), 1)
     markers = count_marker_occurrences(text, THREAT_AMPLIFICATION_MARKERS)
@@ -7851,7 +7841,6 @@ def compute_threat_amplification_advanced(text):
             else "Peu d’amplification explicite de menace."
         )
     }
-
 
 def compute_strong_certainty(text):
     t = normalize_text_for_markers(text)
@@ -7924,7 +7913,6 @@ def compute_strong_certainty(text):
 def contains_term(text: str, term: str) -> bool:
     return re.search(rf"\b{re.escape(term.lower())}\b", text.lower()) is not None
 
-
 JOURNALISTIC_MARKERS = [
     "selon", "d'après", "rapport", "étude", "enquête",
     "article", "communiqué", "sondage", "journal", "presse",
@@ -7932,7 +7920,6 @@ JOURNALISTIC_MARKERS = [
     "a déclaré", "a affirmé", "a indiqué", "a annoncé",
     "selon une étude", "selon le rapport", "d'après les données",
 ]
-
 PHILOSOPHICAL_MARKERS = [
     "vérité", "réalité", "existence", "être", "essence",
     "conscience", "raison", "pensée", "savoir", "croyance",
@@ -7940,7 +7927,6 @@ PHILOSOPHICAL_MARKERS = [
     "morale", "éthique", "justice", "liberté", "devoir",
     "dans quelle mesure", "qu'est-ce que", "en ce sens",
 ]
-
 RELIGIOUS_MARKERS = [
     "dieu", "divin", "foi", "religion", "croyant",
     "âme", "esprit", "sacré", "saint", "prière",
@@ -7988,13 +7974,10 @@ POLITICAL_MARKERS = [
     "peuple",
     "économie",
 ]
-
 # =========================================================
 # ENCYCLOPÉDIQUE
 # =========================================================
-
 ENCYCLOPEDIC_MARKERS = [
-
     "désigne",
     "correspond à",
     "se définit comme",
@@ -8019,13 +8002,10 @@ ENCYCLOPEDIC_MARKERS = [
     "refers to",
     "consists of",
 ]
-
 # =========================================================
 # DÉFINITIONNEL / PÉDAGOGIQUE
 # =========================================================
-
 DEFINITION_MARKERS = [
-
     "par exemple",
     "en résumé",
     "en d'autres termes",
@@ -8046,13 +8026,10 @@ DEFINITION_MARKERS = [
     "concept",
     "pédagogique",
 ]
-
 # =========================================================
 # GÉOPOLITIQUE
 # =========================================================
-
 GEOPOLITICAL_MARKERS = [
-
     "bloc occidental",
     "bloc de l'est",
     "sphère d'influence",
@@ -8077,13 +8054,10 @@ GEOPOLITICAL_MARKERS = [
     "world order",
     "geopolitical",
 ]
-
 # =========================================================
 # ÉCOLOGIQUE
 # =========================================================
-
 ECOLOGICAL_MARKERS = [
-
     "réchauffement climatique",
     "biodiversité",
     "empreinte carbone",
@@ -8106,13 +8080,10 @@ ECOLOGICAL_MARKERS = [
     "climate change",
     "carbon emissions",
 ]
-
 # =========================================================
 # SOCIAL / SOCIOLOGIQUE
 # =========================================================
-
 SOCIAL_MARKERS = [
-
     "inégalités sociales",
     "classes sociales",
     "mobilité sociale",
@@ -8134,13 +8105,10 @@ SOCIAL_MARKERS = [
     "social inequality",
     "social exclusion",
 ]
-
 # =========================================================
 # BIOGRAPHIQUE
 # =========================================================
-
 BIOGRAPHICAL_MARKERS = [
-
     "né en",
     "née en",
     "mort en",
@@ -8162,13 +8130,10 @@ BIOGRAPHICAL_MARKERS = [
     "portrait de",
     "figure historique",
 ]
-
 # =========================================================
 # FICTIONNEL / NARRATIF
 # =========================================================
-
 FICTION_MARKERS = [
-
     "roman",
     "personnage",
     "intrigue",
@@ -8190,13 +8155,10 @@ FICTION_MARKERS = [
     "drame",
     "aventure",
 ]
-
 # =========================================================
 # MYTHIQUE / SYMBOLIQUE
 # =========================================================
-
 MYTHIC_MARKERS = [
-
     "mythe",
     "légende",
     "symbole",
@@ -8214,7 +8176,6 @@ MYTHIC_MARKERS = [
     "transcendance",
     "initiation",
 ]
-
 def detect_conceptual_domains(text: str):
     t = text.lower()
 
@@ -8366,7 +8327,6 @@ def compute_reported_speech_ratio(text: str) -> dict:
         "markers": markers[:15],
         "interpretation": interpretation
     }
-
 # =============================
 # Ancrage au réel
 # =============================
@@ -8380,14 +8340,12 @@ REAL_ANCHOR_EMPIRY = [
     "%", "selon", "économistes", "expert", "secteurs", "postes", "créés", 
     "emplois", "finance", "santé"
 ]
-
 REAL_ANCHOR_REPRODUCIBILITY = [
     "méthode", "paramètres", "reproductible", "reproductibilité",
     "réplication", "répliqué", "protocole détaillé", "dataset",
     "jeu de données", "open source", "code source", "doi", "arxiv",
     "publication", "revue par les pairs", "littérature scientifique"
 ]
-
 REAL_ANCHOR_FALSIFIABILITY = [
     "hypothèse", "modèle partiel", "approximation", "sous certaines conditions",
     "pourrait être faux", "pourrait être réfuté", "compatible avec",
@@ -8395,7 +8353,6 @@ REAL_ANCHOR_FALSIFIABILITY = [
     "selon les données actuelles", "limite du modèle", "pourraient", "pourrait", 
     "certains", "restent prudents", "il faut nuancer", "nuancer", "cependant"
 ]
-
 REAL_ANCHOR_LIMITS = [
     "nous ne savons pas", "reste incomplet", "interprétation débattue",
     "hypothèse de travail", "limite actuelle", "nécessite validation",
@@ -8403,7 +8360,6 @@ REAL_ANCHOR_LIMITS = [
     "dans cette classe de systèmes", "conditions de validité",
     "limites de cette approche"
 ]
-
 SPECULATIVE_INFLATION_MARKERS = [
     "explique tout", "théorie du tout", "théorie unifiée",
     "structure cachée", "structure fondamentale du réel",
@@ -8419,7 +8375,6 @@ SPECULATIVE_INFLATION_MARKERS = [
     "étude choc"
 ]
 
-
 def count_real_anchor_markers(text, markers):
     t = text.lower()
     found = []
@@ -8429,7 +8384,6 @@ def count_real_anchor_markers(text, markers):
             found.append(marker)
 
     return found
-
 
 def normalize_component(count, divisor=4):
     """
@@ -8557,7 +8511,7 @@ def detect_real_anchor(text, result=None):
         "delta_reality_label": delta_label,
         "delta_reality_interpretation": delta_interpretation,
     }
-
+    
 def compute_cognitive_bonus(result: dict):
     """
     Module bonus :
