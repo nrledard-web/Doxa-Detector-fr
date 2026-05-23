@@ -7096,9 +7096,9 @@ def compute_brain_indices(result: dict) -> dict:
 # -----------------------------
 def compute_baratinage_score(result):
     """
-    Estime l'écart entre impression de maîtrise
-    et démonstration explicite.
-    Score normalisé entre 0 et 1.
+    Estime dans quelle mesure un discours produit
+    une impression de maîtrise supérieure
+    à ce que sa démonstration explicite semble soutenir.
     """
 
     # Facteurs augmentant l'indice
@@ -7117,42 +7117,75 @@ def compute_baratinage_score(result):
     PX = result.get("precision_score", 0)
     ER = result.get("reasoning_explicitness_score", 0)
 
-    raw = (CF + CA + DA + IR + AB + CC) - (PR + AR + LM + RV + PX + ER)
+    # Calcul brut
+    raw = (
+        CF
+        + CA
+        + DA
+        + IR
+        + AB
+        + CC
+    ) - (
+        PR
+        + AR
+        + LM
+        + RV
+        + PX
+        + ER
+    )
 
+    # Normalisation
     score = max(0.0, min(raw / 20, 1.0))
 
+    # Interprétation
     if score < 0.25:
+
         label = "Faible"
         color = "#22c55e"
-        interpretation = "La démonstration paraît dominer l’effet discursif."
+
+        interpretation = (
+            "La démonstration paraît dominer "
+            "l’effet discursif."
+        )
 
     elif score < 0.50:
+
         label = "Modéré"
         color = "#eab308"
-        interpretation = "La rhétorique est présente, mais reste contenue."
+
+        interpretation = (
+            "La rhétorique est présente "
+            "mais reste contenue."
+        )
 
     elif score < 0.75:
+
         label = "Élevé"
         color = "#f97316"
+
         interpretation = (
-            "L’impression de maîtrise semble dépasser partiellement "
+            "L’impression de maîtrise semble "
+            "dépasser partiellement "
             "la démonstration explicite."
         )
 
     else:
+
         label = "Très élevé"
         color = "#dc2626"
+
         interpretation = (
-            "L’impression de maîtrise semble nettement supérieure "
+            "L’impression de maîtrise semble "
+            "nettement supérieure "
             "à la démonstration visible."
         )
 
     return {
         "baratinage_score": round(score, 3),
+        "baratinage_raw": round(raw, 3),
         "baratinage_label": label,
         "baratinage_color": color,
         "baratinage_interpretation": interpretation,
-        "baratinage_raw": round(raw, 3),
     }
 
 def compute_doxa_brain(result: dict) -> dict:
@@ -12204,7 +12237,100 @@ st.markdown("""
 </div>
 """, unsafe_allow_html=True)
 
+# =============================
+# Indice de baratinage
+# =============================
 
+st.subheader("Indice de baratinage")
+
+st.caption(
+    "Cette jauge n’évalue pas si le texte est vrai ou faux. "
+    "Elle estime l’écart entre l’impression de maîtrise produite "
+    "par le discours et la démonstration réellement visible."
+)
+
+value = result.get("baratinage_score", 0)
+
+render_custom_gauge(
+    value,
+    result.get("baratinage_color", "#22c55e")
+)
+
+st.markdown(
+    f"""
+<b style='color:{result.get("baratinage_color", "#22c55e")}'>
+{result.get("baratinage_label", "Faible")}
+</b>
+— {round(value*100,1)}%
+""",
+    unsafe_allow_html=True
+)
+
+st.caption(
+    result.get(
+        "baratinage_interpretation",
+        "Indice de baratinage non calculé."
+    )
+)
+
+st.caption(
+    "Démonstration explicite ⟵⟶ Impression de maîtrise"
+)
+
+with st.popover("ℹ️ Comprendre cette jauge"):
+
+    st.markdown("""
+### Indice de baratinage
+
+Cette jauge estime dans quelle mesure un discours produit une **impression de maîtrise, de profondeur ou d’autorité** supérieure à ce que sa démonstration explicite semble soutenir.
+
+Elle ne mesure pas :
+- la vérité du texte ;
+- le mensonge ;
+- l’intention réelle du locuteur.
+
+Elle mesure plutôt un **écart entre effet discursif et fondation démonstrative**.
+
+---
+
+### Principe
+
+Le moteur compare les facteurs qui augmentent l’effet de maîtrise :
+
+- certitude forte ;
+- cohérence apparente ;
+- densité argumentative ;
+- intensité rhétorique ;
+- abstraction ;
+- clôture cognitive.
+
+Avec les facteurs qui le réduisent :
+
+- preuves ;
+- ancrage au réel ;
+- reconnaissance des limites ;
+- révisabilité ;
+- précision ;
+- explicitation du raisonnement.
+
+---
+
+### Lecture
+
+🟢 **Faible** : démonstration dominante  
+🟡 **Modéré** : rhétorique présente mais contenue  
+🟠 **Élevé** : effet de maîtrise notable  
+🔴 **Très élevé** : impression de maîtrise nettement supérieure à la démonstration
+
+---
+
+### Attention
+
+Un score élevé ne signifie pas que le texte est faux ou que l’auteur ment.
+
+Il indique seulement que la force perçue du discours semble davantage venir de sa forme que de sa démonstration explicite.
+""")
+    
 # =============================
 # Barre de crédibilité finale
 # =============================
