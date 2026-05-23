@@ -12298,8 +12298,6 @@ Avec les facteurs qui le réduisent :
 - explicitation du raisonnement.
 
 ---
-st.markdown("""
----
 
 ### Formule utilisée
 
@@ -12311,7 +12309,6 @@ IB = (
 )
 
 score = max(0.0, min(IB / 20, 1.0))
----
 
 ### Lecture
 
