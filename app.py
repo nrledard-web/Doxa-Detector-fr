@@ -11943,8 +11943,18 @@ st.markdown("""
 # =============================
 # 🧠 1. DÉRIVES COGNITIVES FONDAMENTALES
 # =============================
-st.subheader("🧠 Dérives cognitives fondamentales")
-st.caption("Dérives internes du raisonnement liées à l’équilibre entre connaissance (G), compréhension (N) et certitude (D).")
+
+st.markdown(
+    """
+<div style="text-align:center;">
+    <h3>🧠 Dérives cognitives fondamentales</h3>
+    <p style="color:#888; margin-top:-10px;">
+        Dérives internes du raisonnement liées à l’équilibre entre connaissance (G), compréhension (N) et certitude (D).
+    </p>
+</div>
+""",
+    unsafe_allow_html=True
+)
 
 
 # -----------------------------
