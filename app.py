@@ -7091,6 +7091,70 @@ def compute_brain_indices(result: dict) -> dict:
         "dominant_regime": profile,
     }
 
+# -----------------------------
+# Indice de baratinage
+# -----------------------------
+def compute_baratinage_score(result):
+    """
+    Estime l'écart entre impression de maîtrise
+    et démonstration explicite.
+    Score normalisé entre 0 et 1.
+    """
+
+    # Facteurs augmentant l'indice
+    CF = result.get("strong_certainty_score", 0)
+    CA = result.get("coherence_trick_score", 0)
+    DA = result.get("argument_density_score", 0)
+    IR = result.get("rhetorical_intensity_score", 0)
+    AB = result.get("abstraction_score", 0)
+    CC = result.get("cognitive_closure_score", 0)
+
+    # Facteurs réduisant l'indice
+    PR = result.get("proof_score", 0)
+    AR = result.get("reality_anchor_score", 0)
+    LM = result.get("limits_score", 0)
+    RV = result.get("revisability_score", 0)
+    PX = result.get("precision_score", 0)
+    ER = result.get("reasoning_explicitness_score", 0)
+
+    raw = (CF + CA + DA + IR + AB + CC) - (PR + AR + LM + RV + PX + ER)
+
+    score = max(0.0, min(raw / 20, 1.0))
+
+    if score < 0.25:
+        label = "Faible"
+        color = "#22c55e"
+        interpretation = "La démonstration paraît dominer l’effet discursif."
+
+    elif score < 0.50:
+        label = "Modéré"
+        color = "#eab308"
+        interpretation = "La rhétorique est présente, mais reste contenue."
+
+    elif score < 0.75:
+        label = "Élevé"
+        color = "#f97316"
+        interpretation = (
+            "L’impression de maîtrise semble dépasser partiellement "
+            "la démonstration explicite."
+        )
+
+    else:
+        label = "Très élevé"
+        color = "#dc2626"
+        interpretation = (
+            "L’impression de maîtrise semble nettement supérieure "
+            "à la démonstration visible."
+        )
+
+    return {
+        "baratinage_score": round(score, 3),
+        "baratinage_label": label,
+        "baratinage_color": color,
+        "baratinage_interpretation": interpretation,
+        "baratinage_raw": round(raw, 3),
+    }
+
 def compute_doxa_brain(result: dict) -> dict:
     """
     Synthèse finale du cerveau DOXA.
