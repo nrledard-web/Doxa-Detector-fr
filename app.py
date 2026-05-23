@@ -13484,13 +13484,13 @@ with col_center:
     st.pyplot(fig_triangle, use_container_width=True)
 
 
-        st.divider()
+st.divider()
 
-        st.markdown("""
-    <div style="text-align:center; margin:25px 0; color:#888;">
-    ──── 🧠 ────
-    </div>
-    """, unsafe_allow_html=True)
+    st.markdown("""
+<div style="text-align:center; margin:25px 0; color:#888;">
+──── 🧠 ────
+</div>
+""", unsafe_allow_html=True)
 
 st.subheader("Cartographie discursive complémentaire")
 
