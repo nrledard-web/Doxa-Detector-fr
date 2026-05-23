@@ -9251,16 +9251,6 @@ def analyze_article(text: str) -> Dict:
 
     normative_analysis = detect_normative_charges(text)
     
-    st.write("DEBUG NORMATIVE")
-    st.write(normative_analysis)
-
-    st.write("DEBUG LISTE NORMATIVE - derniers termes")
-    st.write(QUALIFICATIONS_NORMATIVES[-30:])
-    
-    st.write("TEST fléau :", contains_term(text.lower(), "fléau"))
-    st.write("TEST véritable fléau :", contains_term(text.lower(), "véritable fléau"))
-    st.write("TEST démesurées :", contains_term(text.lower(), "démesurées"))
-    
     result["normative_charge_score"] = normative_analysis["score"]
     result["normative_score"] = normative_analysis["score"]
     
