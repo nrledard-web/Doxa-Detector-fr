@@ -12955,6 +12955,103 @@ Un score élevé ne prouve pas qu’une information a été volontairement cach�
 
 Il indique seulement que le discours semble laisser hors champ des éléments pouvant modifier son interprétation.
 """)
+
+# =============================
+# Effet placebo étendu
+# =============================
+
+st.subheader("Effet placebo étendu")
+
+st.caption(
+    "Cette jauge n’affirme pas qu’un effet placebo existe réellement. "
+    "Elle estime si le discours transforme une expérience vécue ou ressentie "
+    "en preuve subjective auto-validante."
+)
+
+value = result.get("extended_placebo_score", 0)
+
+render_custom_gauge(
+    value,
+    result.get("extended_placebo_color", "#22c55e")
+)
+
+st.markdown(
+    f"""
+<b style='color:{result.get("extended_placebo_color", "#22c55e")}'>
+{result.get("extended_placebo_label", "Faible")}
+</b>
+— {round(value*100,1)}%
+""",
+    unsafe_allow_html=True
+)
+
+st.caption(
+    result.get(
+        "extended_placebo_interpretation",
+        "Effet placebo étendu non calculé."
+    )
+)
+
+st.caption(
+    "Expérience prudente ⟵⟶ Conviction auto-validée"
+)
+
+with st.popover("ℹ️ Comprendre cette jauge"):
+
+    st.markdown("""
+### Effet placebo étendu
+
+Cette jauge estime dans quelle mesure un discours semble **transformer une expérience vécue, ressentie ou perçue comme efficace** en preuve subjective.
+
+Elle ne mesure pas :
+- l’effet placebo médical au sens strict ;
+- la vérité ou la fausseté de l’expérience ;
+- l’intention réelle du locuteur.
+
+Elle mesure plutôt un **risque d’auto-validation expérientielle**.
+
+---
+
+### Principe
+
+Le moteur combine une formule théorique de mécroyance expérientielle avec une formule heuristique fondée sur les autres jauges déjà calculées.
+
+Les facteurs qui augmentent l’indice sont :
+
+- certitude forte ;
+- clôture cognitive ;
+- prémisses implicites ;
+- cohérence trompeuse ;
+- causalité simplifiée ;
+- surdétermination narrative.
+
+Les facteurs qui le réduisent sont :
+
+- reconnaissance des limites ;
+- révisabilité ;
+- ancrage au réel ;
+- contre-arguments ;
+- précision.
+
+---
+
+### Formule utilisée
+
+```python
+M_placebo = (N + 2D) - G
+
+EP_heuristique = (
+    CF + CC + PI + CT + SC + ND
+) - (
+    LM + RV + AR + CA + PX
+)
+
+score_theorique = max(0.0, min(M_placebo / 20, 1.0))
+
+score_heuristique = max(0.0, min(EP_heuristique / 10, 1.0))
+
+score = (score_theorique * 0.60) + (score_heuristique * 0.40)
+
     
 st.markdown("""
 <div style="text-align:center; margin:25px 0; color:#888;">
