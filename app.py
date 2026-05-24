@@ -12416,11 +12416,6 @@ st.write(
 # Fermeture cognitive
 # -----------------------------
 st.markdown("### Fermeture cognitive")
-
-# -----------------------------
-# Fermeture cognitive
-# -----------------------------
-st.markdown("### Fermeture cognitive")
 st.caption("Excès de certitude par rapport au savoir et à la compréhension.")
 
 value = min(result["drift_mecroyance"] / 10, 1.0)
