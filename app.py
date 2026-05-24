@@ -7190,56 +7190,102 @@ def compute_baratinage_score(result):
 # -----------------------------
 # Effet placebo étendu
 # -----------------------------
-def compute_extended_placebo_effect(N: float, D: float, G: float):
+def compute_extended_placebo_effect(result):
     """
     Effet placebo étendu :
-    mesure le risque qu'une expérience vécue (N), renforcée par
-    une forte certitude (D), produise une conviction auto-validée
-    que le savoir articulé disponible (G) ne suffit plus à corriger.
+    mesure le risque qu'une expérience vécue ou ressentie
+    devienne une preuve auto-validante.
 
-    Formule :
+    Formule théorique :
     M_placebo = (N + 2D) - G
+
+    Formule heuristique :
+    augmente avec les scores liés à l'expérience, à la certitude,
+    à la causalité simplifiée et à la clôture cognitive ;
+    diminue avec les limites, la révisabilité, l'ancrage au réel
+    et les contre-arguments.
     """
 
-    raw_score = (N + (2 * D)) - G
+    # Variables théoriques
+    N = result.get("N", 0)
+    D = result.get("D", 0)
+    G = result.get("G", 0)
 
-    # Normalisation prudente sur 0..20
-    score = max(0.0, min(20.0, raw_score))
-    normalized = score / 20
+    theoretical_raw = (N + (2 * D)) - G
+    theoretical_score = max(0.0, min(1.0, theoretical_raw / 20))
 
-    if normalized < 0.25:
+    # Facteurs augmentant l'effet placebo étendu
+    CF = result.get("strong_certainty_score", 0)
+    CC = result.get("cognitive_closure_score", 0)
+    PI = result.get("implicit_premise_score", 0)
+    CT = result.get("coherence_trap_score", 0)
+    SC = result.get("simplified_causality_score", 0)
+    ND = result.get("narrative_overdetermination_score", 0)
+
+    # Facteurs réduisant l'effet placebo étendu
+    LM = result.get("limits_score", 0)
+    RV = result.get("revisability_score", 0)
+    AR = result.get("reality_anchor_score", 0)
+    CA = result.get("counter_argument_score", 0)
+    PX = result.get("precision_score", 0)
+
+    heuristic_raw = (
+        CF
+        + CC
+        + PI
+        + CT
+        + SC
+        + ND
+    ) - (
+        LM
+        + RV
+        + AR
+        + CA
+        + PX
+    )
+
+    heuristic_score = max(0.0, min(1.0, heuristic_raw / 10))
+
+    # Fusion : 60 % formule théorique, 40 % heuristique
+    final_score = max(
+        0.0,
+        min(1.0, (theoretical_score * 0.60) + (heuristic_score * 0.40))
+    )
+
+    if final_score < 0.25:
         label = "Faible"
         color = "#16a34a"
         interpretation = (
-            "L'expérience vécue ne semble pas produire de conviction auto-validée excessive."
+            "Le discours ne semble pas transformer fortement l'expérience vécue en preuve auto-validante."
         )
-    elif normalized < 0.50:
+    elif final_score < 0.50:
         label = "Modéré"
         color = "#ca8a04"
         interpretation = (
-            "Le discours peut transformer partiellement une expérience vécue en preuve subjective."
+            "Le discours présente une tendance limitée à valider une croyance par l'expérience ressentie."
         )
-    elif normalized < 0.75:
+    elif final_score < 0.75:
         label = "Élevé"
         color = "#f97316"
         interpretation = (
-            "L'expérience vécue paraît fortement renforcer une certitude que le savoir disponible corrige peu."
+            "Le discours semble convertir l'expérience vécue en preuve subjective ou causale."
         )
     else:
         label = "Très élevé"
         color = "#dc2626"
         interpretation = (
-            "Le discours semble convertir l'effet vécu en preuve auto-validante, avec forte clôture interprétative."
+            "Le discours paraît transformer l'expérience ressentie en certitude auto-validée, avec faible révisabilité."
         )
 
     return {
-        "extended_placebo_raw": round(raw_score, 2),
-        "extended_placebo_score": round(normalized, 3),
+        "extended_placebo_raw": round(theoretical_raw, 2),
+        "extended_placebo_theoretical_score": round(theoretical_score, 3),
+        "extended_placebo_heuristic_score": round(heuristic_score, 3),
+        "extended_placebo_score": round(final_score, 3),
         "extended_placebo_label": label,
         "extended_placebo_color": color,
         "extended_placebo_interpretation": interpretation,
     }
-
 # -----------------------------
 # Indice d’omission stratégique
 # -----------------------------
