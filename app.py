@@ -13018,9 +13018,9 @@ Et :
 
 Modulation DOXA :
 
-- **G** = savoir articulé  
+- **G** = savoir articulé, approximé ici par le score factuel disponible  
 - **D** = certitude  
-- **N** = compréhension intégrée  
+- **N** = compréhension intégrée, approximée par l’ancrage et la révisabilité  
 
 ---
 
