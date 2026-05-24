@@ -13051,7 +13051,16 @@ score_theorique = max(0.0, min(M_placebo / 20, 1.0))
 score_heuristique = max(0.0, min(EP_heuristique / 10, 1.0))
 
 score = (score_theorique * 0.60) + (score_heuristique * 0.40)
+```
 
+Où :
+
+- **N** = expérience intégrée / vécu discursif  
+- **D** = certitude / fermeture interprétative  
+- **G** = savoir articulé  
+
+---
+""")
     
 st.markdown("""
 <div style="text-align:center; margin:25px 0; color:#888;">
