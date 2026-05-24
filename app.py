@@ -12805,6 +12805,156 @@ Un score élevé ne signifie pas que le texte est faux ou que l’auteur ment.
 
 Il indique seulement que la force perçue du discours semble davantage venir de sa forme que de sa démonstration explicite.
 """)
+
+# =============================
+# Indice d’omission stratégique
+# =============================
+
+st.subheader("Indice d’omission stratégique")
+
+st.caption(
+    "Cette jauge n’affirme pas qu’un mensonge par omission existe. "
+    "Elle estime si le discours semble sélectionner certains éléments "
+    "au détriment du contexte utile."
+)
+
+value = result.get("omission_score", 0)
+
+render_custom_gauge(
+    value,
+    result.get("omission_color", "#22c55e")
+)
+
+st.markdown(
+    f"""
+<b style='color:{result.get("omission_color", "#22c55e")}'>
+{result.get("omission_label", "Faible")}
+</b>
+— {round(value*100,1)}%
+""",
+    unsafe_allow_html=True
+)
+
+st.caption(
+    result.get(
+        "omission_interpretation",
+        "Indice d’omission stratégique non calculé."
+    )
+)
+
+st.caption(
+    "Contexte explicite ⟵⟶ Sélectivité discursive"
+)
+
+with st.popover("ℹ️ Comprendre cette jauge"):
+
+    st.markdown("""
+### Indice d’omission stratégique
+
+Cette jauge estime dans quelle mesure un discours semble **sélectionner certains éléments** tout en laissant hors champ des informations susceptibles de modifier l’interprétation globale.
+
+Elle ne mesure pas :
+- le mensonge ;
+- l’intention réelle du locuteur ;
+- la quantité absolue d’informations disponibles.
+
+Elle mesure plutôt un **risque de sélectivité discursive**.
+
+---
+
+### Principe
+
+Le moteur compare les facteurs qui augmentent l’indice :
+
+- cherry picking ;
+- données sans référentiel ;
+- prémisses implicites ;
+- asymétrie argumentative ;
+- certitude forte ;
+- clôture cognitive.
+
+Avec les facteurs qui le réduisent :
+
+- reconnaissance des limites ;
+- révisabilité ;
+- ancrage au réel ;
+- précision ;
+- présence de contre-arguments.
+
+---
+
+### Formule utilisée
+
+```python
+MO_heuristique = (
+    CP + DR + PI + AA + CF + CC
+) - (
+    LM + RV + AR + PX + CA
+)
+
+MO_doxa = (G + D) - (2 * N)
+
+MO = MO_heuristique + (MO_doxa * 0.15)
+
+score = max(0.0, min(MO / 20, 1.0))
+```
+
+Où :
+
+- **CP** = cherry picking  
+- **DR** = données sans référentiel  
+- **PI** = prémisses implicites  
+- **AA** = asymétrie argumentative  
+- **CF** = certitude forte  
+- **CC** = clôture cognitive  
+
+Et :
+
+- **LM** = reconnaissance des limites  
+- **RV** = révisabilité  
+- **AR** = ancrage au réel  
+- **PX** = précision  
+- **CA** = contre-arguments  
+
+Modulation DOXA :
+
+- **G** = savoir articulé  
+- **D** = certitude  
+- **N** = compréhension intégrée  
+
+---
+
+### Couleurs
+
+🟢 **Vert — Faible**  
+Le contexte paraît relativement complet.
+
+🟡 **Jaune — Modéré**  
+Quelques éléments semblent peu contextualisés.
+
+🟠 **Orange — Élevé**  
+Le discours paraît sélectionner certains éléments au détriment du contexte.
+
+🔴 **Rouge — Très élevé**  
+Le discours semble fortement orienté par sélection du contexte.
+
+---
+
+### Lecture
+
+🟢 **Faible** : contexte relativement complet  
+🟡 **Modéré** : éléments partiellement contextualisés  
+🟠 **Élevé** : sélection discursive notable  
+🔴 **Très élevé** : forte orientation par sélection du contexte  
+
+---
+
+### Attention
+
+Un score élevé ne prouve pas qu’une information a été volontairement cachée.
+
+Il indique seulement que le discours semble laisser hors champ des éléments pouvant modifier son interprétation.
+""")
     
 st.markdown("""
 <div style="text-align:center; margin:25px 0; color:#888;">
