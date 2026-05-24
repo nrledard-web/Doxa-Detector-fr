@@ -12921,6 +12921,7 @@ with st.popover("ℹ️ Comprendre cette jauge"):
 Cette jauge estime dans quelle mesure un discours semble **sélectionner certains éléments** tout en laissant hors champ des informations susceptibles de modifier l’interprétation globale.
 
 Elle ne mesure pas :
+
 - le mensonge ;
 - l’intention réelle du locuteur ;
 - la quantité absolue d’informations disponibles.
@@ -12935,6 +12936,7 @@ Le moteur compare les facteurs qui augmentent l’indice :
 
 - cherry picking ;
 - données sans référentiel ;
+- manipulation statistique ;
 - prémisses implicites ;
 - asymétrie argumentative ;
 - certitude forte ;
@@ -12960,7 +12962,7 @@ MO_heuristique = (
     + AA
     + CF
     + CC
-    + (MS * 0.5)
+    + (MS * 0.35)
 ) - (
     LM + RV + AR + PX + CA
 )
@@ -12969,7 +12971,7 @@ MO_doxa = (G + D) - (2 * N)
 
 MO = MO_heuristique + (MO_doxa * 0.15)
 
-score = max(0.0, min(MO / 20, 1.0))
+score = max(0.0, min(MO / 12, 1.0))
 ```
 
 Où :
