@@ -12287,36 +12287,83 @@ st.markdown(
 )
 
 with st.popover("ℹ️ Comprendre cette jauge"):
-    st.markdown("### Pseudo-savoir")
 
-    st.write(
-        "Cette jauge mesure un déséquilibre où le texte accumule du savoir apparent "
-        "ou des éléments de connaissance, mais sans compréhension suffisamment intégrée."
-    )
+    st.markdown(f"""
+### Pseudo-savoir
 
-    st.markdown("**Formule utilisée**")
-    st.code("Pseudo-savoir = max(0, (G + D) - N)")
+Cette jauge mesure un déséquilibre où le texte accumule du savoir apparent ou des éléments de connaissance, mais sans compréhension suffisamment intégrée.
 
-    st.markdown("**Avec les valeurs actuelles**")
-    st.write(
-        f"G = {result['G']:.2f} | "
-        f"D = {result['D']:.2f} | "
-        f"N = {result['N']:.2f}"
-    )
+Elle ne mesure pas :
 
-    st.code(
-        f"max(0, ({result['G']:.2f} + {result['D']:.2f}) - {result['N']:.2f}) "
-        f"= {result['drift_pseudo_savoir']:.2f}"
-    )
+- le mensonge ;
+- la vérité du texte ;
+- l’intention réelle du locuteur.
 
-    st.markdown("**Interprétation**")
-    st.write(
-        "Plus ce score est élevé, plus le texte donne une impression de savoir "
-        "sans que ce savoir soit suffisamment digéré, relié ou compris."
-    )
+Elle mesure plutôt un risque d’accumulation cognitive mal intégrée.
 
-    st.markdown("**Normalisation graphique**")
-    st.code("value = min(drift_pseudo_savoir / 10, 1.0)")
+---
+
+### Formule utilisée
+
+Pseudo-savoir = max(0, (G_drift + D) - N)
+
+Avec :
+
+- **G_drift** = savoir recalibré  
+- **D** = certitude  
+- **N** = compréhension intégrée  
+
+---
+
+### Avec les valeurs actuelles
+
+G_drift = **{result['G_drift']:.2f}**  
+D = **{result['D']:.2f}**  
+N = **{result['N']:.2f}**
+
+Calcul :
+
+max(0, ({result['G_drift']:.2f} + {result['D']:.2f}) - {result['N']:.2f}) = **{result['drift_pseudo_savoir']:.2f}**
+
+---
+
+### Couleurs
+
+🟢 **Vert — Faible**  
+Le savoir paraît suffisamment intégré.
+
+🟡 **Jaune — Modérée**  
+Le texte accumule certains éléments de savoir, mais leur intégration reste partielle.
+
+🟠 **Orange — Élevée**  
+Le discours donne une impression notable de savoir mal digéré ou insuffisamment relié.
+
+🔴 **Rouge — Très élevée**  
+Le texte semble fortement accumuler du savoir apparent sans compréhension intégrée suffisante.
+
+---
+
+### Lecture
+
+🟢 **Faible** : savoir intégré  
+🟡 **Modérée** : accumulation partiellement intégrée  
+🟠 **Élevée** : pseudo-savoir notable  
+🔴 **Très élevée** : accumulation cognitive dominante  
+
+---
+
+### Attention
+
+Un score élevé ne signifie pas que le texte est faux.
+
+Il indique seulement que le savoir affiché semble dépasser son intégration réelle dans le raisonnement.
+
+---
+
+### Normalisation graphique
+
+value = min(drift_pseudo_savoir / 10, 1.0)
+""")
 
 st.divider()
 
