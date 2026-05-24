@@ -8921,9 +8921,7 @@ def analyze_article(text: str) -> Dict:
         D_drift
     )
 
-    result["G_drift"] = round(G_drift, 3)
-    result["N_drift"] = round(N_drift, 3)
-    result["D_drift"] = round(D_drift, 3)
+
     
     st.write("DEBUG GND dérive cognitive :", {
         "G_original": round(G, 3),
