@@ -7383,7 +7383,7 @@ def compute_omission_score(result):
     score = max(0.0, min(raw / 12, 1.0))
 
     # Interprétation
-    if score < 0.25:
+    if score < 0.15:
 
         label = "Faible"
         color = "#22c55e"
