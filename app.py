@@ -12362,12 +12362,14 @@ st.markdown(
 )
 
 with st.popover("ℹ️ Comprendre cette jauge"):
-    st.markdown("""
+
+    st.markdown(f"""
 ### Intuition dogmatique
 
 Cette jauge mesure un déséquilibre où l’intuition ou la compréhension apparente s’allie à une certitude forte, mais sans base de savoir suffisamment articulée.
 
 Elle ne mesure pas :
+
 - le mensonge ;
 - la vérité du texte ;
 - l’intention réelle du locuteur.
@@ -12378,61 +12380,64 @@ Elle mesure plutôt une conviction portée par la compréhension apparente plus 
 
 ### Formule utilisée
 
-```python
 Intuition dogmatique = max(0, (N + D) - G_drift)
 
 Avec :
 
-N = compréhension intégrée
-D = certitude
-G_drift = savoir recalibré
-Avec les valeurs actuelles
+- **N** = compréhension intégrée  
+- **D** = certitude  
+- **G_drift** = savoir recalibré  
 
-""")
+---
 
-st.write(
-    f"N = {result['N']:.2f} | "
-    f"D = {result['D']:.2f} | "
-    f"G_drift = {result['G_drift']:.2f}"
-)
+### Avec les valeurs actuelles
 
-st.code(
-    f"max(0, ({result['N']:.2f} + {result['D']:.2f}) - "
-    f"{result['G_drift']:.2f}) = "
-    f"{result['drift_intuition_dogmatique']:.2f}"
-)
+N = **{result['N']:.2f}**  
+D = **{result['D']:.2f}**  
+G_drift = **{result['G_drift']:.2f}**
 
-st.markdown("""
-Couleurs
+Calcul :
 
-🟢 Vert — Faible
+max(0, ({result['N']:.2f} + {result['D']:.2f}) - {result['G_drift']:.2f}) = **{result['drift_intuition_dogmatique']:.2f}**
+
+---
+
+### Couleurs
+
+🟢 **Vert — Faible**  
 La conviction reste soutenue par une base de savoir suffisante.
 
-🟡 Jaune — Modérée
+🟡 **Jaune — Modérée**  
 Une intuition ou compréhension apparente commence à dépasser le savoir articulé.
 
-🟠 Orange — Élevée
+🟠 **Orange — Élevée**  
 Le discours semble s’appuyer fortement sur une intuition affirmée.
 
-🔴 Rouge — Très élevée
+🔴 **Rouge — Très élevée**  
 La conviction semble nettement dépasser le savoir disponible.
 
-Lecture
+---
 
-🟢 Faible : intuition contenue par le savoir
-🟡 Modérée : intuition partiellement dominante
-🟠 Élevée : intuition fortement structurante
-🔴 Très élevée : conviction dogmatique dominante
+### Lecture
 
-Attention
+🟢 **Faible** : intuition contenue par le savoir  
+🟡 **Modérée** : intuition partiellement dominante  
+🟠 **Élevée** : intuition fortement structurante  
+🔴 **Très élevée** : conviction dogmatique dominante  
+
+---
+
+### Attention
 
 Un score élevé ne signifie pas que l’intuition est fausse.
 
 Il indique seulement que la conviction semble dépasser le savoir articulé disponible.
 
-Normalisation graphique
-value = min(drift_intuition_dogmatique / 10, 1.0)
+---
 
+### Normalisation graphique
+
+value = min(drift_intuition_dogmatique / 10, 1.0)
 """)
 
 
