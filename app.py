@@ -8911,6 +8911,21 @@ def analyze_article(text: str) -> Dict:
     # -----------------------------
     M = round((G + N) - D, 1)
     drifts = compute_cognitive_drifts(G, N, D)
+    
+    
+    M = round((G + N) - D, 1)
+    drifts = compute_cognitive_drifts(G, N, D)
+
+    st.write("DEBUG GND dérive cognitive :", {
+        "G": round(G, 3),
+        "N": round(N, 3),
+        "D": round(D, 3),
+        "M": M,
+    })
+
+    st.write("DEBUG dérives cognitives :", drifts)
+
+    
 
     penalties = compute_red_flag_penalties({
         "G": G,
