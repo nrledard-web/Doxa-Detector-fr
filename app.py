@@ -7103,44 +7103,57 @@ def compute_baratinage_score(result):
 
     # Facteurs augmentant l'indice
     CF = result.get("strong_certainty_score", 0)
-    CA = result.get("coherence_trick_score", 0)
-    DA = result.get("argument_density_score", 0)
-    IR = result.get("rhetorical_intensity_score", 0)
-    AB = result.get("abstraction_score", 0)
-    CC = result.get("cognitive_closure_score", 0)
+    CE = result.get("deceptive_coherence", 0)
+    ACE = result.get("advanced_deceptive_coherence_score", 0)
+    RP = result.get("rhetorical_pressure", 0)
+    NP = result.get("narrative_pressure_score", 0)
+    PI = result.get("premise_score", 0)
+    CS = result.get("certainty_score", 0)
 
     # Facteurs réduisant l'indice
-    PR = result.get("proof_score", 0)
-    AR = result.get("reality_anchor_score", 0)
-    LM = result.get("limits_score", 0)
-    RV = result.get("revisability_score", 0)
-    PX = result.get("precision_score", 0)
-    ER = result.get("reasoning_explicitness_score", 0)
+    HF = result.get("hard_fact_score", 0) / 20
+    AR = result.get("bonus_anchor", 0)
+    RV = result.get("bonus_revisability", 0)
+    BC = result.get("bonus_coherence", 0)
+    AS = result.get("argument_support_count", 0) * 0.08
+    AN = result.get("argument_nuances_count", 0) * 0.06
 
     # -----------------------------
     # Calcul heuristique principal
     # -----------------------------
     raw_heuristic = (
-        CF + CA + DA + IR + AB + CC
+        CF
+        + CE
+        + ACE
+        + RP
+        + NP
+        + PI
+        + CS
     ) - (
-        PR + AR + LM + RV + PX + ER
+        HF
+        + AR
+        + RV
+        + BC
+        + AS
+        + AN
     )
 
     # -----------------------------
     # Modulateur DOXA léger
     # IB ≈ (G + 2D) − N
     # -----------------------------
-    G = result.get("gnosis_score", 0)
+    G = HF
 
     D = (
         result.get("strong_certainty_score", 0)
-        + result.get("cognitive_closure_score", 0)
+        + result.get("certainty_score", 0)
     ) / 2
 
     N = (
-        result.get("reality_anchor_score", 0)
-        + result.get("revisability_score", 0)
-    ) / 2
+        result.get("bonus_anchor", 0)
+        + result.get("bonus_revisability", 0)
+        + result.get("bonus_coherence", 0)
+    ) / 3
 
     doxa_baratinage = (G + (2 * D)) - N
 
@@ -7148,37 +7161,37 @@ def compute_baratinage_score(result):
     raw = raw_heuristic + (doxa_baratinage * 0.15)
 
     # Normalisation
-    score = max(0.0, min(raw / 20, 1.0))
+    score = max(0.0, min(raw / 6, 1.0))
 
     # Interprétation
     if score < 0.15:
         label = "Faible"
         color = "#22c55e"
         interpretation = (
-            "Le contexte présenté paraît relativement complet."
+            "La démonstration paraît dominer l’effet discursif."
         )
-    
+
     elif score < 0.35:
         label = "Modéré"
         color = "#eab308"
         interpretation = (
-            "Quelques éléments semblent peu contextualisés."
+            "Le discours produit une certaine impression de maîtrise, "
+            "mais celle-ci reste partiellement soutenue."
         )
-    
+
     elif score < 0.65:
         label = "Élevé"
         color = "#f97316"
         interpretation = (
-            "Le discours paraît sélectionner certains éléments "
-            "au détriment du contexte."
+            "L’impression de maîtrise semble dépasser la démonstration visible."
         )
-    
+
     else:
         label = "Très élevé"
         color = "#dc2626"
         interpretation = (
-            "Le discours semble fortement orienté "
-            "par sélection du contexte."
+            "Le discours paraît produire une forte impression de maîtrise "
+            "mal soutenue par la démonstration explicite."
         )
 
     return {
