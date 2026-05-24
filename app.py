@@ -7151,30 +7151,34 @@ def compute_baratinage_score(result):
     score = max(0.0, min(raw / 20, 1.0))
 
     # Interprétation
-    if score < 0.25:
+    if score < 0.15:
         label = "Faible"
         color = "#22c55e"
-        interpretation = "La démonstration paraît dominer l’effet discursif."
-
-    elif score < 0.50:
+        interpretation = (
+            "Le contexte présenté paraît relativement complet."
+        )
+    
+    elif score < 0.35:
         label = "Modéré"
         color = "#eab308"
-        interpretation = "La rhétorique est présente mais reste contenue."
-
-    elif score < 0.75:
+        interpretation = (
+            "Quelques éléments semblent peu contextualisés."
+        )
+    
+    elif score < 0.65:
         label = "Élevé"
         color = "#f97316"
         interpretation = (
-            "L’impression de maîtrise semble dépasser partiellement "
-            "la démonstration explicite."
+            "Le discours paraît sélectionner certains éléments "
+            "au détriment du contexte."
         )
-
+    
     else:
         label = "Très élevé"
         color = "#dc2626"
         interpretation = (
-            "L’impression de maîtrise semble nettement supérieure "
-            "à la démonstration visible."
+            "Le discours semble fortement orienté "
+            "par sélection du contexte."
         )
 
     return {
