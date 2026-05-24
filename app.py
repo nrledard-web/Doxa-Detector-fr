@@ -7527,6 +7527,34 @@ def compute_doxa_brain(result: dict) -> dict:
         "brain_summary": None
     }
 
+# -----------------------------
+# DEBUG global des jauges
+# -----------------------------
+DEBUG_DOXA = True
+
+if DEBUG_DOXA:
+
+    debug_scores = {
+        k: v
+        for k, v in sorted(result.items())
+        if (
+            isinstance(v, (int, float))
+            and (
+                "score" in k.lower()
+                or "gauge" in k.lower()
+                or "penalty" in k.lower()
+            )
+        )
+    }
+
+    st.write(
+        "DEBUG — Scores réellement présents :",
+        debug_scores
+    )
+
+# -----------------------------
+# Pénalités mécroyance
+# -----------------------------
 def compute_mecroyance_penalties(result: dict) -> dict:
     penalty = 0.0
     lie_boost = 0.0
