@@ -9484,7 +9484,7 @@ def analyze_article(text: str) -> Dict:
             "G": result.get("gnosis_score"),
         }
     )
-    
+    st.write("TOUTES LES CLÉS RESULT :", sorted(result.keys()))
     # -----------------------------
     # Indice d’omission stratégique
     # -----------------------------
