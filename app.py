@@ -7355,7 +7355,10 @@ def compute_omission_score(result):
     # MO ≈ (G + D) − 2N
     # -----------------------------
 
-    G = result.get("gnosis_score", 0)
+    G = (
+        result.get("hard_fact_score", 0)
+        + AR
+    ) / 2
 
     D = (
         result.get("strong_certainty_score", 0)
