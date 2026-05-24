@@ -7244,6 +7244,11 @@ def compute_extended_placebo_effect(N: float, D: float, G: float):
 # Indice d’omission stratégique
 # -----------------------------
 def compute_omission_score(result):
+    """
+    Estime dans quelle mesure le discours semble
+    sélectionner certains éléments au détriment
+    du contexte utile à l’interprétation.
+    """
 
     # Facteurs augmentant l'indice
     CP = result.get("cherry_picking_score", 0)
@@ -7260,7 +7265,10 @@ def compute_omission_score(result):
     PX = result.get("precision_score", 0)
     CA = result.get("counter_argument_score", 0)
 
-    raw = (
+    # -----------------------------
+    # Calcul heuristique principal
+    # -----------------------------
+    raw_heuristic = (
         CP
         + DR
         + PI
@@ -7275,8 +7283,32 @@ def compute_omission_score(result):
         + CA
     )
 
+    # -----------------------------
+    # Modulateur DOXA léger
+    # MO ≈ (G + D) − 2N
+    # -----------------------------
+
+    G = result.get("gnosis_score", 0)
+
+    D = (
+        result.get("strong_certainty_score", 0)
+        + result.get("cognitive_closure_score", 0)
+    ) / 2
+
+    N = (
+        result.get("reality_anchor_score", 0)
+        + result.get("revisability_score", 0)
+    ) / 2
+
+    doxa_omission = (G + D) - (2 * N)
+
+    # Poids volontairement faible
+    raw = raw_heuristic + (doxa_omission * 0.15)
+
+    # Normalisation
     score = max(0.0, min(raw / 20, 1.0))
 
+    # Interprétation
     if score < 0.25:
 
         label = "Faible"
@@ -7317,6 +7349,9 @@ def compute_omission_score(result):
 
     return {
         "omission_score": round(score, 3),
+        "omission_raw": round(raw, 3),
+        "omission_raw_heuristic": round(raw_heuristic, 3),
+        "omission_doxa_modulator": round(doxa_omission, 3),
         "omission_label": label,
         "omission_color": color,
         "omission_interpretation": interpretation,
