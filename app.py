@@ -12981,7 +12981,8 @@ Où :
 - **PI** = prémisses implicites  
 - **AA** = asymétrie argumentative  
 - **CF** = certitude forte  
-- **CC** = clôture cognitive  
+- **CC** = clôture cognitive
+- **MS** = manipulation statistique
 
 Et :
 
@@ -13017,10 +13018,10 @@ Le discours semble fortement orienté par sélection du contexte.
 
 ### Lecture
 
-🟢 **Faible** : contexte relativement complet  
-🟡 **Modéré** : éléments partiellement contextualisés  
-🟠 **Élevé** : sélection discursive notable  
-🔴 **Très élevé** : forte orientation par sélection du contexte  
+🟢 **Faible (0–14.9%)** : contexte relativement complet  
+🟡 **Modéré (15–34.9%)** : éléments partiellement contextualisés  
+🟠 **Élevé (35–64.9%)** : sélection discursive notable  
+🔴 **Très élevé (65–100%)** : forte orientation par sélection du contexte
 
 ---
 
