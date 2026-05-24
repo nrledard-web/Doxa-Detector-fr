@@ -9462,6 +9462,12 @@ def analyze_article(text: str) -> Dict:
     result.update(omission)
 
     # -----------------------------
+    # Effet placebo étendu
+    # -----------------------------
+    placebo = compute_extended_placebo_effect(result)
+    result.update(placebo)
+
+    # -----------------------------
     # Cerveau DOXA
     # -----------------------------
     # brain_indices = compute_brain_indices(result)
