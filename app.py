@@ -12690,11 +12690,15 @@ Avec les facteurs qui le réduisent :
 ### Formule utilisée
 
 ```python
-IB = (
+IB_heuristique = (
     CF + CA + DA + IR + AB + CC
 ) - (
     PR + AR + LM + RV + PX + ER
 )
+
+IB_doxa = (G + 2D) - N
+
+IB = IB_heuristique + (IB_doxa * 0.15)
 
 score = max(0.0, min(IB / 20, 1.0))
 
