@@ -7209,89 +7209,155 @@ def compute_baratinage_score(result):
 # -----------------------------
 def compute_extended_placebo_effect(result):
     """
-    Effet placebo étendu :
-    mesure le risque qu'une expérience vécue ou ressentie
-    devienne une preuve auto-validante.
-
-    Formule théorique :
-    M_placebo = (N + 2D) - G
-
-    Formule heuristique :
-    augmente avec les scores liés à l'expérience, à la certitude,
-    à la causalité simplifiée et à la clôture cognitive ;
-    diminue avec les limites, la révisabilité, l'ancrage au réel
-    et les contre-arguments.
+    Mesure dans quelle mesure un vécu,
+    une impression ou une cohérence perçue
+    devient une preuve auto-validante.
     """
 
+    # -----------------------------
     # Variables théoriques
-    N = result.get("N", 0)
-    D = result.get("D", 0)
-    G = result.get("G", 0)
+    # M = (N + 2D) - G
+    # -----------------------------
+
+    G = result.get("hard_fact_score", 0) / 20
+
+    D = (
+        result.get("strong_certainty_score", 0)
+        + result.get("certainty_score", 0)
+    ) / 2
+
+    N = (
+        result.get("bonus_anchor", 0)
+        + result.get("bonus_coherence", 0)
+        + result.get("bonus_revisability", 0)
+    ) / 3
 
     theoretical_raw = (N + (2 * D)) - G
-    theoretical_score = max(0.0, min(1.0, theoretical_raw / 20))
 
-    # Facteurs augmentant l'effet placebo étendu
+    theoretical_score = max(
+        0.0,
+        min(1.0, theoretical_raw)
+    )
+
+    # -----------------------------
+    # Facteurs augmentant
+    # -----------------------------
+
     CF = result.get("strong_certainty_score", 0)
-    CC = result.get("cognitive_closure_score", 0)
-    PI = result.get("implicit_premise_score", 0)
-    CT = result.get("coherence_trap_score", 0)
-    SC = result.get("simplified_causality_score", 0)
-    ND = result.get("narrative_overdetermination_score", 0)
 
-    # Facteurs réduisant l'effet placebo étendu
-    LM = result.get("limits_score", 0)
-    RV = result.get("revisability_score", 0)
-    AR = result.get("reality_anchor_score", 0)
-    CA = result.get("counter_argument_score", 0)
-    PX = result.get("precision_score", 0)
+    PI = result.get("premise_score", 0)
+
+    CT = result.get("deceptive_coherence", 0)
+
+    ACT = result.get(
+        "advanced_deceptive_coherence_score",
+        0
+    )
+
+    SC = max(
+        result.get("causal_overreach_score", 0),
+        result.get("false_causality_basic_score", 0)
+    )
+
+    ND = (
+        result.get("narrative_overdetermination_score", 0)
+        + result.get("narrative_pressure_score", 0)
+    ) / 2
+
+    # -----------------------------
+    # Facteurs réduisant
+    # -----------------------------
+
+    AR = result.get("bonus_anchor", 0)
+
+    RV = result.get("bonus_revisability", 0)
+
+    BC = result.get("bonus_coherence", 0)
+
+    CA = (
+        result.get("argument_counterweight_count", 0)
+        * 0.08
+    )
+
+    HF = result.get("hard_fact_score", 0) / 20
 
     heuristic_raw = (
         CF
-        + CC
         + PI
         + CT
+        + ACT
         + SC
         + ND
     ) - (
-        LM
+        AR
         + RV
-        + AR
+        + BC
         + CA
-        + PX
+        + HF
     )
 
-    heuristic_score = max(0.0, min(1.0, heuristic_raw / 10))
+    heuristic_score = max(
+        0.0,
+        min(1.0, heuristic_raw / 4)
+    )
 
-    # Fusion : 60 % formule théorique, 40 % heuristique
+    # -----------------------------
+    # Fusion
+    # -----------------------------
+
+    final_score = (
+        (theoretical_score * 0.60)
+        +
+        (heuristic_score * 0.40)
+    )
+
     final_score = max(
         0.0,
-        min(1.0, (theoretical_score * 0.60) + (heuristic_score * 0.40))
+        min(1.0, final_score)
     )
 
+    # -----------------------------
+    # Interprétation
+    # -----------------------------
+
     if final_score < 0.25:
+
         label = "Faible"
         color = "#16a34a"
+
         interpretation = (
-            "Le discours ne semble pas transformer fortement l'expérience vécue en preuve auto-validante."
+            "Le discours ne semble pas transformer fortement "
+            "le vécu en preuve auto-validante."
         )
+
     elif final_score < 0.50:
+
         label = "Modéré"
         color = "#ca8a04"
+
         interpretation = (
-            "Le discours présente une tendance limitée à valider une croyance par l'expérience ressentie."
+            "Le discours présente une tendance limitée "
+            "à valider une croyance par le ressenti."
         )
+
     elif final_score < 0.75:
+
         label = "Élevé"
         color = "#f97316"
+
         interpretation = (
-            "Le discours semble convertir l'expérience vécue en preuve subjective ou causale."
+            "Le discours semble convertir "
+            "l'expérience en preuve subjective."
         )
+
     else:
+
         label = "Très élevé"
         color = "#dc2626"
+
         interpretation = (
-            "Le discours paraît transformer l'expérience ressentie en certitude auto-validée, avec faible révisabilité."
+            "Le discours paraît transformer "
+            "le ressenti en certitude auto-validée."
         )
 
     return {
