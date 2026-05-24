@@ -7354,7 +7354,7 @@ def compute_omission_score(result):
     raw = raw_heuristic + (doxa_omission * 0.15)
 
     # Normalisation
-    score = max(0.0, min(raw / 20, 1.0))
+    score = max(0.0, min(raw / 12, 1.0))
 
     # Interprétation
     if score < 0.25:
