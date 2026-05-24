@@ -6762,6 +6762,25 @@ def compute_red_flag_penalties(metrics: dict) -> dict:
         "lie_boost": round(min(lie_boost, 6.0), 2),
     }
 
+
+
+st.write("DEBUG GND dérive cognitive :", {
+    "G": G,
+    "N": N,
+    "D": D,
+})
+cognitive_drifts = compute_cognitive_drifts(G, N, D)
+result.update(cognitive_drifts)
+
+st.write("DEBUG dérives cognitives :", {
+    "drift_mecroyance": result.get("drift_mecroyance"),
+    "drift_pseudo_savoir": result.get("drift_pseudo_savoir"),
+    "drift_intuition_dogmatique": result.get("drift_intuition_dogmatique"),
+    "global_cognitive_drift": result.get("global_cognitive_drift"),
+})
+# -----------------------------
+# compute cognitive drifts
+# -----------------------------
 def compute_cognitive_drifts(G, N, D):
     M = (G + N) - D
 
