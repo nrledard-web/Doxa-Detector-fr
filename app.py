@@ -6769,7 +6769,16 @@ st.write("DEBUG GND dérive cognitive :", {
     "N": N,
     "D": D,
 })
-
+st.write("DEBUG GND dérive cognitive :", {
+    "G_direct": result.get("G"),
+    "N_direct": result.get("N"),
+    "D_direct": result.get("D"),
+    "hard_fact_score": result.get("hard_fact_score"),
+    "bonus_anchor": result.get("bonus_anchor"),
+    "bonus_revisability": result.get("bonus_revisability"),
+    "strong_certainty_score": result.get("strong_certainty_score"),
+    "certainty_score": result.get("certainty_score"),
+})
 # -----------------------------
 # compute cognitive drifts
 # -----------------------------
@@ -6816,18 +6825,6 @@ def compute_cognitive_drifts(G, N, D):
         "global_cognitive_drift": global_drift,
         "cognitive_drift_interpretation": interpretation,
     }
-
-
-cognitive_drifts = compute_cognitive_drifts(G, N, D)
-result.update(cognitive_drifts)
-
-st.write("DEBUG dérives cognitives :", {
-    "drift_mecroyance": result.get("drift_mecroyance"),
-    "drift_pseudo_savoir": result.get("drift_pseudo_savoir"),
-    "drift_intuition_dogmatique": result.get("drift_intuition_dogmatique"),
-    "global_cognitive_drift": result.get("global_cognitive_drift"),
-})
-
 
 
 def classify_cognitive_regime(result: dict) -> dict:
