@@ -9485,7 +9485,64 @@ def analyze_article(text: str) -> Dict:
     
     bonus = compute_cognitive_bonus(result)
     result.update(bonus)
-    
+
+    # -----------------------------
+    # DEBUG baratinage
+    # -----------------------------
+    DEBUG_BARATINAGE = True
+
+    if DEBUG_BARATINAGE:
+
+        st.write(
+            "CLÉS utiles baratinage :",
+            [k for k in sorted(result.keys()) if any(x in k.lower() for x in [
+                "certainty",
+                "coherence",
+                "rhetorical",
+                "premise",
+                "anchor",
+                "revis",
+                "density",
+                "argument",
+                "demonstr",
+                "pressure",
+                "normative",
+                "emotional",
+                "propaganda",
+                "fact",
+                "precision",
+                "semantic",
+                "baratin",
+                "discursive",
+            ])]
+        )
+
+        st.write(
+            "DEBUG baratinage :",
+            {
+                k: v
+                for k, v in sorted(result.items())
+                if (
+                    isinstance(v, (int, float))
+                    and any(x in k.lower() for x in [
+                        "certainty",
+                        "coherence",
+                        "rhetorical",
+                        "premise",
+                        "anchor",
+                        "revis",
+                        "density",
+                        "argument",
+                        "pressure",
+                        "fact",
+                        "precision",
+                        "semantic",
+                        "discursive",
+                    ])
+                )
+            }
+        )
+
     # -----------------------------
     # Indice de baratinage
     # -----------------------------
