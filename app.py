@@ -13218,54 +13218,58 @@ Elle mesure plutôt un **risque d’auto-validation expérientielle**.
 
 ### Principe
 
-Le moteur combine une formule théorique de mécroyance expérientielle avec une formule heuristique fondée sur les autres jauges déjà calculées.
+Le moteur combine :
+
+- une formule théorique de mécroyance expérientielle ;
+- une formule heuristique ;
+- un garde-fou d’expérience auto-validante (**EX**).
 
 Les facteurs qui augmentent l’indice sont :
 
 - certitude forte ;
-- clôture cognitive ;
 - prémisses implicites ;
 - cohérence trompeuse ;
-- causalité simplifiée ;
-- surdétermination narrative.
+- cohérence trompeuse avancée ;
+- causalité abusive ;
+- pression ou surdétermination narrative.
 
 Les facteurs qui le réduisent sont :
 
-- reconnaissance des limites ;
-- révisabilité ;
 - ancrage au réel ;
+- révisabilité ;
+- bonus de cohérence ;
 - contre-arguments ;
-- précision.
+- score factuel disponible.
 
 ---
 
 ### Formule utilisée
 
 ```python
-M_placebo = (N + 2D) - G
-
-EP_heuristique = (
-    CF + CC + PI + CT + SC + ND
-) - (
-    LM + RV + AR + CA + PX
+EX = max(
+    surinterpretation_factuelle,
+    auto_validation_narrative,
+    fausse_causalite,
+    causalite_abusive
 )
 
-score_theorique = max(0.0, min(M_placebo / 20, 1.0))
+M_placebo = ((N + 2D) - G) * EX
 
-score_heuristique = max(0.0, min(EP_heuristique / 10, 1.0))
+EP_heuristique = (
+    CF + PI + CT + ACT + SC + ND
+) - (
+    AR + RV + BC + CA + HF
+)
+
+score_theorique = max(0.0, min(M_placebo, 1.0))
+
+score_heuristique = max(
+    0.0,
+    min((EP_heuristique / 4) * max(EX, 0.25), 1.0)
+)
 
 score = (score_theorique * 0.60) + (score_heuristique * 0.40)
-```
 
-Où :
-
-- **N** = expérience intégrée / vécu discursif  
-- **D** = certitude / fermeture interprétative  
-- **G** = savoir articulé  
-
----
-""")
-    
 st.markdown("""
 <div style="text-align:center; margin:25px 0; color:#888;">
 ────────── ✦ ──────────
