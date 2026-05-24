@@ -9493,45 +9493,6 @@ def analyze_article(text: str) -> Dict:
     result.update(baratinage)
     
     # -----------------------------
-    # DEBUG omission
-    # -----------------------------
-    st.write(
-        "DEBUG clés omission :",
-        {
-            "CP": result.get("cherry_picking_score"),
-            "DR": result.get("data_without_reference_score"),
-            "PI": result.get("implicit_premise_score"),
-            "AA": result.get("argument_asymmetry_score"),
-            "CF": result.get("strong_certainty_score"),
-            "CC": result.get("cognitive_closure_score"),
-            "MS": result.get("statistical_manipulation_score"),
-            "LM": result.get("limits_score"),
-            "RV": result.get("revisability_score"),
-            "AR": result.get("reality_anchor_score"),
-            "PX": result.get("precision_score"),
-            "CA": result.get("counter_argument_score"),
-            "G": result.get("gnosis_score"),
-        }
-    )
-    st.write(
-    "CLÉS utiles omission :",
-    [k for k in sorted(result.keys()) if any(x in k.lower() for x in [
-        "data",
-        "reference",
-        "premise",
-        "closure",
-        "limit",
-        "revis",
-        "reality",
-        "anchor",
-        "precision",
-        "counter",
-        "gnosis",
-        "stat",
-        "certainty",
-    ])]
-)
-    # -----------------------------
     # Indice d’omission stratégique
     # -----------------------------
     omission = compute_omission_score(result)
@@ -9542,27 +9503,6 @@ def analyze_article(text: str) -> Dict:
     # -----------------------------
     placebo = compute_extended_placebo_effect(result)
     result.update(placebo)
-
-    # -----------------------------
-    # DEBUG global des jauges
-    # -----------------------------
-    DEBUG_DOXA = True
-
-    if DEBUG_DOXA:
-        debug_scores = {
-            k: v
-            for k, v in sorted(result.items())
-            if (
-                isinstance(v, (int, float))
-                and (
-                    "score" in k.lower()
-                    or "gauge" in k.lower()
-                    or "penalty" in k.lower()
-                )
-            )
-        }
-
-        st.write("DEBUG — Scores réellement présents :", debug_scores)
 
     # -----------------------------
     # Cerveau DOXA
