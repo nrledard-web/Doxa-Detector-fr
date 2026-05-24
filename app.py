@@ -8907,10 +8907,8 @@ def analyze_article(text: str) -> Dict:
     D = clamp(D_raw * 10, 0, 10)
 
     # -----------------------------
-    # Indices dérivés
+    # Indices dérivés recalibrés
     # -----------------------------
-    # Harmonisation des échelles
-    
     G_drift = G * 0.5
     N_drift = N
     D_drift = D
@@ -8923,17 +8921,14 @@ def analyze_article(text: str) -> Dict:
         D_drift
     )
     
-    
-    M = round((G + N) - D, 1)
-    drifts = compute_cognitive_drifts(G, N, D)
-
     st.write("DEBUG GND dérive cognitive :", {
-        "G": round(G, 3),
-        "N": round(N, 3),
-        "D": round(D, 3),
-        "M": M,
+        "G_original": round(G, 3),
+        "G_drift": round(G_drift, 3),
+        "N_drift": round(N_drift, 3),
+        "D_drift": round(D_drift, 3),
+        "M_recalibré": M,
     })
-
+    
     st.write("DEBUG dérives cognitives :", drifts)
 
     
