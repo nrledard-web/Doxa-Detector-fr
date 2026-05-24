@@ -8920,21 +8920,7 @@ def analyze_article(text: str) -> Dict:
         N_drift,
         D_drift
     )
-
-
     
-    st.write("DEBUG GND dérive cognitive :", {
-        "G_original": round(G, 3),
-        "G_drift": round(G_drift, 3),
-        "N_drift": round(N_drift, 3),
-        "D_drift": round(D_drift, 3),
-        "M_recalibré": M,
-    })
-    
-    st.write("DEBUG dérives cognitives :", drifts)
-
-    
-
     penalties = compute_red_flag_penalties({
         "G": G,
         "certainty_score": certainty_analysis[0],
