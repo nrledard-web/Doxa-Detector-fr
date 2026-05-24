@@ -7303,6 +7303,7 @@ def compute_omission_score(result):
     AA = result.get("argument_asymmetry_score", 0)
     CF = result.get("strong_certainty_score", 0)
     CC = result.get("cognitive_closure_score", 0)
+    MS = result.get("statistical_manipulation_score", 0)
 
     # Facteurs réduisant l'indice
     LM = result.get("limits_score", 0)
@@ -7311,16 +7312,17 @@ def compute_omission_score(result):
     PX = result.get("precision_score", 0)
     CA = result.get("counter_argument_score", 0)
 
-    # -----------------------------
-    # Calcul heuristique principal
-    # -----------------------------
+# -----------------------------
+# Calcul heuristique principal
+# -----------------------------
     raw_heuristic = (
         CP
-        + DR
+        + (DR * 1.5)
         + PI
         + AA
         + CF
         + CC
+        + (MS * 0.35)
     ) - (
         LM
         + RV
