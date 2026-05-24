@@ -9454,7 +9454,13 @@ def analyze_article(text: str) -> Dict:
     
     bonus = compute_cognitive_bonus(result)
     result.update(bonus)
-
+    
+    # -----------------------------
+    # Indice de baratinage
+    # -----------------------------
+    baratinage = compute_baratinage_score(result)
+    result.update(baratinage)
+    
     # -----------------------------
     # Indice d’omission stratégique
     # -----------------------------
@@ -9506,11 +9512,6 @@ def analyze_article(text: str) -> Dict:
         total_credibility_penalty + display_gauge_penalty,
         2
     )
-    # -----------------------------
-    # Indice de baratinage
-    # -----------------------------
-    baratinage = compute_baratinage_score(result)
-    result.update(baratinage)
     
     # -----------------------------
     # Pénalités finales
