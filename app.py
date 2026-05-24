@@ -9537,6 +9537,11 @@ def analyze_article(text: str) -> Dict:
         "drift_mecroyance": drifts["drift_mecroyance"],
         "drift_pseudo_savoir": drifts["drift_pseudo_savoir"],
         "drift_intuition_dogmatique": drifts["drift_intuition_dogmatique"],
+
+        "G_drift": round(G_drift, 3),
+        "N_drift": round(N_drift, 3),
+        "D_drift": round(D_drift, 3),
+        
         "global_cognitive_drift": drifts["global_cognitive_drift"],
         "cognitive_drift_interpretation": drifts["cognitive_drift_interpretation"],
 
