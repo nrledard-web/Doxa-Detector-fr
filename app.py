@@ -12481,62 +12481,13 @@ with st.popover("ℹ️ Comprendre cette jauge", use_container_width=True):
         "entre savoir, compréhension et certitude."
     )
 
-    ### Formule fondatrice
-    
-    Forme théorique :
-    
-    M = (G + N) - D
-    
-    Forme utilisée ici :
-    
-    M = (G_drift + N) - D
-    
-    avec :
-    
-    G_drift = G × 0.5
-    
-    afin d’éviter qu’un savoir fortement présent domine mécaniquement les autres dimensions.
+    st.markdown("""
+**Formule fondatrice**
 
-    st.markdown("**Dérives utilisées**")
+Forme théorique :
 
-    st.code("Fermeture cognitive = max(0, -M)")
-    st.code("Pseudo-savoir = max(0, (G + D) - N)")
-    st.code("Intuition dogmatique = max(0, (N + D) - G)")
-
-    st.markdown("**Formule de synthèse**")
-    st.code(
-        "dominant_value = max(fermeture, pseudo_savoir, intuition)\n"
-        "average_value = (fermeture + pseudo_savoir + intuition) / 3\n"
-        "global_drift = dominant_value * 0.6 + average_value * 0.4"
-    )
-
-    st.markdown("**Valeurs actuelles**")
-    st.write(
-        f"Fermeture cognitive = {result['drift_mecroyance']:.2f} | "
-        f"Pseudo-savoir = {result['drift_pseudo_savoir']:.2f} | "
-        f"Intuition dogmatique = {result['drift_intuition_dogmatique']:.2f}"
-    )
-
-    st.code(
-        f"dominant_value = {max(result['drift_mecroyance'], result['drift_pseudo_savoir'], result['drift_intuition_dogmatique']):.2f}\n"
-        f"average_value = {((result['drift_mecroyance'] + result['drift_pseudo_savoir'] + result['drift_intuition_dogmatique']) / 3):.2f}\n"
-        f"global_drift = {global_score:.2f}"
-    )
-
-    st.markdown("**Résultat actuel**")
-    st.write(f"Score : **{global_score:.2f}**")
-    st.write(f"Niveau : **{global_label}**")
-    st.write(result["cognitive_drift_interpretation"])
-
-    st.markdown("**Lecture**")
-    st.write(
-        "Plus l’indice est élevé, plus une dérive cognitive domine la structure du texte. "
-        "Le poids de 60 % donné à la dérive dominante évite qu’un signal fort soit noyé "
-        "par deux signaux faibles."
-    )
-
-    st.markdown("**Échelle**")
-    st.write("🟢 Faible < 1.5 | 🟡 Modérée < 3.5 | 🟠 Élevée < 6 | 🔴 Très élevée ≥ 6")
+```text
+M = (G + N) - D
 
 st.markdown("""
 <div style="text-align:center; margin:25px 0; color:#888;">
