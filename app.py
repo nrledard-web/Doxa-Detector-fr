@@ -13261,14 +13261,66 @@ EP_heuristique = (
     AR + RV + BC + CA + HF
 )
 
-score_theorique = max(0.0, min(M_placebo, 1.0))
-
-score_heuristique = max(
-    0.0,
-    min((EP_heuristique / 4) * max(EX, 0.25), 1.0)
-)
-
 score = (score_theorique * 0.60) + (score_heuristique * 0.40)
+```
+
+Où :
+
+- **EX** = expérience auto-validante / surinterprétation vécue  
+- **N** = expérience intégrée, approximée par l’ancrage, la cohérence et la révisabilité  
+- **D** = certitude  
+- **G** = savoir articulé, approximé par le score factuel disponible  
+
+Et :
+
+- **CF** = certitude forte  
+- **PI** = prémisses implicites  
+- **CT** = cohérence trompeuse  
+- **ACT** = cohérence trompeuse avancée  
+- **SC** = causalité simplifiée / abusive  
+- **ND** = pression ou surdétermination narrative  
+
+Facteurs correcteurs :
+
+- **AR** = ancrage au réel  
+- **RV** = révisabilité  
+- **BC** = bonus de cohérence  
+- **CA** = contre-arguments  
+- **HF** = score factuel disponible  
+
+---
+
+### Couleurs
+
+🟢 **Vert — Faible**  
+L’expérience reste prudente et ne devient pas une preuve suffisante.
+
+🟡 **Jaune — Modéré**  
+Le vécu commence à soutenir la conviction.
+
+🟠 **Orange — Élevé**  
+Le ressenti sert fortement de validation subjective.
+
+🔴 **Rouge — Très élevé**  
+L’expérience semble devenir une preuve auto-validée peu révisable.
+
+---
+
+### Lecture
+
+🟢 **Faible** : expérience prudente  
+🟡 **Modéré** : validation partielle par le ressenti  
+🟠 **Élevé** : vécu fortement utilisé comme preuve  
+🔴 **Très élevé** : certitude auto-validée par l’expérience  
+
+---
+
+### Attention
+
+Un score élevé ne signifie pas que l’expérience est fausse.
+
+Il indique seulement que le discours semble attribuer au vécu une valeur démonstrative supérieure au savoir disponible.
+""")
 
 st.markdown("""
 <div style="text-align:center; margin:25px 0; color:#888;">
