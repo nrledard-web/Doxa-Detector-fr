@@ -8909,8 +8909,19 @@ def analyze_article(text: str) -> Dict:
     # -----------------------------
     # Indices dérivés
     # -----------------------------
-    M = round((G + N) - D, 1)
-    drifts = compute_cognitive_drifts(G, N, D)
+    # Harmonisation des échelles
+    
+    G_drift = G * 0.5
+    N_drift = N
+    D_drift = D
+    
+    M = round((G_drift + N_drift) - D_drift, 1)
+    
+    drifts = compute_cognitive_drifts(
+        G_drift,
+        N_drift,
+        D_drift
+    )
     
     
     M = round((G + N) - D, 1)
