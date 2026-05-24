@@ -7301,7 +7301,7 @@ def compute_extended_placebo_effect(result):
 
     heuristic_score = max(
         0.0,
-        min(1.0, heuristic_raw / 4)
+        min(1.0, (heuristic_raw / 4) * max(EX, 0.25))
     )
 
     # -----------------------------
