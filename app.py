@@ -12523,7 +12523,7 @@ with st.popover("ℹ️ Comprendre cette jauge", use_container_width=True):
     )
 
     st.markdown("**Échelle**")
-    st.write("🟢 Faible < 1 | 🟡 Modérée < 3 | 🟠 Élevée < 6 | 🔴 Très élevée ≥ 6")
+    st.write("🟢 Faible < 1.5 | 🟡 Modérée < 3.5 | 🟠 Élevée < 6 | 🔴 Très élevée ≥ 6")
 
 st.markdown("""
 <div style="text-align:center; margin:25px 0; color:#888;">
