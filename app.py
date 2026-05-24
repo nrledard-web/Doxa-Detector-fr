@@ -9464,53 +9464,30 @@ def analyze_article(text: str) -> Dict:
     result.update(baratinage)
     
     # -----------------------------
+    # DEBUG omission
+    # -----------------------------
+    st.write(
+        "DEBUG clés omission :",
+        {
+            "CP": result.get("cherry_picking_score"),
+            "DR": result.get("data_without_reference_score"),
+            "PI": result.get("implicit_premise_score"),
+            "AA": result.get("argument_asymmetry_score"),
+            "CF": result.get("strong_certainty_score"),
+            "CC": result.get("cognitive_closure_score"),
+            "MS": result.get("statistical_manipulation_score"),
+            "LM": result.get("limits_score"),
+            "RV": result.get("revisability_score"),
+            "AR": result.get("reality_anchor_score"),
+            "PX": result.get("precision_score"),
+            "CA": result.get("counter_argument_score"),
+            "G": result.get("gnosis_score"),
+        }
+    )
+    
+    # -----------------------------
     # Indice d’omission stratégique
     # -----------------------------
-    st.write("DEBUG clés omission :", {
-    CP = result.get("cherry_picking_score", 0)
-    
-    DR = result.get("data_without_reference_score",
-         result.get("missing_reference_score",
-         result.get("unreferenced_data_score", 0)))
-    
-    PI = result.get("implicit_premise_score",
-         result.get("implicit_premises_score", 0))
-    
-    AA = result.get("argument_asymmetry_score", 0)
-    
-    CF = result.get("strong_certainty_score",
-         result.get("strong_certainty_composite_score", 0))
-    
-    CC = result.get("cognitive_closure_score",
-         result.get("closure_gauge",
-         result.get("closure", 0)))
-    
-    MS = result.get("statistical_manipulation_score",
-         result.get("statistics_manipulation_score",
-         result.get("manipulation_statistique_score", 0)))
-    
-    LM = result.get("limits_score",
-         result.get("limits", 0))
-    
-    RV = result.get("revisability_score",
-         result.get("revisability",
-         result.get("R", 0)))
-    
-    AR = result.get("reality_anchor_score",
-         result.get("real_anchor_score",
-         result.get("anchoring_score",
-         result.get("ancrage_reel_score", 0))))
-    
-    PX = result.get("precision_score",
-         result.get("precision", 0))
-    
-    CA = result.get("counter_argument_score",
-         result.get("counterarguments_score",
-         result.get("counter_arguments_score", 0)))
-    
-    G = result.get("gnosis_score",
-        result.get("G", 0))
-
     omission = compute_omission_score(result)
     result.update(omission)
 
