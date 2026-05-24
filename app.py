@@ -12379,25 +12379,6 @@ with st.popover("ℹ️ Comprendre cette jauge"):
 
 st.divider()
 
-
-# -----------------------------
-# DEBUG fermeture cognitive
-# -----------------------------
-st.write(
-    "DEBUG fermeture cognitive :",
-    {
-        "drift_mecroyance": result.get("drift_mecroyance"),
-        "G": result.get("G"),
-        "G_drift": result.get("G_drift"),
-        "N": result.get("N"),
-        "D": result.get("D"),
-
-        "baratinage_score": result.get("baratinage_score"),
-        "omission_score": result.get("omission_score"),
-        "extended_placebo_score": result.get("extended_placebo_score"),
-    }
-)
-
 # -----------------------------
 # Fermeture cognitive
 # -----------------------------
