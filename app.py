@@ -12320,23 +12320,6 @@ with st.popover("ℹ️ Comprendre cette jauge"):
 
 st.divider()
 
-st.write(
-    "DEBUG intuition dogmatique :",
-    {
-        "drift_intuition_dogmatique": result.get("drift_intuition_dogmatique"),
-
-        "G": result.get("G"),
-        "G_drift": result.get("G_drift"),
-
-        "N": result.get("N"),
-        "D": result.get("D"),
-
-        "baratinage_score": result.get("baratinage_score"),
-        "omission_score": result.get("omission_score"),
-        "extended_placebo_score": result.get("extended_placebo_score"),
-    }
-)
-
 # -----------------------------
 # Intuition dogmatique
 # -----------------------------
