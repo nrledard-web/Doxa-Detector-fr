@@ -13260,8 +13260,18 @@ EP_heuristique = (
 ) - (
     AR + RV + BC + CA + HF
 )
+score_theorique = max(0.0, min(M_placebo, 1.0))
 
-score = (score_theorique * 0.60) + (score_heuristique * 0.40)
+score_heuristique = max(
+    0.0,
+    min((EP_heuristique / 4) * max(EX, 0.25), 1.0)
+)
+
+score = (
+    score_theorique * 0.60
+) + (
+    score_heuristique * 0.40
+)
 ```
 
 Où :
