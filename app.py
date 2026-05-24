@@ -12437,36 +12437,86 @@ st.markdown(
 )
 
 with st.popover("ℹ️ Comprendre cette jauge"):
-    st.markdown("### Fermeture cognitive")
+
+    st.markdown("""
+### Fermeture cognitive
+
+Cette jauge mesure un déséquilibre où la certitude affirmée dépasse le savoir articulé et la compréhension intégrée.
+
+Elle ne mesure pas :
+
+- le mensonge ;
+- la vérité du texte ;
+- l’intention réelle du locuteur.
+
+Elle mesure plutôt un risque de fermeture interprétative.
+""")
+
+    st.markdown("### Principe")
 
     st.write(
-        "Cette jauge mesure un déséquilibre où la certitude affirmée dépasse "
-        "le savoir articulé et la compréhension intégrée."
+        "Le moteur compare le niveau de certitude au savoir disponible "
+        "et à la compréhension intégrée."
     )
 
-    st.markdown("**Formule utilisée**")
-    st.code("Fermeture cognitive = max(0, D - (G + N))")
+    st.markdown("### Formule utilisée")
 
-    st.markdown("**Avec les valeurs actuelles**")
+    st.code("""
+Forme théorique :
+
+Fermeture cognitive = max(0, D - (G + N))
+
+Forme utilisée ici :
+
+Fermeture cognitive = max(
+    0,
+    D - (G_drift + N)
+)
+
+G_drift = G × 0.5
+""")
+
+    st.markdown("### Avec les valeurs actuelles")
+
     st.write(
-        f"D = {result['D']:.2f} | "
-        f"G = {result['G']:.2f} | "
-        f"N = {result['N']:.2f}"
+        f"D = {result['D_drift']:.2f} | "
+        f"G_drift = {result['G_drift']:.2f} | "
+        f"N = {result['N_drift']:.2f}"
     )
 
     st.code(
-        f"max(0, {result['D']:.2f} - ({result['G']:.2f} + {result['N']:.2f})) "
+        f"max(0, {result['D_drift']:.2f} - "
+        f"({result['G_drift']:.2f} + {result['N_drift']:.2f})) "
         f"= {result['drift_mecroyance']:.2f}"
     )
 
-    st.markdown("**Interprétation**")
+    st.markdown("### Couleurs")
+
     st.write(
-        "Plus ce score est élevé, plus le texte affirme avec certitude alors que "
-        "les bases de savoir et de compréhension restent insuffisantes."
+        "🟢 Faible — équilibre préservé\n\n"
+        "🟡 Modérée — certitude légèrement dominante\n\n"
+        "🟠 Élevée — fermeture interprétative notable\n\n"
+        "🔴 Très élevée — certitude nettement supérieure au savoir disponible"
     )
 
-    st.markdown("**Normalisation graphique**")
+    st.markdown("### Lecture")
+
+    st.write(
+        "Plus ce score est élevé, plus le discours affirme avec certitude "
+        "alors que les bases de savoir et de compréhension restent limitées."
+    )
+
+    st.markdown("### Normalisation graphique")
+
     st.code("value = min(drift_mecroyance / 10, 1.0)")
+
+    st.markdown("### Attention")
+
+    st.write(
+        "Un score élevé ne signifie pas que le texte est faux.\n\n"
+        "Il indique seulement qu’une certitude semble dépasser "
+        "le savoir disponible et son intégration."
+    )
 
 st.divider()
 
