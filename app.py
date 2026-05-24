@@ -12887,7 +12887,13 @@ Avec les facteurs qui le réduisent :
 
 ```python
 MO_heuristique = (
-    CP + DR + PI + AA + CF + CC
+    CP
+    + (DR * 1.5)
+    + PI
+    + AA
+    + CF
+    + CC
+    + (MS * 0.5)
 ) - (
     LM + RV + AR + PX + CA
 )
