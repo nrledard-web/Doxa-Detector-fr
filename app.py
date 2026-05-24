@@ -7117,72 +7117,71 @@ def compute_baratinage_score(result):
     PX = result.get("precision_score", 0)
     ER = result.get("reasoning_explicitness_score", 0)
 
-    # Calcul brut
-    raw = (
-        CF
-        + CA
-        + DA
-        + IR
-        + AB
-        + CC
+    # -----------------------------
+    # Calcul heuristique principal
+    # -----------------------------
+    raw_heuristic = (
+        CF + CA + DA + IR + AB + CC
     ) - (
-        PR
-        + AR
-        + LM
-        + RV
-        + PX
-        + ER
+        PR + AR + LM + RV + PX + ER
     )
+
+    # -----------------------------
+    # Modulateur DOXA léger
+    # IB ≈ (G + 2D) − N
+    # -----------------------------
+    G = result.get("gnosis_score", 0)
+
+    D = (
+        result.get("strong_certainty_score", 0)
+        + result.get("cognitive_closure_score", 0)
+    ) / 2
+
+    N = (
+        result.get("reality_anchor_score", 0)
+        + result.get("revisability_score", 0)
+    ) / 2
+
+    doxa_baratinage = (G + (2 * D)) - N
+
+    # Poids volontairement faible
+    raw = raw_heuristic + (doxa_baratinage * 0.15)
 
     # Normalisation
     score = max(0.0, min(raw / 20, 1.0))
 
     # Interprétation
     if score < 0.25:
-
         label = "Faible"
         color = "#22c55e"
-
-        interpretation = (
-            "La démonstration paraît dominer "
-            "l’effet discursif."
-        )
+        interpretation = "La démonstration paraît dominer l’effet discursif."
 
     elif score < 0.50:
-
         label = "Modéré"
         color = "#eab308"
-
-        interpretation = (
-            "La rhétorique est présente "
-            "mais reste contenue."
-        )
+        interpretation = "La rhétorique est présente mais reste contenue."
 
     elif score < 0.75:
-
         label = "Élevé"
         color = "#f97316"
-
         interpretation = (
-            "L’impression de maîtrise semble "
-            "dépasser partiellement "
+            "L’impression de maîtrise semble dépasser partiellement "
             "la démonstration explicite."
         )
 
     else:
-
         label = "Très élevé"
         color = "#dc2626"
-
         interpretation = (
-            "L’impression de maîtrise semble "
-            "nettement supérieure "
+            "L’impression de maîtrise semble nettement supérieure "
             "à la démonstration visible."
         )
 
     return {
         "baratinage_score": round(score, 3),
         "baratinage_raw": round(raw, 3),
+        "baratinage_raw_heuristic": round(raw_heuristic, 3),
+        "baratinage_doxa_modulator": round(doxa_baratinage, 3),
         "baratinage_label": label,
         "baratinage_color": color,
         "baratinage_interpretation": interpretation,
