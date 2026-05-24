@@ -12889,7 +12889,19 @@ IB_doxa = (G + 2D) - N
 
 IB = IB_heuristique + (IB_doxa * 0.15)
 
-score = max(0.0, min(IB / 20, 1.0))
+score = max(0.0, min(IB / 6, 1.0))
+
+- **CE** = cohérence trompeuse  
+- **ACE** = cohérence trompeuse avancée  
+- **RP** = pression rhétorique  
+- **NP** = pression narrative  
+- **PI** = prémisses implicites  
+- **CS** = certitude générale  
+
+- **HF** = score factuel disponible  
+- **BC** = bonus de cohérence  
+- **AS** = arguments de soutien  
+- **AN** = nuances argumentatives
 
 ### Lecture
 
