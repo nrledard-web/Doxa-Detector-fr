@@ -12473,21 +12473,151 @@ st.caption(result["cognitive_drift_interpretation"])
 
 
 with st.popover("ℹ️ Comprendre cette jauge", use_container_width=True):
-    st.markdown("### Indice global de dérive cognitive")
 
-    st.write(
-        "Cette jauge synthétise les trois dérives cognitives fondamentales. "
-        "Elle ne dit pas si le texte est vrai ou faux : elle mesure le degré de déséquilibre "
-        "entre savoir, compréhension et certitude."
-    )
+    st.markdown(f"""
+### Indice global de dérive cognitive
 
-    st.markdown("""
-**Formule fondatrice**
+Cette jauge synthétise les trois dérives cognitives fondamentales.
+
+Elle ne dit pas si le texte est vrai ou faux :
+elle mesure le degré de déséquilibre entre savoir,
+compréhension et certitude.
+
+---
+
+### Principe
+
+Le moteur combine trois dérives :
+
+- fermeture cognitive ;
+- pseudo-savoir ;
+- intuition dogmatique.
+
+L’indice final donne davantage de poids à la dérive dominante afin d’éviter qu’un signal fort soit noyé dans la moyenne.
+
+---
+
+### Formule fondatrice
 
 Forme théorique :
 
-```text
-M = (G + N) - D
+M = (G + N) − D
+
+Forme utilisée ici :
+
+M = (G_drift + N) − D
+
+avec :
+
+G_drift = G × 0.5
+
+afin d’éviter qu’un savoir fortement présent domine mécaniquement les autres dimensions.
+
+---
+
+### Dérives utilisées
+
+Fermeture cognitive = max(0, -M)
+
+Pseudo-savoir = max(0, (G_drift + D) - N)
+
+Intuition dogmatique = max(0, (N + D) - G_drift)
+
+---
+
+### Formule utilisée
+
+dominant_value = max(
+    fermeture,
+    pseudo_savoir,
+    intuition
+)
+
+average_value = (
+    fermeture
+    + pseudo_savoir
+    + intuition
+) / 3
+
+global_drift = (
+    dominant_value * 0.60
+) + (
+    average_value * 0.40)
+
+---
+
+### Valeurs actuelles
+
+Fermeture cognitive :
+{result['drift_mecroyance']:.2f}
+
+Pseudo-savoir :
+{result['drift_pseudo_savoir']:.2f}
+
+Intuition dogmatique :
+{result['drift_intuition_dogmatique']:.2f}
+
+---
+
+### Résultat actuel
+
+Score :
+{global_score:.2f}
+
+Niveau :
+{global_label}
+
+{result["cognitive_drift_interpretation"]}
+
+---
+
+### Couleurs
+
+🟢 Vert — Faible  
+Les dimensions restent relativement équilibrées.
+
+🟡 Jaune — Modérée  
+Une dérive commence à structurer le raisonnement.
+
+🟠 Orange — Élevée  
+Une logique cognitive domine nettement l’équilibre général.
+
+🔴 Rouge — Très élevée  
+Une forme cognitive semble fortement surdéterminer le discours.
+
+---
+
+### Lecture
+
+🟢 Faible : équilibre global conservé
+
+🟡 Modérée : dérive émergente
+
+🟠 Élevée : déséquilibre notable
+
+🔴 Très élevée : dérive dominante
+
+---
+
+### Attention
+
+Un score élevé ne signifie pas que le texte est faux.
+
+Il indique seulement qu’une forme de déséquilibre entre savoir,
+compréhension et certitude semble dominer la structure du discours.
+
+---
+
+### Échelle
+
+🟢 Faible < 1.5
+
+🟡 Modérée < 3.5
+
+🟠 Élevée < 6
+
+🔴 Très élevée ≥ 6
+""")
 
 st.markdown("""
 <div style="text-align:center; margin:25px 0; color:#888;">
