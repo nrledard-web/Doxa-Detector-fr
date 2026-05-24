@@ -12165,7 +12165,7 @@ else:
     etiquette_r = "Très solide"
     message_r = "Le texte présente un raisonnement robuste, structuré et bien soutenu."
 
-st.subheader(f"{couleur_r} Cohérence structurelle : {etiquette_r}")
+st.subheader(f"{couleur_r} Solidité argumentative : {etiquette_r}")
 # Barre épaisse colorée
 st.caption(
     "Cette jauge mesure la Cohérence structurelle du texte : structure du raisonnement, "
