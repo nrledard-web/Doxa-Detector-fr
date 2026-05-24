@@ -7219,25 +7219,28 @@ def compute_extended_placebo_effect(result):
     # M = (N + 2D) - G
     # -----------------------------
 
+    EX = max(
+        result.get("factual_overinterpretation_score", 0),
+        result.get("self_validating_score", 0),
+        result.get("false_causality_basic_score", 0),
+        result.get("causal_overreach_score", 0),
+    )
+    
     G = result.get("hard_fact_score", 0) / 20
-
+    
     D = (
         result.get("strong_certainty_score", 0)
         + result.get("certainty_score", 0)
     ) / 2
-
+    
     N = (
         result.get("bonus_anchor", 0)
         + result.get("bonus_coherence", 0)
         + result.get("bonus_revisability", 0)
     ) / 3
-
-    theoretical_raw = (N + (2 * D)) - G
-
-    theoretical_score = max(
-        0.0,
-        min(1.0, theoretical_raw)
-    )
+    
+    theoretical_raw = ((N + (2 * D)) - G) * EX
+    theoretical_score = max(0.0, min(1.0, theoretical_raw))
 
     # -----------------------------
     # Facteurs augmentant
