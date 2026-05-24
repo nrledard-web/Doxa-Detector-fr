@@ -7298,19 +7298,38 @@ def compute_omission_score(result):
 
     # Facteurs augmentant l'indice
     CP = result.get("cherry_picking_score", 0)
-    DR = result.get("data_without_reference_score", 0)
-    PI = result.get("implicit_premise_score", 0)
+    
+    DR = result.get("missing_reference_score", 0)
+    
+    PI = result.get("premise_score", 0)
+    
     AA = result.get("argument_asymmetry_score", 0)
+    
     CF = result.get("strong_certainty_score", 0)
-    CC = result.get("cognitive_closure_score", 0)
+    
+    CC = result.get(
+        "cognitive_closure_score",
+        result.get("closure_score", 0)
+    )
+    
     MS = result.get("statistical_manipulation_score", 0)
-
+    
     # Facteurs réduisant l'indice
     LM = result.get("limits_score", 0)
-    RV = result.get("revisability_score", 0)
-    AR = result.get("reality_anchor_score", 0)
+    
+    RV = (
+        result.get("revisability_score", 0)
+        + result.get("bonus_revisability", 0)
+    )
+    
+    AR = (
+        result.get("reality_anchor_score", 0)
+        + result.get("bonus_anchor", 0)
+    )
+    
     PX = result.get("precision_score", 0)
-    CA = result.get("counter_argument_score", 0)
+    
+    CA = result.get("argument_counterweight_count", 0)
 
 # -----------------------------
 # Calcul heuristique principal
