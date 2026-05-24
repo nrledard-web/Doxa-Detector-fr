@@ -9579,77 +9579,7 @@ def analyze_article(text: str) -> Dict:
     # -----------------------------
     omission = compute_omission_score(result)
     result.update(omission)
-    # -----------------------------
-    # DEBUG effet placebo étendu
-    # -----------------------------
-    DEBUG_PLACEBO = True
-
-    if DEBUG_PLACEBO:
-
-        st.write(
-            "CLÉS utiles placebo :",
-            [k for k in sorted(result.keys()) if any(x in k.lower() for x in [
-                "placebo",
-                "certainty",
-                "strong",
-                "closure",
-                "premise",
-                "coherence",
-                "causality",
-                "causal",
-                "narrative",
-                "overdetermination",
-                "limit",
-                "revis",
-                "anchor",
-                "reality",
-                "counter",
-                "precision",
-                "fact",
-                "gnosis",
-                "doxa",
-                "bonus",
-                "experience",
-                "empirie",
-            ])]
-        )
-
-        st.write(
-            "DEBUG placebo :",
-            {
-                k: v
-                for k, v in sorted(result.items())
-                if (
-                    isinstance(v, (int, float))
-                    and any(x in k.lower() for x in [
-                        "certainty",
-                        "strong",
-                        "closure",
-                        "premise",
-                        "coherence",
-                        "causality",
-                        "causal",
-                        "narrative",
-                        "overdetermination",
-                        "limit",
-                        "revis",
-                        "anchor",
-                        "reality",
-                        "counter",
-                        "precision",
-                        "fact",
-                        "bonus",
-                        "empirie",
-                    ])
-                )
-            }
-        )
-
-    # -----------------------------
-    # Effet placebo étendu
-    # -----------------------------
-    placebo = compute_extended_placebo_effect(result)
-    result.update(placebo)
+    
     # -----------------------------
     # Effet placebo étendu
     # -----------------------------
