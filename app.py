@@ -8909,9 +8909,15 @@ def analyze_article(text: str) -> Dict:
     # -----------------------------
     # Indices dérivés recalibrés
     # -----------------------------
-    G_drift = G * 0.5
-    N_drift = N
-    D_drift = D
+    drifts = compute_cognitive_drifts(
+        G_drift,
+        N_drift,
+        D_drift
+    )
+
+    result["G_drift"] = round(G_drift, 3)
+    result["N_drift"] = round(N_drift, 3)
+    result["D_drift"] = round(D_drift, 3)
     
     M = round((G_drift + N_drift) - D_drift, 1)
     
