@@ -9484,7 +9484,24 @@ def analyze_article(text: str) -> Dict:
             "G": result.get("gnosis_score"),
         }
     )
-    st.write("TOUTES LES CLÉS RESULT :", sorted(result.keys()))
+    st.write(
+    "CLÉS utiles omission :",
+    [k for k in sorted(result.keys()) if any(x in k.lower() for x in [
+        "data",
+        "reference",
+        "premise",
+        "closure",
+        "limit",
+        "revis",
+        "reality",
+        "anchor",
+        "precision",
+        "counter",
+        "gnosis",
+        "stat",
+        "certainty",
+    ])]
+)
     # -----------------------------
     # Indice d’omission stratégique
     # -----------------------------
