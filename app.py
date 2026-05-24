@@ -12481,8 +12481,21 @@ with st.popover("ℹ️ Comprendre cette jauge", use_container_width=True):
         "entre savoir, compréhension et certitude."
     )
 
-    st.markdown("**Formule fondatrice**")
-    st.code("M = (G + N) - D")
+    ### Formule fondatrice
+    
+    Forme théorique :
+    
+    M = (G + N) - D
+    
+    Forme utilisée ici :
+    
+    M = (G_drift + N) - D
+    
+    avec :
+    
+    G_drift = G × 0.5
+    
+    afin d’éviter qu’un savoir fortement présent domine mécaniquement les autres dimensions.
 
     st.markdown("**Dérives utilisées**")
 
