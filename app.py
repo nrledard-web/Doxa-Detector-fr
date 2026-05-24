@@ -12114,6 +12114,25 @@ st.markdown("""
 </div>
 """, unsafe_allow_html=True)
 
+
+st.write("DEBUG cohérence structurelle :", {
+    "hard_fact_score": result.get("hard_fact_score"),
+    "discursive_coherence_score": result.get("discursive_coherence_score"),
+    "final_credibility_score": result.get("final_credibility_score"),
+    "credibility_penalty": result.get("credibility_penalty"),
+
+    "G": result.get("G"),
+    "G_drift": result.get("G_drift"),
+    "N": result.get("N"),
+    "D": result.get("D"),
+
+    "baratinage_score": result.get("baratinage_score"),
+    "omission_score": result.get("omission_score"),
+    "extended_placebo_score": result.get("extended_placebo_score"),
+})
+
+
+
 # =============================
 # Barre de raisonnement
 # =============================
