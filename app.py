@@ -12623,7 +12623,7 @@ st.markdown("""
 <div style="text-align:center; margin:25px 0; color:#888;">
 ────────── ✦ ──────────
 </div>
-""", unsafe_allow_html=True)
+""", unsafe_allow_html=True) 
 
 # =============================
 # 🧠 LECTURE DES INTENTIONS COGNITIVES
