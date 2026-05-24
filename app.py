@@ -6761,24 +6761,6 @@ def compute_red_flag_penalties(metrics: dict) -> dict:
         "credibility_penalty": round(min(credibility_penalty, 8.0), 2),
         "lie_boost": round(min(lie_boost, 6.0), 2),
     }
-
-
-
-st.write("DEBUG GND dérive cognitive :", {
-    "G": G,
-    "N": N,
-    "D": D,
-})
-st.write("DEBUG GND dérive cognitive :", {
-    "G_direct": result.get("G"),
-    "N_direct": result.get("N"),
-    "D_direct": result.get("D"),
-    "hard_fact_score": result.get("hard_fact_score"),
-    "bonus_anchor": result.get("bonus_anchor"),
-    "bonus_revisability": result.get("bonus_revisability"),
-    "strong_certainty_score": result.get("strong_certainty_score"),
-    "certainty_score": result.get("certainty_score"),
-})
 # -----------------------------
 # compute cognitive drifts
 # -----------------------------
