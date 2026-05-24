@@ -12168,9 +12168,9 @@ else:
 st.subheader(f"{couleur_r} Solidité argumentative : {etiquette_r}")
 # Barre épaisse colorée
 st.caption(
-    "Cette jauge mesure la Cohérence structurelle du texte : structure du raisonnement, "
-    "cohérence logique et présence d’éléments vérifiables. "
-    "La crédibilité globale dépend aussi de la qualité des sources et de la vérifiabilité des affirmations."
+    "Cette jauge mesure la solidité argumentative globale du texte : "
+    "structure du raisonnement, cohérence logique, vérifiabilité, qualité des sources "
+    "et pénalités discursives détectées."
 )
 st.markdown(f"""
 <div style="width:100%; margin-top:10px; margin-bottom:10px;">
