@@ -9466,6 +9466,22 @@ def analyze_article(text: str) -> Dict:
     # -----------------------------
     # Indice d’omission stratégique
     # -----------------------------
+    st.write("DEBUG clés omission :", {
+    "CP": result.get("cherry_picking_score"),
+    "DR": result.get("data_without_reference_score"),
+    "PI": result.get("implicit_premise_score"),
+    "AA": result.get("argument_asymmetry_score"),
+    "CF": result.get("strong_certainty_score"),
+    "CC": result.get("cognitive_closure_score"),
+    "MS": result.get("statistical_manipulation_score"),
+    "LM": result.get("limits_score"),
+    "RV": result.get("revisability_score"),
+    "AR": result.get("reality_anchor_score"),
+    "PX": result.get("precision_score"),
+    "CA": result.get("counter_argument_score"),
+    "G": result.get("gnosis_score"),
+})
+
     omission = compute_omission_score(result)
     result.update(omission)
 
