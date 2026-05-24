@@ -12880,9 +12880,9 @@ Avec les facteurs qui le réduisent :
 
 ```python
 IB_heuristique = (
-    CF + CA + DA + IR + AB + CC
+    CF + CE + ACE + RP + NP + PI + CS
 ) - (
-    PR + AR + LM + RV + PX + ER
+    HF + AR + RV + BC + AS + AN
 )
 
 IB_doxa = (G + 2D) - N
