@@ -13002,13 +13002,13 @@ compréhension et certitude.
 
 ### Principe
 
-Le moteur combine trois dérives :
+Le moteur combine :
 
-- fermeture cognitive ;
-- pseudo-savoir ;
-- intuition dogmatique.
+- la fermeture cognitive ;
+- le pseudo-savoir ;
+- l’intuition dogmatique.
 
-L’indice final donne davantage de poids à la dérive dominante afin d’éviter qu’un signal fort soit noyé dans la moyenne.
+La clôture cognitive est affichée séparément comme indicateur transversal de révisabilité du discours et n’entre pas directement dans le calcul de cet indice.
 
 ---
 
