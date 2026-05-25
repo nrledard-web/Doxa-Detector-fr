@@ -19606,12 +19606,6 @@ if not claims_df.empty:
 else:
     st.info(T["paste_longer_text"])
     
-st.markdown("""
-<div style="text-align:center; margin:25px 0; color:#888;">
-──── 🧠 ────
-</div>
-""", unsafe_allow_html=True)
-
 
 st.divider()  
 st.markdown("""
@@ -19621,7 +19615,7 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 # -----------------------------
-# ai_module
+# Synthèse critique IA
 # -----------------------------
 st.subheader(T["ai_module"])
 st.caption(T["ai_module_caption"])
