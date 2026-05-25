@@ -12388,53 +12388,102 @@ st.caption(
     "une structure davantage stabilisée par l’expérience et la reproductibilité."
 )
 
-# =============================
-# Composantes
-# =============================
+with st.popover("ℹ️ Comprendre cette jauge"):
 
-st.markdown("### Composantes de l’ancrage")
+    st.markdown(f"""
+### Ancrage au réel
 
-c1, c2 = st.columns(2)
-c3, c4 = st.columns(2)
-c5, _ = st.columns(2)
+Cette jauge mesure dans quelle mesure le discours reste contraint par l’expérience, la reproductibilité, la falsifiabilité et la reconnaissance explicite de ses limites.
 
-c1.metric("Empirie", result.get("real_anchor_E", 0))
-c2.metric("Reproductibilité", result.get("real_anchor_R", 0))
-c3.metric("Falsifiabilité", result.get("real_anchor_F", 0))
-c4.metric("Limites", result.get("real_anchor_L", 0))
-c5.metric("Spéculation", result.get("real_anchor_S", 0))
+Elle ne mesure pas :
 
-# =============================
-# Delta réalité / mécroyance
-# =============================
+- la vérité absolue du texte ;
+- l’intention réelle du locuteur ;
+- la valeur morale du discours.
 
-st.markdown("### Tension réalité / cohérence")
+Elle mesure plutôt le degré de **contrainte empirique** qui limite la spéculation libre.
 
-delta = result.get("delta_reality", 0)
-delta_label = result.get("delta_reality_label", "Non calculé")
-delta_text = result.get("delta_reality_interpretation", "")
+---
 
-if delta <= -5:
-    delta_color = "#16a34a"
+### Principe
 
-elif delta <= 2:
-    delta_color = "#ca8a04"
+Le moteur compare les éléments qui ancrent le discours dans le réel :
 
-else:
-    delta_color = "#dc2626"
+- empirie ;
+- reproductibilité ;
+- falsifiabilité ;
+- reconnaissance des limites.
 
-st.markdown(
-    f"<b style='color:{delta_color}'>{delta_label}</b> — Δ = {delta}",
-    unsafe_allow_html=True
-)
+Avec les éléments qui l’éloignent du réel :
 
-st.caption(delta_text)
+- spéculation extrapolative ;
+- certitude excessive ;
+- cohérence autoporteuse.
 
-# =============================
-# Marqueurs détectés
-# =============================
+---
 
-with st.expander("Voir les marqueurs d’ancrage", expanded=False):
+### Composantes de l’ancrage
+
+Empirie :
+**{result.get("real_anchor_E", 0)}**
+
+Reproductibilité :
+**{result.get("real_anchor_R", 0)}**
+
+Falsifiabilité :
+**{result.get("real_anchor_F", 0)}**
+
+Limites explicites :
+**{result.get("real_anchor_L", 0)}**
+
+Spéculation :
+**{result.get("real_anchor_S", 0)}**
+
+---
+
+### Tension réalité / cohérence
+
+{delta_label} — Δ = **{delta}**
+
+{delta_text}
+
+---
+
+### Couleurs
+
+🔴 **Très faible**  
+Le discours est très peu contraint par l’expérience ou la vérification.
+
+🟠 **Fragile**  
+Quelques éléments d’ancrage existent, mais la spéculation ou l’affirmation dominent.
+
+🟡 **Modéré**  
+Le discours présente un ancrage partiel au réel.
+
+⚪ **Fort**  
+Le discours est relativement stabilisé par l’expérience et les limites reconnues.
+
+🔵 **Très fort**  
+Le discours est fortement contraint par l’expérience, la reproductibilité ou la falsifiabilité.
+
+---
+
+### Lecture
+
+Spéculation libre ⟵⟶ Contrainte du réel
+
+Plus le score monte, plus le discours semble contraint par des éléments vérifiables, reproductibles ou falsifiables.
+
+---
+
+### Attention
+
+Un score élevé ne signifie pas que le texte est vrai.
+
+Il indique seulement que le discours semble davantage stabilisé par l’expérience, la vérifiabilité et la reconnaissance de ses limites.
+""")
+
+    st.markdown("### Marqueurs d’ancrage")
 
     st.write(
         "**Empirie :**",
@@ -12460,7 +12509,6 @@ with st.expander("Voir les marqueurs d’ancrage", expanded=False):
         "**Spéculation extrapolative :**",
         result.get("real_anchor_speculation_markers", [])
     )
-
 
 # =============================
 # 🧠 Structure cognitive du texte
