@@ -12900,7 +12900,7 @@ Le moteur observe la tension entre :
 - la capacité du discours à rester révisable.
 
 Plus la clôture monte, plus le texte semble difficile à corriger, nuancer ou réviser.
-
+La clôture cognitive est affichée séparément comme indicateur transversal de révisabilité du discours et n’entre pas directement dans le calcul de cet indice.
 ---
 
 ### Formule utilisée
