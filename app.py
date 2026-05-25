@@ -19617,7 +19617,7 @@ st.markdown("""
 # -----------------------------
 # Synthèse critique IA
 # -----------------------------
-st.subheader(T["ai_module"])
+st.subheader(T["Synthèse critique IA"])
 st.caption(T["ai_module_caption"])
 
 if client is None:
