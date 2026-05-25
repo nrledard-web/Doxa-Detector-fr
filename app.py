@@ -12544,16 +12544,7 @@ revisability = (
     - result["D"]
 )
 
-closure = (
-    (
-        result["D"]
-        * (1 + len(result["red_flags"]) / 5)
-    )
-    /
-    (result["G"] + result["N"])
-    if (result["G"] + result["N"]) > 0
-    else 10
-)
+closure = result.get("closure", 0)
 
 with st.popover("📊 Voir les métriques cognitives"):
 
