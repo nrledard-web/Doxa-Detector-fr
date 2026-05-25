@@ -12849,9 +12849,28 @@ st.caption(
     "Plus elle monte, plus la certitude domine le savoir et l’intégration."
 )
 # -----------------------------
-# Valeur clôture cognitive
+# Calcul clôture cognitive
 # -----------------------------
-closure = result.get("closure", 0)
+closure = round(
+    (
+        result.get("doxic_rigidity_score", 0) * 0.50
+        +
+        result.get("certainty_score", 0) * 0.30
+        +
+        result.get("strong_certainty_score", 0) * 0.20
+    )
+    -
+    (
+        result.get("bonus_revisability", 0) * 0.40
+        +
+        result.get("bonus_anchor", 0) * 0.20
+    ),
+    2
+)
+
+closure = max(0, closure)
+
+result["closure"] = closure
 
 closure_gauge = min(closure / 1.5, 1.0)
 
