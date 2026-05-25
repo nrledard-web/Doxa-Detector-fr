@@ -13304,7 +13304,7 @@ st.markdown("""
 """, unsafe_allow_html=True) 
 
 # =============================
-# 🧠 LECTURE DES INTENTIONS COGNITIVES
+# 🧠 Jauge de mécroyance et des intentions cognitives
 # =============================
 
 st.markdown(
@@ -13312,7 +13312,7 @@ st.markdown(
 <div style="text-align:center; margin-top:10px; margin-bottom:20px;">
 
 <h3 style="margin-bottom:8px;">
-🧠 Lecture des intentions cognitives
+🧠 Jauge de mécroyance et des intentions cognitives
 </h3>
 
 <div style="color:#888; font-size:0.95rem;">
