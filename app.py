@@ -19795,3 +19795,26 @@ with st.expander("Afficher les feedbacks"):
             st.info("Aucun feedback enregistré.")
     elif admin_code:
         st.error("Code incorrect.")
+
+st.divider()
+
+# =============================
+# Nouscope
+# =============================
+st.caption("""
+**Le NOUSCOPE**
+
+Cette architecture d’IRM du langage constitue la base expérimentale du développement du Nouscope.
+
+Définition :
+
+Le Nouscope est un instrument d’exploration cognitive destiné à cartographier les dynamiques du savoir (G), de l’intégration (N), de la certitude (D) et de leurs dérives.
+
+Son objectif n’est pas de décider du vrai ou du faux, mais d’observer comment un discours se structure, se stabilise, se ferme ou reste révisable.
+
+À terme, le Nouscope ambitionne de fonctionner comme une forme d’imagerie du raisonnement :
+non une IRM du cerveau biologique,
+mais une IRM du langage, des architectures argumentatives et des équilibres cognitifs.
+
+DOXA Detector constitue la première couche d’observation de cette architecture.
+""")
