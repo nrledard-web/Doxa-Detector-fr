@@ -12351,12 +12351,6 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 
-st.markdown("""
-<div style="text-align:center; margin:25px 0; color:#888;">
-────────── ✦ ──────────
-</div>
-""", unsafe_allow_html=True)
-
 # =============================
 # 🧠 1. DÉRIVES COGNITIVES FONDAMENTALES
 # =============================
