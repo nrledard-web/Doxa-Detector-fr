@@ -11923,6 +11923,201 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 # =============================
+# Barre de raisonnement
+# =============================
+
+score = result.get("hard_fact_score", 0)
+
+if score < 6:
+    couleur_r = "🔴"
+    color_r = "#dc2626"
+    etiquette_r = "Très fragile"
+    message_r = "Le texte présente peu d’éléments de raisonnement structurés."
+elif score < 9:
+    couleur_r = "🟠"
+    color_r = "#f97316"
+    etiquette_r = "Fragile"
+    message_r = "Le raisonnement existe, mais reste incomplet ou insuffisamment construit."
+elif score < 13:
+    couleur_r = "🟡"
+    color_r = "#facc15"
+    etiquette_r = "Modérée"
+    message_r = "Le texte présente une structure de raisonnement cohérente, mais plusieurs affirmations restent conceptuelles ou insuffisamment démontrées."
+elif score < 16:
+    couleur_r = "🟢"
+    color_r = "#16a34a"
+    etiquette_r = "Solide"
+    message_r = "Le discours est bien organisé en surface, mais cette cohérence ne garantit pas sa validité épistémique."
+else:
+    couleur_r = "🟢"
+    color_r = "#15803d"
+    etiquette_r = "Très solide"
+    message_r = "Le texte présente un raisonnement robuste, structuré et bien soutenu."
+
+st.subheader(f"{couleur_r} Solidité argumentative : {etiquette_r}")
+# Barre épaisse colorée
+st.caption(
+    "Cette jauge mesure la solidité argumentative globale du texte : "
+    "structure du raisonnement, cohérence logique, vérifiabilité, qualité des sources "
+    "et pénalités discursives détectées."
+)
+st.markdown(f"""
+<div style="width:100%; margin-top:10px; margin-bottom:10px;">
+    <div style="
+        width:100%;
+        height:26px;
+        background:#e5e7eb;
+        border-radius:12px;
+        overflow:hidden;
+        border:1px solid #cbd5e1;
+    ">
+        <div style="
+            width:{min(score / 20, 1) * 100}%;
+            height:100%;
+            background:{color_r};
+            transition:width 0.4s ease;
+        "></div>
+    </div>
+</div>
+""", unsafe_allow_html=True)
+
+st.markdown(
+    f"<b style='color:{color_r}'>{etiquette_r}</b> — Score : {round(score, 1)}/20",
+    unsafe_allow_html=True
+)
+st.caption(message_r)
+with st.popover("ℹ️ Comprendre cette jauge"):
+
+    st.markdown(f"""
+### Solidité argumentative
+
+Cette jauge estime la solidité argumentative globale du texte.
+
+Elle ne mesure pas :
+
+- la vérité absolue du texte ;
+- l’intention réelle du locuteur ;
+- la seule cohérence stylistique.
+
+Elle mesure plutôt la capacité du discours à soutenir ses affirmations par une structure logique, des éléments vérifiables et une base documentaire suffisante.
+
+---
+
+### Principe
+
+Le moteur combine :
+
+- la structure du raisonnement ;
+- la cohérence discursive ;
+- la vérifiabilité des affirmations ;
+- la qualité des sources ;
+- la présence de pénalités discursives.
+
+Cette jauge peut être fragilisée indirectement par :
+
+- le **baratinage**, lorsqu’une impression de maîtrise dépasse la démonstration visible ;
+- l’**omission stratégique**, lorsque le contexte utile semble insuffisamment présenté.
+
+L’**effet placebo étendu** n’est pas intégré ici sauf cas particulier.
+
+---
+
+### Formule utilisée
+
+```python
+HFS_brut = (
+    0.18 * G
+    + 0.12 * N
+    + 0.20 * V
+    + 0.22 * QS
+    + 0.18 * VC
+) - (
+    0.16 * D
+    + 0.12 * R
+    + 0.18 * RC
+    + P
+)
+
+HFS = HFS_brut + 8 + bonus_epistemique
+
+score = max(0, min(HFS, 20))
+```
+
+---
+
+### Où :
+
+- **G** = gnōsis / savoir articulé  
+- **N** = nous / compréhension intégrée  
+- **V** = vérifiabilité globale  
+- **QS** = qualité des sources  
+- **VC** = vérifiabilité moyenne des affirmations  
+- **D** = doxa / certitude  
+- **R** = risque rhétorique  
+- **RC** = risque moyen des affirmations  
+- **P** = pénalités de crédibilité  
+
+---
+
+### Fragilités complémentaires
+
+Baratinage :
+**{round(result.get("baratinage_score", 0) * 100, 1)}%**
+
+Omission stratégique :
+**{round(result.get("omission_score", 0) * 100, 1)}%**
+
+---
+
+### Valeur actuelle
+
+Score argumentatif :
+**{round(score, 1)}/20**
+
+Cohérence discursive brute :
+**{round(result.get("discursive_coherence_score", 0), 1)}/20**
+
+Crédibilité finale après pénalités :
+**{round(result.get("final_credibility_score", 0), 1)}/20**
+
+Couleurs
+
+🔴 Rouge — Très fragile
+Le texte présente peu d’éléments de raisonnement structurés.
+
+🟠 Orange — Fragile
+Le raisonnement existe mais reste incomplet ou insuffisamment construit.
+
+🟡 Jaune — Modérée
+Le texte présente une structure cohérente mais plusieurs affirmations restent conceptuelles ou insuffisamment démontrées.
+
+🟢 Vert — Solide
+Le discours est bien organisé et relativement soutenu.
+
+🟢 Vert foncé — Très solide
+Le texte présente un raisonnement robuste, structuré et bien soutenu.
+
+Lecture
+
+🔴 0–5.9 : raisonnement très fragile
+
+🟠 6–8.9 : raisonnement fragile
+
+🟡 9–12.9 : raisonnement modéré
+
+🟢 13–15.9 : raisonnement solide
+
+🟢 16–20 : raisonnement très solide
+
+Attention
+
+Un score élevé ne garantit pas que le texte est vrai.
+
+Il indique seulement que sa structure argumentative, ses appuis vérifiables et sa cohérence globale paraissent relativement solides.
+""")
+
+
+# =============================
 # Analyse analogique du raisonnement
 # =============================
 
@@ -12155,200 +12350,6 @@ st.markdown("""
 </div>
 """, unsafe_allow_html=True)
 
-# =============================
-# Barre de raisonnement
-# =============================
-
-score = result.get("hard_fact_score", 0)
-
-if score < 6:
-    couleur_r = "🔴"
-    color_r = "#dc2626"
-    etiquette_r = "Très fragile"
-    message_r = "Le texte présente peu d’éléments de raisonnement structurés."
-elif score < 9:
-    couleur_r = "🟠"
-    color_r = "#f97316"
-    etiquette_r = "Fragile"
-    message_r = "Le raisonnement existe, mais reste incomplet ou insuffisamment construit."
-elif score < 13:
-    couleur_r = "🟡"
-    color_r = "#facc15"
-    etiquette_r = "Modérée"
-    message_r = "Le texte présente une structure de raisonnement cohérente, mais plusieurs affirmations restent conceptuelles ou insuffisamment démontrées."
-elif score < 16:
-    couleur_r = "🟢"
-    color_r = "#16a34a"
-    etiquette_r = "Solide"
-    message_r = "Le discours est bien organisé en surface, mais cette cohérence ne garantit pas sa validité épistémique."
-else:
-    couleur_r = "🟢"
-    color_r = "#15803d"
-    etiquette_r = "Très solide"
-    message_r = "Le texte présente un raisonnement robuste, structuré et bien soutenu."
-
-st.subheader(f"{couleur_r} Solidité argumentative : {etiquette_r}")
-# Barre épaisse colorée
-st.caption(
-    "Cette jauge mesure la solidité argumentative globale du texte : "
-    "structure du raisonnement, cohérence logique, vérifiabilité, qualité des sources "
-    "et pénalités discursives détectées."
-)
-st.markdown(f"""
-<div style="width:100%; margin-top:10px; margin-bottom:10px;">
-    <div style="
-        width:100%;
-        height:26px;
-        background:#e5e7eb;
-        border-radius:12px;
-        overflow:hidden;
-        border:1px solid #cbd5e1;
-    ">
-        <div style="
-            width:{min(score / 20, 1) * 100}%;
-            height:100%;
-            background:{color_r};
-            transition:width 0.4s ease;
-        "></div>
-    </div>
-</div>
-""", unsafe_allow_html=True)
-
-st.markdown(
-    f"<b style='color:{color_r}'>{etiquette_r}</b> — Score : {round(score, 1)}/20",
-    unsafe_allow_html=True
-)
-st.caption(message_r)
-with st.popover("ℹ️ Comprendre cette jauge"):
-
-    st.markdown(f"""
-### Solidité argumentative
-
-Cette jauge estime la solidité argumentative globale du texte.
-
-Elle ne mesure pas :
-
-- la vérité absolue du texte ;
-- l’intention réelle du locuteur ;
-- la seule cohérence stylistique.
-
-Elle mesure plutôt la capacité du discours à soutenir ses affirmations par une structure logique, des éléments vérifiables et une base documentaire suffisante.
-
----
-
-### Principe
-
-Le moteur combine :
-
-- la structure du raisonnement ;
-- la cohérence discursive ;
-- la vérifiabilité des affirmations ;
-- la qualité des sources ;
-- la présence de pénalités discursives.
-
-Cette jauge peut être fragilisée indirectement par :
-
-- le **baratinage**, lorsqu’une impression de maîtrise dépasse la démonstration visible ;
-- l’**omission stratégique**, lorsque le contexte utile semble insuffisamment présenté.
-
-L’**effet placebo étendu** n’est pas intégré ici sauf cas particulier.
-
----
-
-### Formule utilisée
-
-```python
-HFS_brut = (
-    0.18 * G
-    + 0.12 * N
-    + 0.20 * V
-    + 0.22 * QS
-    + 0.18 * VC
-) - (
-    0.16 * D
-    + 0.12 * R
-    + 0.18 * RC
-    + P
-)
-
-HFS = HFS_brut + 8 + bonus_epistemique
-
-score = max(0, min(HFS, 20))
-```
-
----
-
-### Où :
-
-- **G** = gnōsis / savoir articulé  
-- **N** = nous / compréhension intégrée  
-- **V** = vérifiabilité globale  
-- **QS** = qualité des sources  
-- **VC** = vérifiabilité moyenne des affirmations  
-- **D** = doxa / certitude  
-- **R** = risque rhétorique  
-- **RC** = risque moyen des affirmations  
-- **P** = pénalités de crédibilité  
-
----
-
-### Fragilités complémentaires
-
-Baratinage :
-**{round(result.get("baratinage_score", 0) * 100, 1)}%**
-
-Omission stratégique :
-**{round(result.get("omission_score", 0) * 100, 1)}%**
-
----
-
-### Valeur actuelle
-
-Score argumentatif :
-**{round(score, 1)}/20**
-
-Cohérence discursive brute :
-**{round(result.get("discursive_coherence_score", 0), 1)}/20**
-
-Crédibilité finale après pénalités :
-**{round(result.get("final_credibility_score", 0), 1)}/20**
-
-Couleurs
-
-🔴 Rouge — Très fragile
-Le texte présente peu d’éléments de raisonnement structurés.
-
-🟠 Orange — Fragile
-Le raisonnement existe mais reste incomplet ou insuffisamment construit.
-
-🟡 Jaune — Modérée
-Le texte présente une structure cohérente mais plusieurs affirmations restent conceptuelles ou insuffisamment démontrées.
-
-🟢 Vert — Solide
-Le discours est bien organisé et relativement soutenu.
-
-🟢 Vert foncé — Très solide
-Le texte présente un raisonnement robuste, structuré et bien soutenu.
-
-Lecture
-
-🔴 0–5.9 : raisonnement très fragile
-
-🟠 6–8.9 : raisonnement fragile
-
-🟡 9–12.9 : raisonnement modéré
-
-🟢 13–15.9 : raisonnement solide
-
-🟢 16–20 : raisonnement très solide
-
-Attention
-
-Un score élevé ne garantit pas que le texte est vrai.
-
-Il indique seulement que sa structure argumentative, ses appuis vérifiables et sa cohérence globale paraissent relativement solides.
-""")
-
 
 st.markdown("""
 <div style="text-align:center; margin:25px 0; color:#888;">
@@ -12371,7 +12372,6 @@ st.markdown(
 """,
     unsafe_allow_html=True
 )
-
 
 # -----------------------------
 # Pseudo-savoir
