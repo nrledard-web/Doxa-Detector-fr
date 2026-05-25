@@ -12052,10 +12052,11 @@ Verdict :
 ```python
 score = final_credibility_score
 
-si final_credibility_score est absent :
+if final_credibility_score is None:
     score = hard_fact_score
 
 display_score = max(score, 2.0)
+```
 
 ---
 
