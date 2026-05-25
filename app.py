@@ -12350,7 +12350,133 @@ st.markdown("""
 </div>
 """, unsafe_allow_html=True)
 
+# =============================
+# Ancrage au réel
+# =============================
 
+st.markdown("──── 🧪 ────")
+st.subheader("Ancrage au réel")
+
+st.caption(
+    "Cette jauge mesure dans quelle mesure le discours reste contraint "
+    "par l’expérience, la reproductibilité, la falsifiabilité et "
+    "la reconnaissance explicite de ses limites."
+)
+
+anchor_score = result.get("real_anchor_score", 0)
+anchor_label = result.get("real_anchor_label", "Non calculé")
+anchor_text = result.get("real_anchor_interpretation", "")
+
+if anchor_score < 3:
+    anchor_color = "#7f1d1d"   # rouge sombre
+    anchor_label = "Très faible"
+
+elif anchor_score < 7:
+    anchor_color = "#b45309"   # cuivre
+    anchor_label = "Fragile"
+
+elif anchor_score < 12:
+    anchor_color = "#a16207"   # ambre
+    anchor_label = "Modéré"
+
+elif anchor_score < 16:
+    anchor_color = "#57534e"   # pierre / neutre
+    anchor_label = "Fort"
+
+else:
+    anchor_color = "#334155"   # bleu acier
+    anchor_label = "Très fort"
+
+render_custom_gauge(anchor_score / 20, anchor_color)
+
+st.markdown(
+    f"<b style='color:{anchor_color}'>{anchor_label}</b> — {anchor_score}/20",
+    unsafe_allow_html=True
+)
+
+st.caption(anchor_text)
+
+st.caption("Spéculation libre ⟵⟶ Contrainte du réel")
+
+st.caption(
+    "Contrairement aux jauges morales classiques, cette palette ne récompense "
+    "pas une supposée vérité. Elle visualise la tension entre spéculation libre "
+    "et contrainte du réel. Les couleurs froides et minérales indiquent "
+    "une structure davantage stabilisée par l’expérience et la reproductibilité."
+)
+
+# =============================
+# Composantes
+# =============================
+
+st.markdown("### Composantes de l’ancrage")
+
+c1, c2 = st.columns(2)
+c3, c4 = st.columns(2)
+c5, _ = st.columns(2)
+
+c1.metric("Empirie", result.get("real_anchor_E", 0))
+c2.metric("Reproductibilité", result.get("real_anchor_R", 0))
+c3.metric("Falsifiabilité", result.get("real_anchor_F", 0))
+c4.metric("Limites", result.get("real_anchor_L", 0))
+c5.metric("Spéculation", result.get("real_anchor_S", 0))
+
+# =============================
+# Delta réalité / mécroyance
+# =============================
+
+st.markdown("### Tension réalité / cohérence")
+
+delta = result.get("delta_reality", 0)
+delta_label = result.get("delta_reality_label", "Non calculé")
+delta_text = result.get("delta_reality_interpretation", "")
+
+if delta <= -5:
+    delta_color = "#16a34a"
+
+elif delta <= 2:
+    delta_color = "#ca8a04"
+
+else:
+    delta_color = "#dc2626"
+
+st.markdown(
+    f"<b style='color:{delta_color}'>{delta_label}</b> — Δ = {delta}",
+    unsafe_allow_html=True
+)
+
+st.caption(delta_text)
+
+# =============================
+# Marqueurs détectés
+# =============================
+
+with st.expander("Voir les marqueurs d’ancrage", expanded=False):
+
+    st.write(
+        "**Empirie :**",
+        result.get("real_anchor_empirical_markers", [])
+    )
+
+    st.write(
+        "**Reproductibilité :**",
+        result.get("real_anchor_reproducibility_markers", [])
+    )
+
+    st.write(
+        "**Falsifiabilité :**",
+        result.get("real_anchor_falsifiability_markers", [])
+    )
+
+    st.write(
+        "**Limites explicites :**",
+        result.get("real_anchor_limits_markers", [])
+    )
+
+    st.write(
+        "**Spéculation extrapolative :**",
+        result.get("real_anchor_speculation_markers", [])
+    )
 # =============================
 # 🧠 1. DÉRIVES COGNITIVES FONDAMENTALES
 # =============================
@@ -19130,133 +19256,7 @@ st.caption("Ouverture cognitive ⟵⟶ Clôture cognitive")
 st.caption(closure_text)
 st.markdown(f"**{T['interpretation']} :** {cog.interpret()}")
 
-# =============================
-# Ancrage au réel
-# =============================
 
-st.markdown("──── 🧪 ────")
-st.subheader("Ancrage au réel")
-
-st.caption(
-    "Cette jauge mesure dans quelle mesure le discours reste contraint "
-    "par l’expérience, la reproductibilité, la falsifiabilité et "
-    "la reconnaissance explicite de ses limites."
-)
-
-anchor_score = result.get("real_anchor_score", 0)
-anchor_label = result.get("real_anchor_label", "Non calculé")
-anchor_text = result.get("real_anchor_interpretation", "")
-
-if anchor_score < 3:
-    anchor_color = "#7f1d1d"   # rouge sombre
-    anchor_label = "Très faible"
-
-elif anchor_score < 7:
-    anchor_color = "#b45309"   # cuivre
-    anchor_label = "Fragile"
-
-elif anchor_score < 12:
-    anchor_color = "#a16207"   # ambre
-    anchor_label = "Modéré"
-
-elif anchor_score < 16:
-    anchor_color = "#57534e"   # pierre / neutre
-    anchor_label = "Fort"
-
-else:
-    anchor_color = "#334155"   # bleu acier
-    anchor_label = "Très fort"
-
-render_custom_gauge(anchor_score / 20, anchor_color)
-
-st.markdown(
-    f"<b style='color:{anchor_color}'>{anchor_label}</b> — {anchor_score}/20",
-    unsafe_allow_html=True
-)
-
-st.caption(anchor_text)
-
-st.caption("Spéculation libre ⟵⟶ Contrainte du réel")
-
-st.caption(
-    "Contrairement aux jauges morales classiques, cette palette ne récompense "
-    "pas une supposée vérité. Elle visualise la tension entre spéculation libre "
-    "et contrainte du réel. Les couleurs froides et minérales indiquent "
-    "une structure davantage stabilisée par l’expérience et la reproductibilité."
-)
-
-# =============================
-# Composantes
-# =============================
-
-st.markdown("### Composantes de l’ancrage")
-
-c1, c2 = st.columns(2)
-c3, c4 = st.columns(2)
-c5, _ = st.columns(2)
-
-c1.metric("Empirie", result.get("real_anchor_E", 0))
-c2.metric("Reproductibilité", result.get("real_anchor_R", 0))
-c3.metric("Falsifiabilité", result.get("real_anchor_F", 0))
-c4.metric("Limites", result.get("real_anchor_L", 0))
-c5.metric("Spéculation", result.get("real_anchor_S", 0))
-
-# =============================
-# Delta réalité / mécroyance
-# =============================
-
-st.markdown("### Tension réalité / cohérence")
-
-delta = result.get("delta_reality", 0)
-delta_label = result.get("delta_reality_label", "Non calculé")
-delta_text = result.get("delta_reality_interpretation", "")
-
-if delta <= -5:
-    delta_color = "#16a34a"
-
-elif delta <= 2:
-    delta_color = "#ca8a04"
-
-else:
-    delta_color = "#dc2626"
-
-st.markdown(
-    f"<b style='color:{delta_color}'>{delta_label}</b> — Δ = {delta}",
-    unsafe_allow_html=True
-)
-
-st.caption(delta_text)
-
-# =============================
-# Marqueurs détectés
-# =============================
-
-with st.expander("Voir les marqueurs d’ancrage", expanded=False):
-
-    st.write(
-        "**Empirie :**",
-        result.get("real_anchor_empirical_markers", [])
-    )
-
-    st.write(
-        "**Reproductibilité :**",
-        result.get("real_anchor_reproducibility_markers", [])
-    )
-
-    st.write(
-        "**Falsifiabilité :**",
-        result.get("real_anchor_falsifiability_markers", [])
-    )
-
-    st.write(
-        "**Limites explicites :**",
-        result.get("real_anchor_limits_markers", [])
-    )
-
-    st.write(
-        "**Spéculation extrapolative :**",
-        result.get("real_anchor_speculation_markers", [])
-    )
 
 st.markdown("""
 <div style="text-align:center; margin:25px 0; color:#888;">
