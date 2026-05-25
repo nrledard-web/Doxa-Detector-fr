@@ -19528,33 +19528,107 @@ st.markdown("""
 </div>
 """, unsafe_allow_html=True)
 
-# -----------------------------
-# Méthode
-# -----------------------------
-if show_method:
+st.markdown("""
+### Méthode
 
-    st.subheader(T["method"])
+#### Formule originelle
 
-    method_text = f"""
-### {T['original_formula']}
+```text
+M = (G + N) - D
+```
 
-`M = (G + N) - D`
+G : densité de savoir articulé — sources, chiffres, noms, références, traces vérifiables.
 
-- {T['articulated_knowledge_density']}
-- {T['integration']}
-- {T['assertive_rigidity']}
+N : intégration — contexte, nuances, réserves, cohérence argumentative.
 
-### {T['llm_metrics']}
+D : rigidité assertive — certitudes non soutenues, emballement rhétorique.
 
-- **{T['overconfidence']}** : `D - (G + N)`
-- **{T['calibration']}** : `D / (G + N)`
-- **{T['revisability']}** : `(G + N + V) - D`
-- **{T['cognitive_closure']}** : `(D * S) / (G + N)`
+---
 
-{T['disclaimer']}
-"""
+#### Métriques dérivées
 
-    st.markdown(method_text)
+```text
+Surconfiance = D - (G + N)
+
+Calibration relative = D / (G + N)
+
+Révisabilité = (G + N + V) - D
+
+Fermeture cognitive =
+max(0, D - (G_drift + N))
+
+Pseudo-savoir =
+max(0, (G_drift + D) - N)
+
+Intuition dogmatique =
+max(0, (N + D) - G_drift)
+
+Dérive cognitive globale =
+dominant_value * 0.60
++
+average_value * 0.40
+```
+
+Avec :
+
+```text
+G_drift = G × 0.5
+```
+
+---
+
+#### Nouvelles jauges structurelles
+
+```text
+Baratinage =
+(
+CF + CE + ACE + RP + NP + PI + CS
+)
+-
+(
+HF + AR + RV + BC + AS + AN
+)
+
+Omission stratégique =
+(
+CP
++ DR×1.5
++ PI
++ AA
++ CF
++ CC
++ MS×0.35
+)
+-
+(
+LM
++ RV
++ AR
++ PX
++ CA
+)
+
+Effet placebo étendu =
+(
+((N + 2D) - G)
+× EX
+)
++
+heuristique pondérée
+```
+
+---
+
+#### Lecture
+
+Cette app ne remplace ni un journaliste,
+ni un chercheur,
+ni un greffier du réel.
+
+Mais elle retire déjà quelques masques au texte qui parade.
+""")
+
+
 st.divider()    
 st.markdown("""
 <div style="text-align:center; margin:25px 0; color:#888;">
