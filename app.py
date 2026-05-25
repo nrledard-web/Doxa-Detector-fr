@@ -12000,88 +12000,128 @@ else:
 st.caption(analogique_message)
 
 # Popover explicatif
-with st.popover("ℹ️ Formule / explication"):
+with st.popover("ℹ️ Comprendre cette jauge"):
+
     st.markdown(f"""
 ### Analyse analogique du raisonnement
 
-Cette jauge estime la **solidité cognitive et argumentative du raisonnement**.
+Cette jauge estime la **solidité argumentative après pénalités**.
 
-Elle ne mesure pas seulement la vérité brute des affirmations : elle évalue la **structure logique du discours**, sa vérifiabilité et les fragilités détectées.
+Elle ne mesure pas :
+
+- la vérité absolue du texte ;
+- l’intention réelle du locuteur ;
+- la seule cohérence stylistique.
+
+Elle mesure plutôt la solidité restante du raisonnement après prise en compte des fragilités détectées.
+
+---
+
+### Principe
+
+Cette jauge part de la solidité argumentative globale, puis tient compte des pénalités de crédibilité.
+
+Elle peut être diminuée par :
+
+- pression rhétorique ;
+- certitude excessive ;
+- contradiction interne ;
+- données sans référentiel ;
+- baratinage ;
+- omission stratégique.
+
+L’effet placebo étendu n’est pas intégré ici sauf cas particulier de discours expérientiel.
 
 ---
 
 ### Résultats de cette analyse
 
-Score analogique affiché : **{round(display_score,1)}/20**  
-Score brut calculé : **{round(real_score,1)}/20**
+Score affiché :
+**{round(display_score, 1)}/20**
 
-Verdict : **{score_label}**
+Score réel utilisé :
+**{round(real_score, 1)}/20**
 
----
-
-### Lecture du score
-
-Un score faible ne signifie pas nécessairement absence totale de contenu, mais plutôt une **accumulation de signaux de fragilité**.
-
-Plusieurs jauges secondaires peuvent être activées simultanément :
-
-- pression rhétorique  
-- certitude excessive  
-- simplification narrative  
-- déséquilibre entre savoir et affirmation  
-- pénalités de crédibilité  
-
-Lorsque ces signaux s’additionnent, ils **réduisent fortement la solidité apparente du raisonnement**, même si le texte reste structuré en surface.
+Verdict :
+**{score_label}**
 
 ---
 
-### Plancher visuel
+### Formule utilisée
 
-Le score affiché applique un **plancher minimal de 2/20** afin d’éviter une barre vide.
+```python
+score = final_credibility_score
 
-Le score réel (**{round(real_score,1)}**) reste utilisé pour tous les calculs internes.
+si final_credibility_score est absent :
+    score = hard_fact_score
 
----
-
-### Formule heuristique réelle
-
-`HFS brut = (0.18×G + 0.12×N + 0.20×V + 0.22×QS + 0.18×VC) − (0.16×D + 0.12×R + 0.18×RC + P)`
-
-Puis :
-
-`HFS = HFS brut + 8 + bonus_épistémique`
-
-Le score final est borné entre **0 et 20**.
-
-Avec :
-
-- **G** : gnōsis  
-- **N** : nous  
-- **V** : vérifiabilité globale  
-- **QS** : qualité des sources  
-- **VC** : vérifiabilité moyenne des affirmations  
-- **D** : doxa  
-- **R** : risque rhétorique  
-- **RC** : risque moyen des affirmations  
-- **P** : pénalités de crédibilité  
+display_score = max(score, 2.0)
 
 ---
 
-### Interprétation
+### Valeurs complémentaires
 
-0–6 : raisonnement très fragile  
-6–9 : raisonnement fragile  
-9–13 : raisonnement modéré  
-13–16 : raisonnement solide  
-16–20 : raisonnement très solide  
+Solidité argumentative brute :
+
+**{round(result.get("hard_fact_score", 0), 1)}/20**
+
+Crédibilité finale pénalisée :
+
+**{round(result.get("final_credibility_score", 0), 1)}/20**
+
+Pénalité de crédibilité :
+
+**{round(result.get("credibility_penalty", 0), 2)}**
+
+Baratinage :
+
+**{round(result.get("baratinage_score", 0) * 100, 1)}%**
+
+Omission stratégique :
+
+**{round(result.get("omission_score", 0) * 100, 1)}%**
 
 ---
 
-### Conclusion
+### Couleurs
 
-Un score de **{round(display_score,1)}/20** indique un raisonnement **{score_label.lower()}**,  
-avec une **présence notable de signaux de fragilité cognitive**.
-""")
+🔴 **Rouge — Faible**  
+Le raisonnement paraît très fragilisé.
+
+🟠 **Orange — Fragile**  
+Une structure existe mais reste peu démonstrative.
+
+🟡 **Jaune — Modérée**  
+La structure logique est présente mais plusieurs liens restent partiels ou insuffisamment soutenus.
+
+🟢 **Vert — Solide**  
+Les idées s’enchaînent de manière globalement cohérente.
+
+🟢 **Vert foncé — Très solide**  
+Le discours présente une progression claire, cohérente et bien structurée.
+
+---
+
+### Lecture
+
+🔴 **0–5.9** : raisonnement très fragile  
+
+🟠 **6–8.9** : raisonnement fragile  
+
+🟡 **9–12.9** : raisonnement modéré  
+
+🟢 **13–15.9** : raisonnement solide  
+
+🟢 **16–20** : raisonnement très solide  
+
+---
+
+### Attention
+
+Un score élevé ne garantit pas que le texte est vrai.
+
+Il indique seulement que le raisonnement conserve une solidité apparente après application des pénalités détectées.
+
 
 st.markdown("""
 <div style="text-align:center; margin:25px 0; color:#888;">
