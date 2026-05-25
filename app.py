@@ -19574,7 +19574,10 @@ st.markdown("""
 ──── 🧠 ────
 </div>
 """, unsafe_allow_html=True)
-
+            
+# -----------------------------
+# hard_fact_checking_by_claim
+# -----------------------------
 st.subheader(T["hard_fact_checking_by_claim"])
 claims_df = pd.DataFrame(
     [
@@ -19617,6 +19620,9 @@ st.markdown("""
 </div>
 """, unsafe_allow_html=True)
 
+# -----------------------------
+# ai_module
+# -----------------------------
 st.subheader(T["ai_module"])
 st.caption(T["ai_module_caption"])
 
