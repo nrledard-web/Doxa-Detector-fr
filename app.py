@@ -13638,31 +13638,6 @@ st.markdown("""
 </div>
 """, unsafe_allow_html=True)    
 
-
-
-st.write("DEBUG crédibilité finale :", {
-    "hard_fact_score": result.get("hard_fact_score"),
-    "final_credibility_score": result.get("final_credibility_score"),
-    "credibility_penalty": result.get("credibility_penalty"),
-    "display_gauge_penalty": result.get("display_gauge_penalty"),
-
-    "G": result.get("G"),
-    "G_drift": result.get("G_drift"),
-    "N": result.get("N"),
-    "D": result.get("D"),
-
-    "discursive_pressure": result.get("discursive_pressure"),
-    "rhetorical_pressure": result.get("rhetorical_pressure"),
-    "propaganda_score": result.get("propaganda_score"),
-
-    "baratinage_score": result.get("baratinage_score"),
-    "omission_score": result.get("omission_score"),
-    "extended_placebo_score": result.get("extended_placebo_score"),
-})
-
-
-
-
 # =============================
 # Barre de crédibilité finale
 # =============================
