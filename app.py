@@ -12820,6 +12820,25 @@ G_drift = G × 0.5
 
 st.divider()
 
+
+st.write(
+    "DEBUG clés clôture :",
+    {
+        "closure": result.get("closure"),
+        "cognitive_closure": result.get("cognitive_closure"),
+        "cognitive_closure_score": result.get("cognitive_closure_score"),
+        "closure_score": result.get("closure_score"),
+        "doxic_rigidity_score": result.get("doxic_rigidity_score"),
+        "certainty_score": result.get("certainty_score"),
+        "strong_certainty_score": result.get("strong_certainty_score"),
+        "revisability": result.get("bonus_revisability"),
+        "anchor": result.get("bonus_anchor"),
+    }
+)
+
+
+
+
 # -----------------------------
 # 🧠 jauge de Clôture cognitive
 # -----------------------------
