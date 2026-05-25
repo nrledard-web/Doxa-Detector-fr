@@ -12849,7 +12849,10 @@ st.caption("Ouverture cognitive ⟵⟶ Clôture cognitive")
 
 st.caption(closure_text)
 
-st.markdown(f"**{T['interpretation']} :** {cog.interpret()}")
+st.markdown(
+    f"**{T.get('interpretation', 'Interprétation')} :** "
+    f"{result.get('closure_interpretation', closure_text)}"
+)
 
 with st.popover("ℹ️ Comprendre cette jauge"):
 
