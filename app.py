@@ -12842,7 +12842,7 @@ st.write(
 # -----------------------------
 # 🧠 jauge de Clôture cognitive
 # -----------------------------
-st.subheader("🧠 Clôture cognitive")
+st.subheader("Clôture cognitive")
 
 st.caption(
     "Cette jauge mesure le degré de verrouillage cognitif du texte. "
