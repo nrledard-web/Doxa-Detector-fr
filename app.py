@@ -12387,6 +12387,12 @@ st.caption(
     "et contrainte du réel. Les couleurs froides et minérales indiquent "
     "une structure davantage stabilisée par l’expérience et la reproductibilité."
 )
+# -----------------------------
+# Tension réalité / cohérence
+# -----------------------------
+delta = result.get("delta_reality", 0)
+delta_label = result.get("delta_reality_label", "Non calculé")
+delta_text = result.get("delta_reality_interpretation", "")
 
 with st.popover("ℹ️ Comprendre cette jauge"):
 
