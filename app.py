@@ -12643,18 +12643,6 @@ Clôture cognitive :
 
 ---
 
-### Lecture
-
-🟢 Faible surconfiance → certitude contenue
-
-🟡 Calibration moyenne → équilibre instable
-
-🟠 Révisabilité faible → rigidification
-
-🔴 Clôture élevée → verrouillage cognitif
-
----
-
 ### Attention
 
 Ces indicateurs décrivent une architecture cognitive.
