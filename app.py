@@ -13358,9 +13358,9 @@ else:
 
 st.subheader(f"{emoji} Tension cognitive : {gauge_label}")
 st.caption(
-    "Cette jauge indique si le discours relève plutôt d’une erreur sincère "
-    "(mécroyance) ou d’une possible manipulation. "
-    "Plus la jauge progresse, plus la structure du texte se rapproche du mensonge."
+    "Cette jauge estime si le discours relève davantage d’une mécroyance "
+    "(erreur sincère) ou d’une dynamique pouvant suggérer une manipulation. "
+    "Plus la jauge progresse, plus la structure du texte se rapproche d’un mensonge probable."
 )
 # Barre visuelle de la jauge
 st.markdown(f"""
@@ -14105,7 +14105,9 @@ else:
     color_c = "#15803d"
     etiquette_c = "Très solide"
     message_c = "Le texte présente une structure cognitive robuste et peu de signaux de fragilité."
-
+    
+result["final_credibility_label"] = etiquette_c
+result["final_credibility_message"] = message_c
 st.subheader(f"{couleur_c} Crédibilité finale : {etiquette_c}")
 
 st.caption(
