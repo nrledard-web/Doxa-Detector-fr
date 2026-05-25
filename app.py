@@ -12461,6 +12461,93 @@ with st.expander("Voir les marqueurs d’ancrage", expanded=False):
         result.get("real_anchor_speculation_markers", [])
     )
 
+
+# =============================
+# 🧠 Structure cognitive du texte
+# =============================
+
+st.subheader("🧠 Structure cognitive du texte")
+
+st.caption(
+    "Vue synthétique des équilibres entre savoir, compréhension, certitude et révisabilité."
+)
+
+cog = Cognition(result["G"], result["N"], result["D"])
+
+overconfidence = result["D"] - (result["G"] + result["N"])
+
+calibration = (
+    result["D"] /
+    (result["G"] + result["N"])
+    if (result["G"] + result["N"]) > 0
+    else 10
+)
+
+revisability = (
+    result["G"]
+    + result["N"]
+    + result["V"]
+    - result["D"]
+)
+
+closure = (
+    (
+        result["D"]
+        * (1 + len(result["red_flags"]) / 5)
+    )
+    /
+    (result["G"] + result["N"])
+    if (result["G"] + result["N"]) > 0
+    else 10
+)
+
+c1, c2 = st.columns(2)
+
+c1.metric(
+    T["overconfidence"],
+    round(overconfidence, 2)
+)
+
+c2.metric(
+    T["calibration"],
+    round(calibration, 2)
+)
+
+c3, c4 = st.columns(2)
+
+c3.metric(
+    T["revisability"],
+    round(revisability, 2)
+)
+
+c4.metric(
+    T["cognitive_closure"],
+    round(closure, 2)
+)
+
+with st.popover("ℹ️ Comprendre cette structure"):
+
+    st.markdown(f"""
+### Structure cognitive du texte
+
+Cette section présente les métriques fondamentales du modèle cognitif.
+
+Elle ne mesure pas :
+
+- la vérité absolue ;
+- le mensonge ;
+- l’intention du locuteur.
+
+Elle observe les rapports entre savoir, compréhension, certitude et capacité de révision.
+
+---
+
+### Formule fondatrice
+
+```text
+M = (G + N) - D
+
+
 st.markdown("""
 <div style="text-align:center; margin:25px 0; color:#888;">
 ────────── ✦ ──────────
@@ -19345,21 +19432,85 @@ st.markdown("""
 </div>
 """, unsafe_allow_html=True)
 
-st.subheader("Structure cognitive du texte analysé")
-st.info(T["llm_intro"])
+# -----------------------------
+# Analyse syllogistique
+# -----------------------------
+st.subheader("Analyse syllogistique")
 
-cog = Cognition(result["G"], result["N"], result["D"])
-overconfidence = result["D"] - (result["G"] + result["N"])
-calibration = result["D"] / (result["G"] + result["N"]) if (result["G"] + result["N"]) > 0 else 10
-revisability = (result["G"] + result["N"] + result["V"]) - result["D"]
-closure = (result["D"] * (1 + len(result["red_flags"]) / 5)) / (result["G"] + result["N"]) if (result["G"] + result["N"]) > 0 else 10
+if result.get("syllogisms"):
+    for i, s in enumerate(result["syllogisms"], start=1):
+        with st.expander(f"Syllogisme potentiel {i}", expanded=False):
+            st.write(f"**Forme** : {s['form']}")
+            st.write(f"**Terme moyen** : {s['middle_term'] if s['middle_term'] else '-'}")
+            st.write(f"**Figure** : {s['figure'] if s['figure'] else '-'}")
+            st.write(f"**Statut** : {s['status']}")
 
-c1, c2 = st.columns(2)
-c1.metric(T["overconfidence"], round(overconfidence, 2))
-c2.metric(T["calibration"], round(calibration, 2))
-c3, c4 = st.columns(2)
-c3.metric(T["revisability"], round(revisability, 2))
-c4.metric(T["cognitive_closure"], round(closure, 2))
+            st.write("**Prémisse 1**")
+            st.write(s["premise_1"])
+            if "p1_terms" in s:
+                st.caption(f"Sujet : {s['p1_terms']['subject']} | Prédicat : {s['p1_terms']['predicate']}")
+
+            st.write("**Prémisse 2**")
+            st.write(s["premise_2"])
+            if "p2_terms" in s:
+                st.caption(f"Sujet : {s['p2_terms']['subject']} | Prédicat : {s['p2_terms']['predicate']}")
+
+            st.write("**Conclusion**")
+            st.write(s["conclusion"])
+            if "c_terms" in s:
+                st.caption(f"Sujet : {s['c_terms']['subject']} | Prédicat : {s['c_terms']['predicate']}")
+else:
+    st.info("Aucun syllogisme détecté.")
+
+st.divider()
+# -----------------------------
+# Enthymèmes
+# -----------------------------
+st.subheader("Enthymèmes détectés")
+
+if result.get("enthymemes"):
+    for i, e in enumerate(result["enthymemes"], start=1):
+        with st.expander(f"Enthymème potentiel {i}", expanded=False):
+            st.write(f"**Forme** : {e['form']}")
+            st.write(f"**Sujet** : {e['subject']}")
+            st.write(f"**Prédicat** : {e['predicate']}")
+            st.write(f"**Statut** : {e['status']}")
+
+            st.write("**Conclusion**")
+            st.write(e["conclusion"])
+
+            if e["context"]:
+                st.write("**Contexte précédent**")
+                for line in e["context"]:
+                    st.write(f"- {line}")
+else:
+    st.info("Aucun enthymème détecté.")
+
+st.divider()
+
+# -----------------------------
+# Sophismes syllogistiques
+# -----------------------------
+st.subheader("Sophismes syllogistiques")
+
+if result.get("fallacies"):
+    for i, f in enumerate(result["fallacies"], start=1):
+        with st.expander(f"Sophisme détecté {i}", expanded=False):
+            st.write(f"**Type** : {f['type']}")
+            st.write(f"**Description** : {f['description']}")
+
+            s = f["syllogism"]
+
+            st.write("**Prémisse 1**")
+            st.write(s["premise_1"])
+
+            st.write("**Prémisse 2**")
+            st.write(s["premise_2"])
+
+            st.write("**Conclusion**")
+            st.write(s["conclusion"])
+else:
+    st.info("Aucun sophisme syllogistique détecté.")
 
 st.divider()
 
@@ -19403,78 +19554,6 @@ st.markdown("""
 </div>
 """, unsafe_allow_html=True)
 
-st.divider()
-st.subheader("Analyse syllogistique")
-
-if result.get("syllogisms"):
-    for i, s in enumerate(result["syllogisms"], start=1):
-        with st.expander(f"Syllogisme potentiel {i}", expanded=False):
-            st.write(f"**Forme** : {s['form']}")
-            st.write(f"**Terme moyen** : {s['middle_term'] if s['middle_term'] else '-'}")
-            st.write(f"**Figure** : {s['figure'] if s['figure'] else '-'}")
-            st.write(f"**Statut** : {s['status']}")
-
-            st.write("**Prémisse 1**")
-            st.write(s["premise_1"])
-            if "p1_terms" in s:
-                st.caption(f"Sujet : {s['p1_terms']['subject']} | Prédicat : {s['p1_terms']['predicate']}")
-
-            st.write("**Prémisse 2**")
-            st.write(s["premise_2"])
-            if "p2_terms" in s:
-                st.caption(f"Sujet : {s['p2_terms']['subject']} | Prédicat : {s['p2_terms']['predicate']}")
-
-            st.write("**Conclusion**")
-            st.write(s["conclusion"])
-            if "c_terms" in s:
-                st.caption(f"Sujet : {s['c_terms']['subject']} | Prédicat : {s['c_terms']['predicate']}")
-else:
-    st.info("Aucun syllogisme détecté.")
-
-st.divider()
-
-st.subheader("Enthymèmes détectés")
-
-if result.get("enthymemes"):
-    for i, e in enumerate(result["enthymemes"], start=1):
-        with st.expander(f"Enthymème potentiel {i}", expanded=False):
-            st.write(f"**Forme** : {e['form']}")
-            st.write(f"**Sujet** : {e['subject']}")
-            st.write(f"**Prédicat** : {e['predicate']}")
-            st.write(f"**Statut** : {e['status']}")
-
-            st.write("**Conclusion**")
-            st.write(e["conclusion"])
-
-            if e["context"]:
-                st.write("**Contexte précédent**")
-                for line in e["context"]:
-                    st.write(f"- {line}")
-else:
-    st.info("Aucun enthymème détecté.")
-
-st.divider()
-
-st.subheader("Sophismes syllogistiques")
-
-if result.get("fallacies"):
-    for i, f in enumerate(result["fallacies"], start=1):
-        with st.expander(f"Sophisme détecté {i}", expanded=False):
-            st.write(f"**Type** : {f['type']}")
-            st.write(f"**Description** : {f['description']}")
-
-            s = f["syllogism"]
-
-            st.write("**Prémisse 1**")
-            st.write(s["premise_1"])
-
-            st.write("**Prémisse 2**")
-            st.write(s["premise_2"])
-
-            st.write("**Conclusion**")
-            st.write(s["conclusion"])
-else:
-    st.info("Aucun sophisme syllogistique détecté.")
 
 st.divider()  
 st.markdown("""
@@ -19528,6 +19607,9 @@ st.markdown("""
 </div>
 """, unsafe_allow_html=True)
 
+# -----------------------------
+# Méthode
+# -----------------------------
 st.markdown("""
 ### Méthode
 
