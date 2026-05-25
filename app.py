@@ -1534,70 +1534,54 @@ def interpret_closure_gauge(value: float):
         return "Clôture critique", "#dc2626", "Le texte semble fortement verrouillé par sa propre structure."
 
 def generate_share_block(result):
+    from urllib.parse import quote
 
-    credibility = result.get("hard_fact_score", 0)
+    cred_final = round(result.get("final_credibility_score", result.get("hard_fact_score", 0)), 1)
+    hard_fact = round(result.get("hard_fact_score", 0), 1)
 
-    gravity = result.get(
-        "cognitive_gravity",
-        0
-    )
+    M = round(result.get("M", result.get("G_drift", 0) + result.get("N", 0) - result.get("D", 0)), 2)
 
-    stability = result.get(
-        "cognitive_stability",
-        0
-    )
+    global_drift = round(result.get("global_cognitive_drift", 0), 2)
+    closure = round(result.get("closure", 0), 2)
+    real_anchor = round(result.get("real_anchor_score", result.get("reality_anchor_score", 0)), 2)
 
-    regime = result.get(
-        "dominant_regime",
-        ""
-    )
+    baratinage = round(result.get("baratinage_score", 0) * 100, 1)
+    omission = round(result.get("omission_score", 0) * 100, 1)
+    placebo = round(result.get("extended_placebo_score", 0) * 100, 1)
 
-    verdict = result.get(
-        "brain_verdict",
-        ""
-    )
+    regime = result.get("cognitive_regime", result.get("dominant_regime", "Non déterminé"))
+    verdict = result.get("verdict", "Non déterminé")
 
-    # -----------------------------
-    # Red flags lisibles
-    # -----------------------------
-    flags_lines = []
+    flags = []
 
-    red_flags = result.get("red_flags", [])
-
-    if isinstance(red_flags, list):
-        for flag in red_flags:
-            if isinstance(flag, dict):
-                name = flag.get("name", "Signal détecté")
-                reason = flag.get("reason", "")
-                if reason:
-                    flags_lines.append(f"- {name} : {reason}")
+    penalty_details = result.get("penalty_details", {})
+    for group in penalty_details.values():
+        if isinstance(group, list):
+            for item in group:
+                if isinstance(item, dict):
+                    flags.append(item.get("name") or item.get("label") or str(item))
                 else:
-                    flags_lines.append(f"- {name}")
-            else:
-                flags_lines.append(f"- {flag}")
+                    flags.append(str(item))
 
-    # Catégories rhétoriques détectées
-    patterns = result.get("political_patterns", {})
+    flags = [f for f in flags if f]
+    flags_text = "\n".join(f"- {f}" for f in flags[:8]) if flags else "- Aucun signal majeur"
 
-    if isinstance(patterns, dict):
-        for name, count in patterns.items():
-            if count and count > 0:
-                clean_name = name.replace("_", " ").capitalize()
-                flags_lines.append(f"- {clean_name} ({count})")
+    summary = f"""Analyse DOXA Detector
 
-    if flags_lines:
-        flags_text = "\n".join(flags_lines[:12])
-    else:
-        flags_text = "Aucun signal rhétorique majeur détecté"
+Crédibilité finale : {cred_final}/20
+Solidité argumentative brute : {hard_fact}/20
 
-    summary = f"""
-Analyse DOXA Detector
+Mécroyance (M) : {M}
+Dérive cognitive globale : {global_drift}
+Clôture cognitive : {closure}
+Ancrage au réel : {real_anchor}/20
 
-Crédibilité : {credibility}/20
-Gravité cognitive : {gravity}
-Stabilité cognitive : {stability}
+Baratinage : {baratinage}%
+Omission stratégique : {omission}%
+Effet placebo étendu : {placebo}%
 
-Régime dominant : {regime}
+Régime dominant :
+{regime}
 
 Verdict :
 {verdict}
@@ -1611,8 +1595,7 @@ https://doxa-detector-fr-krsbrtpqc6kucpdg9bfgv2.streamlit.app/
 M = (G + N) − D
 """
 
-    encoded = urllib.parse.quote(summary)
-
+    encoded = quote(summary)
     return summary, encoded
 
 def render_custom_gauge(value: float, color: str):
