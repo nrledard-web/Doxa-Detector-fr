@@ -12555,29 +12555,31 @@ closure = (
     else 10
 )
 
-c1, c2 = st.columns(2)
+with st.popover("📊 Voir les métriques cognitives"):
 
-c1.metric(
-    T["overconfidence"],
-    round(overconfidence, 2)
-)
+    c1, c2 = st.columns(2)
 
-c2.metric(
-    T["calibration"],
-    round(calibration, 2)
-)
+    c1.metric(
+        T["overconfidence"],
+        round(overconfidence, 2)
+    )
 
-c3, c4 = st.columns(2)
+    c2.metric(
+        T["calibration"],
+        round(calibration, 2)
+    )
 
-c3.metric(
-    T["revisability"],
-    round(revisability, 2)
-)
+    c3, c4 = st.columns(2)
 
-c4.metric(
-    T["cognitive_closure"],
-    round(closure, 2)
-)
+    c3.metric(
+        T["revisability"],
+        round(revisability, 2)
+    )
+
+    c4.metric(
+        T["cognitive_closure"],
+        round(closure, 2)
+    )
 
 with st.popover("ℹ️ Comprendre cette structure"):
 
@@ -12598,49 +12600,50 @@ Elle observe les rapports entre savoir, compréhension, certitude et capacité d
 
 ### Formule fondatrice
 
-```text
 M = (G + N) - D
+
 Avec :
 
-G → savoir articulé
-N → compréhension intégrée
-D → certitude / rigidité
-Métriques affichées
-Surconfiance =
-D - (G + N)
+- **G** → savoir articulé
+- **N** → compréhension intégrée
+- **D** → certitude / rigidité
 
-Calibration =
-D / (G + N)
+---
 
-Révisabilité =
-(G + N + V) - D
+### Métriques affichées
 
-Clôture cognitive =
-(D × S) / (G + N)
+Surconfiance = D - (G + N)
 
-avec :
+Calibration = D / (G + N)
 
-V = vérifiabilité
-S = facteur de signalisation
-Valeurs actuelles
+Révisabilité = (G + N + V) - D
+
+Clôture cognitive = (D × S) / (G + N)
+
+Avec :
+
+- **V** = vérifiabilité
+- **S** = facteur de signalisation
+
+---
+
+### Valeurs actuelles
 
 Surconfiance :
-
-{round(overconfidence,2)}
+**{round(overconfidence, 2)}**
 
 Calibration :
-
-{round(calibration,2)}
+**{round(calibration, 2)}**
 
 Révisabilité :
-
-{round(revisability,2)}
+**{round(revisability, 2)}**
 
 Clôture cognitive :
+**{round(closure, 2)}**
 
-{round(closure,2)}
+---
 
-Lecture
+### Lecture
 
 🟢 Faible surconfiance → certitude contenue
 
@@ -12650,7 +12653,9 @@ Lecture
 
 🔴 Clôture élevée → verrouillage cognitif
 
-Attention
+---
+
+### Attention
 
 Ces indicateurs décrivent une architecture cognitive.
 
