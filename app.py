@@ -13730,101 +13730,165 @@ st.markdown(
 
 st.caption(message_c)
 
-with st.popover("ℹ️ Formule / explication"):
+with st.popover("ℹ️ Comprendre cette jauge"):
 
-    st.subheader(f"{T['verdict']} : {couleur_c} Crédibilité finale — {etiquette_c}")
-    st.caption(f"Score final : {round(final_score, 1)}/20 — {message_c}")
-    st.subheader(T["summary"])
-
-    m1, m2 = st.columns(2)
-    m1.metric("HFS", round(result["hard_fact_score"], 1))
-    m2.metric("G — gnōsis", round(result["G"], 2))
-    
-    m3, m4 = st.columns(2)
-    m3.metric("N — nous", round(result["N"], 2))
-    m4.metric("D — doxa", round(result["D"], 2))
-    
-    m5, m6 = st.columns(2)
-    m5.metric("Pression discursive", round(result.get("discursive_pressure", 0), 2))
-    m6.metric("ID", round(result.get("ID", 0), 2))
-    
-    m7, m8 = st.columns(2)
-    m7.metric("Pénalité jauges", round(result.get("display_gauge_penalty", 0), 2))
-    m8.metric("Score final", round(final_score, 1))
-    
     st.markdown(f"""
-    Cette jauge synthétise la **crédibilité globale du texte**.
-    
-    Elle combine trois dimensions :
-    
-    - la solidité factuelle du texte  
-    - l’équilibre cognitif entre connaissance, compréhension et certitude  
-    - la pression discursive détectée dans le langage  
-    
-    ---
-    
-    ### 1️⃣ Solidité factuelle
-    
-    `HFS = hard_fact_score / 20`
-    
-    Dans cette analyse :
-    
-    `HFS = {round(result["hard_fact_score"], 1)} / 20`
-    
-    ---
-    
-    ### 2️⃣ Calibration cognitive
-    
-    `OC = (G + N) / (G + N + D)`
-    
-    avec :
-    
-    G = gnōsis  
-    N = nous  
-    D = doxa  
-    
-    Dans cette analyse :
-    
-    `OC = ({round(result["G"],2)} + {round(result["N"],2)}) / ({round(result["G"],2)} + {round(result["N"],2)} + {round(result["D"],2)})`
-    
-    `OC ≈ {round((result["G"] + result["N"]) / max((result["G"] + result["N"] + result["D"]), 1), 2)}`
-    
-    ---
-    
-    ### 3️⃣ Indice de pression discursive
-    
-    `ID = 1 − pression_discursive`
-    
-    avec :
-    
-    `pression_discursive = propagande + pression_rhétorique`
-    
-    Plus la pression discursive est forte, plus le score final diminue.
-    
-    ---
-    
-    ### 4️⃣ Formule heuristique principale
-    
-    `score_initial = 20 × HFS × OC × ID`
-    
-    ---
-    
-    ### 5️⃣ Ajustement final
-    
-    `score_final = score_initial − pénalité_jauges`
-    
-    Score final observé :
-    
-    `score_final = {round(final_score, 1)} / 20`
-    
-    ---
-    
-    ### Interprétation du score final
-    
-    0–5 : crédibilité très fragile  
-    6–9 : crédibilité fragile  
-    10–14 : crédibilité prudente  
-    15–20 : crédibilité robuste
+### Crédibilité finale
+
+Cette jauge synthétise la crédibilité globale du texte.
+
+Elle ne mesure pas :
+
+- la vérité absolue du texte ;
+- l’intention réelle du locuteur ;
+- la seule cohérence du style.
+
+Elle mesure plutôt le niveau de confiance raisonnable que le discours semble permettre après prise en compte des fragilités détectées.
+
+---
+
+### Principe
+
+Le moteur combine :
+
+- la solidité factuelle ;
+- l’équilibre cognitif entre savoir, compréhension et certitude ;
+- la pression discursive ;
+- les pénalités de crédibilité.
+
+Les jauges complémentaires peuvent influencer indirectement le score via les pénalités appliquées.
+
+Influences complémentaires observées :
+
+- **baratinage** ;
+- **omission stratégique** ;
+
+L’effet placebo étendu n’est pris en compte que s’il atteint un niveau significatif.
+
+---
+
+### Formule utilisée
+
+```python
+HFS = hard_fact_score / 20
+
+OC = (
+    G + N
+) / (
+    G + N + D
+)
+
+ID = (
+    1 - pression_discursive
+)
+
+score_initial = (
+    20
+    * HFS
+    * OC
+    * ID
+)
+
+score_final = (
+    score_initial
+    - penalite_jauges
+)
+---
+
+### Avec les valeurs actuelles
+
+HFS :
+
+**{round(result["hard_fact_score"], 1)} / 20**
+
+G :
+
+**{round(result["G"], 2)}**
+
+N :
+
+**{round(result["N"], 2)}**
+
+D :
+
+**{round(result["D"], 2)}**
+
+Pression discursive :
+
+**{round(result.get("discursive_pressure", 0), 2)}**
+
+Pénalité jauges :
+
+**{round(result.get("display_gauge_penalty", 0), 2)}**
+
+---
+
+### Fragilités complémentaires
+
+Baratinage :
+
+**{round(result.get("baratinage_score", 0) * 100, 1)}%**
+
+Omission stratégique :
+
+**{round(result.get("omission_score", 0) * 100, 1)}%**
+
+Effet placebo étendu :
+
+**{round(result.get("extended_placebo_score", 0) * 100, 1)}%**
+
+---
+
+### Résultat actuel
+
+Score final :
+
+**{round(final_score, 1)}/20**
+
+Niveau :
+
+**{etiquette_c}**
+
+{message_c}
+
+---
+
+### Couleurs
+
+🔴 **Rouge — Très fragile**  
+Le texte présente de fortes fragilités structurelles ou vérifiables.
+
+🟠 **Orange — Fragile**  
+Le texte contient plusieurs fragilités importantes.
+
+🟡 **Jaune — Prudente**  
+Le raisonnement existe mais certaines affirmations restent peu démontrées.
+
+🟢 **Vert — Solide**  
+Le texte présente une crédibilité globalement correcte.
+
+🟢 **Vert foncé — Très solide**  
+Le discours présente peu de signaux de fragilité.
+
+---
+
+### Lecture
+
+🔴 **0–5** : crédibilité très fragile
+
+🟠 **6–9** : crédibilité fragile
+
+🟡 **10–14** : crédibilité prudente
+
+🟢 **15–20** : crédibilité robuste
+
+---
+
+### Attention
+
+Un score élevé ne garantit pas que le texte est vrai.
+
+Il indique seulement que le discours conserve une crédibilité relative après prise en compte des fragilités détectées.
     """)
 
     st.markdown("""
