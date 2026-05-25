@@ -12821,6 +12821,119 @@ G_drift = G × 0.5
 st.divider()
 
 # -----------------------------
+# 🧠 jauge de Clôture cognitive
+# -----------------------------
+st.subheader("🧠 Clôture cognitive")
+
+st.caption(
+    "Cette jauge mesure le degré de verrouillage cognitif du texte. "
+    "Plus elle monte, plus la certitude domine le savoir et l’intégration."
+)
+
+closure_gauge = min(closure / 1.5, 1.0)
+
+closure_label, closure_color, closure_text = interpret_closure_gauge(closure)
+
+render_custom_gauge(closure_gauge, closure_color)
+
+st.markdown(
+    f"<b style='color:{closure_color}'>{closure_label}</b> — {round(closure, 2)}",
+    unsafe_allow_html=True
+)
+
+st.caption("Ouverture cognitive ⟵⟶ Clôture cognitive")
+
+st.caption(closure_text)
+
+st.markdown(f"**{T['interpretation']} :** {cog.interpret()}")
+
+with st.popover("ℹ️ Comprendre cette jauge"):
+
+    st.markdown(f"""
+### Clôture cognitive
+
+Cette jauge estime dans quelle mesure un texte semble se refermer sur sa propre certitude.
+
+Elle ne mesure pas :
+
+- la vérité absolue du texte ;
+- le mensonge ;
+- l’intention réelle du locuteur.
+
+Elle mesure plutôt un **risque de verrouillage cognitif** : le moment où la certitude domine le savoir articulé et la compréhension intégrée.
+
+---
+
+### Principe
+
+Le moteur observe la tension entre :
+
+- le savoir disponible ;
+- la compréhension intégrée ;
+- le niveau de certitude ;
+- la capacité du discours à rester révisable.
+
+Plus la clôture monte, plus le texte semble difficile à corriger, nuancer ou réviser.
+
+---
+
+### Formule utilisée
+
+closure = degré de clôture cognitive calculé par le modèle cognitif
+
+closure_gauge = min(closure / 1.5, 1.0)
+
+---
+
+### Valeur actuelle
+
+Clôture cognitive :
+
+**{round(closure, 2)}**
+
+Valeur normalisée de la jauge :
+
+**{round(closure_gauge * 100, 1)}%**
+
+Interprétation :
+
+**{closure_label}**
+
+---
+
+### Couleurs
+
+🟢 **Vert — Ouverture cognitive**  
+Le texte reste révisable, nuancé ou ouvert à la correction.
+
+🟡 **Jaune — Tension cognitive**  
+Certaines certitudes apparaissent, mais sans verrouillage dominant.
+
+🟠 **Orange — Clôture partielle**  
+La certitude commence à limiter la révisabilité du discours.
+
+🔴 **Rouge — Clôture forte**  
+La certitude semble dominer le savoir et la compréhension intégrée.
+
+---
+
+### Lecture
+
+🟢 **Ouverture** : le doute structure encore la cognition  
+🟡 **Tension** : certitude présente mais encore révisable  
+🟠 **Clôture partielle** : réduction de la nuance  
+🔴 **Clôture forte** : verrouillage interprétatif dominant  
+
+---
+
+### Attention
+
+Un score élevé ne signifie pas que le texte est faux.
+
+Il indique seulement que le discours semble moins révisable, plus affirmatif, ou davantage fermé à la correction.
+""")
+    
+# -----------------------------
 # Indice global de dérive cognitive
 # -----------------------------
 st.markdown("### Indice global de dérive cognitive")
@@ -19240,31 +19353,6 @@ c3.metric(T["revisability"], round(revisability, 2))
 c4.metric(T["cognitive_closure"], round(closure, 2))
 
 st.divider()
-
-st.subheader("Jauge de clôture cognitive")
-
-st.caption(
-    "Cette jauge mesure le degré de verrouillage cognitif du texte. "
-    "Plus elle monte, plus la certitude domine le savoir et l’intégration."
-)
-
-closure_gauge = min(closure / 1.5, 1.0)
-
-closure_label, closure_color, closure_text = interpret_closure_gauge(closure)
-
-render_custom_gauge(closure_gauge, closure_color)
-
-st.markdown(
-    f"<b style='color:{closure_color}'>{closure_label}</b> — {round(closure,2)}",
-    unsafe_allow_html=True
-)
-
-st.caption("Ouverture cognitive ⟵⟶ Clôture cognitive")
-
-st.caption(closure_text)
-st.markdown(f"**{T['interpretation']} :** {cog.interpret()}")
-
-
 
 st.markdown("""
 <div style="text-align:center; margin:25px 0; color:#888;">
