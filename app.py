@@ -12546,7 +12546,62 @@ Elle observe les rapports entre savoir, compréhension, certitude et capacité d
 
 ```text
 M = (G + N) - D
+Avec :
 
+G → savoir articulé
+N → compréhension intégrée
+D → certitude / rigidité
+Métriques affichées
+Surconfiance =
+D - (G + N)
+
+Calibration =
+D / (G + N)
+
+Révisabilité =
+(G + N + V) - D
+
+Clôture cognitive =
+(D × S) / (G + N)
+
+avec :
+
+V = vérifiabilité
+S = facteur de signalisation
+Valeurs actuelles
+
+Surconfiance :
+
+{round(overconfidence,2)}
+
+Calibration :
+
+{round(calibration,2)}
+
+Révisabilité :
+
+{round(revisability,2)}
+
+Clôture cognitive :
+
+{round(closure,2)}
+
+Lecture
+
+🟢 Faible surconfiance → certitude contenue
+
+🟡 Calibration moyenne → équilibre instable
+
+🟠 Révisabilité faible → rigidification
+
+🔴 Clôture élevée → verrouillage cognitif
+
+Attention
+
+Ces indicateurs décrivent une architecture cognitive.
+
+Ils ne déterminent ni la vérité ni la fausseté du texte.
+""")
 
 st.markdown("""
 <div style="text-align:center; margin:25px 0; color:#888;">
