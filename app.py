@@ -12829,6 +12829,10 @@ st.caption(
     "Cette jauge mesure le degré de verrouillage cognitif du texte. "
     "Plus elle monte, plus la certitude domine le savoir et l’intégration."
 )
+# -----------------------------
+# Valeur clôture cognitive
+# -----------------------------
+closure = result.get("closure", 0)
 
 closure_gauge = min(closure / 1.5, 1.0)
 
