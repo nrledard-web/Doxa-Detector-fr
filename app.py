@@ -12122,7 +12122,7 @@ Le discours présente une progression claire, cohérente et bien structurée.
 Un score élevé ne garantit pas que le texte est vrai.
 
 Il indique seulement que le raisonnement conserve une solidité apparente après application des pénalités détectées.
-
+""")
 
 st.markdown("""
 <div style="text-align:center; margin:25px 0; color:#888;">
