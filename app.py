@@ -9075,21 +9075,34 @@ def analyze_article(text: str) -> Dict:
     # Score final fusion des jauges
     # -----------------------------
     HFS = hard_fact_score / 20
-
-    OC = max(0.0, (G + N) / (G + N + D)) if (G + N + D) > 0 else 0.0
-
+    
+    OC = (
+        max(0.0, (G + N) / (G + N + D))
+        if (G + N + D) > 0
+        else 0.0
+    )
+    
     discursive_pressure = min(
         1.0,
         propaganda_analysis["score"] + rhetorical_pressure
     )
-
+    
     ID = max(0.1, 1 - discursive_pressure)
-
+    
+    # Bonus léger : valorise le savoir et la compréhension
+    knowledge_bonus = min(
+        1.0,
+        ((G + N) / 20) * 0.08
+    )
+    
     final_credibility_score = round(
-        20 * HFS * OC * ID,
+        min(
+            20,
+            (20 * HFS * OC * ID)
+            + (knowledge_bonus * 20)
+        ),
         1
     )
-
     if final_credibility_score < 6:
         verdict = T["low_credibility"]
     elif final_credibility_score < 10:
