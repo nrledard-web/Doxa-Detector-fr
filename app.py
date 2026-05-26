@@ -3189,6 +3189,12 @@ FRAME_SHIFT_TERMS += [
     "au-delà de l'électricité",
     "idées reçues",
     "réalités factuelles",
+    "ce n'est pas pour autant",
+    "ce n’est pas pour autant",
+    "en réalité",
+    "et ce n'est pas tout",
+    "et ce n’est pas tout",
+    "le problème ?",
 ]
 
 ATTACK_TERMS = [
@@ -3491,15 +3497,6 @@ ATTACK_TERMS += [
     "prennent un malin plaisir",
     "agitent le chiffon rouge",
     "chiffon rouge",
-]
-
-FRAME_SHIFT_TERMS += [
-    "ce n'est pas pour autant",
-    "ce n’est pas pour autant",
-    "en réalité",
-    "et ce n'est pas tout",
-    "et ce n’est pas tout",
-    "le problème ?",
 ]
 
 BINARY_OPPOSITION_TERMS += [
