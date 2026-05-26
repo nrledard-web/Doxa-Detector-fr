@@ -13306,7 +13306,7 @@ st.markdown(
 st.caption(result["cognitive_drift_interpretation"])
 
 
-with st.popover("ℹ️ Comprendre cette jauge", use_container_width=True):
+with st.popover("ℹ️ Comprendre cette jauge"):
 
     st.markdown(f"""
 ### Indice global de dérive cognitive
