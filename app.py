@@ -9168,6 +9168,20 @@ def analyze_article(text: str) -> Dict:
 
     hard_fact_score = round(clamp(hard_fact_score + short_epistemic_bonus, 0, 20), 1)
 
+    # Bonus de robustesse quantitative
+    quantitative_robustness_bonus = 0.0
+    
+    if quantitative_robustness_analysis["score"] >= 0.50:
+        quantitative_robustness_bonus = 0.4
+    
+    if quantitative_robustness_analysis["score"] >= 0.75:
+        quantitative_robustness_bonus = 0.7
+    
+    hard_fact_score = round(
+        clamp(hard_fact_score + quantitative_robustness_bonus, 0, 20),
+        1
+    )
+
     political_pattern_score, political_results, matched_terms = detect_political_patterns(text)
     
     rhetorical_pressure = compute_rhetorical_pressure(political_results)
