@@ -9076,7 +9076,14 @@ def analyze_article(text: str) -> Dict:
     # -----------------------------
     HFS = hard_fact_score / 20
     
-    OC = max(0.0, (G + N) / (G + N + D)) if (G + N + D) > 0 else 0.0
+    OC = (
+        max(
+            0.0,
+            ((G * 1.2) + N) / ((G * 1.2) + N + D)
+        )
+        if ((G * 1.2) + N + D) > 0
+        else 0.0
+    )
     
     discursive_pressure = min(
         1.0,
