@@ -9076,11 +9076,7 @@ def analyze_article(text: str) -> Dict:
     # -----------------------------
     HFS = hard_fact_score / 20
     
-    OC = (
-        max(0.0, (G + N) / (G + N + D))
-        if (G + N + D) > 0
-        else 0.0
-    )
+    OC = max(0.0, (G + N) / (G + N + D)) if (G + N + D) > 0 else 0.0
     
     discursive_pressure = min(
         1.0,
@@ -9089,18 +9085,8 @@ def analyze_article(text: str) -> Dict:
     
     ID = max(0.1, 1 - discursive_pressure)
     
-    # Bonus léger : valorise le savoir et la compréhension
-    knowledge_bonus = min(
-        1.0,
-        ((G + N) / 20) * 0.08
-    )
-    
     final_credibility_score = round(
-        min(
-            20,
-            (20 * HFS * OC * ID)
-            + (knowledge_bonus * 20)
-        ),
+        20 * HFS * OC * ID,
         1
     )
     if final_credibility_score < 6:
