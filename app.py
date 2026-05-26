@@ -9063,7 +9063,7 @@ def analyze_article(text: str) -> Dict:
     short_epistemic_bonus = 0.0
     if claims:
         short_epistemic_bonus = sum(c.short_adjustment for c in claims) / len(claims)
-        short_epistemic_bonus = min(short_epistemic_bonus, 1.5)
+        short_epistemic_bonus = min(short_epistemic_bonus, 0.8)
 
     hard_fact_score = round(clamp(hard_fact_score + short_epistemic_bonus, 0, 20), 1)
 
