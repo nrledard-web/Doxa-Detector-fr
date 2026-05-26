@@ -19109,6 +19109,122 @@ with sq3:
             "Elle indique que son cadre méthodologique reste insuffisamment explicité."
         )
 
+# =============================
+# Robustesse quantitative
+# =============================
+with sq3:
+    st.subheader("Analyse analogique de la robustesse quantitative")
+    
+    st.caption(
+        "Cette jauge estime si les chiffres, comparaisons et ordres de grandeur "
+        "structurent réellement le raisonnement, ou servent surtout d’habillage rhétorique."
+    )
+    
+    value = result.get("quantitative_robustness_score", 0)
+    
+    render_custom_gauge(
+        value,
+        result.get("quantitative_robustness_color", "#22c55e")
+    )
+    
+    st.markdown(
+        f"""
+    <b style='color:{result.get("quantitative_robustness_color", "#22c55e")}'>
+    {result.get("quantitative_robustness_label", "Faible")}
+    </b>
+    — {round(value*100,1)}%
+    """,
+        unsafe_allow_html=True
+    )
+    
+    st.caption(
+        result.get(
+            "quantitative_robustness_interpretation",
+            "Robustesse quantitative non calculée."
+        )
+    )
+    
+    st.caption(
+        "Chiffres décoratifs ⟵⟶ Architecture quantitative"
+    )
+    
+    
+    # -----------------------------
+    # Popover marqueurs
+    # -----------------------------
+    with st.popover("🔎 Voir les marqueurs"):
+    
+        markers = result.get(
+            "quantitative_robustness_markers",
+            []
+        )
+    
+        weak = result.get(
+            "quantitative_robustness_weak_markers",
+            []
+        )
+    
+        if markers:
+            st.write("Marqueurs détectés :")
+            st.write(markers)
+    
+        if weak:
+            st.write("")
+            st.write("Marqueurs d’affaiblissement :")
+            st.write(weak)
+    
+    
+    # -----------------------------
+    # Popover explication
+    # -----------------------------
+    with st.popover("ℹ️ Comprendre cette jauge"):
+    
+        st.markdown("""
+    
+    ### Analyse analogique de la robustesse quantitative
+    
+    Cette jauge mesure si les données numériques, comparaisons et ordres de grandeur participent réellement au raisonnement.
+    
+    Principe
+    
+    Le moteur recherche :
+    
+    - comparaisons quantitatives ;
+    - ordres de grandeur ;
+    - unités ;
+    - structures comparatives ;
+    - usage démonstratif des chiffres.
+    
+    La jauge réduit son score lorsque :
+    
+    - les chiffres semblent décoratifs ;
+    - le texte privilégie l’emphase ;
+    - les comparaisons restent peu structurées.
+    
+    Formule utilisée
+    
+    ```text
+    positive =
+    marqueurs quantitatifs
+    +
+    comparaisons
+    +
+    unités
+    +
+    densité numérique
+    
+    negative =
+    marqueurs émotionnels
+    +
+    amplification
+    
+    score =
+    clamp(
+    positive − negative,
+    0,
+    1
+    )
+
 st.divider()
 
 st.markdown("""
