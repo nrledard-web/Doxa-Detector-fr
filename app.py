@@ -627,72 +627,46 @@ client = get_openai_client()
 # Header
 # -----------------------------
 st.markdown("""
-<h1 style="text-align:center; font-size:36px;">
-De la logique d’Aristote aux équations du discours
-</h1>
-""", unsafe_allow_html=True)
-
-st.markdown("""
 <div style="
 color:#111827;
 font-size:16px;
-line-height:1.8;
+line-height:1.45;
 text-align:justify;
 ">
 
-<b>DOXA Detector analyse la structure cognitive des discours grâce à un moteur analytique fondé sur des équations, des heuristiques discursives, des fonctions de calcul et une analyse analogique des formes argumentatives.</b>
+<p><b>DOXA Detector analyse la structure cognitive des discours grâce à un moteur analytique fondé sur des équations, des heuristiques discursives, des fonctions de calcul et une analyse analogique des formes argumentatives.</b></p>
 
-<br><br>
+<p><b>Le moteur repose principalement sur une approche hybride articulée autour de quatre axes complémentaires : l’heuristique, l’analogie, la grammaire discursive et la rhétorique.</b></p>
 
-<b>Le moteur repose principalement sur une approche hybride articulée autour de quatre axes complémentaires : l’heuristique, l’analogie, la grammaire discursive et la rhétorique.</b>
-
-<br><br>
-
-<b>Basé essentiellement sur du calcul explicite, le cœur du modèle s’organise notamment autour de l’équation cognitive :</b>
+<p><b>Basé essentiellement sur du calcul explicite, le cœur du modèle s’organise notamment autour de l’équation cognitive :</b></p>
 
 <div style="
 text-align:center;
 font-size:22px;
 font-weight:bold;
 color:#000000;
-margin:14px 0;
+margin:6px 0;
 ">
 M = (G + N) − D
 </div>
 
-<b>où le savoir (G), la compréhension intégrée (N) et le degré de certitude (D) permettent d’estimer certaines dynamiques cognitives susceptibles d’apparaître dans un discours.</b>
+<p><b>où le savoir (G), la compréhension intégrée (N) et le degré de certitude (D) permettent d’estimer certaines dynamiques cognitives susceptibles d’apparaître dans un discours.</b></p>
 
-<br><br>
+<p><b>Dans la tradition logique inaugurée par Aristote — qui distinguait prémisses, raisonnements et sophismes — l’application observe les structures argumentatives présentes dans un texte afin d’en extraire les mécanismes de construction, de stabilisation et parfois de fermeture cognitive.</b></p>
 
-<b>Dans la tradition logique inaugurée par Aristote — qui distinguait prémisses, raisonnements et sophismes — l’application observe les structures argumentatives présentes dans un texte afin d’en extraire les mécanismes de construction, de stabilisation et parfois de fermeture cognitive.</b>
+<p><b>L’approche heuristique consiste à repérer des indices, des marqueurs récurrents et des configurations susceptibles de révéler certaines propriétés du discours.</b></p>
 
-<br><br>
+<p><b>L’approche analogique observe la forme globale du raisonnement. Le texte n’est pas évalué uniquement pour ce qu’il affirme mais pour la manière dont il s’organise et pour les architectures cognitives auxquelles il ressemble.</b></p>
 
-<b>L’approche heuristique consiste à repérer des indices, des marqueurs récurrents et des configurations susceptibles de révéler certaines propriétés du discours.</b>
+<p><b>La grammaire discursive étudie l’organisation du langage au niveau du discours lui-même : articulation des idées, transitions, certitudes, nuances, hiérarchisation des propositions et dynamique argumentative. Elle ne vise ni la correction orthographique ni l’évaluation grammaticale scolaire.</b></p>
 
-<br><br>
+<p><b>L’analyse rhétorique observe les procédés d’influence employés consciemment ou non : technicité, narrativité, cadrage, amplification, persuasion, saturation ou mise en scène discursive.</b></p>
 
-<b>L’approche analogique observe la forme globale du raisonnement. Le texte n’est pas évalué uniquement pour ce qu’il affirme mais pour la manière dont il s’organise et pour les architectures cognitives auxquelles il ressemble.</b>
+<p><b>DOXA Detector identifie ainsi différentes formes de sophismes, de biais argumentatifs et de mécanismes persuasifs sans nécessiter la compréhension complète du sens des mots ; l’analyse sémantique demeurant secondaire, complémentaire et facultative.</b></p>
 
-<br><br>
+<p><b>Ces structures constituent souvent l’empreinte des biais du langage et permettent d’en révéler certains mécanismes, aussi bien dans l’analyse des publications médiatiques que dans une démarche d’apprentissage visant à mieux reconnaître — et parfois éviter — leur reproduction.</b></p>
 
-<b>La grammaire discursive étudie l’organisation du langage au niveau du discours lui-même : articulation des idées, transitions, certitudes, nuances, hiérarchisation des propositions et dynamique argumentative. Elle ne vise ni la correction orthographique ni l’évaluation grammaticale scolaire.</b>
-
-<br><br>
-
-<b>L’analyse rhétorique observe les procédés d’influence employés consciemment ou non : technicité, narrativité, cadrage, amplification, persuasion, saturation ou mise en scène discursive.</b>
-
-<br><br>
-
-<b>DOXA Detector identifie ainsi différentes formes de sophismes, de biais argumentatifs et de mécanismes persuasifs sans nécessiter la compréhension complète du sens des mots ; l’analyse sémantique demeurant secondaire, complémentaire et facultative.</b>
-
-<br><br>
-
-<b>Ces structures constituent souvent l’empreinte des biais du langage et permettent d’en révéler certains mécanismes, aussi bien dans l’analyse des publications médiatiques que dans une démarche d’apprentissage visant à mieux reconnaître — et parfois éviter — leur reproduction.</b>
-
-<br><br>
-
-<b>L’intelligence artificielle n’intervient que comme module optionnel d’assistance, de calcul, de synthèse ou d’interprétation. L’évaluation principale demeure fondée sur des mécanismes explicites, calculables et révisables plutôt que sur une compréhension sémantique opaque.</b>
+<p><b>L’intelligence artificielle n’intervient que comme module optionnel d’assistance, de calcul, de synthèse ou d’interprétation. L’évaluation principale demeure fondée sur des mécanismes explicites, calculables et révisables plutôt que sur une compréhension sémantique opaque.</b></p>
 
 </div>
 """, unsafe_allow_html=True)
