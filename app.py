@@ -8854,24 +8854,23 @@ def compute_quantitative_robustness(text: str) -> dict:
     )
 
     score = max(0.0, min(raw, 1.0))
-
+    
     if score < 0.25:
         label = "Faible"
-        color = "#22c55e"
-        interpretation = "Le texte mobilise peu de structure quantitative robuste."
+        color = "#eab308"
+    
     elif score < 0.50:
         label = "Modérée"
         color = "#eab308"
-        interpretation = "Le texte contient quelques appuis quantitatifs, mais leur rôle démonstratif reste limité."
+    
     elif score < 0.75:
         label = "Solide"
-        color = "#3b82f6"
-        interpretation = "Le texte articule plusieurs données, comparaisons ou ordres de grandeur de manière structurante."
+        color = "#22c55e"
+    
     else:
         label = "Très solide"
-        color = "#2563eb"
-        interpretation = "Le raisonnement repose fortement sur une architecture quantitative explicite et relativement robuste."
-
+        color = "#16a34a"
+    
     return {
         "score": round(score, 3),
         "label": label,
