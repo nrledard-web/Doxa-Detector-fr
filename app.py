@@ -3175,25 +3175,29 @@ SIMPLIFICATION_TERMS = [
     "tout s'explique par",
 ]
 
-FRAME_SHIFT_TERMS = [
+FRAME_SHIFT_STRONG = [
     "la vraie question",
     "le vrai problème",
     "ce n'est pas la question",
     "la question n'est pas là",
-]
 
-FRAME_SHIFT_TERMS += [
     "souveraineté énergétique",
     "sécurité économique",
     "indépendance nationale",
     "au-delà de l'électricité",
+]
+FRAME_SHIFT_WEAK = [
     "idées reçues",
     "réalités factuelles",
+
     "ce n'est pas pour autant",
     "ce n’est pas pour autant",
+
     "en réalité",
+
     "et ce n'est pas tout",
     "et ce n’est pas tout",
+
     "le problème ?",
 ]
 
