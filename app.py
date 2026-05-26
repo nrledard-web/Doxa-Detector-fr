@@ -1550,7 +1550,10 @@ def generate_share_block(result):
     placebo = round(result.get("extended_placebo_score", 0) * 100, 1)
 
     regime = result.get("cognitive_regime", result.get("dominant_regime", "Non déterminé"))
-    verdict = result.get("verdict", "Non déterminé")
+    verdict = result.get(
+        "final_credibility_label",
+        result.get("verdict", "Non déterminé")
+    )
 
     flags = []
 
