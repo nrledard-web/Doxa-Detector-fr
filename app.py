@@ -11753,6 +11753,8 @@ if not result:
     st.stop()
 
 
+
+
 # =============================
 # DEBUG — Savoir vs pénalités
 # =============================
@@ -11786,7 +11788,7 @@ def debug_knowledge_balance(result: dict):
         "Ce debug sert à vérifier si un texte riche en savoir explicite est trop pénalisé "
         "par scientificité rhétorique, autorité vague, frame shift ou ancrage réel fragile."
     )
-
+debug_knowledge_balance(result)
 
 
     
