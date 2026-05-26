@@ -11794,9 +11794,9 @@ debug_knowledge_balance(result)
 # AIDE DE LECTURE DES JAUGES
 # =====================================================
 
-    def show_gauge_help():
-        with st.expander("📘 Comment lire les jauges", expanded=False):
-            st.markdown("""
+def show_gauge_help():
+    with st.expander("📘 Comment lire les jauges", expanded=False):
+        st.markdown("""
 Chaque jauge mesure un mécanisme du discours : raisonnement, pression rhétorique, biais argumentatifs ou degré de certitude.
 
 Les jauges n’indiquent pas si un texte est vrai ou faux, mais **la solidité de sa structure cognitive**.
