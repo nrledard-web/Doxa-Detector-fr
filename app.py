@@ -3492,14 +3492,6 @@ ATTACK_TERMS += [
     "agitent le chiffon rouge",
     "chiffon rouge",
 ]
-FRAME_SHIFT_TERMS += [
-    "ce n'est pas pour autant",
-    "ce n’est pas pour autant",
-    "en réalité",
-    "et ce n'est pas tout",
-    "et ce n’est pas tout",
-    "le problème ?",
-]
 
 BINARY_OPPOSITION_TERMS += [
     "gaz à effet de serre ou déchets nucléaires",
