@@ -11747,6 +11747,9 @@ if analyze_submitted:
     st.session_state.last_article = article
 
 result = st.session_state.get("last_result")
+
+debug_knowledge_balance(result)
+
 article_for_analysis = st.session_state.get("last_article", "")
 
 if not result:
@@ -11788,7 +11791,7 @@ def debug_knowledge_balance(result: dict):
         "Ce debug sert à vérifier si un texte riche en savoir explicite est trop pénalisé "
         "par scientificité rhétorique, autorité vague, frame shift ou ancrage réel fragile."
     )
-    debug_knowledge_balance(result)
+
 
 
     
