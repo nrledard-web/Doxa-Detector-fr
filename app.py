@@ -19178,52 +19178,52 @@ with sq3:
     # Popover explication
     # -----------------------------
     with st.popover("ℹ️ Comprendre cette jauge"):
-    
+
         st.markdown("""
-    
-    ### Analyse analogique de la robustesse quantitative
-    
-    Cette jauge mesure si les données numériques, comparaisons et ordres de grandeur participent réellement au raisonnement.
-    
-    Principe
-    
-    Le moteur recherche :
-    
-    - comparaisons quantitatives ;
-    - ordres de grandeur ;
-    - unités ;
-    - structures comparatives ;
-    - usage démonstratif des chiffres.
-    
-    La jauge réduit son score lorsque :
-    
-    - les chiffres semblent décoratifs ;
-    - le texte privilégie l’emphase ;
-    - les comparaisons restent peu structurées.
-    
-    Formule utilisée
-    
-    ```text
-    positive =
-    marqueurs quantitatifs
-    +
-    comparaisons
-    +
-    unités
-    +
-    densité numérique
-    
-    negative =
-    marqueurs émotionnels
-    +
-    amplification
-    
-    score =
-    clamp(
-    positive − negative,
-    0,
-    1
-    )
+
+### Analyse analogique de la robustesse quantitative
+
+Cette jauge mesure si les données numériques, comparaisons et ordres de grandeur participent réellement au raisonnement.
+
+Principe
+
+Le moteur recherche :
+
+- comparaisons quantitatives ;
+- ordres de grandeur ;
+- unités ;
+- structures comparatives ;
+- usage démonstratif des chiffres.
+
+La jauge réduit son score lorsque :
+
+- les chiffres semblent décoratifs ;
+- le texte privilégie l’emphase ;
+- les comparaisons restent peu structurées.
+
+Formule utilisée
+
+```text
+positive =
+marqueurs quantitatifs
++
+comparaisons
++
+unités
++
+densité numérique
+
+negative =
+marqueurs émotionnels
++
+amplification
+
+score =
+clamp(
+positive - negative,
+0,
+1
+)
 
 st.divider()
 
