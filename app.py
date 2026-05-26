@@ -10697,10 +10697,10 @@ def detect_discourse_type_from_rhetoric(text: str, rhetorical_scores: dict):
     scores["scientifique"] += rhetorical_scores.get("technicite", 0) * 1.1
     scores["scientifique"] += rhetorical_scores.get("dissimulation_attenuation", 0) * 0.3
 
-    scores["journalistique"] += rhetorical_scores.get("technicite", 0) * 0.9
-    scores["journalistique"] += rhetorical_scores.get("narrativité", 0) * 0.5
-    scores["journalistique"] += rhetorical_scores.get("coherence_performative", 0) * 0.3
-    scores["journalistique"] += rhetorical_scores.get("saturation_rhetorique", 0) * 0.4
+    scores["journalistique"] += rhetorical_scores.get("technicite", 0) * 0.45
+    scores["journalistique"] += rhetorical_scores.get("narrativité", 0) * 0.35
+    scores["journalistique"] += rhetorical_scores.get("coherence_performative", 0) * 0.15
+    scores["journalistique"] += rhetorical_scores.get("saturation_rhetorique", 0) * 0.20
 
     scores["technocratique"] += rhetorical_scores.get("dissimulation_attenuation", 0) * 1.8
     scores["technocratique"] += rhetorical_scores.get("technicite", 0) * 0.5
@@ -10753,8 +10753,10 @@ def detect_discourse_type_from_rhetoric(text: str, rhetorical_scores: dict):
     # Écologique
     # =====================================================
     
-    scores["ecologique"] += rhetorical_scores.get("ecologique", 0) * 1.3
-    scores["ecologique"] += rhetorical_scores.get("amplification", 0) * 0.15
+    scores["ecologique"] += rhetorical_scores.get("ecologique", 0) * 2.0
+    scores["ecologique"] += rhetorical_scores.get("technicite", 0) * 0.25
+    scores["ecologique"] += rhetorical_scores.get("scientificite_rhetorique", 0) * 0.20
+    scores["ecologique"] += rhetorical_scores.get("amplification", 0) * 0.10
     
     # =====================================================
     # Social
