@@ -19237,16 +19237,16 @@ positive - negative,
 
 Lecture
 
-🟢 Faible :
+🟡 Faible :
 les chiffres jouent peu de rôle dans le raisonnement
 
 🟡 Modérée :
 présence d’éléments quantitatifs utiles
 
-🔵 Solide :
+🟢 Solide :
 comparaisons et quantification structurantes
 
-🔵 Très solide :
+🟢 Très solide :
 architecture quantitative fortement intégrée
 
 Attention
