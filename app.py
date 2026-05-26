@@ -8196,6 +8196,41 @@ ENCYCLOPEDIC_MARKERS = [
     "refers to",
     "consists of",
 ]
+ENCYCLOPEDIC_MARKERS += [
+
+    # structure encyclopédique
+    "selon",
+    "selon les chercheurs",
+    "selon les historiens",
+    "on distingue",
+    "est considéré comme",
+    "est généralement considéré",
+    "fait l'objet de",
+    "est associé à",
+    "désigne également",
+    "dans la littérature",
+    "dans ce contexte",
+    "historiquement",
+    "au sens large",
+    "au sens strict",
+
+    # exposition
+    "comprend",
+    "inclut",
+    "regroupe",
+    "englobe",
+    "se caractérise",
+    "correspond aux",
+    "peut prendre plusieurs formes",
+
+    # neutralisation du pamphlet
+    "certains auteurs",
+    "plusieurs auteurs",
+    "certains considèrent",
+    "fait débat",
+    "fait référence",
+]
+
 # =========================================================
 # DÉFINITIONNEL / PÉDAGOGIQUE
 # =========================================================
