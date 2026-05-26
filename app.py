@@ -14332,7 +14332,14 @@ life_score = round((result.get("hard_fact_score", 0) / 20) * 100, 1)
 brain = result.get("doxa_brain", {})
 
 st.markdown("### 🧠 Cerveau DOXA")
-
+st.caption(
+    "Le cerveau DOXA décrit principalement le fonctionnement cognitif interne du discours "
+    "(cohérence, développement, stabilité, richesse argumentative). "
+    "Il ne constitue pas une mesure directe de crédibilité finale, de mécroyance ou "
+    "d’intentions cognitives, dont l’évaluation intègre également des contraintes "
+    "supplémentaires et des pénalités liées notamment à l’ancrage au réel, "
+    "à la révisabilité et aux pressions discursives."
+)
 st.markdown(
     f"""
 <div style='
