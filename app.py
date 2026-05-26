@@ -8779,7 +8779,107 @@ def compute_cognitive_bonus(result: dict):
         "bonus_interpretation":
             "Compensation par ancrage réel, révisabilité et cohérence."
     }
+# =============================
+# Robustesse quantitative
+# =============================
+def compute_quantitative_robustness(text: str) -> dict:
+    if not text or not text.strip():
+        return {
+            "score": 0.0,
+            "label": "Faible",
+            "color": "#22c55e",
+            "markers": [],
+            "interpretation": "Aucune structure quantitative notable détectée."
+        }
 
+    t = normalize_text_for_markers(text)
+
+    markers = []
+
+    positive_terms = [
+        "cycle de vie",
+        "par kilowattheure",
+        "kilowattheure",
+        "pour comparaison",
+        "en moyenne",
+        "par rapport",
+        "comparaison",
+        "émissions",
+        "co₂",
+        "carbone",
+        "grammes",
+        "secteur",
+        "surface occupée",
+        "hectare",
+        "production stable",
+        "neutralité carbone",
+        "données",
+        "chiffres",
+        "étude",
+        "rapport",
+        "selon",
+    ]
+
+    for term in positive_terms:
+        if contains_term(t, term):
+            markers.append(term)
+
+    numbers = re.findall(r"\b\d+(?:[.,]\d+)?\s*(?:%|grammes?|g|kg|tonnes?|m3|m³|kwh|kilowattheure|hectares?)?\b", text.lower())
+
+    if len(numbers) >= 3:
+        markers.append("plusieurs données chiffrées")
+
+    if any(x in t for x in ["charbon", "gaz", "solaire", "éolien", "nucléaire"]):
+        if any(x in t for x in ["pour comparaison", "comparaison", "par rapport", "contrairement"]):
+            markers.append("comparaison inter-énergies")
+
+    weak_terms = [
+        "choc",
+        "massif",
+        "majeur",
+        "énorme",
+        "catastrophe",
+        "absolument certain",
+        "sans précédent",
+    ]
+
+    weak_hits = [
+        term for term in weak_terms
+        if contains_term(t, term)
+    ]
+
+    raw = (
+        min(len(markers) * 0.07, 0.85)
+        - min(len(weak_hits) * 0.05, 0.25)
+    )
+
+    score = max(0.0, min(raw, 1.0))
+
+    if score < 0.25:
+        label = "Faible"
+        color = "#22c55e"
+        interpretation = "Le texte mobilise peu de structure quantitative robuste."
+    elif score < 0.50:
+        label = "Modérée"
+        color = "#eab308"
+        interpretation = "Le texte contient quelques appuis quantitatifs, mais leur rôle démonstratif reste limité."
+    elif score < 0.75:
+        label = "Solide"
+        color = "#3b82f6"
+        interpretation = "Le texte articule plusieurs données, comparaisons ou ordres de grandeur de manière structurante."
+    else:
+        label = "Très solide"
+        color = "#2563eb"
+        interpretation = "Le raisonnement repose fortement sur une architecture quantitative explicite et relativement robuste."
+
+    return {
+        "score": round(score, 3),
+        "label": label,
+        "color": color,
+        "markers": unique_keep_order(markers),
+        "weak_markers": unique_keep_order(weak_hits),
+        "interpretation": interpretation
+    }
 
 def analyze_article(text: str) -> Dict:
     article = text
@@ -8866,6 +8966,7 @@ def analyze_article(text: str) -> Dict:
     argument_density_analysis = compute_argument_density(text)
     complex_enthymeme_analysis = compute_complex_enthymemes(text)
     self_validating_analysis = compute_self_validating_narrative(text)
+    quantitative_robustness_analysis = compute_quantitative_robustness(text)
 
     certainty = len(re.findall(r"certain|absolument|prouvé|évident|incontestable", text.lower()))
     emotional = len(re.findall(r"|".join(re.escape(w) for w in EMOTIONAL_WORDS), text.lower()))
@@ -9066,43 +9167,6 @@ def analyze_article(text: str) -> Dict:
         short_epistemic_bonus = min(short_epistemic_bonus, 0.8)
 
     hard_fact_score = round(clamp(hard_fact_score + short_epistemic_bonus, 0, 20), 1)
-
-    # ==========================
-    # DEBUG HARD FACT
-    # ==========================
-    st.write("### DEBUG HFS")
-
-    st.write("G :", G)
-    st.write("N :", N)
-    st.write("V :", V)
-
-    st.write("source_quality :", source_quality)
-    st.write("avg_claim_verifiability :", avg_claim_verifiability)
-
-    st.write("D :", D)
-    st.write("R :", R)
-
-    st.write("avg_claim_risk :", avg_claim_risk)
-
-    st.write(
-        "total_credibility_penalty :",
-        total_credibility_penalty
-    )
-
-    st.write(
-        "short_epistemic_bonus :",
-        short_epistemic_bonus
-    )
-
-    st.write(
-        "hard_fact_score_raw :",
-        round(hard_fact_score_raw, 3)
-    )
-
-    st.write(
-        "hard_fact_score final :",
-        hard_fact_score
-    )
 
     political_pattern_score, political_results, matched_terms = detect_political_patterns(text)
     
@@ -9474,6 +9538,13 @@ def analyze_article(text: str) -> Dict:
 
         "false_dilemma_nuance_count": aristotelian_fallacies["false_dilemma"].get("nuance_count", 0),
         "false_dilemma_nuance_markers": aristotelian_fallacies["false_dilemma"].get("nuance_markers", []),
+
+        "quantitative_robustness_score": quantitative_robustness_analysis["score"],
+        "quantitative_robustness_label": quantitative_robustness_analysis["label"],
+        "quantitative_robustness_color": quantitative_robustness_analysis["color"],
+        "quantitative_robustness_markers": quantitative_robustness_analysis["markers"],
+        "quantitative_robustness_weak_markers": quantitative_robustness_analysis["weak_markers"],
+        "quantitative_robustness_interpretation": quantitative_robustness_analysis["interpretation"],
 
         "reported_speech_score": reported_speech["score"],
         "reported_speech_ratio": reported_speech["ratio"],
