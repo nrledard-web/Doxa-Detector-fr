@@ -13758,9 +13758,6 @@ Le texte contient une tension entre mécroyance et manipulation.
 
 La certitude paraît plus forte que les preuves disponibles, mais les signaux ne suffisent pas encore à conclure à une manipulation nette.
 """)
-    
-else:
-    pass
 
 # =============================
 # Indice de baratinage
