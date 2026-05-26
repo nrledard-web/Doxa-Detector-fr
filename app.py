@@ -9066,7 +9066,45 @@ def analyze_article(text: str) -> Dict:
 
     hard_fact_score = round(clamp(hard_fact_score + short_epistemic_bonus, 0, 20), 1)
 
+    # ==========================
+    # DEBUG HARD FACT
+    # ==========================
+    st.write("### DEBUG HFS")
+
+    st.write("G :", G)
+    st.write("N :", N)
+    st.write("V :", V)
+
+    st.write("source_quality :", source_quality)
+    st.write("avg_claim_verifiability :", avg_claim_verifiability)
+
+    st.write("D :", D)
+    st.write("R :", R)
+
+    st.write("avg_claim_risk :", avg_claim_risk)
+
+    st.write(
+        "total_credibility_penalty :",
+        total_credibility_penalty
+    )
+
+    st.write(
+        "short_epistemic_bonus :",
+        short_epistemic_bonus
+    )
+
+    st.write(
+        "hard_fact_score_raw :",
+        round(hard_fact_score_raw, 3)
+    )
+
+    st.write(
+        "hard_fact_score final :",
+        hard_fact_score
+    )
+
     political_pattern_score, political_results, matched_terms = detect_political_patterns(text)
+    
     rhetorical_pressure = compute_rhetorical_pressure(political_results)
 
     # -----------------------------
