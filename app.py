@@ -3020,10 +3020,6 @@ def compute_scientific_simulation(text: str):
         hits = [term for term in terms if contains_term(t, term) or term in t]
         details[category] = len(hits)
         markers.extend(hits)
-    # amortissement de la technicité
-    if category == "technicite_rhetorique":
-        score += min(len(hits), 5)
-    else:
         score += len(hits)
 
     percent_matches = re.findall(r"\b\d+(?:[.,]\d+)?\s*%", text)
