@@ -11716,44 +11716,6 @@ if analyze_submitted:
             "Veuillez saisir une affirmation plus développée."
         )
         st.stop()
-        
-    # =====================================================
-    # Vérification : page web parasite
-    # =====================================================
-
-    web_noise = detect_web_noise(article)
-
-    if web_noise["is_noise"]:
-        st.session_state.last_result = None
-        st.session_state.last_article = article
-
-        st.warning("⚠️ Analyse bloquée")
-        st.caption("Le contenu chargé ressemble à une page de navigation ou un menu de site.")
-        st.caption(
-            f"Détection technique : {web_noise['hits']} marqueurs web, "
-            f"{web_noise['real_sentences']} phrases réelles détectées."
-        )
-
-        st.info(
-            "DOXA Detector a détecté trop d’éléments techniques : "
-            "menus, catégories, cookies, annonces ou blocs de navigation.\n\n"
-            "Pour éviter une fausse bonne note, l’analyse est interrompue.\n\n"
-            "Veuillez coller uniquement le corps de l’article."
-        )
-
-        st.stop()
-
-    st.session_state.last_result = analyze_article(article)
-    st.session_state.last_article = article
-
-result = st.session_state.get("last_result")
-
-debug_knowledge_balance(result)
-
-article_for_analysis = st.session_state.get("last_article", "")
-
-if not result:
-    st.stop()
 
 
 
@@ -11787,14 +11749,46 @@ def debug_knowledge_balance(result: dict):
     for k, v in debug_keys.items():
         st.write(f"**{k}** :", v)
 
-    st.caption(
-        "Ce debug sert à vérifier si un texte riche en savoir explicite est trop pénalisé "
-        "par scientificité rhétorique, autorité vague, frame shift ou ancrage réel fragile."
-    )
 
 
 
     
+    # =====================================================
+    # Vérification : page web parasite
+    # =====================================================
+
+    web_noise = detect_web_noise(article)
+
+    if web_noise["is_noise"]:
+        st.session_state.last_result = None
+        st.session_state.last_article = article
+
+        st.warning("⚠️ Analyse bloquée")
+        st.caption("Le contenu chargé ressemble à une page de navigation ou un menu de site.")
+        st.caption(
+            f"Détection technique : {web_noise['hits']} marqueurs web, "
+            f"{web_noise['real_sentences']} phrases réelles détectées."
+        )
+
+        st.info(
+            "DOXA Detector a détecté trop d’éléments techniques : "
+            "menus, catégories, cookies, annonces ou blocs de navigation.\n\n"
+            "Pour éviter une fausse bonne note, l’analyse est interrompue.\n\n"
+            "Veuillez coller uniquement le corps de l’article."
+        )
+
+        st.stop()
+
+    st.session_state.last_result = analyze_article(article)
+    st.session_state.last_article = article
+
+result = st.session_state.get("last_result")
+article_for_analysis = st.session_state.get("last_article", "")
+
+if not result:
+    st.stop()
+
+debug_knowledge_balance(result)
 
 # =====================================================
 # AIDE DE LECTURE DES JAUGES
