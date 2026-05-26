@@ -9049,7 +9049,8 @@ def analyze_article(text: str) -> Dict:
             + 0.14 * N
             + 0.18 * V
             + 0.18 * source_quality
-            + 0.18 * avg_claim_verifiability
+            + 0.14 * avg_claim_verifiability
+            + 0.04 * ((G + N + V) / 3)
         )
         - (
             0.16 * D
