@@ -662,9 +662,7 @@ M = (G + N) − D
 
 <p><b>L’analyse rhétorique observe les procédés d’influence employés consciemment ou non : technicité, narrativité, cadrage, amplification, persuasion, saturation ou mise en scène discursive.</b></p>
 
-<p><b>DOXA Detector identifie ainsi différentes formes de sophismes, de biais argumentatifs et de mécanismes persuasifs sans nécessiter la compréhension complète du sens des mots ; l’analyse sémantique demeurant secondaire, complémentaire et facultative.</b></p>
-
-<p><b>Ces structures constituent souvent l’empreinte des biais du langage et permettent d’en révéler certains mécanismes, aussi bien dans l’analyse des publications médiatiques que dans une démarche d’apprentissage visant à mieux reconnaître — et parfois éviter — leur reproduction.</b></p>
+<p><b>DOXA Detector identifie ainsi différentes formes de sophismes, de biais argumentatifs et de mécanismes persuasifs sans nécessiter la compréhension du sens des mots.</b></p>
 
 <p><b>L’intelligence artificielle n’intervient que comme module optionnel d’assistance des calculs. L’évaluation principale demeure fondée sur des mécanismes calculables plutôt que sur une compréhension sémantique opaque.</b></p>
 
