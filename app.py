@@ -666,7 +666,7 @@ M = (G + N) − D
 
 <p><b>Ces structures constituent souvent l’empreinte des biais du langage et permettent d’en révéler certains mécanismes, aussi bien dans l’analyse des publications médiatiques que dans une démarche d’apprentissage visant à mieux reconnaître — et parfois éviter — leur reproduction.</b></p>
 
-<p><b>L’intelligence artificielle n’intervient que comme module optionnel d’assistance des calculs. L’évaluation principale demeure fondée sur des mécanismes explicites, calculables et révisables plutôt que sur une compréhension sémantique opaque.</b></p>
+<p><b>L’intelligence artificielle n’intervient que comme module optionnel d’assistance des calculs. L’évaluation principale demeure fondée sur des mécanismes calculables plutôt que sur une compréhension sémantique opaque.</b></p>
 
 </div>
 """, unsafe_allow_html=True)
