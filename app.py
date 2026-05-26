@@ -11749,7 +11749,19 @@ def debug_knowledge_balance(result: dict):
     for k, v in debug_keys.items():
         st.write(f"**{k}** :", v)
 
-
+    st.subheader("🔎 DEBUG — Clés contenant reality / anchor / scientific")
+    
+    for key in result.keys():
+        key_lower = key.lower()
+    
+        if (
+            "reality" in key_lower
+            or "anchor" in key_lower
+            or "ancrage" in key_lower
+            or "scient" in key_lower
+            or "rhetoric" in key_lower
+        ):
+            st.write(key, ":", result.get(key))
 
 
     
