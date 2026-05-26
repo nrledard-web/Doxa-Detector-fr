@@ -8443,7 +8443,7 @@ def detect_conceptual_domains(text: str):
     
     for marker in JOURNALISTIC_MARKERS:
         if contains_term(t, marker):
-            domains["journalistique"] += 1
+            domains["journalistique"] += 1.25
             terms["journalistique"].append(marker)
 
     for marker in PHILOSOPHICAL_MARKERS:
