@@ -11751,7 +11751,7 @@ article_for_analysis = st.session_state.get("last_article", "")
 if not result:
     st.stop()
 
-debug_knowledge_balance(result)
+
 
 # =====================================================
 # AIDE DE LECTURE DES JAUGES
