@@ -3180,24 +3180,15 @@ FRAME_SHIFT_TERMS = [
     "le vrai problème",
     "ce n'est pas la question",
     "la question n'est pas là",
+]
 
+FRAME_SHIFT_TERMS += [
     "souveraineté énergétique",
     "sécurité économique",
     "indépendance nationale",
     "au-delà de l'électricité",
-
     "idées reçues",
     "réalités factuelles",
-
-    "ce n'est pas pour autant",
-    "ce n’est pas pour autant",
-
-    "en réalité",
-
-    "et ce n'est pas tout",
-    "et ce n’est pas tout",
-
-    "le problème ?",
 ]
 
 ATTACK_TERMS = [
@@ -3500,6 +3491,14 @@ ATTACK_TERMS += [
     "prennent un malin plaisir",
     "agitent le chiffon rouge",
     "chiffon rouge",
+]
+FRAME_SHIFT_TERMS += [
+    "ce n'est pas pour autant",
+    "ce n’est pas pour autant",
+    "en réalité",
+    "et ce n'est pas tout",
+    "et ce n’est pas tout",
+    "le problème ?",
 ]
 
 BINARY_OPPOSITION_TERMS += [
