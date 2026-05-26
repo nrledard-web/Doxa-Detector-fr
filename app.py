@@ -11715,54 +11715,6 @@ if analyze_submitted:
             "Veuillez saisir une affirmation plus développée."
         )
         st.stop()
-
-
-
-
-# =============================
-# DEBUG — Savoir vs pénalités
-# =============================
-def debug_knowledge_balance(result: dict):
-    st.divider()
-    st.subheader("🛠 Debug — Savoir / Certitude / Pénalités")
-
-    debug_keys = {
-        "G / savoir": result.get("G"),
-        "N / compréhension": result.get("N"),
-        "D / certitude": result.get("D"),
-        "M = (G + N) - D": result.get("M"),
-        "Hard fact score": result.get("hard_fact_score"),
-        "Ancrage réel": result.get("real_anchor_score"),
-        "Crédibilité finale": result.get("final_credibility_score"),
-        "Pénalité crédibilité": result.get("credibility_penalty"),
-        "Scientificité rhétorique": result.get("scientific_simulation_score"),
-        "Autorité vague": result.get("vague_authority_score"),
-        "Frame shift": result.get("frame_shift_score"),
-        "Cherry picking": result.get("cherry_picking_score"),
-        "Qualification normative": result.get("normative_qualification_score"),
-        "Amplification menace": result.get("threat_amplification_score"),
-        "Omission stratégique": result.get("omission_score"),
-        "Baratinage": result.get("baratinage_score"),
-    }
-
-    for k, v in debug_keys.items():
-        st.write(f"**{k}** :", v)
-
-    st.subheader("🔎 DEBUG — Clés contenant reality / anchor / scientific")
-    
-    for key in result.keys():
-        key_lower = key.lower()
-    
-        if (
-            "reality" in key_lower
-            or "anchor" in key_lower
-            or "ancrage" in key_lower
-            or "scient" in key_lower
-            or "rhetoric" in key_lower
-        ):
-            st.write(key, ":", result.get(key))
-
-
     
     # =====================================================
     # Vérification : page web parasite
