@@ -8468,7 +8468,7 @@ def detect_conceptual_domains(text: str):
 
     for marker in ENCYCLOPEDIC_MARKERS:
         if contains_term(t, marker):
-            domains["encyclopedique"] += 1.25
+            domains["encyclopedique"] += 1
             terms["encyclopedique"].append(marker)
 
     for marker in DEFINITION_MARKERS:
