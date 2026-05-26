@@ -19226,6 +19226,34 @@ positive - negative,
 )
 """)
 
+        st.metric(
+            "Robustesse quantitative",
+            f"{round(value * 100, 1)}%"
+        )
+        
+        st.markdown("""
+
+Lecture
+
+🟢 Faible :
+les chiffres jouent peu de rôle dans le raisonnement
+
+🟡 Modérée :
+présence d’éléments quantitatifs utiles
+
+🔵 Solide :
+comparaisons et quantification structurantes
+
+🔵 Très solide :
+architecture quantitative fortement intégrée
+
+Attention
+
+Une robustesse quantitative élevée ne signifie pas que les conclusions sont vraies.
+
+Elle indique seulement que les chiffres semblent participer au raisonnement plutôt qu’au décor rhétorique.
+""")
+
 st.divider()
 
 st.markdown("""
