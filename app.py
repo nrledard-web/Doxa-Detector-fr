@@ -3175,7 +3175,7 @@ SIMPLIFICATION_TERMS = [
     "tout s'explique par",
 ]
 
-FRAME_SHIFT_STRONG = [
+FRAME_SHIFT_TERMS = [
     "la vraie question",
     "le vrai problème",
     "ce n'est pas la question",
@@ -3185,8 +3185,7 @@ FRAME_SHIFT_STRONG = [
     "sécurité économique",
     "indépendance nationale",
     "au-delà de l'électricité",
-]
-FRAME_SHIFT_WEAK = [
+
     "idées reçues",
     "réalités factuelles",
 
