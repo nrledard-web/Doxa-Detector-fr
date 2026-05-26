@@ -11752,6 +11752,45 @@ article_for_analysis = st.session_state.get("last_article", "")
 if not result:
     st.stop()
 
+
+# =============================
+# DEBUG — Savoir vs pénalités
+# =============================
+def debug_knowledge_balance(result: dict):
+    st.divider()
+    st.subheader("🛠 Debug — Savoir / Certitude / Pénalités")
+
+    debug_keys = {
+        "G / savoir": result.get("G"),
+        "N / compréhension": result.get("N"),
+        "D / certitude": result.get("D"),
+        "M = (G + N) - D": result.get("M"),
+        "Hard fact score": result.get("hard_fact_score"),
+        "Ancrage réel": result.get("reality_anchor_score", result.get("anchoring_score")),
+        "Crédibilité finale": result.get("final_credibility_score"),
+        "Pénalité crédibilité": result.get("credibility_penalty"),
+        "Scientificité rhétorique": result.get("scientificity_score"),
+        "Autorité vague": result.get("vague_authority_score"),
+        "Frame shift": result.get("frame_shift_score"),
+        "Cherry picking": result.get("cherry_picking_score"),
+        "Qualification normative": result.get("normative_qualification_score"),
+        "Amplification menace": result.get("threat_amplification_score"),
+        "Omission stratégique": result.get("omission_score"),
+        "Baratinage": result.get("baratinage_score"),
+    }
+
+    for k, v in debug_keys.items():
+        st.write(f"**{k}** :", v)
+
+    st.caption(
+        "Ce debug sert à vérifier si un texte riche en savoir explicite est trop pénalisé "
+        "par scientificité rhétorique, autorité vague, frame shift ou ancrage réel fragile."
+    )
+
+
+
+    
+
 # =====================================================
 # AIDE DE LECTURE DES JAUGES
 # =====================================================
