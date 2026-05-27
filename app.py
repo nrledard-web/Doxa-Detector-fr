@@ -16648,9 +16648,13 @@ with sr7:
     st.markdown("### Frame shift")
     st.caption("Déplacement du cadre du débat pour orienter l’interprétation.")
 
-    value = result["frame_shift_score"]
-
-    frame_shift_score = result.get("frame_shift_score", 0)
+    value = result.get(
+        "frame_shift_adjusted",
+        result.get(
+            "frame_shift_score",
+            0
+        )
+    )
 
     # Amortisseur : évite de confondre élargissement légitime et glissement stratégique
     if (
@@ -16720,6 +16724,39 @@ with sr7:
 
         st.markdown("**Interprétation actuelle**")
         st.write(result["frame_shift_interpretation"])
+
+        st.metric(
+            "Frame shift brut",
+            f"{round(result.get('frame_shift_raw',0)*100,1)}%"
+        )
+        
+        st.metric(
+            "Légitimité",
+            f"{round(result.get('frame_shift_legitimacy',0)*100,1)}%"
+        )
+        
+        st.metric(
+            "Illégitimité",
+            f"{round(result.get('frame_shift_illegitimacy',0)*100,1)}%"
+        )
+        
+        st.metric(
+            "Balance",
+            round(
+                result.get(
+                    "frame_shift_balance",
+                    0
+                ),
+                2
+            )
+        )
+        
+        st.caption(
+            result.get(
+                "frame_shift_interpretation_v2",
+                ""
+            )
+        )
 
         st.markdown("**Lecture**")
         st.write(
