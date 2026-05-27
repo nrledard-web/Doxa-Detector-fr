@@ -12938,6 +12938,7 @@ with st.expander("Voir les scores rhétoriques détaillés", expanded=False):
 # =============================
 # Morphologie discursive
 # =============================
+morphology = result.get("discursive_morphology", {})
 
 st.markdown(
     f"""
