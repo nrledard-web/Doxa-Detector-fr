@@ -10130,6 +10130,10 @@ def analyze_article(text: str) -> Dict:
     
     # Modulation contextuelle selon le type de discours
     result = apply_discourse_modifiers(result)
+
+    result["discursive_morphology"] = compute_discursive_morphology(text)
+
+    result = classify_cognitive_regime(result)
     
     result = classify_cognitive_regime(result)
     
