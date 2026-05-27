@@ -9981,6 +9981,18 @@ def analyze_article(text: str) -> Dict:
     result["reported_speech_reduction"] = round(reported_speech_reduction, 3)
 
     # -----------------------------
+    # Interprétation avancée frame shift
+    # -----------------------------
+    frame_meta = compute_frame_shift_interpretation(
+        result
+    )
+    
+    result.update(
+        frame_meta
+    )
+    
+    return result
+    # -----------------------------
     # Pénalité des jauges affichées
     # -----------------------------
     display_gauge_penalty = compute_display_gauge_penalty(result)
