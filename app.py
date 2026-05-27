@@ -9035,6 +9035,292 @@ def compute_quantitative_robustness(text: str) -> dict:
         "interpretation": interpretation
     }
 
+# =============================
+# Morphologie discursive DOXA
+# Domaines / Familles / Modes
+# =============================
+
+DOMAINS = {
+    "economie": {
+        "label": "Économie",
+        "markers": [
+            "économie", "économique", "marché", "croissance", "inflation",
+            "dette", "budget", "finance", "fiscalité", "impôt",
+            "banque", "capital", "emploi", "salaire", "pouvoir d'achat"
+        ],
+    },
+
+    "ecologie": {
+        "label": "Écologie",
+        "markers": [
+            "écologie", "climat", "biodiversité", "pollution", "carbone",
+            "réchauffement", "transition", "environnement", "énergie",
+            "ressources", "durable", "planète"
+        ],
+    },
+
+    "histoire": {
+        "label": "Histoire",
+        "markers": [
+            "histoire", "siècle", "époque", "révolution", "empire",
+            "monarchie", "guerre", "traité", "colonisation", "archives",
+            "mémoire", "chronologie"
+        ],
+    },
+
+    "geographie": {
+        "label": "Géographie",
+        "markers": [
+            "territoire", "frontière", "région", "pays", "ville",
+            "continent", "population", "migration", "carte", "espace",
+            "urbanisation", "géographie"
+        ],
+    },
+
+    "science": {
+        "label": "Science",
+        "markers": [
+            "science", "scientifique", "étude", "hypothèse", "expérience",
+            "données", "mesure", "preuve", "méthode", "modèle",
+            "corrélation", "reproductibilité"
+        ],
+    },
+
+    "politique": {
+        "label": "Politique",
+        "markers": [
+            "politique", "État", "gouvernement", "parti", "élection",
+            "république", "démocratie", "pouvoir", "peuple",
+            "souveraineté", "loi", "institution"
+        ],
+    },
+
+    "religion_spiritualite": {
+        "label": "Religion / Spiritualité",
+        "markers": [
+            "dieu", "foi", "âme", "sacré", "spirituel",
+            "religion", "prière", "salut", "péché", "grâce",
+            "révélation", "transcendance"
+        ],
+    },
+
+    "amour_affectif": {
+        "label": "Amour / Affectif",
+        "markers": [
+            "amour", "désir", "beauté", "cœur", "regard",
+            "caresse", "absence", "passion", "tendresse",
+            "baiser", "fusion", "âme sœur"
+        ],
+    },
+}
+
+
+DISCURSIVE_FAMILIES = {
+    "encyclopedique": {
+        "label": "Encyclopédique",
+        "markers": [
+            "désigne", "définition", "selon", "source", "référence",
+            "date", "contexte", "historique", "exemple", "catégorie"
+        ],
+        "closure_risk": 0.25,
+        "linked_gauges": ["real_anchor_score", "discursive_coherence_score", "omission_score"],
+    },
+
+    "scientifique_reel": {
+        "label": "Scientifique réel",
+        "markers": [
+            "hypothèse", "incertitude", "limite", "corrélation",
+            "données disponibles", "méthodologie", "reproductible",
+            "falsifiable", "échantillon", "résultats"
+        ],
+        "closure_risk": 0.15,
+        "linked_gauges": ["real_anchor_score", "quantitative_robustness_score"],
+    },
+
+    "pseudo_savant": {
+        "label": "Pseudo-savant",
+        "markers": [
+            "paradigme", "quantique", "vibration", "matrice",
+            "énergie", "preuve irréfutable", "vérité cachée",
+            "systémique", "complexité", "fréquence"
+        ],
+        "closure_risk": 0.80,
+        "linked_gauges": ["pseudo_knowledge_score", "baratinage_score", "misleading_coherence_score"],
+    },
+
+    "pamphletaire": {
+        "label": "Pamphlétaire",
+        "markers": [
+            "scandale", "honte", "trahison", "corruption",
+            "vendus", "complices", "mensonge", "parasites",
+            "oligarchie", "tricheurs"
+        ],
+        "closure_risk": 0.65,
+        "linked_gauges": ["rhetorical_pressure", "binary_opposition_score", "threat_amplification_score"],
+    },
+
+    "technocratique": {
+        "label": "Technocratique",
+        "markers": [
+            "gouvernance", "optimisation", "régulation", "pilotage",
+            "processus", "indicateur", "protocole", "dispositif",
+            "performance", "efficience"
+        ],
+        "closure_risk": 0.55,
+        "linked_gauges": ["pseudo_knowledge_score", "data_without_reference_score"],
+    },
+
+    "bureaucratique": {
+        "label": "Bureaucratique",
+        "markers": [
+            "formulaire", "procédure", "conformité", "obligation",
+            "dossier", "instruction", "demande", "autorisation",
+            "règlement", "administratif"
+        ],
+        "closure_risk": 0.50,
+        "linked_gauges": ["opacity_score", "responsibility_dilution_score"],
+    },
+
+    "lyrique_amoureux": {
+        "label": "Lyrique amoureux",
+        "markers": [
+            "beauté", "désir", "regard", "absence", "tendresse",
+            "éternité", "caresse", "baiser", "flamme", "fusion"
+        ],
+        "closure_risk": 0.35,
+        "linked_gauges": ["emotional_amplification_score", "extended_placebo_score"],
+    },
+
+    "mystique": {
+        "label": "Mystique / sacralisant",
+        "markers": [
+            "sacré", "pureté", "lumière", "éveil", "destin",
+            "révélation", "vérité ultime", "essence", "salut", "âme"
+        ],
+        "closure_risk": 0.75,
+        "linked_gauges": ["cognitive_closure_score", "extended_placebo_score"],
+    },
+}
+
+
+DISCURSIVE_MODES = {
+    "prophetique": {
+        "label": "Prophétique",
+        "markers": [
+            "inévitable", "bientôt", "viendra", "chute",
+            "réveil", "destin", "fin", "annoncer", "verra"
+        ],
+        "intensity_risk": 0.75,
+    },
+
+    "alarmiste": {
+        "label": "Alarmiste",
+        "markers": [
+            "danger", "menace", "urgence", "catastrophe",
+            "effondrement", "crise majeure", "alerte", "grave"
+        ],
+        "intensity_risk": 0.80,
+    },
+
+    "moraliste": {
+        "label": "Moraliste",
+        "markers": [
+            "honteux", "indigne", "vertu", "faute",
+            "coupable", "responsable", "immoral", "justice morale"
+        ],
+        "intensity_risk": 0.60,
+    },
+
+    "ironique": {
+        "label": "Ironique / satirique",
+        "markers": [
+            "soi-disant", "comme par hasard", "bien sûr",
+            "évidemment", "quelle surprise", "bravo", "magnifique"
+        ],
+        "intensity_risk": 0.45,
+    },
+
+    "victimaire": {
+        "label": "Victimaire",
+        "markers": [
+            "oppression", "victime", "injustice", "persécution",
+            "méprisés", "abandonnés", "silencés", "écrasés"
+        ],
+        "intensity_risk": 0.65,
+    },
+
+    "publicitaire": {
+        "label": "Publicitaire / promesse",
+        "markers": [
+            "solution", "révolutionnaire", "garanti", "simple",
+            "rapide", "transformer", "résultat", "opportunité"
+        ],
+        "intensity_risk": 0.70,
+    },
+}
+def score_marker_group(text: str, group: dict) -> dict:
+    text_lower = text.lower()
+    markers = group.get("markers", [])
+
+    hits = []
+    for marker in markers:
+        if marker.lower() in text_lower:
+            hits.append(marker)
+
+    score = len(hits) / max(len(markers), 1)
+
+    return {
+        "label": group.get("label", "Non défini"),
+        "score": round(min(score, 1.0), 3),
+        "markers_detected": hits,
+    }
+
+
+def compute_discursive_morphology(text: str) -> dict:
+    domain_scores = {
+        key: score_marker_group(text, value)
+        for key, value in DOMAINS.items()
+    }
+
+    family_scores = {
+        key: {
+            **score_marker_group(text, value),
+            "closure_risk": value.get("closure_risk", 0),
+            "linked_gauges": value.get("linked_gauges", []),
+        }
+        for key, value in DISCURSIVE_FAMILIES.items()
+    }
+
+    mode_scores = {
+        key: {
+            **score_marker_group(text, value),
+            "intensity_risk": value.get("intensity_risk", 0),
+        }
+        for key, value in DISCURSIVE_MODES.items()
+    }
+
+    dominant_domain = max(domain_scores.items(), key=lambda x: x[1]["score"])
+    dominant_family = max(family_scores.items(), key=lambda x: x[1]["score"])
+    dominant_mode = max(mode_scores.items(), key=lambda x: x[1]["score"])
+
+    return {
+        "domains": domain_scores,
+        "families": family_scores,
+        "modes": mode_scores,
+
+        "dominant_domain": dominant_domain[0],
+        "dominant_domain_label": dominant_domain[1]["label"],
+        "dominant_domain_score": dominant_domain[1]["score"],
+
+        "dominant_family": dominant_family[0],
+        "dominant_family_label": dominant_family[1]["label"],
+        "dominant_family_score": dominant_family[1]["score"],
+
+        "dominant_mode": dominant_mode[0],
+        "dominant_mode_label": dominant_mode[1]["label"],
+        "dominant_mode_score": dominant_mode[1]["score"],
+    }
+
 def analyze_article(text: str) -> Dict:
     article = text
     words = text.split()
