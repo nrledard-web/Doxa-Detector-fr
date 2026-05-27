@@ -12939,15 +12939,19 @@ with st.expander("Voir les scores rhétoriques détaillés", expanded=False):
 # Morphologie discursive
 # =============================
 
-st.subheader("🧬 Morphologie discursive")
-
-morphology = result.get("discursive_morphology", {})
-
 st.markdown(
     f"""
-**Domaine dominant :** {morphology.get("dominant_domain_label", "Non déterminé")}  
-**Famille discursive dominante :** {morphology.get("dominant_family_label", "Non déterminée")}  
+**Domaine dominant :** {morphology.get("dominant_domain_label", "Non déterminé")}
+— tendance {morphology.get("domains", {}).get(morphology.get("dominant_domain"), {}).get("label", "")}
+({round(morphology.get("dominant_domain_score", 0)*100, 1)}%)
+
+**Famille discursive dominante :** {morphology.get("dominant_family_label", "Non déterminée")}
+— tendance {morphology.get("families", {}).get(morphology.get("dominant_family"), {}).get("label", "")}
+({round(morphology.get("dominant_family_score", 0)*100, 1)}%)
+
 **Mode dominant :** {morphology.get("dominant_mode_label", "Non déterminé")}
+— tendance {morphology.get("modes", {}).get(morphology.get("dominant_mode"), {}).get("label", "")}
+({round(morphology.get("dominant_mode_score", 0)*100, 1)}%)
 """
 )
 
