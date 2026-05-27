@@ -16645,28 +16645,22 @@ with sr7:
 
         st.metric(
             "Frame shift brut",
-            f"{round(result.get('frame_shift_raw',0)*100,1)}%"
+            f"{round(result.get('frame_shift_raw', 0) * 100, 1)}%"
         )
         
         st.metric(
-            "Légitimité",
-            f"{round(result.get('frame_shift_legitimacy',0)*100,1)}%"
+            "Frame shift corrigé",
+            f"{round(result.get('frame_shift_adjusted', 0) * 100, 1)}%"
         )
         
         st.metric(
-            "Illégitimité",
-            f"{round(result.get('frame_shift_illegitimacy',0)*100,1)}%"
+            "Marqueurs retenus",
+            f"{len(result.get('frame_shift_valid_markers', []))} / {len(result.get('frame_shift_markers', []))}"
         )
         
         st.metric(
-            "Balance",
-            round(
-                result.get(
-                    "frame_shift_balance",
-                    0
-                ),
-                2
-            )
+            "Marqueurs neutralisés",
+            f"{len(result.get('frame_shift_neutralized_markers', []))} / {len(result.get('frame_shift_markers', []))}"
         )
         
         st.caption(
@@ -16675,6 +16669,26 @@ with sr7:
                 ""
             )
         )
+        
+        st.markdown("**Marqueurs retenus dans le calcul**")
+        
+        valid_markers = result.get("frame_shift_valid_markers", [])
+        
+        if valid_markers:
+            for marker in valid_markers:
+                st.warning(marker)
+        else:
+            st.success("Aucun marqueur retenu comme frame shift pénalisant.")
+        
+        st.markdown("**Marqueurs neutralisés**")
+        
+        neutralized_markers = result.get("frame_shift_neutralized_markers", [])
+        
+        if neutralized_markers:
+            for marker in neutralized_markers:
+                st.success(marker)
+        else:
+            st.info("Aucun marqueur neutralisé.")
 
         st.markdown("**Lecture**")
         st.write(
