@@ -8294,7 +8294,14 @@ ENCYCLOPEDIC_MARKERS = [
 ENCYCLOPEDIC_MARKERS += [
 
     # structure encyclopédique
-    "selon",
+    "wikipédia",
+    "article",
+    "encyclopédie",
+    "classification",
+    "désigne",
+    "historique",
+    "catégorie",
+    "définition",
     "selon les chercheurs",
     "selon les historiens",
     "on distingue",
