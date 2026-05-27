@@ -9208,7 +9208,8 @@ DISCURSIVE_MODES = {
         "label": "Prophétique",
         "markers": [
             "inévitable", "bientôt", "viendra", "chute",
-            "réveil", "destin", "fin", "annoncer", "verra"
+            "réveil", "destin","fin du monde", "fin d’un cycle", "chute", "effondrement",
+            "destin", "inévitable", "viendra", "réveil", "prophétie" "annoncer", "verra"
         ],
         "intensity_risk": 0.75,
     },
@@ -9302,6 +9303,23 @@ def compute_discursive_morphology(text: str) -> dict:
     dominant_domain = max(domain_scores.items(), key=lambda x: x[1]["score"])
     dominant_family = max(family_scores.items(), key=lambda x: x[1]["score"])
     dominant_mode = max(mode_scores.items(), key=lambda x: x[1]["score"])
+    
+    # -----------------------------
+    # Stabilisation des dominantes
+    # -----------------------------
+    
+    dominant_domain_label = dominant_domain[1]["label"]
+    dominant_family_label = dominant_family[1]["label"]
+    dominant_mode_label = dominant_mode[1]["label"]
+    
+    if dominant_domain[1]["score"] < 0.20:
+        dominant_domain_label = "Non stabilisé"
+    
+    if dominant_family[1]["score"] < 0.20:
+        dominant_family_label = "Non stabilisée"
+    
+    if dominant_mode[1]["score"] < 0.20:
+        dominant_mode_label = "Mode faible ou non stabilisé"
 
     return {
         "domains": domain_scores,
