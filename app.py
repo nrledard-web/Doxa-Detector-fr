@@ -4346,175 +4346,91 @@ def compute_frame_shift_interpretation(result: dict):
 
     frame_raw = result.get("frame_shift_score", 0)
 
-    # -------------------------
-    # Légitimité
-    # -------------------------
-    legitimacy = (
+    markers = result.get("frame_shift_markers", [])
 
-        (result.get("real_anchor_score", 0) / 20) * 0.30
+    retained_markers = []
+    neutralized_markers = []
 
-        + result.get(
-            "quantitative_robustness_score",
-            0
-        ) * 0.20
+    # -----------------------------
+    # Forces de contexte
+    # -----------------------------
+    real_anchor = result.get("real_anchor_score", 0)
+    quantitative = result.get("quantitative_robustness_score", 0)
+    coherence = result.get("discursive_coherence_score", 0)
+    rhetorical_pressure = result.get("rhetorical_pressure", 0)
+    propaganda = result.get("propaganda_score", 0)
+    threat = result.get("threat_amplification_score", 0)
+    omission = result.get("omission_score", 0)
 
-        + (
-            result.get(
-                "discursive_coherence_score",
-                10
-            ) / 20
-        ) * 0.20
+    for marker in markers:
 
-        + min(
-            result.get(
-                "nuance_count",
-                0
-            ) / 6,
-            1
-        ) * 0.15
+        marker_score = 0
 
-        + result.get(
-            "reported_discourse_factor",
-            0
-        ) * 0.15
+        # Facteurs qui neutralisent un faux frame shift
+        if real_anchor >= 8:
+            marker_score -= 1
 
-    )
+        if quantitative >= 0.50:
+            marker_score -= 1
 
-    # -------------------------
-    # Illégitimité
-    # -------------------------
-    illegitimacy = (
+        if coherence >= 12:
+            marker_score -= 1
 
-        result.get(
-            "rhetorical_pressure",
-            0
-        ) * 0.25
+        # Facteurs qui confirment un vrai frame shift pénalisant
+        if rhetorical_pressure >= 0.35:
+            marker_score += 1
 
-        + result.get(
-            "amplification_threat_score",
-            result.get(
-                "threat_amplification_score",
-                0
-            )
-        ) * 0.20
+        if propaganda >= 0.30:
+            marker_score += 1
 
-        + (
-            result.get(
-                "certainty",
-                0
-            ) / 5
-        ) * 0.15
+        if threat >= 0.30:
+            marker_score += 1
 
-        + result.get(
-            "propaganda_score",
-            0
-        ) * 0.20
+        if omission >= 0.25:
+            marker_score += 1
 
-        + result.get(
-            "omission_score",
-            0
-        ) * 0.20
+        # Marqueur retenu = vrai frame shift pénalisant
+        if marker_score > 0:
+            retained_markers.append(marker)
+        else:
+            neutralized_markers.append(marker)
 
-    )
+    total_markers = max(len(markers), 1)
 
-    legitimacy = max(
-        0,
-        min(
-            legitimacy,
-            1
-        )
-    )
+    retained_ratio = len(retained_markers) / total_markers
 
-    illegitimacy = max(
-        0,
-        min(
-            illegitimacy,
-            1
-        )
-    )
+    frame_adjusted = frame_raw * retained_ratio
+    frame_adjusted = max(0, min(frame_adjusted, 1))
 
-    # -------------------------
-    # Balance
-    # -------------------------
+    legitimacy = len(neutralized_markers) / total_markers
+    illegitimacy = len(retained_markers) / total_markers
     balance = legitimacy - illegitimacy
 
-    corrected = (
-        frame_raw
-        *
-        (
-            1
-            -
-            legitimacy * 0.45
-            +
-            illegitimacy * 0.35
-        )
-    )
-
-    corrected = max(
-        0,
-        min(
-            corrected,
-            1
-        )
-    )
-
-    # -------------------------
-    # Texte
-    # -------------------------
-    if balance > 0.35:
-
-        interpretation = (
-            "Le déplacement semble principalement explicatif ou contextuel."
-        )
-
-    elif balance > 0:
-
-        interpretation = (
-            "Le déplacement paraît globalement cohérent mais comporte quelques effets d’orientation."
-        )
-
-    elif balance > -0.25:
-
-        interpretation = (
-            "Le déplacement paraît ambigu et peut influencer l’interprétation."
-        )
-
+    if len(markers) == 0:
+        interpretation = "Aucun déplacement de cadre notable détecté."
+    elif len(retained_markers) == 0:
+        interpretation = "Les marqueurs détectés semblent principalement explicatifs ou contextuels."
+    elif retained_ratio < 0.35:
+        interpretation = "Quelques déplacements de cadre sont retenus, mais la majorité semble contextuelle."
+    elif retained_ratio < 0.65:
+        interpretation = "Le texte contient plusieurs déplacements de cadre partiellement orientants."
     else:
-
-        interpretation = (
-            "Le déplacement semble davantage orienter le cadre que l’expliquer."
-        )
+        interpretation = "La majorité des marqueurs détectés correspond à de vrais déplacements de cadre pénalisants."
 
     return {
+        "frame_shift_raw": round(frame_raw, 3),
+        "frame_shift_adjusted": round(frame_adjusted, 3),
 
-        "frame_shift_raw": round(
-            frame_raw,
-            3
-        ),
+        "frame_shift_retained_ratio": round(retained_ratio, 3),
 
-        "frame_shift_legitimacy": round(
-            legitimacy,
-            3
-        ),
+        "frame_shift_legitimacy": round(legitimacy, 3),
+        "frame_shift_illegitimacy": round(illegitimacy, 3),
+        "frame_shift_balance": round(balance, 3),
 
-        "frame_shift_illegitimacy": round(
-            illegitimacy,
-            3
-        ),
+        "frame_shift_valid_markers": retained_markers,
+        "frame_shift_neutralized_markers": neutralized_markers,
 
-        "frame_shift_balance": round(
-            balance,
-            3
-        ),
-
-        "frame_shift_adjusted": round(
-            corrected,
-            3
-        ),
-
-        "frame_shift_interpretation_v2":
-        interpretation,
-
+        "frame_shift_interpretation_v2": interpretation,
     }
 
 
