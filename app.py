@@ -9327,15 +9327,15 @@ def compute_discursive_morphology(text: str) -> dict:
         "modes": mode_scores,
 
         "dominant_domain": dominant_domain[0],
-        "dominant_domain_label": dominant_domain[1]["label"],
+        "dominant_domain_label": dominant_domain_label,
         "dominant_domain_score": dominant_domain[1]["score"],
 
         "dominant_family": dominant_family[0],
-        "dominant_family_label": dominant_family[1]["label"],
+        "dominant_family_label": dominant_family_label,
         "dominant_family_score": dominant_family[1]["score"],
 
         "dominant_mode": dominant_mode[0],
-        "dominant_mode_label": dominant_mode[1]["label"],
+        "dominant_mode_label": dominant_mode_label,
         "dominant_mode_score": dominant_mode[1]["score"],
     }
 
