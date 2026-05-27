@@ -16668,16 +16668,6 @@ with sr7:
         )
     )
 
-    # Amortisseur : évite de confondre élargissement légitime et glissement stratégique
-    if (
-        result.get("G", 0) >= 8
-        and result.get("N", 0) >= 8
-        and result.get("hard_fact_score", 0) >= 12
-    ):
-        frame_shift_score *= 0.65
-    
-    result["frame_shift_score_adjusted"] = frame_shift_score
-
     if value < 0.15:
         label, color = "Faible", "#ca8a04"
     elif value < 0.35:
