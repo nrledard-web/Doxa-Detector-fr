@@ -4339,6 +4339,185 @@ def compute_frame_shift(text: str):
         "markers": hits,
         "interpretation": interpretation,
     }
+# =============================
+# Interprétation du frame shift
+# =============================
+def compute_frame_shift_interpretation(result: dict):
+
+    frame_raw = result.get("frame_shift_score", 0)
+
+    # -------------------------
+    # Légitimité
+    # -------------------------
+    legitimacy = (
+
+        (result.get("real_anchor_score", 0) / 20) * 0.30
+
+        + result.get(
+            "quantitative_robustness_score",
+            0
+        ) * 0.20
+
+        + (
+            result.get(
+                "discursive_coherence_score",
+                10
+            ) / 20
+        ) * 0.20
+
+        + min(
+            result.get(
+                "nuance_count",
+                0
+            ) / 6,
+            1
+        ) * 0.15
+
+        + result.get(
+            "reported_discourse_factor",
+            0
+        ) * 0.15
+
+    )
+
+    # -------------------------
+    # Illégitimité
+    # -------------------------
+    illegitimacy = (
+
+        result.get(
+            "rhetorical_pressure",
+            0
+        ) * 0.25
+
+        + result.get(
+            "amplification_threat_score",
+            result.get(
+                "threat_amplification_score",
+                0
+            )
+        ) * 0.20
+
+        + (
+            result.get(
+                "certainty",
+                0
+            ) / 5
+        ) * 0.15
+
+        + result.get(
+            "propaganda_score",
+            0
+        ) * 0.20
+
+        + result.get(
+            "omission_score",
+            0
+        ) * 0.20
+
+    )
+
+    legitimacy = max(
+        0,
+        min(
+            legitimacy,
+            1
+        )
+    )
+
+    illegitimacy = max(
+        0,
+        min(
+            illegitimacy,
+            1
+        )
+    )
+
+    # -------------------------
+    # Balance
+    # -------------------------
+    balance = legitimacy - illegitimacy
+
+    corrected = (
+        frame_raw
+        *
+        (
+            1
+            -
+            legitimacy * 0.45
+            +
+            illegitimacy * 0.35
+        )
+    )
+
+    corrected = max(
+        0,
+        min(
+            corrected,
+            1
+        )
+    )
+
+    # -------------------------
+    # Texte
+    # -------------------------
+    if balance > 0.35:
+
+        interpretation = (
+            "Le déplacement semble principalement explicatif ou contextuel."
+        )
+
+    elif balance > 0:
+
+        interpretation = (
+            "Le déplacement paraît globalement cohérent mais comporte quelques effets d’orientation."
+        )
+
+    elif balance > -0.25:
+
+        interpretation = (
+            "Le déplacement paraît ambigu et peut influencer l’interprétation."
+        )
+
+    else:
+
+        interpretation = (
+            "Le déplacement semble davantage orienter le cadre que l’expliquer."
+        )
+
+    return {
+
+        "frame_shift_raw": round(
+            frame_raw,
+            3
+        ),
+
+        "frame_shift_legitimacy": round(
+            legitimacy,
+            3
+        ),
+
+        "frame_shift_illegitimacy": round(
+            illegitimacy,
+            3
+        ),
+
+        "frame_shift_balance": round(
+            balance,
+            3
+        ),
+
+        "frame_shift_adjusted": round(
+            corrected,
+            3
+        ),
+
+        "frame_shift_interpretation_v2":
+        interpretation,
+
+    }
+
+
 # =========================================================
 # ASYMÉTRIE ARGUMENTATIVE
 # =========================================================
