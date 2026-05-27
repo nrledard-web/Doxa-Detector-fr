@@ -12896,7 +12896,9 @@ st.markdown("""
 </div>
 """, unsafe_allow_html=True)
 
-
+# =============================
+# Type de discours détecté
+# =============================
 st.markdown("### Type de discours détecté")
 
 st.info(
@@ -12914,6 +12916,25 @@ with st.expander("Voir les scores rhétoriques détaillés", expanded=False):
 
     st.markdown("#### Registres émotionnels")
     st.json(result.get("emotional_registers", {}))
+
+# =============================
+# Morphologie discursive
+# =============================
+
+st.subheader("🧬 Morphologie discursive")
+
+morphology = result.get("discursive_morphology", {})
+
+st.markdown(
+    f"""
+**Domaine dominant :** {morphology.get("dominant_domain_label", "Non déterminé")}  
+**Famille discursive dominante :** {morphology.get("dominant_family_label", "Non déterminée")}  
+**Mode dominant :** {morphology.get("dominant_mode_label", "Non déterminé")}
+"""
+)
+
+with st.popover("🔎 Voir le détail morphologique"):
+    st.write(morphology)
 
 st.markdown("""
 <div style="text-align:center; margin:25px 0; color:#888;">
