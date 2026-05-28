@@ -4422,7 +4422,6 @@ def compute_frame_shift_interpretation(result: dict):
         "frame_shift_adjusted": round(frame_adjusted, 3),
 
         "frame_shift_retained_ratio": round(retained_ratio, 3),
-
         "frame_shift_legitimacy": round(legitimacy, 3),
         "frame_shift_illegitimacy": round(illegitimacy, 3),
         "frame_shift_balance": round(balance, 3),
