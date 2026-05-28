@@ -11086,7 +11086,13 @@ def analyze_article(text: str) -> Dict:
     
     # Modulation contextuelle selon le type de discours
     result = apply_discourse_modifiers(result)
-
+    
+    # -----------------------------
+    # Ancrage au réel
+    # -----------------------------
+    real_anchor = detect_real_anchor(text, result)
+    result.update(real_anchor)
+    
     result["discursive_morphology"] = compute_discursive_morphology(text)
 
     result["meta_cognitive_consistency"] = (
@@ -11140,11 +11146,8 @@ def analyze_article(text: str) -> Dict:
     reported_speech_reduction = 1 - min(reported_speech_score * 0.35, 0.35)
 
     for key in [
-        "propaganda_score",
-        "normative_score",
-        "certainty_score",
-        "binary_opposition_score",
-        "threat_amplification_score",
+        "propaganda_score", "normative_score", "certainty_score",
+        "binary_opposition_score", "threat_amplification_score",
         "doxic_rigidity_score",
     ]:
         result[key] = round(result.get(key, 0) * reported_speech_reduction, 3)
@@ -11157,7 +11160,6 @@ def analyze_article(text: str) -> Dict:
     frame_meta = compute_frame_shift_interpretation(
         result
     )
-    
     result.update(
         frame_meta
     )
@@ -11174,7 +11176,6 @@ def analyze_article(text: str) -> Dict:
         total_credibility_penalty + display_gauge_penalty,
         2
     )
-    
     # -----------------------------
     # Pénalités finales
     # -----------------------------
@@ -11185,39 +11186,27 @@ def analyze_article(text: str) -> Dict:
         "mecroyance_penalties": mecroyance_penalties,
         "display_gauge_penalty": display_gauge_penalty,
     }
-    
     result["penalty_index"] = total_credibility_penalty
     
     result["final_credibility_score"] = round(
         max(0, result["hard_fact_score"] - total_credibility_penalty),
         1
     )
-    
     result["hard_fact_score_penalized"] = result["final_credibility_score"]
     
     result["improved_penalized"] = round(
         max(0, result["improved"] - total_credibility_penalty),
         1
     )
-
-    # -----------------------------
-    # Ancrage au réel
-    # -----------------------------
-    
-    real_anchor = detect_real_anchor(text, result)
-    result.update(real_anchor)
-    
     # -----------------------------
     # Bonus cognitif
     # -----------------------------
-    
     bonus = compute_cognitive_bonus(result)
     result.update(bonus)
     
     # -----------------------------
     # Cerveau DOXA FINAL
     # -----------------------------
-    
     brain = compute_brain_indices(result)
     result.update(brain)
     
@@ -11225,7 +11214,7 @@ def analyze_article(text: str) -> Dict:
     result.update(result["doxa_brain"])
     
     return result
-
+    
 # -----------------------------
 # Corroboration
 # -----------------------------
