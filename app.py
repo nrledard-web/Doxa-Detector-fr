@@ -9360,6 +9360,84 @@ DISCURSIVE_REGIMES = {
     },
 
 }
+# =============================
+# Régimes rythmiques
+# =============================
+
+RHYTHMIC_REGIMES = {
+
+    "martele": {
+        "label": "Martelé",
+        "markers": [
+            "!",
+            "jamais",
+            "toujours",
+            "absolument",
+            "sans cesse",
+            "il faut",
+            "nous devons",
+            "immédiatement",
+        ],
+        "rhythmic_force": 0.80,
+    },
+
+    "fluide": {
+        "label": "Fluide",
+        "markers": [
+            "cependant",
+            "toutefois",
+            "néanmoins",
+            "en revanche",
+            "par ailleurs",
+            "dans certains cas",
+            "il convient de",
+        ],
+        "rhythmic_force": 0.30,
+    },
+
+    "fragmentaire": {
+        "label": "Fragmentaire",
+        "markers": [
+            "...",
+            "?",
+            "mais",
+            "or",
+            "pourtant",
+            "alors",
+            "d'un côté",
+            "de l'autre",
+        ],
+        "rhythmic_force": 0.60,
+    },
+
+    "bureaucratique_rythmique": {
+        "label": "Bureaucratique",
+        "markers": [
+            "mise en œuvre",
+            "cadre réglementaire",
+            "procédure",
+            "dispositif",
+            "conformité",
+            "régulation",
+            "gouvernance",
+        ],
+        "rhythmic_force": 0.55,
+    },
+
+    "incantatoire_rythmique": {
+        "label": "Incantatoire",
+        "markers": [
+            "le peuple",
+            "l'histoire montre",
+            "plus jamais",
+            "nous allons",
+            "il est temps",
+            "réveil",
+            "destin",
+        ],
+        "rhythmic_force": 0.85,
+    },
+}
 
 def score_marker_group(text: str, group: dict) -> dict:
     text_lower = text.lower()
@@ -9401,6 +9479,14 @@ def compute_discursive_morphology(text: str) -> dict:
         }
         for key, value in DISCURSIVE_MODES.items()
     }
+    rhythmic_scores = {
+        key: {
+            **score_marker_group(text, value),
+            "rhythmic_force": value.get("rhythmic_force", 0),
+        }
+        for key, value in RHYTHMIC_REGIMES.items()
+    }
+    
     regime_scores = {
         key: {
             **score_marker_group(text, value),
@@ -9413,7 +9499,8 @@ def compute_discursive_morphology(text: str) -> dict:
     dominant_family = max(family_scores.items(), key=lambda x: x[1]["score"])
     dominant_mode = max(mode_scores.items(), key=lambda x: x[1]["score"])
     dominant_regime = max(regime_scores.items(), key=lambda x: x[1]["score"])
-
+    dominant_rhythm = max(rhythmic_scores.items(), key=lambda x: x[1]["score"])
+    
     # -----------------------------
     # Stabilisation des dominantes
     # -----------------------------
@@ -9422,6 +9509,10 @@ def compute_discursive_morphology(text: str) -> dict:
     dominant_family_label = dominant_family[1]["label"]
     dominant_mode_label = dominant_mode[1]["label"]
     dominant_regime_label = dominant_regime[1]["label"]
+    dominant_rhythm_label = dominant_rhythm[1]["label"]
+
+    if dominant_rhythm[1]["score"] < 0.20:
+        dominant_rhythm_label = "Rythme faible ou non stabilisé"
     
     if dominant_domain[1]["score"] < 0.20:
         dominant_domain_label = "Non stabilisé"
@@ -9457,6 +9548,12 @@ def compute_discursive_morphology(text: str) -> dict:
         "dominant_regime": dominant_regime[0],
         "dominant_regime_label": dominant_regime_label,
         "dominant_regime_score": dominant_regime[1]["score"],
+
+        "rhythms": rhythmic_scores,
+
+        "dominant_rhythm": dominant_rhythm[0],
+        "dominant_rhythm_label": dominant_rhythm_label,
+        "dominant_rhythm_score": dominant_rhythm[1]["score"],
     }
 
 def analyze_article(text: str) -> Dict:
