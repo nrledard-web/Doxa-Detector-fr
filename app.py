@@ -13953,6 +13953,25 @@ if validation.get("validations"):
             st.write(
                 f"• {gauge} → {info['status']} : {info['reason']}"
             )
+            adjustments = result.get("dynamic_gauge_adjustments", {})
+
+st.markdown(
+    f"""
+**Ajustements dynamiques proposés :**
+{adjustments.get("adjustment_count", 0)} ajustement(s)
+"""
+)
+
+if adjustments.get("adjustments"):
+
+    with st.popover("⚙️ Voir les ajustements dynamiques"):
+
+        for gauge, info in adjustments["adjustments"].items():
+
+            st.write(
+                f"• {gauge} : {info['original']} → {info['adjusted']} "
+                f"({info['reason']})"
+            )
 
 with st.popover("🔎 Voir le détail morphologique"):
     st.write(morphology)
