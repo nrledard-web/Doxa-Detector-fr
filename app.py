@@ -10252,15 +10252,13 @@ def compute_dynamic_gauge_adjustments(result: dict) -> dict:
     # Technocratique
     # -----------------------------
     if validation.get("technocratique", {}).get("status") == "validée":
-        current = result.get("technocratic_pressure_score", 0)
 
-        adjusted = min(current + 0.10, 1)
-
-        adjustments["technocratic_pressure_score"] = {
-            "original": current,
-            "adjusted": adjusted,
-            "delta": round(adjusted - current, 3),
-            "reason": "Convergence entre régime technocratique et suffixation technocratique.",
+        adjustments["technocratic_context"] = {
+            "original": 0,
+            "adjusted": 0.10,
+            "delta": 0.10,
+            "reason":
+            "Convergence entre régime technocratique et suffixation technocratique.",
         }
 
     return {
