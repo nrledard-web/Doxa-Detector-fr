@@ -9655,7 +9655,7 @@ def compute_homoeoteleutic_density(text: str) -> dict:
 
     density = total_matches / max(len(words), 1)
 
-    density = min(density * 8, 1.0)
+    density = min(density * 3.5, 1.0)
 
     if density < 0.10:
         label = "Faible densité homéotéleutique"
