@@ -9220,6 +9220,9 @@ DISCURSIVE_MODES = {
             "inévitable", "bientôt", "viendra", "chute",
             "réveil", "destin","fin du monde", "fin d’un cycle", "chute", "effondrement",
             "destin", "inévitable", "viendra", "réveil", "prophétie", "annoncer", "verra"
+            "absolument certain", "nous allons vers", "d'ici", "si rien n'est fait",
+            "crise majeure", "inévitable", "va provoquer", "risque de", "pourrait conduire",
+            "avenir", "catastrophe", "effondrement social",
         ],
         "intensity_risk": 0.75,
     },
@@ -9229,6 +9232,8 @@ DISCURSIVE_MODES = {
         "markers": [
             "danger", "menace", "urgence", "catastrophe",
             "effondrement", "crise majeure", "alerte", "grave"
+            "inquiétude", "craignent", "urgence", "grave",
+            "menace", "crise sociale",
         ],
         "intensity_risk": 0.80,
     },
