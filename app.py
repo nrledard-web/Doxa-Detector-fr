@@ -6129,14 +6129,12 @@ def compute_advanced_deceptive_coherence(text: str):
     t = normalize_text_for_markers(text)
 
     markers = []
-
     # -----------------------------
     # 1) Marqueurs directs
     # -----------------------------
     for m in ADVANCED_DECEPTIVE_COHERENCE_MARKERS:
         if contains_term(t, m) or m in t:
             markers.append(m)
-
     # -----------------------------
     # 2) Cohérence + certitude
     # -----------------------------
@@ -6149,7 +6147,7 @@ def compute_advanced_deceptive_coherence(text: str):
         )
     ):
         markers.append("enchaînement logique fortement affirmatif")
-
+        
     # Projection fortement affirmée
     if (
         any(w in t for w in [
@@ -6169,7 +6167,6 @@ def compute_advanced_deceptive_coherence(text: str):
         )
     ):
         markers.append("projection persuasive fortement affirmée")
-
     # -----------------------------
     # 3) Auto-validation narrative
     # -----------------------------
@@ -6182,7 +6179,6 @@ def compute_advanced_deceptive_coherence(text: str):
         )
     ):
         markers.append("récit auto-validant")
-
     # -----------------------------
     # 4) Opposition structurante
     # -----------------------------
@@ -6198,34 +6194,18 @@ def compute_advanced_deceptive_coherence(text: str):
 
     # Cohérence catastrophiste fluide
     catastrophe_terms = [
-        "danger",
-        "menace",
-        "effondrement",
-        "catastrophe",
-        "chaos",
-        "désastre",
-        "submersion",
-        "invasion",
+        "danger", "menace", "effondrement", "catastrophe",
+        "chaos", "désastre", "submersion", "invasion",
     ]
-    
     method_terms = [
-        "rapport",
-        "étude",
-        "expert",
-        "selon",
+        "rapport", "étude", "expert", "selon",
     ]
-    
     nuance_terms = [
         "ne signifie pas nécessairement",
-        "plusieurs facteurs",
-        "plusieurs options",
-        "doivent être distingués",
-        "peut rester",
-        "analyse rigoureuse",
-        "cependant",
-        "toutefois",
-        "néanmoins",
-        "éviter deux excès",
+        "plusieurs facteurs", "plusieurs options",
+        "doivent être distingués", "peut rester",
+        "analyse rigoureuse", "cependant", "toutefois",
+        "néanmoins", "éviter deux excès",
     ]
     
     has_catastrophe = any(w in t for w in catastrophe_terms)
@@ -6234,7 +6214,6 @@ def compute_advanced_deceptive_coherence(text: str):
     
     if has_catastrophe and has_method and not has_nuance:
         markers.append("cohérence catastrophiste argumentée")
-
     # -----------------------------
     # Nettoyage
     # -----------------------------
@@ -6243,15 +6222,10 @@ def compute_advanced_deceptive_coherence(text: str):
     nuance_hits = [
         m for m in [
             "ne signifie pas nécessairement",
-            "plusieurs facteurs",
-            "plusieurs options",
-            "doivent être distingués",
-            "peut rester",
-            "analyse rigoureuse",
-            "cependant",
-            "toutefois",
-            "néanmoins",
-            "éviter deux excès",
+            "plusieurs facteurs", "plusieurs options",
+            "doivent être distingués", "peut rester",
+            "analyse rigoureuse", "cependant", "toutefois",
+            "néanmoins", "éviter deux excès",
         ]
         if contains_term(t, m)
     ]
