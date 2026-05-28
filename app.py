@@ -9402,11 +9402,19 @@ def compute_discursive_morphology(text: str) -> dict:
         }
         for key, value in DISCURSIVE_MODES.items()
     }
+    regime_scores = {
+        key: {
+            **score_marker_group(text, value),
+            "closure_force": value.get("closure_force", 0),
+        }
+        for key, value in DISCURSIVE_REGIMES.items()
+    }
 
     dominant_domain = max(domain_scores.items(), key=lambda x: x[1]["score"])
     dominant_family = max(family_scores.items(), key=lambda x: x[1]["score"])
     dominant_mode = max(mode_scores.items(), key=lambda x: x[1]["score"])
-    
+    dominant_regime = max(regime_scores.items(), key=lambda x: x[1]["score"])
+
     # -----------------------------
     # Stabilisation des dominantes
     # -----------------------------
@@ -9414,6 +9422,7 @@ def compute_discursive_morphology(text: str) -> dict:
     dominant_domain_label = dominant_domain[1]["label"]
     dominant_family_label = dominant_family[1]["label"]
     dominant_mode_label = dominant_mode[1]["label"]
+        dominant_regime_label = dominant_regime[1]["label"]
     
     if dominant_domain[1]["score"] < 0.20:
         dominant_domain_label = "Non stabilisé"
@@ -9423,6 +9432,9 @@ def compute_discursive_morphology(text: str) -> dict:
     
     if dominant_mode[1]["score"] < 0.20:
         dominant_mode_label = "Mode faible ou non stabilisé"
+
+    if dominant_regime[1]["score"] < 0.20:
+        dominant_regime_label = "Régime faible ou non stabilisé"
 
     return {
         "domains": domain_scores,
@@ -9440,6 +9452,12 @@ def compute_discursive_morphology(text: str) -> dict:
         "dominant_mode": dominant_mode[0],
         "dominant_mode_label": dominant_mode_label,
         "dominant_mode_score": dominant_mode[1]["score"],
+
+        "regimes": regime_scores,
+
+        "dominant_regime": dominant_regime[0],
+        "dominant_regime_label": dominant_regime_label,
+        "dominant_regime_score": dominant_regime[1]["score"],
     }
 
 def analyze_article(text: str) -> Dict:
