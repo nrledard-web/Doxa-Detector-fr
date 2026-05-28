@@ -10854,6 +10854,10 @@ def analyze_article(text: str) -> Dict:
     result = apply_discourse_modifiers(result)
 
     result["discursive_morphology"] = compute_discursive_morphology(text)
+
+    result["meta_cognitive_consistency"] = (
+        compute_meta_cognitive_consistency(result)
+    )
     
     result = classify_cognitive_regime(result)
     
