@@ -9918,6 +9918,131 @@ def compute_discursive_morphology(text: str) -> dict:
         "cognitive_attractors": cognitive_attractors,
     }
 
+def compute_meta_cognitive_consistency(result: dict) -> dict:
+
+    morphology = result.get("discursive_morphology", {})
+
+    observations = []
+
+    coherence_score = 0
+
+    # -----------------------------
+    # Récupération des couches
+    # -----------------------------
+
+    dominant_family = morphology.get("dominant_family", "")
+    dominant_regime = morphology.get("dominant_regime", "")
+    dominant_rhythm = morphology.get("dominant_rhythm", "")
+
+    morph_density = (
+        morphology.get("morphological_density", {})
+        .get("dominant_density", 0)
+    )
+
+    homoeo_density = (
+        morphology.get("homoeoteleutic_density", {})
+        .get("density", 0)
+    )
+
+    repetition_score = (
+        morphology.get("structural_repetition", {})
+        .get("score", 0)
+    )
+
+    attractor_score = (
+        morphology.get("cognitive_attractors", {})
+        .get("dominant_score", 0)
+    )
+
+    # -----------------------------
+    # Convergences technocratiques
+    # -----------------------------
+
+    if (
+        dominant_regime == "technocratique"
+        and morph_density > 0.40
+    ):
+        coherence_score += 2
+
+        observations.append(
+            "Convergence technocratique entre régime et morphologie."
+        )
+
+    # -----------------------------
+    # Stabilisation cognitive
+    # -----------------------------
+
+    if (
+        repetition_score > 0.40
+        and homoeo_density > 0.30
+    ):
+        coherence_score += 2
+
+        observations.append(
+            "Stabilisation cognitive forte par répétition et homogénéité terminale."
+        )
+
+    # -----------------------------
+    # Cadence martelée
+    # -----------------------------
+
+    if dominant_rhythm == "martele":
+
+        coherence_score += 1
+
+        observations.append(
+            "Cadence discursive martelée détectée."
+        )
+
+    # -----------------------------
+    # Attracteur fort
+    # -----------------------------
+
+    if attractor_score > 0.60:
+
+        coherence_score += 2
+
+        observations.append(
+            "Présence d’un attracteur cognitif fortement dominant."
+        )
+
+    # -----------------------------
+    # Contradictions potentielles
+    # -----------------------------
+
+    if (
+        dominant_family == "scientifique_reel"
+        and dominant_rhythm == "incantatoire_rythmique"
+    ):
+
+        coherence_score -= 1
+
+        observations.append(
+            "Tension entre scientificité et rythme incantatoire."
+        )
+
+    # -----------------------------
+    # Verdict
+    # -----------------------------
+
+    if coherence_score <= 1:
+        label = "Morphologie peu stabilisée"
+
+    elif coherence_score <= 3:
+        label = "Morphologie cohérente"
+
+    elif coherence_score <= 5:
+        label = "Morphologie fortement structurée"
+
+    else:
+        label = "Morphologie cognitive hautement stabilisée"
+
+    return {
+        "score": coherence_score,
+        "label": label,
+        "observations": observations,
+    }
+
 def analyze_article(text: str) -> Dict:
     article = text
     words = text.split()
