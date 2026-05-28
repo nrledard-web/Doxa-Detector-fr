@@ -9421,7 +9421,7 @@ def compute_discursive_morphology(text: str) -> dict:
     dominant_domain_label = dominant_domain[1]["label"]
     dominant_family_label = dominant_family[1]["label"]
     dominant_mode_label = dominant_mode[1]["label"]
-        dominant_regime_label = dominant_regime[1]["label"]
+    dominant_regime_label = dominant_regime[1]["label"]
     
     if dominant_domain[1]["score"] < 0.20:
         dominant_domain_label = "Non stabilisé"
