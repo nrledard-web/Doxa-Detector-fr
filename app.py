@@ -11093,76 +11093,91 @@ def analyze_article(text: str) -> Dict:
     real_anchor = detect_real_anchor(text, result)
     result.update(real_anchor)
     
+    # -----------------------------
+    # Morphologie cognitive
+    # -----------------------------
     result["discursive_morphology"] = compute_discursive_morphology(text)
-
+    
     result["meta_cognitive_consistency"] = (
         compute_meta_cognitive_consistency(result)
     )
-    result["gauge_validation"] = compute_gauge_validation(result)
-
-    result["dynamic_gauge_adjustments"] = compute_dynamic_gauge_adjustments(result)
-
-    result["validation_summary"] = compute_validation_summary(result)
     
+    result["gauge_validation"] = (
+        compute_gauge_validation(result)
+    )
+    
+    result["dynamic_gauge_adjustments"] = (
+        compute_dynamic_gauge_adjustments(result)
+    )
+    
+    result["validation_summary"] = (
+        compute_validation_summary(result)
+    )
+    
+    # -----------------------------
+    # Régime cognitif
+    # -----------------------------
     result = classify_cognitive_regime(result)
     
-    result = classify_cognitive_regime(result)
-    
+    # -----------------------------
+    # Bonus cognitif
+    # -----------------------------
     bonus = compute_cognitive_bonus(result)
     result.update(bonus)
-
+    
     # -----------------------------
-    # Indice de baratinage
+    # Baratinage / omission / placebo
     # -----------------------------
     baratinage = compute_baratinage_score(result)
     result.update(baratinage)
     
-    # -----------------------------
-    # Indice d’omission stratégique
-    # -----------------------------
     omission = compute_omission_score(result)
     result.update(omission)
     
-    # -----------------------------
-    # Effet placebo étendu
-    # -----------------------------
     placebo = compute_extended_placebo_effect(result)
     result.update(placebo)
-
+    
     # -----------------------------
-    # Cerveau DOXA
+    # Cerveau DOXA FINAL
     # -----------------------------
-    # brain_indices = compute_brain_indices(result)
-    # result.update(brain_indices)
+    brain = compute_brain_indices(result)
+    result.update(brain)
     
     result["doxa_brain"] = compute_doxa_brain(result)
     result.update(result["doxa_brain"])
-
+    
     # -----------------------------
-    # Modérateur discours rapporté / citations
+    # Modérateur discours rapporté
     # -----------------------------
     reported_speech_score = result.get("reported_speech_score", 0)
-
-    reported_speech_reduction = 1 - min(reported_speech_score * 0.35, 0.35)
-
+    
+    reported_speech_reduction = (
+        1 - min(reported_speech_score * 0.35, 0.35)
+    )
+    
     for key in [
-        "propaganda_score", "normative_score", "certainty_score",
-        "binary_opposition_score", "threat_amplification_score",
+        "propaganda_score",
+        "normative_score",
+        "certainty_score",
+        "binary_opposition_score",
+        "threat_amplification_score",
         "doxic_rigidity_score",
     ]:
-        result[key] = round(result.get(key, 0) * reported_speech_reduction, 3)
-        
-    result["reported_speech_reduction"] = round(reported_speech_reduction, 3)
-
-    # -----------------------------
-    # Interprétation avancée frame shift
-    # -----------------------------
-    frame_meta = compute_frame_shift_interpretation(
-        result
+        result[key] = round(
+            result.get(key, 0) * reported_speech_reduction,
+            3
+        )
+    
+    result["reported_speech_reduction"] = round(
+        reported_speech_reduction,
+        3
     )
-    result.update(
-        frame_meta
-    )
+    
+    # -----------------------------
+    # Interprétation frame shift
+    # -----------------------------
+    frame_meta = compute_frame_shift_interpretation(result)
+    result.update(frame_meta)
     
     return result
     # -----------------------------
@@ -11198,20 +11213,7 @@ def analyze_article(text: str) -> Dict:
         max(0, result["improved"] - total_credibility_penalty),
         1
     )
-    # -----------------------------
-    # Bonus cognitif
-    # -----------------------------
-    bonus = compute_cognitive_bonus(result)
-    result.update(bonus)
-    
-    # -----------------------------
-    # Cerveau DOXA FINAL
-    # -----------------------------
-    brain = compute_brain_indices(result)
-    result.update(brain)
-    
-    result["doxa_brain"] = compute_doxa_brain(result)
-    result.update(result["doxa_brain"])
+
     
     return result
     
