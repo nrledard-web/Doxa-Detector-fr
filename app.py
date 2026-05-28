@@ -9579,6 +9579,7 @@ def compute_discursive_morphology(text: str) -> dict:
         }
         for key, value in RHYTHMIC_REGIMES.items()
     }
+    morphological_density = compute_morphological_density(text)
     
     regime_scores = {
         key: {
@@ -9647,6 +9648,8 @@ def compute_discursive_morphology(text: str) -> dict:
         "dominant_rhythm": dominant_rhythm[0],
         "dominant_rhythm_label": dominant_rhythm_label,
         "dominant_rhythm_score": dominant_rhythm[1]["score"],
+
+        "morphological_density": morphological_density,
     }
 
 def analyze_article(text: str) -> Dict:
