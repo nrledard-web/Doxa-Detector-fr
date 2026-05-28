@@ -13554,6 +13554,10 @@ st.markdown(
 **Densité homéotéleutique :**
 {morphology.get("homoeoteleutic_density", {}).get("label", "Non déterminée")}
 — densité {round(morphology.get("homoeoteleutic_density", {}).get("density", 0)*100, 1)}%
+
+**Attracteur cognitif dominant :**
+{morphology.get("cognitive_attractors", {}).get("dominant_label", "Non déterminé")}
+— intensité {round(morphology.get("cognitive_attractors", {}).get("dominant_score", 0)*100, 1)}%
 """
 )
 
