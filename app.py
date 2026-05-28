@@ -9505,6 +9505,100 @@ HOMOEOTELEUTIC_ENDINGS = [
     "ique",
     "oire",
 ]
+# =============================
+# Attracteurs cognitifs
+# =============================
+
+COGNITIVE_ATTRACTORS = {
+
+    "securite": {
+        "label": "Sécurité / stabilité",
+        "markers": [
+            "sécurité",
+            "stabilité",
+            "protection",
+            "prévisible",
+            "fiable",
+            "continuité",
+            "maîtrise",
+            "contrôle",
+        ],
+        "effect": "stabilisation cognitive",
+    },
+
+    "urgence": {
+        "label": "Urgence / crise",
+        "markers": [
+            "urgence",
+            "crise",
+            "danger",
+            "menace",
+            "effondrement",
+            "catastrophe",
+            "imminent",
+            "alerte",
+        ],
+        "effect": "compression anxiogène",
+    },
+
+    "science": {
+        "label": "Science / expertise",
+        "markers": [
+            "étude",
+            "expert",
+            "analyse",
+            "rapport",
+            "scientifique",
+            "données",
+            "preuve",
+            "recherche",
+        ],
+        "effect": "légitimation épistémique",
+    },
+
+    "souverainete": {
+        "label": "Souveraineté / indépendance",
+        "markers": [
+            "souveraineté",
+            "indépendance",
+            "autonomie",
+            "nation",
+            "territoire",
+            "stratégique",
+            "sécurité énergétique",
+        ],
+        "effect": "ancrage géopolitique",
+    },
+
+    "progres": {
+        "label": "Progrès / futur",
+        "markers": [
+            "avenir",
+            "innovation",
+            "développement",
+            "progrès",
+            "technologie",
+            "transition",
+            "modernisation",
+        ],
+        "effect": "projection futuriste",
+    },
+
+    "moralisation": {
+        "label": "Moralisation",
+        "markers": [
+            "justice",
+            "inacceptable",
+            "haine",
+            "raciste",
+            "xénophobe",
+            "devoir",
+            "responsabilité",
+        ],
+        "effect": "polarisation morale",
+    },
+
+}
 
 def score_marker_group(text: str, group: dict) -> dict:
     text_lower = text.lower()
@@ -9678,6 +9772,44 @@ def compute_homoeoteleutic_density(text: str) -> dict:
         "total_matches": total_matches,
     }
 
+def compute_cognitive_attractors(text: str) -> dict:
+
+    text_lower = text.lower()
+
+    results = {}
+
+    for key, attractor in COGNITIVE_ATTRACTORS.items():
+
+        hits = []
+
+        for marker in attractor.get("markers", []):
+
+            if marker.lower() in text_lower:
+                hits.append(marker)
+
+        score = len(hits) / max(len(attractor.get("markers", [])), 1)
+
+        results[key] = {
+            "label": attractor.get("label", key),
+            "score": round(min(score, 1.0), 3),
+            "markers_detected": hits,
+            "effect": attractor.get("effect", ""),
+        }
+
+    dominant = max(results.items(), key=lambda x: x[1]["score"])
+
+    dominant_label = dominant[1]["label"]
+
+    if dominant[1]["score"] < 0.20:
+        dominant_label = "Attracteur faible ou dispersé"
+
+    return {
+        "attractors": results,
+        "dominant_attractor": dominant[0],
+        "dominant_label": dominant_label,
+        "dominant_score": dominant[1]["score"],
+    }
+
 def compute_discursive_morphology(text: str) -> dict:
     domain_scores = {
         key: score_marker_group(text, value)
@@ -9710,6 +9842,7 @@ def compute_discursive_morphology(text: str) -> dict:
     morphological_density = compute_morphological_density(text)
     structural_repetition = compute_structural_repetition(text)
     homoeoteleutic_density = compute_homoeoteleutic_density(text)
+    cognitive_attractors = compute_cognitive_attractors(text)
     
     regime_scores = {
         key: {
@@ -9782,6 +9915,7 @@ def compute_discursive_morphology(text: str) -> dict:
         "morphological_density": morphological_density,
         "structural_repetition": structural_repetition,
         "homoeoteleutic_density": homoeoteleutic_density,
+        "cognitive_attractors": cognitive_attractors,
     }
 
 def analyze_article(text: str) -> Dict:
