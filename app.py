@@ -13177,6 +13177,11 @@ st.markdown(
 ({round(morphology.get("dominant_regime_score", 0)*100, 1)}%)
 """
 )
+**Rythme discursif dominant :**
+{morphology.get("dominant_rhythm_label", "Non déterminé")}
+— tendance {morphology.get("rhythms", {}).get(morphology.get("dominant_rhythm"), {}).get("label", "")}
+({round(morphology.get("dominant_rhythm_score", 0)*100, 1)}%)
+
 
 with st.popover("🔎 Voir le détail morphologique"):
     st.write(morphology)
