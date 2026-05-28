@@ -13416,6 +13416,10 @@ st.markdown(
 **Répétition structurelle :**
 {morphology.get("structural_repetition", {}).get("label", "Non déterminée")}
 — score {round(morphology.get("structural_repetition", {}).get("score", 0)*100, 1)}%
+
+**Densité homéotéleutique :**
+{morphology.get("homoeoteleutic_density", {}).get("label", "Non déterminée")}
+— densité {round(morphology.get("homoeoteleutic_density", {}).get("density", 0)*100, 1)}%
 """
 )
 
