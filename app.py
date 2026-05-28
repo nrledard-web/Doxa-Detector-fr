@@ -9549,6 +9549,75 @@ def compute_morphological_density(text: str) -> dict:
         "dominant_density": dominant[1]["density"],
     }
 
+def compute_structural_repetition(text: str) -> dict:
+    """
+    Détecte la répétition de structures discursives simples :
+    débuts de phrases, formules injonctives, structures récurrentes.
+    """
+
+    sentences = [
+        s.strip()
+        for s in re.split(r"[.!?]+", text)
+        if len(s.strip()) > 5
+    ]
+
+    openings = []
+    repeated_openings = {}
+
+    for sentence in sentences:
+        words = sentence.lower().split()
+        if len(words) >= 2:
+            opening = " ".join(words[:2])
+            openings.append(opening)
+
+    for opening in openings:
+        repeated_openings[opening] = repeated_openings.get(opening, 0) + 1
+
+    repeated_openings = {
+        k: v for k, v in repeated_openings.items()
+        if v >= 2
+    }
+
+    incantatory_forms = [
+        "il faut",
+        "nous devons",
+        "nous allons",
+        "il est",
+        "c'est",
+        "ce sont",
+        "jamais",
+        "toujours",
+    ]
+
+    incantatory_hits = [
+        form for form in incantatory_forms
+        if form in text.lower()
+    ]
+
+    repetition_score = (
+        len(repeated_openings) * 0.15
+        + len(incantatory_hits) * 0.10
+    )
+
+    repetition_score = min(repetition_score, 1.0)
+
+    if repetition_score < 0.15:
+        label = "Faible répétition structurelle"
+    elif repetition_score < 0.35:
+        label = "Répétition structurelle modérée"
+    elif repetition_score < 0.60:
+        label = "Répétition structurelle élevée"
+    else:
+        label = "Répétition structurelle saturante"
+
+    return {
+        "score": round(repetition_score, 3),
+        "label": label,
+        "repeated_openings": repeated_openings,
+        "incantatory_forms": incantatory_hits,
+        "sentence_count": len(sentences),
+    }
+
 
 def compute_discursive_morphology(text: str) -> dict:
     domain_scores = {
@@ -9580,6 +9649,7 @@ def compute_discursive_morphology(text: str) -> dict:
         for key, value in RHYTHMIC_REGIMES.items()
     }
     morphological_density = compute_morphological_density(text)
+    structural_repetition = compute_structural_repetition(text)
     
     regime_scores = {
         key: {
@@ -9650,6 +9720,7 @@ def compute_discursive_morphology(text: str) -> dict:
         "dominant_rhythm_score": dominant_rhythm[1]["score"],
 
         "morphological_density": morphological_density,
+        "structural_repetition": structural_repetition,
     }
 
 def analyze_article(text: str) -> Dict:
