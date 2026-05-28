@@ -13323,7 +13323,7 @@ with st.expander("Voir les scores rhétoriques détaillés", expanded=False):
 # Morphologie discursive
 # =============================
 morphology = result.get("discursive_morphology", {})
-
+st.write("DEBUG STRUCT REP =", morphology.get("structural_repetition"))
 st.markdown(
     f"""
 **Domaine dominant :** {morphology.get("dominant_domain_label", "Non déterminé")}
