@@ -13073,6 +13073,11 @@ st.markdown(
 **Mode dominant :** {morphology.get("dominant_mode_label", "Non déterminé")}
 — tendance {morphology.get("modes", {}).get(morphology.get("dominant_mode"), {}).get("label", "")}
 ({round(morphology.get("dominant_mode_score", 0)*100, 1)}%)
+
+**Régime discursif dominant :**
+{morphology.get("dominant_regime_label", "Non déterminé")}
+— tendance {morphology.get("regimes", {}).get(morphology.get("dominant_regime"), {}).get("label", "")}
+({round(morphology.get("dominant_regime_score", 0)*100, 1)}%)
 """
 )
 
