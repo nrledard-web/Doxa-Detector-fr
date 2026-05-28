@@ -10535,6 +10535,11 @@ def analyze_article(text: str) -> Dict:
 
     result["discursive_morphology"] = compute_discursive_morphology(text)
 
+    st.write(
+        "DEBUG DIRECT",
+        result["discursive_morphology"].get("structural_repetition")
+    )
+    
     result = classify_cognitive_regime(result)
     
     result = classify_cognitive_regime(result)
