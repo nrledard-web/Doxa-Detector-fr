@@ -10208,6 +10208,66 @@ def compute_gauge_validation(result: dict) -> dict:
         "suspicious_count": suspicious,
     }
 
+def compute_dynamic_gauge_adjustments(result: dict) -> dict:
+    """
+    Ajustements doux des jauges à partir de la morphologie cognitive.
+    Ne remplace pas les scores bruts : ajoute une lecture corrigée / contextualisée.
+    """
+
+    validation = result.get("gauge_validation", {}).get("validations", {})
+
+    adjustments = {}
+
+    # -----------------------------
+    # Ancrage au réel
+    # -----------------------------
+    real_anchor = result.get("real_anchor_score", 0)
+
+    if validation.get("ancrage_reel", {}).get("status") == "suspecte":
+        adjusted = min(real_anchor + 4, 20)
+
+        adjustments["real_anchor_score"] = {
+            "original": real_anchor,
+            "adjusted": adjusted,
+            "delta": round(adjusted - real_anchor, 2),
+            "reason": "Ancrage réel probablement sous-évalué par rapport à la robustesse quantitative et à la morphologie détectée.",
+        }
+
+    # -----------------------------
+    # Cohérence trompeuse
+    # -----------------------------
+    misleading = result.get("misleading_coherence_score", 0)
+
+    if validation.get("coherence_trompeuse", {}).get("status") == "validée":
+        adjusted = min(misleading + 0.10, 1)
+
+        adjustments["misleading_coherence_score"] = {
+            "original": misleading,
+            "adjusted": adjusted,
+            "delta": round(adjusted - misleading, 3),
+            "reason": "La stabilisation morphologique renforce l’effet de cohérence apparente.",
+        }
+
+    # -----------------------------
+    # Technocratique
+    # -----------------------------
+    if validation.get("technocratique", {}).get("status") == "validée":
+        current = result.get("technocratic_pressure_score", 0)
+
+        adjusted = min(current + 0.10, 1)
+
+        adjustments["technocratic_pressure_score"] = {
+            "original": current,
+            "adjusted": adjusted,
+            "delta": round(adjusted - current, 3),
+            "reason": "Convergence entre régime technocratique et suffixation technocratique.",
+        }
+
+    return {
+        "adjustments": adjustments,
+        "adjustment_count": len(adjustments),
+    }
+
 def analyze_article(text: str) -> Dict:
     article = text
     words = text.split()
@@ -11024,6 +11084,8 @@ def analyze_article(text: str) -> Dict:
         compute_meta_cognitive_consistency(result)
     )
     result["gauge_validation"] = compute_gauge_validation(result)
+
+    result["dynamic_gauge_adjustments"] = compute_dynamic_gauge_adjustments(result)
     
     result = classify_cognitive_regime(result)
     
