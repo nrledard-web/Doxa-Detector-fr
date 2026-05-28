@@ -13687,8 +13687,26 @@ st.markdown(
 **Attracteur cognitif dominant :**
 {morphology.get("cognitive_attractors", {}).get("dominant_label", "Non déterminé")}
 — intensité {round(morphology.get("cognitive_attractors", {}).get("dominant_score", 0)*100, 1)}%
+
 """
 )
+meta = result.get("meta_cognitive_consistency", {})
+
+st.markdown(
+    f"""
+**Cohérence méta-cognitive :**
+{meta.get("label", "Non déterminée")}
+— score {meta.get("score", 0)}
+"""
+)
+
+if meta.get("observations"):
+
+    with st.popover("🧠 Observations méta-cognitives"):
+
+        for obs in meta.get("observations", []):
+
+            st.write(f"• {obs}")
 
 with st.popover("🔎 Voir le détail morphologique"):
     st.write(morphology)
