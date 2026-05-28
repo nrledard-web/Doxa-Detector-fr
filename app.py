@@ -13276,6 +13276,10 @@ st.markdown(
 {morphology.get("dominant_rhythm_label", "Non déterminé")}
 — tendance {morphology.get("rhythms", {}).get(morphology.get("dominant_rhythm"), {}).get("label", "")}
 ({round(morphology.get("dominant_rhythm_score", 0)*100, 1)}%)
+
+**Densité morphologique dominante :**
+{morphology.get("morphological_density", {}).get("dominant_label", "Non déterminée")}
+— densité {round(morphology.get("morphological_density", {}).get("dominant_density", 0)*100, 1)}%
 """
 )
 
