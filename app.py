@@ -9139,6 +9139,9 @@ DISCURSIVE_FAMILIES = {
             "hypothèse", "incertitude", "limite", "corrélation",
             "données disponibles", "méthodologie", "reproductible",
             "falsifiable", "échantillon", "résultats"
+            "étude", "rapport", "expert", "experts", "chercheurs", 
+            "données", "statistiques", "analyse", "publication", 
+            "prévision", "projection",
         ],
         "closure_risk": 0.15,
         "linked_gauges": ["real_anchor_score", "quantitative_robustness_score"],
