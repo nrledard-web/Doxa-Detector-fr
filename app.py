@@ -10043,6 +10043,171 @@ def compute_meta_cognitive_consistency(result: dict) -> dict:
         "observations": observations,
     }
 
+def compute_gauge_validation(result: dict) -> dict:
+
+    morphology = result.get("discursive_morphology", {})
+    validations = {}
+
+    # -----------------------------
+    # Raccourcis
+    # -----------------------------
+
+    dominant_family = morphology.get("dominant_family", "")
+    dominant_regime = morphology.get("dominant_regime", "")
+
+    morph_density = (
+        morphology.get("morphological_density", {})
+        .get("dominant_density", 0)
+    )
+
+    homoeo_density = (
+        morphology.get("homoeoteleutic_density", {})
+        .get("density", 0)
+    )
+
+    repetition_score = (
+        morphology.get("structural_repetition", {})
+        .get("score", 0)
+    )
+
+    attractor = (
+        morphology.get("cognitive_attractors", {})
+        .get("dominant_attractor", "")
+    )
+
+    # -----------------------------
+    # Scientificité rhétorique
+    # -----------------------------
+
+    scientificity = result.get("scientificity_rhetoric_score", 0)
+
+    if (
+        scientificity > 0.60
+        and dominant_family == "scientifique_reel"
+    ):
+        validations["scientificite_rhetorique"] = {
+            "status": "nuancée",
+            "reason":
+            "Scientificité présente mais appuyée sur une structure réellement technique.",
+        }
+
+    elif scientificity > 0.60:
+
+        validations["scientificite_rhetorique"] = {
+            "status": "validée",
+            "reason":
+            "Simulation d’objectivité cohérente avec la morphologie détectée.",
+        }
+
+    # -----------------------------
+    # Technocratisation
+    # -----------------------------
+
+    if (
+        dominant_regime == "technocratique"
+        and morph_density > 0.40
+    ):
+
+        validations["technocratique"] = {
+            "status": "validée",
+            "reason":
+            "Convergence entre régime technocratique et suffixation abstraite.",
+        }
+
+    # -----------------------------
+    # Alarmisme
+    # -----------------------------
+
+    alarmism = result.get("threat_amplification_score", 0)
+
+    if (
+        alarmism > 0.30
+        and attractor == "urgence"
+    ):
+
+        validations["alarmisme"] = {
+            "status": "validée",
+            "reason":
+            "Présence d’un attracteur de crise cohérent avec l’alarmisme.",
+        }
+
+    elif (
+        alarmism > 0.30
+        and attractor != "urgence"
+    ):
+
+        validations["alarmisme"] = {
+            "status": "nuancée",
+            "reason":
+            "Alarmisme détecté mais sans attracteur anxiogène dominant.",
+        }
+
+    # -----------------------------
+    # Cohérence trompeuse
+    # -----------------------------
+
+    misleading = result.get("misleading_coherence_score", 0)
+
+    if (
+        misleading > 0.35
+        and repetition_score > 0.40
+        and homoeo_density > 0.30
+    ):
+
+        validations["coherence_trompeuse"] = {
+            "status": "validée",
+            "reason":
+            "La stabilisation morphologique renforce l’impression de cohérence.",
+        }
+
+    # -----------------------------
+    # Ancrage au réel
+    # -----------------------------
+
+    real_anchor = result.get("real_anchor_score", 0)
+
+    quantitative = result.get(
+        "quantitative_robustness_score",
+        0
+    )
+
+    if (
+        real_anchor < 5
+        and quantitative > 0.60
+    ):
+
+        validations["ancrage_reel"] = {
+            "status": "suspecte",
+            "reason":
+            "Présence d’architecture quantitative malgré un ancrage très faible.",
+        }
+
+    # -----------------------------
+    # Verdict global
+    # -----------------------------
+
+    validated = sum(
+        1 for v in validations.values()
+        if v["status"] == "validée"
+    )
+
+    nuanced = sum(
+        1 for v in validations.values()
+        if v["status"] == "nuancée"
+    )
+
+    suspicious = sum(
+        1 for v in validations.values()
+        if v["status"] == "suspecte"
+    )
+
+    return {
+        "validations": validations,
+        "validated_count": validated,
+        "nuanced_count": nuanced,
+        "suspicious_count": suspicious,
+    }
+
 def analyze_article(text: str) -> Dict:
     article = text
     words = text.split()
@@ -10858,6 +11023,7 @@ def analyze_article(text: str) -> Dict:
     result["meta_cognitive_consistency"] = (
         compute_meta_cognitive_consistency(result)
     )
+    result["gauge_validation"] = compute_gauge_validation(result)
     
     result = classify_cognitive_regime(result)
     
