@@ -9489,6 +9489,22 @@ MORPHOLOGICAL_PATTERNS = {
     },
 
 }
+# =============================
+# Densité homéotéleutique
+# =============================
+
+HOMOEOTELEUTIC_ENDINGS = [
+    "tion",
+    "sion",
+    "isme",
+    "iste",
+    "ment",
+    "ance",
+    "ence",
+    "aire",
+    "ique",
+    "oire",
+]
 
 def score_marker_group(text: str, group: dict) -> dict:
     text_lower = text.lower()
@@ -9617,7 +9633,50 @@ def compute_structural_repetition(text: str) -> dict:
         "incantatory_forms": incantatory_hits,
         "sentence_count": len(sentences),
     }
+def compute_homoeoteleutic_density(text: str) -> dict:
 
+    words = [
+        w.strip(".,;:!?()[]{}\"'")
+        for w in text.lower().split()
+    ]
+
+    endings_detected = {}
+
+    total_matches = 0
+
+    for word in words:
+
+        for ending in HOMOEOTELEUTIC_ENDINGS:
+
+            if word.endswith(ending):
+
+                endings_detected.setdefault(ending, []).append(word)
+                total_matches += 1
+
+    density = total_matches / max(len(words), 1)
+
+    density = min(density * 8, 1.0)
+
+    if density < 0.10:
+        label = "Faible densité homéotéleutique"
+    elif density < 0.30:
+        label = "Densité homéotéleutique modérée"
+    elif density < 0.60:
+        label = "Densité homéotéleutique élevée"
+    else:
+        label = "Densité homéotéleutique saturante"
+
+    summarized = {
+        k: list(set(v[:10]))
+        for k, v in endings_detected.items()
+    }
+
+    return {
+        "density": round(density, 3),
+        "label": label,
+        "endings_detected": summarized,
+        "total_matches": total_matches,
+    }
 
 def compute_discursive_morphology(text: str) -> dict:
     domain_scores = {
@@ -9650,6 +9709,7 @@ def compute_discursive_morphology(text: str) -> dict:
     }
     morphological_density = compute_morphological_density(text)
     structural_repetition = compute_structural_repetition(text)
+    homoeoteleutic_density = compute_homoeoteleutic_density(text)
     
     regime_scores = {
         key: {
@@ -9721,6 +9781,7 @@ def compute_discursive_morphology(text: str) -> dict:
 
         "morphological_density": morphological_density,
         "structural_repetition": structural_repetition,
+        "homoeoteleutic_density": homoeoteleutic_density,
     }
 
 def analyze_article(text: str) -> Dict:
