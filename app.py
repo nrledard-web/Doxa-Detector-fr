@@ -9133,8 +9133,8 @@ DISCURSIVE_FAMILIES = {
         "linked_gauges": ["real_anchor_score", "discursive_coherence_score", "omission_score"],
     },
 
-    "scientifique_reel": {
-        "label": "Scientifique réel",
+    "Scientifique médiatisé": {
+        "label": "Scientifique médiatisé",
         "markers": [
             "hypothèse", "incertitude", "limite", "corrélation",
             "données disponibles", "méthodologie", "reproductible",
