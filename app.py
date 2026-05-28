@@ -13351,6 +13351,10 @@ st.markdown(
 **Densité morphologique dominante :**
 {morphology.get("morphological_density", {}).get("dominant_label", "Non déterminée")}
 — densité {round(morphology.get("morphological_density", {}).get("dominant_density", 0)*100, 1)}%
+
+**Répétition structurelle :**
+{morphology.get("structural_repetition", {}).get("label", "Non déterminée")}
+— score {round(morphology.get("structural_repetition", {}).get("score", 0)*100, 1)}%
 """
 )
 
