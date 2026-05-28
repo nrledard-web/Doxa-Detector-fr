@@ -9439,6 +9439,57 @@ RHYTHMIC_REGIMES = {
     },
 }
 
+# =============================
+# Densité morphologique
+# =============================
+
+MORPHOLOGICAL_PATTERNS = {
+
+    "suffixation_ideologique": {
+        "label": "Suffixation idéologique",
+        "suffixes": [
+            "isme",
+            "iste",
+            "isation",
+            "isateur",
+        ],
+        "cognitive_effect": "idéologisation",
+    },
+
+    "suffixation_moralisante": {
+        "label": "Suffixation moralisante",
+        "suffixes": [
+            "phobe",
+            "philie",
+            "iste",
+        ],
+        "cognitive_effect": "moralisation",
+    },
+
+    "suffixation_technocratique": {
+        "label": "Suffixation technocratique",
+        "suffixes": [
+            "tion",
+            "sation",
+            "nance",
+            "ment",
+        ],
+        "cognitive_effect": "abstraction procédurale",
+    },
+
+    "suffixation_catastrophiste": {
+        "label": "Suffixation catastrophiste",
+        "suffixes": [
+            "crise",
+            "danger",
+            "effondrement",
+            "urgence",
+        ],
+        "cognitive_effect": "projection anxiogène",
+    },
+
+}
+
 def score_marker_group(text: str, group: dict) -> dict:
     text_lower = text.lower()
     markers = group.get("markers", [])
@@ -9454,6 +9505,48 @@ def score_marker_group(text: str, group: dict) -> dict:
         "label": group.get("label", "Non défini"),
         "score": round(min(score, 1.0), 3),
         "markers_detected": hits,
+    }
+
+def compute_morphological_density(text: str) -> dict:
+
+    words = text.lower().split()
+
+    results = {}
+
+    for key, pattern in MORPHOLOGICAL_PATTERNS.items():
+
+        detected = []
+
+        for suffix in pattern.get("suffixes", []):
+
+            for word in words:
+
+                cleaned = word.strip(".,;:!?()[]{}\"'")
+
+                if cleaned.endswith(suffix):
+                    detected.append(cleaned)
+
+        density = len(detected) / max(len(words), 1)
+
+        results[key] = {
+            "label": pattern.get("label", key),
+            "density": round(min(density * 10, 1.0), 3),
+            "detected": list(set(detected[:20])),
+            "cognitive_effect": pattern.get("cognitive_effect", ""),
+        }
+
+    dominant = max(results.items(), key=lambda x: x[1]["density"])
+
+    dominant_label = dominant[1]["label"]
+
+    if dominant[1]["density"] < 0.10:
+        dominant_label = "Morphologie faible ou dispersée"
+
+    return {
+        "patterns": results,
+        "dominant_pattern": dominant[0],
+        "dominant_label": dominant_label,
+        "dominant_density": dominant[1]["density"],
     }
 
 
