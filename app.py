@@ -9274,6 +9274,94 @@ DISCURSIVE_MODES = {
         "intensity_risk": 0.70,
     },
 }
+# =============================
+# Régimes discursifs
+# =============================
+
+DISCURSIVE_REGIMES = {
+
+    "stabilisateur": {
+        "label": "Stabilisateur",
+        "markers": [
+            "il est évident",
+            "nul ne peut nier",
+            "les experts s'accordent",
+            "la réalité est",
+            "tout le monde sait",
+            "il faut comprendre",
+            "il est certain",
+            "les faits montrent",
+            "la science montre",
+        ],
+        "closure_force": 0.75
+    },
+
+    "incantatoire": {
+        "label": "Incantatoire",
+        "markers": [
+            "jamais",
+            "toujours",
+            "encore",
+            "encore une fois",
+            "sans cesse",
+            "répéter",
+            "marteler",
+            "absolument",
+            "inévitable",
+        ],
+        "closure_force": 0.65
+    },
+
+    "technocratique": {
+        "label": "Technocratique",
+        "markers": [
+            "gouvernance",
+            "protocole",
+            "optimisation",
+            "indicateur",
+            "neutralité carbone",
+            "procédure",
+            "régulation",
+            "modèle",
+            "stratégie",
+            "pilotage",
+        ],
+        "closure_force": 0.55
+    },
+
+    "catastrophiste": {
+        "label": "Catastrophiste",
+        "markers": [
+            "effondrement",
+            "catastrophe",
+            "crise majeure",
+            "urgence absolue",
+            "menace existentielle",
+            "point de non-retour",
+            "disparition",
+            "danger imminent",
+        ],
+        "closure_force": 0.85
+    },
+
+    "moral_saturant": {
+        "label": "Moral saturant",
+        "markers": [
+            "raciste",
+            "xénophobe",
+            "haine",
+            "extrême droite",
+            "extrémiste",
+            "complotiste",
+            "négationniste",
+            "islamophobe",
+            "misogyne",
+        ],
+        "closure_force": 0.80
+    },
+
+}
+
 def score_marker_group(text: str, group: dict) -> dict:
     text_lower = text.lower()
     markers = group.get("markers", [])
