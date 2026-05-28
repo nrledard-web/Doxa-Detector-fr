@@ -9126,7 +9126,7 @@ DISCURSIVE_FAMILIES = {
     "encyclopedique": {
         "label": "Encyclopédique",
         "markers": [
-            "désigne", "définition", "selon", "source", "référence",
+            "désigne", "définition", "source", "référence",
             "date", "contexte", "historique", "exemple", "catégorie"
         ],
         "closure_risk": 0.25,
@@ -9138,7 +9138,7 @@ DISCURSIVE_FAMILIES = {
         "markers": [
             "hypothèse", "incertitude", "limite", "corrélation",
             "données disponibles", "méthodologie", "reproductible",
-            "falsifiable", "échantillon", "résultats"
+            "falsifiable", "échantillon", "résultats",
             "étude", "rapport", "expert", "experts", "chercheurs", 
             "données", "statistiques", "analyse", "publication", 
             "prévision", "projection",
@@ -9219,7 +9219,7 @@ DISCURSIVE_MODES = {
         "markers": [
             "inévitable", "bientôt", "viendra", "chute",
             "réveil", "destin","fin du monde", "fin d’un cycle", "chute", "effondrement",
-            "destin", "inévitable", "viendra", "réveil", "prophétie" "annoncer", "verra"
+            "destin", "inévitable", "viendra", "réveil", "prophétie", "annoncer", "verra"
         ],
         "intensity_risk": 0.75,
     },
