@@ -10266,6 +10266,43 @@ def compute_dynamic_gauge_adjustments(result: dict) -> dict:
         "adjustment_count": len(adjustments),
     }
 
+def compute_validation_summary(result: dict) -> str:
+    validation = result.get("gauge_validation", {})
+    adjustments = result.get("dynamic_gauge_adjustments", {})
+    meta = result.get("meta_cognitive_consistency", {})
+
+    validated = validation.get("validated_count", 0)
+    nuanced = validation.get("nuanced_count", 0)
+    suspicious = validation.get("suspicious_count", 0)
+    adjustment_count = adjustments.get("adjustment_count", 0)
+
+    if suspicious > 0 and adjustment_count > 0:
+        return (
+            "La morphologie cognitive confirme plusieurs signaux du texte, "
+            "mais suggère qu’au moins une jauge pourrait être sous-évaluée ou mal calibrée."
+        )
+
+    if validated >= 2 and suspicious == 0:
+        return (
+            "Les principales jauges apparaissent cohérentes avec la morphologie profonde du texte."
+        )
+
+    if meta.get("score", 0) >= 5:
+        return (
+            "Le texte présente une morphologie cognitive fortement stabilisée, "
+            "ce qui renforce la fiabilité des signaux convergents mais invite à surveiller les effets de verrouillage."
+        )
+
+    if nuanced > 0:
+        return (
+            "Certaines jauges doivent être lues avec nuance : la morphologie du texte confirme une partie des signaux, "
+            "sans les valider entièrement."
+        )
+
+    return (
+        "La validation morphologique ne détecte pas de contradiction majeure entre les jauges et la structure du texte."
+    )
+
 def analyze_article(text: str) -> Dict:
     article = text
     words = text.split()
@@ -11084,6 +11121,8 @@ def analyze_article(text: str) -> Dict:
     result["gauge_validation"] = compute_gauge_validation(result)
 
     result["dynamic_gauge_adjustments"] = compute_dynamic_gauge_adjustments(result)
+
+    result["validation_summary"] = compute_validation_summary(result)
     
     result = classify_cognitive_regime(result)
     
@@ -13951,7 +13990,8 @@ if validation.get("validations"):
             st.write(
                 f"• {gauge} → {info['status']} : {info['reason']}"
             )
-            adjustments = result.get("dynamic_gauge_adjustments", {})
+
+adjustments = result.get("dynamic_gauge_adjustments", {})
 
 st.markdown(
     f"""
@@ -13970,6 +14010,8 @@ if adjustments.get("adjustments"):
                 f"• {gauge} : {info['original']} → {info['adjusted']} "
                 f"({info['reason']})"
             )
+
+st.caption(result.get("validation_summary", "Synthèse de validation non disponible."))
 
 with st.popover("🔎 Voir le détail morphologique"):
     st.write(morphology)
