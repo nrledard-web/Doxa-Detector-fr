@@ -13866,6 +13866,14 @@ st.markdown(
 """
 )
 
+validation = result.get("gauge_validation", {})
+
+st.markdown(f"""
+**Validation des jauges :**
+✅ Validées : {validation.get("validated_count", 0)}
+🟡 Nuancées : {validation.get("nuanced_count", 0)}
+⚠️ Suspectes : {validation.get("suspicious_count", 0)}
+""")
 if meta.get("observations"):
 
     with st.popover("🧠 Observations méta-cognitives"):
@@ -13873,6 +13881,16 @@ if meta.get("observations"):
         for obs in meta.get("observations", []):
 
             st.write(f"• {obs}")
+
+if validation.get("validations"):
+
+    with st.popover("🧠 Voir la validation détaillée"):
+
+        for gauge, info in validation["validations"].items():
+
+            st.write(
+                f"• {gauge} → {info['status']} : {info['reason']}"
+            )
 
 with st.popover("🔎 Voir le détail morphologique"):
     st.write(morphology)
