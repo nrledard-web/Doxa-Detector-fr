@@ -16457,7 +16457,7 @@ Le score final est borné entre 0 et 1.
 # =============================
 # Vitalité cognitive
 # =============================
-life_score = round((result.get("hard_fact_score", 0) / 20) * 100, 1)
+life_score = result.get("cognitive_vitality_percent", 0)
 life_value = life_score / 100
 
 if life_score < 30:
