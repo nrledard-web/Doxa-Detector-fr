@@ -7520,7 +7520,7 @@ def compute_omission_score(result):
     
     CA = result.get("argument_counterweight_count", 0)
 
-        # Interprétation
+    # Interprétation
     if score < 0.15:
 
         label = "Faible"
