@@ -703,12 +703,6 @@ with st.container(border=True):
 
     st.subheader("Analyser la structure cognitive d’un discours")
 
-    st.write(
-        "DOXA Detector examine un texte comme une IRM du raisonnement. "
-        "L’application analyse la solidité argumentative, les sources, les affirmations, "
-        "les signaux rhétoriques, les sophismes, la propagande et les dérives cognitives."
-    )
-
     col1, col2, col3 = st.columns(3)
 
     with col1:
