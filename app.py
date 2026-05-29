@@ -16078,7 +16078,7 @@ st.markdown("""
 </div>
 """, unsafe_allow_html=True)
 
-life_score = round((result.get("hard_fact_score", 0) / 20) * 100, 1)
+life_score = result.get("cognitive_vitality_percent", 0)
 
 # =============================
 # Cerveau DOXA
