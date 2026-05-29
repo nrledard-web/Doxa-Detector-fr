@@ -7520,6 +7520,51 @@ def compute_omission_score(result):
     
     CA = result.get("argument_counterweight_count", 0)
 
+        # Interprétation
+    if score < 0.15:
+
+        label = "Faible"
+        color = "#22c55e"
+        interpretation = (
+            "Le contexte présenté paraît relativement complet."
+        )
+
+    elif score < 0.50:
+
+        label = "Modéré"
+        color = "#eab308"
+        interpretation = (
+            "Quelques éléments semblent peu contextualisés."
+        )
+
+    elif score < 0.75:
+
+        label = "Élevé"
+        color = "#f97316"
+        interpretation = (
+            "Le discours paraît sélectionner certains éléments "
+            "au détriment du contexte."
+        )
+
+    else:
+
+        label = "Très élevé"
+        color = "#dc2626"
+        interpretation = (
+            "Le discours semble fortement orienté "
+            "par sélection du contexte."
+        )
+
+    return {
+        "omission_score": round(score, 3),
+        "omission_raw": round(raw, 3),
+        "omission_raw_heuristic": round(raw_heuristic, 3),
+        "omission_doxa_modulator": round(doxa_omission, 3),
+        "omission_label": label,
+        "omission_color": color,
+        "omission_interpretation": interpretation,
+    }
+
 # -----------------------------
 # Calcul heuristique principal
 # -----------------------------
