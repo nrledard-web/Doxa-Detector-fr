@@ -716,12 +716,6 @@ with st.container(border=True):
 
     with col2:
         st.markdown("### 2️⃣ Lancer l’analyse")
-        st.write(
-            "Le moteur examine les affirmations, les sources, la cohérence "
-            "du raisonnement et les indices linguistiques du discours. "
-            "Il détecte également les sophismes, les procédés rhétoriques "
-            "et les structures de persuasion."
-        )
 
     with col3:
         st.markdown("### 3️⃣ Comprendre les résultats")
