@@ -7245,7 +7245,7 @@ def compute_baratinage_score(result):
     # Modulateur DOXA léger
     # IB ≈ (G + 2D) − N
     # -----------------------------
-    G = HF
+    G = min(1.0, max(0.0, result.get("G", 0) / 20))
 
     D = (
         result.get("strong_certainty_score", 0)
@@ -7329,7 +7329,7 @@ def compute_extended_placebo_effect(result):
         result.get("causal_overreach_score", 0),
     )
     
-    G = result.get("hard_fact_score", 0) / 20
+    G = result.get("G", 0) / 20
     
     D = (
         result.get("strong_certainty_score", 0)
@@ -7544,20 +7544,17 @@ def compute_omission_score(result):
     # MO ≈ (G + D) − 2N
     # -----------------------------
 
-    G = (
-        result.get("hard_fact_score", 0)
-        + AR
-    ) / 2
+    G = min(1.0, max(0.0, result.get("G", 0) / 20))
 
-    D = (
+    D = min(1.0, max(0.0, (
         result.get("strong_certainty_score", 0)
         + result.get("cognitive_closure_score", 0)
-    ) / 2
+    ) / 2))
 
-    N = (
+    N = min(1.0, max(0.0, (
         result.get("reality_anchor_score", 0)
         + result.get("revisability_score", 0)
-    ) / 2
+    ) / 2))
 
     doxa_omission = (G + D) - (2 * N)
 
@@ -7566,55 +7563,6 @@ def compute_omission_score(result):
 
     # Normalisation
     score = max(0.0, min(raw / 12, 1.0))
-
-    # Interprétation
-    if score < 0.15:
-
-        label = "Faible"
-        color = "#22c55e"
-
-        interpretation = (
-            "Le contexte présenté paraît relativement complet."
-        )
-
-    elif score < 0.50:
-
-        label = "Modéré"
-        color = "#eab308"
-
-        interpretation = (
-            "Quelques éléments semblent peu contextualisés."
-        )
-
-    elif score < 0.75:
-
-        label = "Élevé"
-        color = "#f97316"
-
-        interpretation = (
-            "Le discours paraît sélectionner certains éléments "
-            "au détriment du contexte."
-        )
-
-    else:
-
-        label = "Très élevé"
-        color = "#dc2626"
-
-        interpretation = (
-            "Le discours semble fortement orienté "
-            "par sélection du contexte."
-        )
-
-    return {
-        "omission_score": round(score, 3),
-        "omission_raw": round(raw, 3),
-        "omission_raw_heuristic": round(raw_heuristic, 3),
-        "omission_doxa_modulator": round(doxa_omission, 3),
-        "omission_label": label,
-        "omission_color": color,
-        "omission_interpretation": interpretation,
-    }
 
 def compute_doxa_brain(result: dict) -> dict:
     """
