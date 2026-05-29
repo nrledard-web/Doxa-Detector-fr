@@ -10310,6 +10310,65 @@ def compute_validation_summary(result: dict) -> str:
     return (
         "La validation morphologique ne détecte pas de contradiction majeure entre les jauges et la structure du texte."
     )
+def compute_cognitive_vitality(result: dict) -> dict:
+"""
+Vitalité cognitive autonome.
+Ne dépend pas du Hard Fact Score.
+"""
+
+argument_density = result.get("argument_density_score", 0)
+coherence = result.get("discursive_coherence_score", 0) / 20
+nuance = min(result.get("argument_nuances_count", 0) * 0.08, 0.30)
+counterweight = min(result.get("argument_counterweight_count", 0) * 0.08, 0.30)
+revisability = result.get("bonus_revisability", 0)
+anchor = result.get("bonus_anchor", 0)
+
+closure = result.get("cognitive_closure", 0)
+if closure > 1:
+    closure = closure / 10
+
+rhetoric = result.get("rhetorical_pressure", 0)
+slogan = result.get("slogan_score", 0)
+
+positive = (
+    argument_density * 0.25
+    + coherence * 0.20
+    + nuance * 0.15
+    + counterweight * 0.15
+    + revisability * 0.15
+    + anchor * 0.10
+)
+
+negative = (
+    closure * 0.35
+    + rhetoric * 0.25
+    + slogan * 0.15
+)
+
+score = positive - negative + 0.35
+score = max(0.0, min(1.0, score))
+
+if score < 0.30:
+    label = "Faible"
+    text = "Vitalité cognitive faible — le discours manque de développement, de nuances ou d’appuis internes."
+elif score < 0.50:
+    label = "Fragile"
+    text = "Vitalité cognitive fragile — le discours présente quelques appuis, mais reste peu développé ou peu révisable."
+elif score < 0.70:
+    label = "Modérée"
+    text = "Vitalité cognitive modérée — le discours présente une matière cognitive réelle, mais encore perfectible."
+else:
+    label = "Solide"
+    text = "Vitalité cognitive solide — le discours développe ses idées avec cohérence, nuances et appuis internes."
+
+return {
+    "score": round(score, 3),
+    "percent": round(score * 100, 1),
+    "label": label,
+    "text": text,
+    "positive": round(positive, 3),
+    "negative": round(negative, 3),
+}
 
 def analyze_article(text: str) -> Dict:
     article = text
@@ -11127,6 +11186,17 @@ def analyze_article(text: str) -> Dict:
     real_anchor = detect_real_anchor(text, result)
     result.update(real_anchor)
     
+    # -----------------------------
+    # Vitalité cognitive
+    # -----------------------------
+    vitality = compute_cognitive_vitality(result)
+    
+    result["cognitive_vitality_score"] = vitality["score"]
+    result["cognitive_vitality_percent"] = vitality["percent"]
+    result["cognitive_vitality_label"] = vitality["label"]
+    result["cognitive_vitality_text"] = vitality["text"]
+    result["cognitive_vitality_details"] = vitality
+
     # -----------------------------
     # Morphologie cognitive
     # -----------------------------
