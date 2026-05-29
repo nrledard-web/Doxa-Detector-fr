@@ -58,7 +58,6 @@ for path in Path(".").rglob("*.py"):
             print(f"\n{path}:{i} [{usage}]")
             print(f"    {context}")
 
-
 def tokenize(text):
     return re.findall(r"\b[\wà-ÿ'-]+\b", text.lower())
 
@@ -129,7 +128,6 @@ STOPWORDS = {
     "ne","n","pas","plus","moins","très","tres",
     "y","en","que","qui","quoi","dont","où","ou"
 }
-
 # -----------------------------
 # Sources presse française
 # -----------------------------
@@ -174,7 +172,6 @@ try:
 except Exception:
     speech_to_text = None
     MICRO_AVAILABLE = False
-
 
 # -----------------------------
 # Configuration page
@@ -246,7 +243,6 @@ st.markdown("""
 /* =========================
    Compatibilité mobile / dark mode
    ========================= */
-
 html, body, [data-testid="stAppViewContainer"], .stApp {
     background-color: #ffffff !important;
     color: #111827 !important;
@@ -393,7 +389,6 @@ pre {
 </style>
 """, unsafe_allow_html=True)
 
-
 # -----------------------------
 # Textes FR uniques
 # -----------------------------
@@ -527,8 +522,6 @@ T = {
     "assertive_rigidity": "D : rigidité assertive — certitudes non soutenues, emballement rhétorique.",
     "disclaimer": "Cette app ne remplace ni un journaliste, ni un chercheur, ni un greffier du réel. Mais elle retire déjà quelques masques au texte qui parade.",
 }
-
-
 # -----------------------------
 # Triangle cognitif 3D
 # -----------------------------
@@ -628,6 +621,7 @@ def plot_cognitive_triangle_3d(G: float, N: float, D: float):
         fontsize=10,
         fontweight="bold"
     )
+    
     ax.text(
         1.0, 6.2, 5.0,
         "Conviction forte\nsans base de savoir",
@@ -635,7 +629,6 @@ def plot_cognitive_triangle_3d(G: float, N: float, D: float):
     )
 
     return fig
-
 
 # -----------------------------
 # OpenAI client
@@ -653,9 +646,7 @@ def get_openai_client() -> Optional["OpenAI"]:
     except Exception:
         return None
 
-
 client = get_openai_client()
-
 
 # -----------------------------
 # Header
@@ -745,8 +736,6 @@ with st.container(border=True):
             "mécroyance, tension cognitive, pression rhétorique, propagande, "
             "gravité cognitive et diagnostic du cerveau DOXA."
         )
-
-
 # =============================
 # Philosophie derrière l'IRM
 # =============================
@@ -769,8 +758,6 @@ st.markdown(
     "<div style='border-top:1px solid #e6e6e6;margin:22px 0'></div>",
     unsafe_allow_html=True
 )
-
-
 # -----------------------------
 # Modèle de cognition
 # -----------------------------
@@ -846,7 +833,6 @@ SAMPLE_ARTICLE = (
     "Malgré cela, l'inquiétude grandit chez les salariés qui craignent pour leur avenir. "
     "Il est absolument certain que nous allons vers une crise sociale majeure si rien n'est fait immédiatement."
 )
-
 # -----------------------------
 # Helpers
 # -----------------------------
@@ -866,7 +852,6 @@ INGROUP_TERMS = [
     "les innocents",
     "les justes",
 ]
-
 OUTGROUP_TERMS = [
     "élites",
     "système",
@@ -904,19 +889,16 @@ def compute_linguistic_suspicion(text: str) -> dict:
         "il est évident", "sans aucun doute", "la vérité est",
         "tout le monde sait", "il est certain", "indéniable"
     ]
-
     absolute_claim_terms = [
         "always", "never", "everyone", "nobody", "all", "none",
         "toujours", "jamais", "tout le monde", "personne", "tous", "aucun"
     ]
-
     dramatic_framing_terms = [
         "shocking truth", "what they don't want you to know", "unbelievable",
         "hidden truth", "explosive revelation", "scandalous",
         "vérité choquante", "ce qu'on ne veut pas que vous sachiez",
         "incroyable", "vérité cachée", "révélation explosive", "scandaleux"
     ]
-
     nuance_terms = [
         "may", "might", "could", "perhaps", "possibly", "suggests", "appears",
         "peut", "pourrait", "peut-être", "possiblement", "semble", "suggère"
@@ -1329,7 +1311,6 @@ def compute_rhetorical_pressure(results: dict) -> float:
         + emotions.get("colere", 0) * 0.08
         + emotions.get("peur", 0) * 0.04
     )
-
     # -----------------------------
     # Modération du discours rapporté
     # -----------------------------
@@ -1347,7 +1328,6 @@ def compute_rhetorical_pressure(results: dict) -> float:
 
     return round(min(max(pressure, 0), 1.0), 3)
     
-
 def interpret_rhetorical_pressure(value: float):
     """
     Traduit la pression rhétorique en étiquette + couleur.
@@ -1361,8 +1341,7 @@ def interpret_rhetorical_pressure(value: float):
         return "Élevée", "#ea580c"     # orange foncé
     else:
         return "Très élevée", "#dc2626" # rouge
-        
-        
+               
 def compute_propaganda_gauge(
     lie_gauge: float,
     rhetorical_pressure: float,
@@ -1488,7 +1467,6 @@ def interpret_discursive_profile(
 # =========================================================
 # MODULATION CONTEXTUELLE DES DISCOURS
 # =========================================================
-
 DISCOURSE_MODIFIERS = {
 
     "philosophique": {
@@ -1574,7 +1552,6 @@ def apply_discourse_modifiers(result: dict):
 
     return result
     
-
 def interpret_closure_gauge(value: float):
     """
     Traduit la clôture cognitive en étiquette + couleur + commentaire.
@@ -1717,7 +1694,6 @@ def extract_article_from_url(url: str) -> str:
 
     except Exception:
         return ""
-
 
 @st.cache_data(show_spinner=False, ttl=1800)
 def search_articles_by_keyword(keyword: str, max_results: int = 10) -> List[Dict]:
