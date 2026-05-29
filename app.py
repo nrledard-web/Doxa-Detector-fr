@@ -25,6 +25,40 @@ NEGATIONS = {"pas", "aucun", "jamais", "ni", "rien"}
 ATTENUATORS = {"peut-être", "semble", "probable", "possible"}
 INTENSIFIERS = {"grave", "extrême", "massif", "violent"}
 
+# audit_hard_fact.py
+from pathlib import Path
+import re
+
+TARGETS = [
+    "hard_fact_score",
+    "hard_fact_score_penalized",
+    "hard_fact_score_adjusted",
+    "hard_fact",
+]
+
+for path in Path(".").rglob("*.py"):
+    if ".venv" in str(path) or "__pycache__" in str(path):
+        continue
+
+    lines = path.read_text(encoding="utf-8", errors="ignore").splitlines()
+
+    for i, line in enumerate(lines, start=1):
+        if any(t in line for t in TARGETS):
+            context = line.strip()
+
+            if re.search(r"def |return |result\[|result\.get|=", context):
+                usage = "calcul / stockage"
+            elif "st." in context or "render" in context or "caption" in context:
+                usage = "affichage"
+            elif "if " in context or "<" in context or ">" in context:
+                usage = "seuil / condition"
+            else:
+                usage = "autre"
+
+            print(f"\n{path}:{i} [{usage}]")
+            print(f"    {context}")
+
+
 def tokenize(text):
     return re.findall(r"\b[\wà-ÿ'-]+\b", text.lower())
 
