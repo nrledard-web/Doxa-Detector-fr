@@ -7487,87 +7487,37 @@ def compute_omission_score(result):
 
     # Facteurs augmentant l'indice
     CP = result.get("cherry_picking_score", 0)
-    
     DR = result.get("missing_reference_score", 0)
-    
     PI = result.get("premise_score", 0)
-    
     AA = result.get("argument_asymmetry_score", 0)
-    
     CF = result.get("strong_certainty_score", 0)
-    
+
     CC = result.get(
         "cognitive_closure_score",
         result.get("closure_score", 0)
     )
-    
+
     MS = result.get("statistical_manipulation_score", 0)
-    
+
     # Facteurs réduisant l'indice
     LM = result.get("limits_score", 0)
-    
+
     RV = (
         result.get("revisability_score", 0)
         + result.get("bonus_revisability", 0)
     )
-    
+
     AR = (
         result.get("reality_anchor_score", 0)
         + result.get("bonus_anchor", 0)
     )
-    
+
     PX = result.get("precision_score", 0)
-    
     CA = result.get("argument_counterweight_count", 0)
 
-    # Interprétation
-    if score < 0.15:
-
-        label = "Faible"
-        color = "#22c55e"
-        interpretation = (
-            "Le contexte présenté paraît relativement complet."
-        )
-
-    elif score < 0.50:
-
-        label = "Modéré"
-        color = "#eab308"
-        interpretation = (
-            "Quelques éléments semblent peu contextualisés."
-        )
-
-    elif score < 0.75:
-
-        label = "Élevé"
-        color = "#f97316"
-        interpretation = (
-            "Le discours paraît sélectionner certains éléments "
-            "au détriment du contexte."
-        )
-
-    else:
-
-        label = "Très élevé"
-        color = "#dc2626"
-        interpretation = (
-            "Le discours semble fortement orienté "
-            "par sélection du contexte."
-        )
-
-    return {
-        "omission_score": round(score, 3),
-        "omission_raw": round(raw, 3),
-        "omission_raw_heuristic": round(raw_heuristic, 3),
-        "omission_doxa_modulator": round(doxa_omission, 3),
-        "omission_label": label,
-        "omission_color": color,
-        "omission_interpretation": interpretation,
-    }
-
-# -----------------------------
-# Calcul heuristique principal
-# -----------------------------
+    # -----------------------------
+    # Calcul heuristique principal
+    # -----------------------------
     raw_heuristic = (
         CP
         + (DR * 1.5)
@@ -7588,7 +7538,6 @@ def compute_omission_score(result):
     # Modulateur DOXA léger
     # MO ≈ (G + D) − 2N
     # -----------------------------
-
     G = min(1.0, max(0.0, result.get("G", 0) / 20))
 
     D = min(1.0, max(0.0, (
@@ -7603,31 +7552,22 @@ def compute_omission_score(result):
 
     doxa_omission = (G + D) - (2 * N)
 
-    # Poids volontairement faible
+    # Score final
     raw = raw_heuristic + (doxa_omission * 0.15)
-
-    # Normalisation
     score = max(0.0, min(raw / 12, 1.0))
 
     # Interprétation
     if score < 0.15:
-
         label = "Faible"
         color = "#22c55e"
-        interpretation = (
-            "Le contexte présenté paraît relativement complet."
-        )
+        interpretation = "Le contexte présenté paraît relativement complet."
 
     elif score < 0.50:
-
         label = "Modéré"
         color = "#eab308"
-        interpretation = (
-            "Quelques éléments semblent peu contextualisés."
-        )
+        interpretation = "Quelques éléments semblent peu contextualisés."
 
     elif score < 0.75:
-
         label = "Élevé"
         color = "#f97316"
         interpretation = (
@@ -7636,7 +7576,6 @@ def compute_omission_score(result):
         )
 
     else:
-
         label = "Très élevé"
         color = "#dc2626"
         interpretation = (
@@ -7653,7 +7592,6 @@ def compute_omission_score(result):
         "omission_color": color,
         "omission_interpretation": interpretation,
     }
-
 def compute_doxa_brain(result: dict) -> dict:
     """
     Synthèse finale du cerveau DOXA.
