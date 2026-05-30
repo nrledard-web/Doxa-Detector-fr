@@ -8652,6 +8652,68 @@ SPECULATIVE_INFLATION_MARKERS = [
     "si rien n'est fait immédiatement", "révolution sans précédent", 
     "étude choc"
 ]
+REAL_ANCHOR_INSTITUTIONS = [
+    "aie",
+    "agence internationale de l’énergie",
+    "rte",
+    "giec",
+    "ipcc",
+    "asn",
+    "andra",
+    "insee",
+    "ocde",
+    "oms",
+    "cour des comptes",
+    "ademe",
+    "edf",
+    "irsn",
+    "la hague",
+    "union européenne",
+    "commission européenne"
+]
+
+REAL_ANCHOR_TECHNICAL_REALITY = [
+    "cycle de vie",
+    "kilowattheure",
+    "co₂",
+    "co2",
+    "grammes",
+    "empreinte carbone",
+    "gaz à effet de serre",
+    "neutralité carbone",
+    "stockage à long terme",
+    "recyclage",
+    "combustibles usés",
+    "circuit fermé",
+    "rejets thermiques",
+    "biodiversité",
+    "artificialisation des sols",
+    "production stable",
+    "pics de demande",
+    "intermittence",
+    "surface occupée",
+    "déchets radioactifs",
+    "refroidissement",
+    "réacteurs"
+]
+
+REAL_ANCHOR_COMPARISONS = [
+    "pour comparaison",
+    "comparé à",
+    "par rapport à",
+    "contrairement à",
+    "si l’on compare",
+    "si l'on compare",
+    "moins que",
+    "plus que",
+    "davantage que",
+    "charbon",
+    "gaz naturel",
+    "solaire",
+    "éolien",
+    "renouvelables",
+    "fossiles"
+]
 
 def count_real_anchor_markers(text, markers):
     t = text.lower()
@@ -8684,35 +8746,141 @@ def detect_real_anchor(text, result=None):
     Score final normalisé sur 20.
     """
 
-    empirical_markers = count_real_anchor_markers(text, REAL_ANCHOR_EMPIRY)
-    reproducibility_markers = count_real_anchor_markers(text, REAL_ANCHOR_REPRODUCIBILITY)
-    falsifiability_markers = count_real_anchor_markers(text, REAL_ANCHOR_FALSIFIABILITY)
-    limits_markers = count_real_anchor_markers(text, REAL_ANCHOR_LIMITS)
-    speculation_markers = count_real_anchor_markers(text, SPECULATIVE_INFLATION_MARKERS)
+    empirical_markers = count_real_anchor_markers(
+        text,
+        REAL_ANCHOR_EMPIRY
+    )
 
-    E = normalize_component(len(empirical_markers), divisor=5)
-    R = normalize_component(len(reproducibility_markers), divisor=4)
-    F = normalize_component(len(falsifiability_markers), divisor=3)
-    L = normalize_component(len(limits_markers), divisor=3)
-    S = normalize_component(len(speculation_markers), divisor=4)
+    reproducibility_markers = count_real_anchor_markers(
+        text,
+        REAL_ANCHOR_REPRODUCIBILITY
+    )
 
-    # Bonus prudent si le texte contient des références académiques explicites
+    falsifiability_markers = count_real_anchor_markers(
+        text,
+        REAL_ANCHOR_FALSIFIABILITY
+    )
+
+    limits_markers = count_real_anchor_markers(
+        text,
+        REAL_ANCHOR_LIMITS
+    )
+
+    speculation_markers = count_real_anchor_markers(
+        text,
+        SPECULATIVE_INFLATION_MARKERS
+    )
+
+    institution_markers = count_real_anchor_markers(
+        text,
+        REAL_ANCHOR_INSTITUTIONS
+    )
+
+    technical_markers = count_real_anchor_markers(
+        text,
+        REAL_ANCHOR_TECHNICAL_REALITY
+    )
+
+    comparison_markers = count_real_anchor_markers(
+        text,
+        REAL_ANCHOR_COMPARISONS
+    )
+
+    E = normalize_component(
+        len(empirical_markers),
+        divisor=5
+    )
+
+    R = normalize_component(
+        len(reproducibility_markers),
+        divisor=4
+    )
+
+    F = normalize_component(
+        len(falsifiability_markers),
+        divisor=3
+    )
+
+    L = normalize_component(
+        len(limits_markers),
+        divisor=3
+    )
+
+    S = normalize_component(
+        len(speculation_markers),
+        divisor=4
+    )
+
+    I = normalize_component(
+        len(institution_markers),
+        divisor=3
+    )
+
+    T = normalize_component(
+        len(technical_markers),
+        divisor=6
+    )
+
+    C = normalize_component(
+        len(comparison_markers),
+        divisor=5
+    )
+
     academic_bonus = 0
 
     t = text.lower()
-    if "doi" in t or "arxiv" in t or "revue par les pairs" in t:
+
+    if (
+        "doi" in t
+        or "arxiv" in t
+        or "revue par les pairs" in t
+    ):
         academic_bonus += 1.0
 
-    if "protocole" in t and ("données" in t or "dataset" in t):
+    if (
+        "protocole" in t
+        and (
+            "données" in t
+            or "dataset" in t
+        )
+    ):
         academic_bonus += 0.8
 
-    if "limite" in t or "hypothèse" in t:
+    if (
+        "limite" in t
+        or "hypothèse" in t
+    ):
         academic_bonus += 0.5
 
-    raw_score = (E + R + F + L + academic_bonus) - S
+    quantitative_bonus = 0.0
 
-    # Normalisation sur 20
-    anchor_score = max(0, min(20, raw_score / 21 * 20))
+    if result:
+        quantitative_bonus = (
+            result.get(
+                "quantitative_robustness_score",
+                0
+            ) * 5
+        )
+
+    raw_score = (
+        E
+        + R
+        + F
+        + L
+        + I
+        + T
+        + C
+        + quantitative_bonus
+        + academic_bonus
+    ) - S
+
+    anchor_score = max(
+        0,
+        min(
+            20,
+            (raw_score / 36) * 20
+        )
+    )
 
     if anchor_score < 5:
         label = "Très faible"
@@ -8788,6 +8956,19 @@ def detect_real_anchor(text, result=None):
         "delta_reality": delta_reality,
         "delta_reality_label": delta_label,
         "delta_reality_interpretation": delta_interpretation,
+
+        "real_anchor_I": round(I, 2),
+        "real_anchor_T": round(T, 2),
+        "real_anchor_C": round(C, 2),
+        
+        "real_anchor_institution_markers": institution_markers,
+        "real_anchor_technical_markers": technical_markers,
+        "real_anchor_comparison_markers": comparison_markers,
+        
+        "real_anchor_quantitative_bonus": round(
+            quantitative_bonus,
+            2
+        ),
     }
     
 def compute_cognitive_bonus(result: dict):
