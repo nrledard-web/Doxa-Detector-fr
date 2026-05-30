@@ -8862,25 +8862,40 @@ def detect_real_anchor(text, result=None):
             ) * 5
         )
 
-    raw_score = (
+    # Pondération épistémique des composantes
+    # E, R, F, L restent centrales.
+    # I, T, C sont des appuis réels, mais moins forts qu'une preuve empirique directe.
+    
+    weighted_raw_score = (
         E
         + R
         + F
         + L
-        + I
-        + T
-        + C
+        + (I * 0.60)
+        + (T * 0.80)
+        + (C * 0.50)
         + quantitative_bonus
         + academic_bonus
     ) - S
-
+    
+    # Maximum théorique approximatif :
+    # E + R + F + L = 20
+    # I*0.60 = 3
+    # T*0.80 = 4
+    # C*0.50 = 2.5
+    # quantitative_bonus = 5
+    # academic_bonus ≈ 2.3
+    # Total ≈ 36.8
+    
     anchor_score = max(
         0,
         min(
             20,
-            (raw_score / 36) * 20
+            (weighted_raw_score / 37) * 20
         )
     )
+    
+    raw_score = weighted_raw_score
 
     if anchor_score < 5:
         label = "Très faible"
