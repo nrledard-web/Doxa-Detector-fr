@@ -8878,7 +8878,7 @@ def detect_real_anchor(text, result=None):
         0,
         min(
             20,
-            (raw_score / 24) * 20
+            (raw_score / 36) * 20
         )
     )
 
