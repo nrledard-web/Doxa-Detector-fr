@@ -14173,6 +14173,9 @@ Falsifiabilité :
 Limites explicites :
 **{result.get("real_anchor_L", 0)}**
 
+Révisabilité :
+**{result.get("real_anchor_RV", 0)}**
+
 Institutions / références concrètes :
 **{result.get("real_anchor_I", 0)}**
 
@@ -14252,6 +14255,10 @@ Il indique seulement que le discours semble davantage stabilisé par l’expéri
     st.write(
         "**Limites explicites :**",
         result.get("real_anchor_limits_markers", [])
+    )
+    st.write(
+        "**Révisabilité :**",
+        result.get("real_anchor_revisability_markers", [])
     )
 
     st.write(
