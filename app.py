@@ -15003,7 +15003,7 @@ Il indique seulement que le discours semble moins révisable, plus affirmatif, o
 # -----------------------------
 # Indice global de dérive cognitive
 # -----------------------------
-st.markdown("### Indice global de dérive cognitive")
+st.subheader("Indice global de dérive cognitive", anchor=False)
 st.caption("Synthèse des trois dérives cognitives.")
 
 global_score = result["global_cognitive_drift"]
