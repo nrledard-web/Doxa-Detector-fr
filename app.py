@@ -14864,7 +14864,7 @@ st.divider()
 # -----------------------------
 # 🧠 jauge de Clôture cognitive
 # -----------------------------
-st.subheader("Clôture cognitive")
+st.subheader("Clôture cognitive", anchor=False)
 
 st.caption(
     "Cette jauge mesure le degré de verrouillage cognitif du texte. "
