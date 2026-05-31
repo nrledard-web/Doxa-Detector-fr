@@ -2723,30 +2723,25 @@ LOGIC_CONFUSION_MARKERS = {
     "causalite_abusive": [
         "cela prouve que", "cela montre que", "c'est pourquoi",
         "ce qui explique que", "ce qui démontre que", "donc la cause",
-        "this proves that", "this shows that", "that is why"
     ],
     "extrapolation": [
         "donc tous", "donc toujours", "donc jamais",
         "par conséquent tout", "il faut en conclure que",
-        "therefore all", "therefore always", "necessarily all"
     ],
     "prediction_absolue": [
         "inévitablement", "forcément", "il est certain que",
         "il est impossible que", "finira par", "conduira nécessairement à",
-        "inevitably", "certainly", "it is impossible that"
     ]
 }
 SCIENTIFIC_SIMULATION_MARKERS = {
     "references_vagues": [
         "des études montrent", "la science prouve", "les chercheurs disent",
         "les scientifiques ont démontré", "plusieurs recherches montrent",
-        "according to studies", "science proves", "research shows",
     ],
 
     "technicite_rhetorique": [
         "système", "structure", "dynamique", "modèle",
         "mécanisme", "processus", "paradigme",
-        "system", "structure", "dynamics", "model", "mechanism", "process",
     ],
 
     "chiffres_sans_source": [
@@ -2754,8 +2749,6 @@ SCIENTIFIC_SIMULATION_MARKERS = {
         "une étude récente",
         "plusieurs recherches",
         "des statistiques montrent",
-        "recent study",
-        "statistics show",
     ]
 }
 
