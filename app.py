@@ -8615,8 +8615,8 @@ REAL_ANCHOR_EMPIRY = [
     "résultat", "validation", "validé", "détecté", "reproduit",
     "statistiquement significatif", "échantillon", "essai clinique",
     "simulation validée", "étude", "rapport", "chiffres", "pourcentage",
-    "%", "selon", "économistes", "expert", "secteurs", "postes", "créés", 
-    "emplois", "finance", "santé"
+    "%", "selon" 
+    
 ]
 REAL_ANCHOR_REPRODUCIBILITY = [
     "méthode", "paramètres", "reproductible", "reproductibilité",
@@ -8625,11 +8625,27 @@ REAL_ANCHOR_REPRODUCIBILITY = [
     "publication", "revue par les pairs", "littérature scientifique"
 ]
 REAL_ANCHOR_FALSIFIABILITY = [
-    "hypothèse", "modèle partiel", "approximation", "sous certaines conditions",
-    "pourrait être faux", "pourrait être réfuté", "compatible avec",
-    "marge d’erreur", "marge d'erreur", "résultats préliminaires",
-    "selon les données actuelles", "limite du modèle", "pourraient", "pourrait", 
-    "certains", "restent prudents", "il faut nuancer", "nuancer", "cependant"
+    "hypothèse",
+    "modèle partiel",
+    "approximation",
+    "sous certaines conditions",
+    "pourrait être faux",
+    "pourrait être réfuté",
+    "compatible avec",
+    "marge d’erreur",
+    "marge d'erreur",
+    "résultats préliminaires",
+    "selon les données actuelles",
+    "limite du modèle"
+]
+REAL_ANCHOR_REVISABILITY = [
+    "pourraient",
+    "pourrait",
+    "certains",
+    "restent prudents",
+    "il faut nuancer",
+    "nuancer",
+    "cependant"
 ]
 REAL_ANCHOR_LIMITS = [
     "nous ne savons pas", "reste incomplet", "interprétation débattue",
@@ -8669,7 +8685,8 @@ REAL_ANCHOR_INSTITUTIONS = [
     "irsn",
     "la hague",
     "union européenne",
-    "commission européenne"
+    "commission européenne", 
+    "économistes", "expert"
 ]
 
 REAL_ANCHOR_TECHNICAL_REALITY = [
@@ -8715,12 +8732,18 @@ REAL_ANCHOR_COMPARISONS = [
     "fossiles"
 ]
 
+import re
+
 def count_real_anchor_markers(text, markers):
+
     t = text.lower()
     found = []
 
     for marker in markers:
-        if marker.lower() in t:
+
+        pattern = r"\b" + re.escape(marker.lower()) + r"\b"
+
+        if re.search(pattern, t):
             found.append(marker)
 
     return found
@@ -8759,6 +8782,15 @@ def detect_real_anchor(text, result=None):
     falsifiability_markers = count_real_anchor_markers(
         text,
         REAL_ANCHOR_FALSIFIABILITY
+    )
+    revisability_markers = count_real_anchor_markers(
+        text,
+        REAL_ANCHOR_REVISABILITY
+    )
+    
+    RV = normalize_component(
+        len(revisability_markers),
+        divisor=4
     )
 
     limits_markers = count_real_anchor_markers(
@@ -8871,9 +8903,10 @@ def detect_real_anchor(text, result=None):
         + R
         + F
         + L
-        + (I * 0.60)
-        + (T * 0.80)
-        + (C * 0.50)
+        + (RV * 0.8)
+        + (I * 0.6)
+        + (T * 0.8)
+        + (C * 0.5)
         + quantitative_bonus
         + academic_bonus
     ) - S
@@ -8960,11 +8993,13 @@ def detect_real_anchor(text, result=None):
         "real_anchor_R": round(R, 2),
         "real_anchor_F": round(F, 2),
         "real_anchor_L": round(L, 2),
+        "real_anchor_RV": round(RV, 2),
         "real_anchor_S": round(S, 2),
 
         "real_anchor_empirical_markers": empirical_markers,
         "real_anchor_reproducibility_markers": reproducibility_markers,
         "real_anchor_falsifiability_markers": falsifiability_markers,
+        "real_anchor_revisability_markers": revisability_markers,
         "real_anchor_limits_markers": limits_markers,
         "real_anchor_speculation_markers": speculation_markers,
 
