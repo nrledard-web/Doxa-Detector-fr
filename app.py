@@ -21696,7 +21696,7 @@ st.markdown("""
 # -----------------------------
 # hard_fact_checking_by_claim
 # -----------------------------
-st.subheader(T["Analyse épistémique des affirmations"])
+st.subheader(T["hard_fact_checking_by_claim"])
 claims_df = pd.DataFrame(
     [
         {
