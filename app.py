@@ -461,7 +461,7 @@ T = {
     "almost_total_absence_of_verifiable_elements": "Absence quasi totale d'éléments vérifiables",
     "text_too_short": "Texte trop court pour soutenir sérieusement une affirmation forte",
     "multiple_claims_very_fragile": "Plusieurs affirmations centrales sont très fragiles au regard des indices présents",
-    "hard_fact_checking_by_claim": "Fact-checking des affirmations",
+    "hard_fact_checking_by_claim": "Analyse épistémique des affirmations",
     "claim": "Affirmation",
     "status": "Statut",
     "verifiability": "Vérifiabilité",
