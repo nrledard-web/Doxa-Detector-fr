@@ -9051,9 +9051,9 @@ def compute_cognitive_bonus(result: dict):
                 result.get(
                     "reasoning_score",
                     result.get(
-                        "hard_fact_score",
-                        10
-                    ) / 20
+                        "cognitive_vitality_score",
+                        result.get("hard_fact_score", 10) / 20
+                    )
                 )
             ) * 0.30
         )
