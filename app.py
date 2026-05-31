@@ -8862,11 +8862,13 @@ def detect_real_anchor(text, result=None):
 
     t = text.lower()
 
-    if (
-        "doi" in t
-        or "arxiv" in t
-        or "revue par les pairs" in t
-    ):
+    if re.search(r"\bdoi\b", t):
+        academic_bonus += 1.0
+    
+    if re.search(r"\barxiv\b", t):
+        academic_bonus += 1.0
+    
+    if "revue par les pairs" in t:
         academic_bonus += 1.0
 
     if (
