@@ -11568,7 +11568,6 @@ def analyze_article(text: str) -> Dict:
     frame_meta = compute_frame_shift_interpretation(result)
     result.update(frame_meta)
     
-    return result
     # -----------------------------
     # Pénalité des jauges affichées
     # -----------------------------
