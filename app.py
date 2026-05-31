@@ -14223,7 +14223,7 @@ Il indique seulement que le discours semble davantage stabilisé par l’expéri
         "**Spéculation extrapolative :**",
         result.get("real_anchor_speculation_markers", [])
     )
-        st.write(
+    st.write(
         "**Institutions / références concrètes :**",
         result.get("real_anchor_institution_markers", [])
     )
@@ -14232,7 +14232,7 @@ Il indique seulement que le discours semble davantage stabilisé par l’expéri
         "**Technicité réaliste :**",
         result.get("real_anchor_technical_markers", [])
     )
-
+    
     st.write(
         "**Comparaisons concrètes :**",
         result.get("real_anchor_comparison_markers", [])
