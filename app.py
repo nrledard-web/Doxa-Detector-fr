@@ -8968,7 +8968,11 @@ def detect_real_anchor(text, result=None):
     if result:
         M = result.get("M", 0)
 
-    delta_reality = round((M + S) - anchor_score, 2)
+    delta_reality = 0
+        delta_label = "Calibration en cours"
+        delta_interpretation = (
+            "La mesure de tension entre cohérence et ancrage au réel est en cours de recalibrage."
+        )
 
     if delta_reality <= -5:
         delta_label = "Structure fortement ancrée"
