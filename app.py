@@ -8963,32 +8963,20 @@ def detect_real_anchor(text, result=None):
             "révisabilité et reproductibilité sont bien représentées."
         )
 
-    # Couplage avec M et spéculation si result existe
-    M = 0
-    if result:
-        M = result.get("M", 0)
-
+    # -----------------------------
+    # Delta réalité
+    # Temporairement désactivé
+    # -----------------------------
+    
     delta_reality = 0
-        delta_label = "Calibration en cours"
-        delta_interpretation = (
-            "La mesure de tension entre cohérence et ancrage au réel est en cours de recalibrage."
-        )
-
-    if delta_reality <= -5:
-        delta_label = "Structure fortement ancrée"
-        delta_interpretation = (
-            "L’ancrage au réel domine nettement la spéculation et la mécroyance."
-        )
-    elif delta_reality <= 2:
-        delta_label = "Zone révisable"
-        delta_interpretation = (
-            "Le discours conserve un équilibre entre cohérence, spéculation et contrainte du réel."
-        )
-    else:
-        delta_label = "Cohérence autoporteuse possible"
-        delta_interpretation = (
-            "La cohérence ou la spéculation semblent dépasser l’ancrage empirique disponible."
-        )
+    
+    delta_label = "Calibration en cours"
+    
+    delta_interpretation = (
+        "La mesure de tension entre cohérence et ancrage au réel "
+        "est temporairement désactivée afin d'être recalibrée après "
+        "l'ajout des nouvelles composantes d'ancrage."
+    )
 
     return {
         "real_anchor_score": round(anchor_score, 2),
