@@ -14110,12 +14110,17 @@ Le moteur compare les éléments qui ancrent le discours dans le réel :
 - reproductibilité ;
 - falsifiabilité ;
 - reconnaissance des limites.
+- institutions ou références concrètes ;
+- technicité réaliste ;
+- comparaisons quantitatives ou concrètes.
+
 
 Avec les éléments qui l’éloignent du réel :
 
 - spéculation extrapolative ;
 - certitude excessive ;
 - cohérence autoporteuse.
+
 
 ---
 
@@ -14132,6 +14137,18 @@ Falsifiabilité :
 
 Limites explicites :
 **{result.get("real_anchor_L", 0)}**
+
+Institutions / références concrètes :
+**{result.get("real_anchor_I", 0)}**
+
+Technicité réaliste :
+**{result.get("real_anchor_T", 0)}**
+
+Comparaisons concrètes :
+**{result.get("real_anchor_C", 0)}**
+
+Robustesse quantitative :
+**{result.get("real_anchor_quantitative_bonus", 0)}**
 
 Spéculation :
 **{result.get("real_anchor_S", 0)}**
@@ -14205,6 +14222,20 @@ Il indique seulement que le discours semble davantage stabilisé par l’expéri
     st.write(
         "**Spéculation extrapolative :**",
         result.get("real_anchor_speculation_markers", [])
+    )
+        st.write(
+        "**Institutions / références concrètes :**",
+        result.get("real_anchor_institution_markers", [])
+    )
+
+    st.write(
+        "**Technicité réaliste :**",
+        result.get("real_anchor_technical_markers", [])
+    )
+
+    st.write(
+        "**Comparaisons concrètes :**",
+        result.get("real_anchor_comparison_markers", [])
     )
 
 # =============================
