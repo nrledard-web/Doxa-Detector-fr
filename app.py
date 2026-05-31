@@ -3061,6 +3061,133 @@ def compute_scientific_simulation(text: str):
         "interpretation": interpretation,
     }
 
+def validate_scientific_simulation_context(result: dict) -> dict:
+    """
+    Distingue la technicité légitime d'une scientificité rhétorique suspecte.
+    """
+
+    markers = result.get("scientific_simulation_markers", [])
+
+    raw_score = result.get("scientific_simulation_score", 0)
+    real_anchor = result.get("real_anchor_score", 0)
+    quantitative = result.get("quantitative_robustness_score", 0)
+
+    technical_anchor_markers = result.get(
+        "real_anchor_technical_markers",
+        []
+    )
+
+    institution_markers = result.get(
+        "real_anchor_institution_markers",
+        []
+    )
+
+    comparison_markers = result.get(
+        "real_anchor_comparison_markers",
+        []
+    )
+
+    technical_terms = [
+        "cycle de vie",
+        "empreinte carbone",
+        "kilowattheure",
+        "neutralité carbone",
+        "stockage à long terme",
+        "recyclage partiel",
+        "recyclage",
+        "combustibles usés",
+        "circuit fermé",
+        "rejets thermiques",
+        "biodiversité",
+        "artificialisation des sols",
+        "production stable",
+        "production prévisible",
+    ]
+
+    validated = []
+    suspicious = []
+
+    for marker in markers:
+        clean_marker = str(marker).lower()
+
+        if (
+            any(term in clean_marker for term in technical_terms)
+            or marker in technical_anchor_markers
+        ):
+            validated.append(marker)
+        else:
+            suspicious.append(marker)
+
+    technical_ratio = len(validated) / max(len(markers), 1)
+
+    attenuation = 0.0
+    reasons = []
+
+    if technical_ratio >= 0.50:
+        attenuation += 0.35
+        reasons.append("majorité de marqueurs techniques légitimes")
+
+    elif technical_ratio >= 0.35:
+        attenuation += 0.20
+        reasons.append("part significative de marqueurs techniques légitimes")
+
+    if real_anchor >= 10:
+        attenuation += 0.20
+        reasons.append("ancrage au réel modéré ou supérieur")
+
+    if quantitative >= 0.50:
+        attenuation += 0.20
+        reasons.append("architecture quantitative visible")
+
+    if institution_markers:
+        attenuation += 0.10
+        reasons.append("références institutionnelles présentes")
+
+    if comparison_markers:
+        attenuation += 0.10
+        reasons.append("comparaisons concrètes présentes")
+
+    attenuation = min(attenuation, 0.80)
+
+    corrected_score = max(0.0, raw_score * (1 - attenuation))
+
+    if attenuation >= 0.60:
+        status = "invalidée"
+        interpretation = (
+            "La scientificité rhétorique brute semble principalement expliquée "
+            "par une technicité légitime, accompagnée d’un ancrage réel ou "
+            "quantitatif suffisant."
+        )
+
+    elif attenuation >= 0.30:
+        status = "nuancée"
+        interpretation = (
+            "La scientificité rhétorique reste détectée, mais une partie des "
+            "marqueurs paraît légitime dans le contexte technique du texte."
+        )
+
+    else:
+        status = "validée"
+        interpretation = (
+            "Les marqueurs de scientificité rhétorique restent peu contrebalancés "
+            "par le contexte technique, l’ancrage réel ou la robustesse quantitative."
+        )
+
+    return {
+        "scientific_simulation_validation": {
+            "status": status,
+            "validated_markers": validated,
+            "suspicious_markers": suspicious,
+            "technical_ratio": round(technical_ratio, 3),
+            "attenuation": round(attenuation, 3),
+            "raw_score": round(raw_score, 3),
+            "corrected_score": round(corrected_score, 3),
+            "reasons": reasons,
+            "interpretation": interpretation,
+        },
+        "scientific_simulation_score_corrected": round(corrected_score, 3),
+    }
+
 def detect_short_form_mode(text: str):
     words = tokenize_words(text)
     word_count = len(words)
