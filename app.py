@@ -20366,47 +20366,47 @@ with bf3:
         st.markdown("**Interprétation actuelle**")
         st.write(result["scientific_simulation_interpretation"])
 
-        scientific_validation = result.get(
-        "scientific_simulation_validation",
-        {}
-    )
-    
-    if scientific_validation:
-    
-        st.markdown("**Validation contextuelle**")
-    
-        st.write(
-            f"Statut : **{scientific_validation.get('status', 'non évaluée')}**"
+            scientific_validation = result.get(
+            "scientific_simulation_validation",
+            {}
         )
-    
-        st.write(
-            f"Score brut : **{round(scientific_validation.get('raw_score', 0) * 100, 1)}%**"
-        )
-    
-        st.write(
-            f"Score corrigé : **{round(scientific_validation.get('corrected_score', 0) * 100, 1)}%**"
-        )
-    
-        st.write(
-            f"Atténuation : **{round(scientific_validation.get('attenuation', 0) * 100, 1)}%**"
-        )
-    
-        st.write(scientific_validation.get("interpretation", ""))
-    
-        st.write(
-            "**Raisons de l’atténuation :**",
-            scientific_validation.get("reasons", [])
-        )
-    
-        st.write(
-            "**Marqueurs techniques validés :**",
-            scientific_validation.get("validated_markers", [])
-        )
-    
-        st.write(
-            "**Marqueurs encore suspects :**",
-            scientific_validation.get("suspicious_markers", [])
-        )
+        
+        if scientific_validation:
+        
+            st.markdown("**Validation contextuelle**")
+        
+            st.write(
+                f"Statut : **{scientific_validation.get('status', 'non évaluée')}**"
+            )
+        
+            st.write(
+                f"Score brut : **{round(scientific_validation.get('raw_score', 0) * 100, 1)}%**"
+            )
+        
+            st.write(
+                f"Score corrigé : **{round(scientific_validation.get('corrected_score', 0) * 100, 1)}%**"
+            )
+        
+            st.write(
+                f"Atténuation : **{round(scientific_validation.get('attenuation', 0) * 100, 1)}%**"
+            )
+        
+            st.write(scientific_validation.get("interpretation", ""))
+        
+            st.write(
+                "**Raisons de l’atténuation :**",
+                scientific_validation.get("reasons", [])
+            )
+        
+            st.write(
+                "**Marqueurs techniques validés :**",
+                scientific_validation.get("validated_markers", [])
+            )
+        
+            st.write(
+                "**Marqueurs encore suspects :**",
+                scientific_validation.get("suspicious_markers", [])
+            )
 
         st.markdown("**Lecture**")
         st.write(
