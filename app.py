@@ -20281,7 +20281,7 @@ with bf2:
             "que des faits strictement démontrés."
         )
 # -----------------------------
-#  Scientificité rhétorique
+# Scientificité rhétorique
 # -----------------------------
 with bf3:
     st.markdown("### Scientificité rhétorique")
@@ -20308,10 +20308,10 @@ with bf3:
     st.caption(result["scientific_simulation_interpretation"])
 
     scientific_validation = result.get(
-    "scientific_simulation_validation",
-    {}
+        "scientific_simulation_validation",
+        {}
     )
-    
+
     if scientific_validation:
         st.caption(
             f"Validation contextuelle : "
@@ -20319,13 +20319,10 @@ with bf3:
             f"— atténuation : "
             f"{round(scientific_validation.get('attenuation', 0) * 100, 1)}%"
         )
-    
+
         st.caption(
             scientific_validation.get("interpretation", "")
         )
-
-    st.write("DEBUG validation scientificité :", result.get("scientific_simulation_validation"))
-    st.write("DEBUG score corrigé :", result.get("scientific_simulation_score_corrected"))
 
     with st.expander("🔎 Voir les marqueurs", expanded=False):
         markers = result.get("scientific_simulation_markers", [])
@@ -20359,50 +20356,44 @@ with bf3:
         markers = result.get("scientific_simulation_markers", [])
 
         st.markdown("**Valeur actuelle**")
-        st.write(f"Score : **{round(sim_value * 100, 1)}%**")
-        st.write(f"Niveau : **{sim_label}**")
+        st.write(f"Score brut : **{round(sim_value * 100, 1)}%**")
+        st.write(f"Niveau brut : **{sim_label}**")
         st.write(f"Marqueurs détectés : **{len(markers)}**")
 
         st.markdown("**Interprétation actuelle**")
         st.write(result["scientific_simulation_interpretation"])
 
-            scientific_validation = result.get(
-            "scientific_simulation_validation",
-            {}
-        )
-        
         if scientific_validation:
-        
             st.markdown("**Validation contextuelle**")
-        
+
             st.write(
                 f"Statut : **{scientific_validation.get('status', 'non évaluée')}**"
             )
-        
+
             st.write(
                 f"Score brut : **{round(scientific_validation.get('raw_score', 0) * 100, 1)}%**"
             )
-        
+
             st.write(
                 f"Score corrigé : **{round(scientific_validation.get('corrected_score', 0) * 100, 1)}%**"
             )
-        
+
             st.write(
                 f"Atténuation : **{round(scientific_validation.get('attenuation', 0) * 100, 1)}%**"
             )
-        
+
             st.write(scientific_validation.get("interpretation", ""))
-        
+
             st.write(
                 "**Raisons de l’atténuation :**",
                 scientific_validation.get("reasons", [])
             )
-        
+
             st.write(
                 "**Marqueurs techniques validés :**",
                 scientific_validation.get("validated_markers", [])
             )
-        
+
             st.write(
                 "**Marqueurs encore suspects :**",
                 scientific_validation.get("suspicious_markers", [])
@@ -20420,7 +20411,7 @@ with bf3:
         st.write(
             "Une scientificité rhétorique élevée ne signifie pas que le texte est faux. "
             "Elle indique que le discours mobilise une apparence de science sans rendre ses bases clairement vérifiables."
-        )     
+        )   
 # -----------------------------
 #  Glissement sémantique
 # -----------------------------
