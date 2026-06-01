@@ -13906,7 +13906,6 @@ with st.popover("ℹ️ Comprendre cette jauge"):
     st.markdown(f"""
 ### Solidité argumentative
 
-st.markdown("""
 ### Méthodologie du moteur
 
 Le moteur n'utilise pas d'analyse sémantique.
