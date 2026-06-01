@@ -495,8 +495,17 @@ T = {
     "zone_pansapience": "Pan-sapience hypothétique : horizon limite d’une cognition presque totalement révisable.",
     "zone_asymptote": "Asymptote idéale : totalité du savoir et de l’intégration, sans rigidification.",
     "out_of_spectrum": "Valeur hors spectre théorique.",
-    "external_corroboration_module": "🔎 Module de corroboration externe",
-    "external_corroboration_caption": "Ce module cherche des sources externes susceptibles de confirmer, nuancer ou contredire les affirmations centrales du texte collé.",
+    
+    "external_corroboration_module":
+        "🔎 Module épistémique de corroboration externe",
+    
+    "external_corroboration_caption":
+        "Ce module recherche des contenus documentaires externes susceptibles "
+        "d’apporter des éléments de corroboration, de nuance ou de contradiction "
+        "aux principales affirmations détectées dans le texte analysé. "
+        "Il ne repose pas sur une analyse sémantique du contenu mais sur la "
+        "détection de marqueurs, de références et de signaux documentaires explicites.",
+        
     "corroboration_in_progress": "Recherche de corroborations en cours...",
     "generated_query": "Requête générée",
     "no_strong_sources_found": "Aucune source suffisamment solide trouvée pour cette affirmation.",
