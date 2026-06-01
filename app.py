@@ -20307,6 +20307,26 @@ with bf3:
 
     st.caption(result["scientific_simulation_interpretation"])
 
+    scientific_validation = result.get(
+    "scientific_simulation_validation",
+    {}
+    )
+    
+    if scientific_validation:
+        st.caption(
+            f"Validation contextuelle : "
+            f"{scientific_validation.get('status', 'non évaluée')} "
+            f"— atténuation : "
+            f"{round(scientific_validation.get('attenuation', 0) * 100, 1)}%"
+        )
+    
+        st.caption(
+            scientific_validation.get("interpretation", "")
+        )
+
+    st.write("DEBUG validation scientificité :", result.get("scientific_simulation_validation"))
+    st.write("DEBUG score corrigé :", result.get("scientific_simulation_score_corrected"))
+
     with st.expander("🔎 Voir les marqueurs", expanded=False):
         markers = result.get("scientific_simulation_markers", [])
         if not markers:
