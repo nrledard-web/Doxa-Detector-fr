@@ -11479,6 +11479,12 @@ def analyze_article(text: str) -> Dict:
     # -----------------------------
     real_anchor = detect_real_anchor(text, result)
     result.update(real_anchor)
+
+    # -----------------------------
+    # Validation scientificité rhétorique
+    # -----------------------------
+    scientific_validation = validate_scientific_simulation_context(result)
+    result.update(scientific_validation)
     
     # -----------------------------
     # Vitalité cognitive
