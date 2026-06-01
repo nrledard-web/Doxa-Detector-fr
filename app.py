@@ -13906,18 +13906,40 @@ with st.popover("ℹ️ Comprendre cette jauge"):
     st.markdown(f"""
 ### Solidité argumentative
 
-Cette jauge estime la solidité argumentative apparente du texte avant pénalités finales.
+st.markdown("""
+### Méthodologie du moteur
 
-Elle mesure la capacité du discours à soutenir ses affirmations par :
-- une structure logique ;
-- une cohérence discursive ;
-- des éléments vérifiables ;
-- une qualité minimale des sources ;
-- une vérifiabilité moyenne des affirmations.
+Le moteur n'utilise pas d'analyse sémantique.
 
-Elle ne mesure pas la vérité absolue du texte, ni l’intention du locuteur.
+Son fonctionnement repose principalement sur des heuristiques explicites,
+des marqueurs observables, des pondérations transparentes et des structures
+discursives identifiables :
 
-Les pénalités discursives, comme le baratinage, l’omission stratégique ou certaines pressions rhétoriques, sont principalement intégrées dans la crédibilité finale, et non dans cette jauge elle-même.
+• la structure du raisonnement ;
+• la cohérence discursive ;
+• l’analyse épistémique des affirmations ;
+• la présence de références ou de corroborations externes lorsqu’elles sont détectées ;
+• plusieurs signaux de prudence ou de risque rhétorique.
+
+Les analyses reposent notamment sur la détection de marqueurs tels que :
+
+• dates ;
+• chiffres ;
+• entités nommées ;
+• sources attribuées ;
+• formulations absolutistes ;
+• nuances et marqueurs de révisabilité ;
+• références institutionnelles ;
+• structures argumentatives ;
+• indicateurs de pression rhétorique.
+
+Le moteur n'évalue donc pas directement la vérité des affirmations et ne tente
+pas d'interpréter leur sens profond. Il estime principalement les propriétés
+épistémiques, argumentatives et documentaires observables dans le texte.
+
+Cette approche privilégie la transparence, l'auditabilité, la reproductibilité
+et l'explicabilité des résultats.
+""")
 ---
 
 ### Principe
