@@ -13938,7 +13938,7 @@ pas d'interpréter leur sens profond. Il estime principalement les propriétés
 
 Cette approche privilégie la transparence, l'auditabilité, la reproductibilité
 et l'explicabilité des résultats.
-""")
+
 ---
 
 ### Principe
