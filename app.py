@@ -13906,16 +13906,18 @@ with st.popover("ℹ️ Comprendre cette jauge"):
     st.markdown(f"""
 ### Solidité argumentative
 
-Cette jauge estime la solidité argumentative globale du texte.
+Cette jauge estime la solidité argumentative apparente du texte avant pénalités finales.
 
-Elle ne mesure pas :
+Elle mesure la capacité du discours à soutenir ses affirmations par :
+- une structure logique ;
+- une cohérence discursive ;
+- des éléments vérifiables ;
+- une qualité minimale des sources ;
+- une vérifiabilité moyenne des affirmations.
 
-- la vérité absolue du texte ;
-- l’intention réelle du locuteur ;
-- la seule cohérence stylistique.
+Elle ne mesure pas la vérité absolue du texte, ni l’intention du locuteur.
 
-Elle mesure plutôt la capacité du discours à soutenir ses affirmations par une structure logique, des éléments vérifiables et une base documentaire suffisante.
-
+Les pénalités discursives, comme le baratinage, l’omission stratégique ou certaines pressions rhétoriques, sont principalement intégrées dans la crédibilité finale, et non dans cette jauge elle-même.
 ---
 
 ### Principe
