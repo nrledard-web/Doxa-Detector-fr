@@ -18295,7 +18295,12 @@ with sr7:
         unsafe_allow_html=True
     )
 
-    st.caption(result["frame_shift_interpretation"])
+    st.caption(
+        result.get(
+            "frame_shift_interpretation_v2",
+            result.get("frame_shift_interpretation", "")
+        )
+    )
 
     validation = result.get("frame_shift_validation", {})
 
@@ -18351,7 +18356,12 @@ with sr7:
         st.write(f"Marqueurs détectés : **{len(markers)}**")
 
         st.markdown("**Interprétation actuelle**")
-        st.write(result["frame_shift_interpretation"])
+        st.write(
+            result.get(
+                "frame_shift_interpretation_v2",
+                result.get("frame_shift_interpretation", "")
+            )
+        )
 
         st.metric(
             "Frame shift brut",
