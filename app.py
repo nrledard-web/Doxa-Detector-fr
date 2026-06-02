@@ -18271,6 +18271,41 @@ with sr7:
                 ""
             )
         )
+        validation = result.get("frame_shift_validation", {})
+
+        st.markdown("**Validation contextuelle**")
+        
+        st.write(
+            f"Statut : **{validation.get('status', 'non calculée')}**"
+        )
+        
+        st.write(
+            f"Score brut : **{round(result.get('frame_shift_raw', 0) * 100, 1)}%**"
+        )
+        
+        st.write(
+            f"Score corrigé : **{round(result.get('frame_shift_adjusted', 0) * 100, 1)}%**"
+        )
+        
+        st.write(
+            f"Atténuation : **{round(validation.get('attenuation', 0) * 100, 1)}%**"
+        )
+        
+        st.write(
+            validation.get(
+                "interpretation",
+                "Validation contextuelle non calculée."
+            )
+        )
+        
+        st.markdown("**Raisons de l’atténuation :**")
+        st.write(validation.get("attenuation_reasons", []))
+        
+        st.markdown("**Marqueurs validés :**")
+        st.write(validation.get("validated_markers", []))
+        
+        st.markdown("**Marqueurs neutralisés :**")
+        st.write(validation.get("neutralized_markers", []))
         
         st.markdown("**Marqueurs retenus dans le calcul**")
         
