@@ -18204,6 +18204,21 @@ with sr7:
 
     st.caption(result["frame_shift_interpretation"])
 
+    validation = result.get("frame_shift_validation", {})
+
+    if validation:
+        st.caption(
+            f"Validation contextuelle : {validation.get('status', 'non calculée')} "
+            f"— atténuation : {round(validation.get('attenuation', 0) * 100, 1)}%"
+        )
+    
+        st.caption(
+            validation.get(
+                "interpretation",
+                ""
+            )
+        )
+
     with st.expander("🔎 Voir les marqueurs", expanded=False):
         markers = result.get("frame_shift_markers", [])
         if not markers:
@@ -18265,12 +18280,6 @@ with sr7:
             f"{len(result.get('frame_shift_neutralized_markers', []))} / {len(result.get('frame_shift_markers', []))}"
         )
         
-        st.caption(
-            result.get(
-                "frame_shift_interpretation_v2",
-                ""
-            )
-        )
         validation = result.get("frame_shift_validation", {})
 
         st.markdown("**Validation contextuelle**")
@@ -18300,12 +18309,6 @@ with sr7:
         
         st.markdown("**Raisons de l’atténuation :**")
         st.write(validation.get("attenuation_reasons", []))
-        
-        st.markdown("**Marqueurs validés :**")
-        st.write(validation.get("validated_markers", []))
-        
-        st.markdown("**Marqueurs neutralisés :**")
-        st.write(validation.get("neutralized_markers", []))
         
         st.markdown("**Marqueurs retenus dans le calcul**")
         
