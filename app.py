@@ -16806,7 +16806,61 @@ st.link_button(
     use_container_width=True
 )
 st.divider()
+sp1, col_center, sp2 = st.columns([2,3,2])
 
+with col_center:
+
+    st.markdown("### 🧠 Modules d’analyse DOXA")
+
+    with st.expander("🧠 Voir le résumé complet des pénalités", expanded=False):
+
+        # =============================
+        # Pénalités appliquées
+        # =============================
+
+        st.markdown("### Pénalités appliquées")
+
+        # =============================
+        # Résumé chiffré
+        # =============================
+        
+
+        colp1, colp2, colp3 = st.columns(3)
+
+        with colp1:
+            st.metric(
+                "Pénalité crédibilité",
+                round(result.get("credibility_penalty_total", 0), 2)
+            )
+
+        with colp2:
+            st.metric(
+                "Boost mensonge",
+                round(result.get("lie_boost_total", 0), 2)
+            )
+
+        with colp3:
+            st.metric(
+                "Score final",
+                f"{result.get('final_credibility_score', result['hard_fact_score'])}/20"
+            )
+
+        st.caption(
+            "Les pénalités corrigent le score lorsque le texte accumule des signaux "
+            "de fermeture cognitive, de manipulation ou de raisonnement fragile."
+        )
+
+        with st.expander("Voir le détail des pénalités"):
+            st.write(result.get("weighted_red_flags", []))
+
+
+st.divider()
+
+    st.subheader("Diagnostic cognitif")
+    life_score = round((result["hard_fact_score"] / 20) * 100, 1)
+    mecroyance_bar = max(0.0, min(1.0, (result["M"] + 10) / 30))
+
+st.divider()
 # =============================
 # Triangle cognitif
 # =============================
@@ -21768,60 +21822,6 @@ else:
     "Analyse sémantique inactive. Les pénalités reposent uniquement "
     "sur l’analyse analogique du discours."
 )
-
-sp1, col_center, sp2 = st.columns([2,3,2])
-
-with col_center:
-
-    st.markdown("### 🧠 Modules d’analyse DOXA")
-
-    with st.expander("🧠 Voir le résumé complet des pénalités", expanded=False):
-
-        # =============================
-        # Pénalités appliquées
-        # =============================
-
-        st.markdown("### Pénalités appliquées")
-
-        # =============================
-        # Résumé chiffré
-        # =============================
-        
-
-        colp1, colp2, colp3 = st.columns(3)
-
-        with colp1:
-            st.metric(
-                "Pénalité crédibilité",
-                round(result.get("credibility_penalty_total", 0), 2)
-            )
-
-        with colp2:
-            st.metric(
-                "Boost mensonge",
-                round(result.get("lie_boost_total", 0), 2)
-            )
-
-        with colp3:
-            st.metric(
-                "Score final",
-                f"{result.get('final_credibility_score', result['hard_fact_score'])}/20"
-            )
-
-        st.caption(
-            "Les pénalités corrigent le score lorsque le texte accumule des signaux "
-            "de fermeture cognitive, de manipulation ou de raisonnement fragile."
-        )
-
-        with st.expander("Voir le détail des pénalités"):
-            st.write(result.get("weighted_red_flags", []))
-
-
-    st.divider()
-
-    st.subheader("Diagnostic cognitif")
-    life_score = round((result["hard_fact_score"] / 20) * 100, 1)
-    mecroyance_bar = max(0.0, min(1.0, (result["M"] + 10) / 30))
 
 # -----------------------------
 # Synthèse critique IA
