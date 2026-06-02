@@ -4555,21 +4555,28 @@ def compute_frame_shift_interpretation(result: dict):
         validation_reasons = []
         neutralization_reasons = []
 
-        # -----------------------------
-        # Raisons de neutralisation
-        # -----------------------------
-        if real_anchor >= 8:
+        # Neutralisation contextuelle
+        if real_anchor >= 8 and marker not in [
+            "souveraineté énergétique",
+            "sécurité économique",
+            "indépendance nationale",
+            "bascule nuance → certitude/menace",
+        ]:
             neutralization_reasons.append("ancrage réel élevé")
 
-        if quantitative >= 0.50:
+        if quantitative >= 0.50 and marker not in [
+            "souveraineté énergétique",
+            "sécurité économique",
+            "indépendance nationale",
+        ]:
             neutralization_reasons.append("robustesse quantitative présente")
 
-        if coherence >= 12:
+        if coherence >= 12 and marker not in [
+            "bascule nuance → certitude/menace",
+        ]:
             neutralization_reasons.append("cohérence discursive élevée")
 
-        # -----------------------------
-        # Raisons de validation
-        # -----------------------------
+        # Validation contextuelle générale
         if rhetorical_pressure >= 0.35:
             validation_reasons.append("pression rhétorique élevée")
 
@@ -4582,7 +4589,31 @@ def compute_frame_shift_interpretation(result: dict):
         if omission >= 0.25:
             validation_reasons.append("omission stratégique détectée")
 
-        marker_score = len(validation_reasons) - len(neutralization_reasons)
+        # Validation spécifique par marqueur
+        if marker == "souveraineté énergétique":
+            validation_reasons.append(
+                "recadrage du débat climatique vers la souveraineté"
+            )
+
+        if marker == "sécurité économique":
+            validation_reasons.append(
+                "recadrage du débat écologique vers les enjeux économiques"
+            )
+
+        if marker == "indépendance nationale":
+            validation_reasons.append(
+                "recadrage du débat écologique vers la géopolitique"
+            )
+
+        if marker == "bascule nuance → certitude/menace":
+            validation_reasons.append(
+                "glissement d'un registre prudent vers une conclusion plus catégorique ou menaçante"
+            )
+
+        marker_score = (
+            len(validation_reasons)
+            - len(neutralization_reasons)
+        )
 
         if marker_score > 0:
             status = "validé"
@@ -4613,7 +4644,11 @@ def compute_frame_shift_interpretation(result: dict):
     retained_ratio = len(retained_markers) / total_markers
     neutralized_ratio = len(neutralized_markers) / total_markers
 
-    frame_adjusted = round(max(0, min(frame_raw * retained_ratio, 1)), 3)
+    frame_adjusted = round(
+        max(0, min(frame_raw * retained_ratio, 1)),
+        3
+    )
+
     attenuation = round(1 - retained_ratio, 3)
 
     if len(markers) == 0:
