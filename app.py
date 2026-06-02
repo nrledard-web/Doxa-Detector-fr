@@ -4407,14 +4407,16 @@ def extract_evidence_window(text: str, terms: list, window: int = 220) -> str:
 # =========================================================
 # FRAME SHIFT
 # =========================================================
-evidence = []
 
 def compute_frame_shift(text: str):
+    evidence = []
     if not text or not text.strip():
         return {
             "score": 0.0,
             "markers": [],
-            "interpretation": "Aucun déplacement du cadre argumentatif détecté."
+            "marker_evidence": [],
+            "interpretation":
+                "Aucun déplacement du cadre argumentatif détecté."
         }
 
     t = normalize_text_for_markers(text)
@@ -4423,14 +4425,15 @@ def compute_frame_shift(text: str):
         term for term in FRAME_SHIFT_TERMS
         if contains_term(t, term)
     ])
+    
     for marker in hits:
-    excerpt = extract_evidence_window(text, [marker])
-
-    evidence.append({
-        "marker": marker,
-        "excerpt": excerpt,
-        "detection_reason": "marqueur lexical de déplacement du cadre",
-    })
+        excerpt = extract_evidence_window(text, [marker])
+    
+        evidence.append({
+            "marker": marker,
+            "excerpt": excerpt,
+            "detection_reason": "marqueur lexical de déplacement du cadre",
+        })
 
     # Marqueurs de transition / bascule
     shift_connectors = [
