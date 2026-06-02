@@ -27,7 +27,6 @@ INTENSIFIERS = {"grave", "extrême", "massif", "violent"}
 
 # audit_hard_fact.py
 from pathlib import Path
-import re
 
 TARGETS = [
     "hard_fact_score",
@@ -9919,9 +9918,26 @@ def score_marker_group(text: str, group: dict) -> dict:
         "markers_detected": hits,
     }
 
+def clean_text_for_morphology(text: str) -> str:
+    if not text:
+        return ""
+
+    text = re.sub(r"https?://\S+", " ", text)
+    text = re.sub(r"www\.\S+", " ", text)
+    text = re.sub(r"\[[0-9,\s]+\]", " ", text)
+    text = re.sub(r"\s+", " ", text)
+
+    return text.strip()
+
+
 def compute_morphological_density(text: str) -> dict:
 
-    words = text.lower().split()
+    text = clean_text_for_morphology(text)
+
+    words = re.findall(
+        r"\b[a-zàâäéèêëîïôöùûüÿçœæ]{4,}\b",
+        text.lower()
+    )
 
     results = {}
 
@@ -9933,17 +9949,15 @@ def compute_morphological_density(text: str) -> dict:
 
             for word in words:
 
-                cleaned = word.strip(".,;:!?()[]{}\"'")
-
-                if cleaned.endswith(suffix):
-                    detected.append(cleaned)
+                if word.endswith(suffix):
+                    detected.append(word)
 
         density = len(detected) / max(len(words), 1)
 
         results[key] = {
             "label": pattern.get("label", key),
             "density": round(min(density * 10, 1.0), 3),
-            "detected": list(set(detected[:20])),
+            "detected": list(dict.fromkeys(detected[:20])),
             "cognitive_effect": pattern.get("cognitive_effect", ""),
         }
 
