@@ -4535,10 +4535,11 @@ def compute_frame_shift_interpretation(result: dict):
 
     frame_raw = result.get("frame_shift_score", 0)
     markers = result.get("frame_shift_markers", [])
+    marker_evidence = result.get("frame_shift_marker_evidence", [])
 
     retained_markers = []
     neutralized_markers = []
-    attenuation_reasons = []
+    marker_validation_details = []
 
     real_anchor = result.get("real_anchor_score", 0)
     quantitative = result.get("quantitative_robustness_score", 0)
@@ -4549,46 +4550,64 @@ def compute_frame_shift_interpretation(result: dict):
     threat = result.get("threat_amplification_score", 0)
     omission = result.get("omission_score", 0)
 
-    if real_anchor >= 8:
-        attenuation_reasons.append("ancrage réel élevé")
-
-    if quantitative >= 0.50:
-        attenuation_reasons.append("robustesse quantitative présente")
-
-    if coherence >= 12:
-        attenuation_reasons.append("cohérence discursive élevée")
-
     for marker in markers:
 
-        marker_score = 0
+        validation_reasons = []
+        neutralization_reasons = []
 
-        # Neutralisation contextuelle
+        # -----------------------------
+        # Raisons de neutralisation
+        # -----------------------------
         if real_anchor >= 8:
-            marker_score -= 1
+            neutralization_reasons.append("ancrage réel élevé")
 
         if quantitative >= 0.50:
-            marker_score -= 1
+            neutralization_reasons.append("robustesse quantitative présente")
 
         if coherence >= 12:
-            marker_score -= 1
+            neutralization_reasons.append("cohérence discursive élevée")
 
-        # Validation pénalisante
+        # -----------------------------
+        # Raisons de validation
+        # -----------------------------
         if rhetorical_pressure >= 0.35:
-            marker_score += 1
+            validation_reasons.append("pression rhétorique élevée")
 
         if propaganda >= 0.30:
-            marker_score += 1
+            validation_reasons.append("propagande détectée")
 
         if threat >= 0.30:
-            marker_score += 1
+            validation_reasons.append("amplification de menace")
 
         if omission >= 0.25:
-            marker_score += 1
+            validation_reasons.append("omission stratégique détectée")
+
+        marker_score = len(validation_reasons) - len(neutralization_reasons)
 
         if marker_score > 0:
+            status = "validé"
             retained_markers.append(marker)
         else:
+            status = "neutralisé"
             neutralized_markers.append(marker)
+
+        evidence_item = next(
+            (
+                item for item in marker_evidence
+                if item.get("marker") == marker
+            ),
+            {}
+        )
+
+        marker_validation_details.append({
+            "marker": marker,
+            "status": status,
+            "marker_score": marker_score,
+            "validation_reasons": validation_reasons,
+            "neutralization_reasons": neutralization_reasons,
+            "detection_reason": evidence_item.get("detection_reason", ""),
+            "excerpt": evidence_item.get("excerpt", ""),
+        })
 
     total_markers = max(len(markers), 1)
     retained_ratio = len(retained_markers) / total_markers
@@ -4629,6 +4648,13 @@ def compute_frame_shift_interpretation(result: dict):
             "déplacements de cadre pénalisants."
         )
 
+    attenuation_reasons = []
+
+    for detail in marker_validation_details:
+        for reason in detail.get("neutralization_reasons", []):
+            if reason not in attenuation_reasons:
+                attenuation_reasons.append(reason)
+
     return {
         "frame_shift_raw": round(frame_raw, 3),
         "frame_shift_adjusted": frame_adjusted,
@@ -4641,6 +4667,7 @@ def compute_frame_shift_interpretation(result: dict):
 
         "frame_shift_valid_markers": retained_markers,
         "frame_shift_neutralized_markers": neutralized_markers,
+        "frame_shift_marker_validation_details": marker_validation_details,
 
         "frame_shift_interpretation_v2": interpretation,
 
