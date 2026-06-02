@@ -18423,6 +18423,50 @@ with sr7:
         else:
             st.info("Aucun marqueur neutralisé.")
 
+        st.markdown("**Diagnostic détaillé des marqueurs**")
+
+        details = result.get("frame_shift_marker_validation_details", [])
+        
+        if details:
+            for item in details:
+                marker = item.get("marker", "Marqueur inconnu")
+                status = item.get("status", "non calculé")
+                marker_score = item.get("marker_score", 0)
+        
+                st.markdown(f"**{marker}**")
+                st.write(f"Statut : **{status}**")
+                st.write(f"Score de validation : **{marker_score}**")
+        
+                detection_reason = item.get("detection_reason", "")
+                if detection_reason:
+                    st.caption(f"Détection : {detection_reason}")
+        
+                validation_reasons = item.get("validation_reasons", [])
+                neutralization_reasons = item.get("neutralization_reasons", [])
+        
+                if validation_reasons:
+                    st.markdown("Raisons de validation :")
+                    for reason in validation_reasons:
+                        st.warning(reason)
+                else:
+                    st.info("Aucune raison forte de validation.")
+        
+                if neutralization_reasons:
+                    st.markdown("Raisons de neutralisation :")
+                    for reason in neutralization_reasons:
+                        st.success(reason)
+                else:
+                    st.info("Aucune raison forte de neutralisation.")
+        
+                excerpt = item.get("excerpt", "")
+                if excerpt:
+                    st.markdown("Extrait concerné :")
+                    st.code(excerpt)
+                else:
+                    st.info("Aucun extrait précis disponible.")
+        else:
+            st.info("Aucun diagnostic détaillé disponible.")
+
         st.markdown("**Lecture**")
         st.write(
             "🟢 Faible : cadre stable\n"
