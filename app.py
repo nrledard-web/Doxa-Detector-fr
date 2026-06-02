@@ -16805,7 +16805,7 @@ st.link_button(
     f"mailto:?subject=Analyse DOXA Detector&body={encoded}",
     use_container_width=True
 )
-    st.divider()
+st.divider()
 
     # =============================
     # Triangle cognitif
