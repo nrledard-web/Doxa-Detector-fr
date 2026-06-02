@@ -4465,34 +4465,38 @@ def compute_frame_shift(text: str):
         "markers": hits,
         "interpretation": interpretation,
     }
-# =============================
-# Interprétation du frame shift
-# =============================
 def compute_frame_shift_interpretation(result: dict):
 
     frame_raw = result.get("frame_shift_score", 0)
-
     markers = result.get("frame_shift_markers", [])
 
     retained_markers = []
     neutralized_markers = []
+    attenuation_reasons = []
 
-    # -----------------------------
-    # Forces de contexte
-    # -----------------------------
     real_anchor = result.get("real_anchor_score", 0)
     quantitative = result.get("quantitative_robustness_score", 0)
     coherence = result.get("discursive_coherence_score", 0)
+
     rhetorical_pressure = result.get("rhetorical_pressure", 0)
     propaganda = result.get("propaganda_score", 0)
     threat = result.get("threat_amplification_score", 0)
     omission = result.get("omission_score", 0)
 
+    if real_anchor >= 8:
+        attenuation_reasons.append("ancrage réel élevé")
+
+    if quantitative >= 0.50:
+        attenuation_reasons.append("robustesse quantitative présente")
+
+    if coherence >= 12:
+        attenuation_reasons.append("cohérence discursive élevée")
+
     for marker in markers:
 
         marker_score = 0
 
-        # Facteurs qui neutralisent un faux frame shift
+        # Neutralisation contextuelle
         if real_anchor >= 8:
             marker_score -= 1
 
@@ -4502,7 +4506,7 @@ def compute_frame_shift_interpretation(result: dict):
         if coherence >= 12:
             marker_score -= 1
 
-        # Facteurs qui confirment un vrai frame shift pénalisant
+        # Validation pénalisante
         if rhetorical_pressure >= 0.35:
             marker_score += 1
 
@@ -4515,49 +4519,75 @@ def compute_frame_shift_interpretation(result: dict):
         if omission >= 0.25:
             marker_score += 1
 
-        # Marqueur retenu = vrai frame shift pénalisant
         if marker_score > 0:
             retained_markers.append(marker)
         else:
             neutralized_markers.append(marker)
 
     total_markers = max(len(markers), 1)
-
     retained_ratio = len(retained_markers) / total_markers
+    neutralized_ratio = len(neutralized_markers) / total_markers
 
-    frame_adjusted = frame_raw * retained_ratio
-    frame_adjusted = max(0, min(frame_adjusted, 1))
-
-    legitimacy = len(neutralized_markers) / total_markers
-    illegitimacy = len(retained_markers) / total_markers
-    balance = legitimacy - illegitimacy
+    frame_adjusted = round(max(0, min(frame_raw * retained_ratio, 1)), 3)
+    attenuation = round(1 - retained_ratio, 3)
 
     if len(markers) == 0:
+        status = "non détectée"
         interpretation = "Aucun déplacement de cadre notable détecté."
+
     elif len(retained_markers) == 0:
-        interpretation = "Les marqueurs détectés semblent principalement explicatifs ou contextuels."
-    elif retained_ratio < 0.35:
-        interpretation = "Quelques déplacements de cadre sont retenus, mais la majorité semble contextuelle."
-    elif retained_ratio < 0.65:
-        interpretation = "Le texte contient plusieurs déplacements de cadre partiellement orientants."
+        status = "neutralisée"
+        interpretation = (
+            "Les marqueurs détectés semblent principalement explicatifs "
+            "ou contextuels."
+        )
+
+    elif len(retained_markers) == 1:
+        status = "validée faiblement"
+        interpretation = (
+            "Un marqueur de déplacement de cadre est retenu, "
+            "mais son poids reste faible dans l’analyse globale."
+        )
+
+    elif retained_ratio < 0.50:
+        status = "atténuée"
+        interpretation = (
+            "Plusieurs marqueurs sont détectés, mais une partie importante "
+            "semble neutralisée par le contexte."
+        )
+
     else:
-        interpretation = "La majorité des marqueurs détectés correspond à de vrais déplacements de cadre pénalisants."
+        status = "validée"
+        interpretation = (
+            "La majorité des marqueurs détectés correspond à de vrais "
+            "déplacements de cadre pénalisants."
+        )
 
     return {
         "frame_shift_raw": round(frame_raw, 3),
-        "frame_shift_adjusted": round(frame_adjusted, 3),
+        "frame_shift_adjusted": frame_adjusted,
 
         "frame_shift_retained_ratio": round(retained_ratio, 3),
-        "frame_shift_legitimacy": round(legitimacy, 3),
-        "frame_shift_illegitimacy": round(illegitimacy, 3),
-        "frame_shift_balance": round(balance, 3),
+        "frame_shift_neutralized_ratio": round(neutralized_ratio, 3),
+        "frame_shift_legitimacy": round(neutralized_ratio, 3),
+        "frame_shift_illegitimacy": round(retained_ratio, 3),
+        "frame_shift_balance": round(neutralized_ratio - retained_ratio, 3),
 
         "frame_shift_valid_markers": retained_markers,
         "frame_shift_neutralized_markers": neutralized_markers,
 
         "frame_shift_interpretation_v2": interpretation,
-    }
 
+        "frame_shift_validation": {
+            "status": status,
+            "attenuation": attenuation,
+            "attenuation_reasons": attenuation_reasons,
+            "validated_markers": retained_markers,
+            "neutralized_markers": neutralized_markers,
+            "suspect_markers": retained_markers,
+            "interpretation": interpretation,
+        },
+    }
 
 # =========================================================
 # ASYMÉTRIE ARGUMENTATIVE
