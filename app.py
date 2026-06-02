@@ -4537,7 +4537,8 @@ def compute_frame_shift_interpretation(result: dict):
     markers = result.get("frame_shift_markers", [])
     marker_evidence = result.get("frame_shift_marker_evidence", [])
 
-    retained_markers = []
+    validated_markers = []
+    contested_markers = []
     neutralized_markers = []
     marker_validation_details = []
 
@@ -4555,28 +4556,9 @@ def compute_frame_shift_interpretation(result: dict):
         validation_reasons = []
         neutralization_reasons = []
 
-        # Neutralisation contextuelle
-        if real_anchor >= 8 and marker not in [
-            "souveraineté énergétique",
-            "sécurité économique",
-            "indépendance nationale",
-            "bascule nuance → certitude/menace",
-        ]:
-            neutralization_reasons.append("ancrage réel élevé")
-
-        if quantitative >= 0.50 and marker not in [
-            "souveraineté énergétique",
-            "sécurité économique",
-            "indépendance nationale",
-        ]:
-            neutralization_reasons.append("robustesse quantitative présente")
-
-        if coherence >= 12 and marker not in [
-            "bascule nuance → certitude/menace",
-        ]:
-            neutralization_reasons.append("cohérence discursive élevée")
-
-        # Validation contextuelle générale
+        # -----------------------------
+        # Validation générale
+        # -----------------------------
         if rhetorical_pressure >= 0.35:
             validation_reasons.append("pression rhétorique élevée")
 
@@ -4589,7 +4571,9 @@ def compute_frame_shift_interpretation(result: dict):
         if omission >= 0.25:
             validation_reasons.append("omission stratégique détectée")
 
-        # Validation spécifique par marqueur
+        # -----------------------------
+        # Validation spécifique
+        # -----------------------------
         if marker == "souveraineté énergétique":
             validation_reasons.append(
                 "recadrage du débat climatique vers la souveraineté"
@@ -4610,17 +4594,50 @@ def compute_frame_shift_interpretation(result: dict):
                 "glissement d'un registre prudent vers une conclusion plus catégorique ou menaçante"
             )
 
+        # -----------------------------
+        # Neutralisation spécifique
+        # -----------------------------
+        if coherence >= 12:
+            neutralization_reasons.append(
+                "cohérence discursive élevée"
+            )
+
+        if real_anchor >= 8 and marker not in [
+            "souveraineté énergétique",
+            "sécurité économique",
+            "indépendance nationale",
+            "bascule nuance → certitude/menace",
+        ]:
+            neutralization_reasons.append(
+                "ancrage réel élevé"
+            )
+
+        if quantitative >= 0.50 and marker not in [
+            "souveraineté énergétique",
+            "sécurité économique",
+            "indépendance nationale",
+            "bascule nuance → certitude/menace",
+        ]:
+            neutralization_reasons.append(
+                "robustesse quantitative présente"
+            )
+
         marker_score = (
             len(validation_reasons)
             - len(neutralization_reasons)
         )
 
-        if marker_score > 0:
-            status = "validé"
-            retained_markers.append(marker)
-        else:
+        if len(validation_reasons) == 0:
             status = "neutralisé"
             neutralized_markers.append(marker)
+
+        elif marker_score <= 0:
+            status = "contesté"
+            contested_markers.append(marker)
+
+        else:
+            status = "validé"
+            validated_markers.append(marker)
 
         evidence_item = next(
             (
@@ -4641,39 +4658,58 @@ def compute_frame_shift_interpretation(result: dict):
         })
 
     total_markers = max(len(markers), 1)
-    retained_ratio = len(retained_markers) / total_markers
+
+    validated_ratio = len(validated_markers) / total_markers
+    contested_ratio = len(contested_markers) / total_markers
     neutralized_ratio = len(neutralized_markers) / total_markers
 
+    # Les marqueurs contestés comptent partiellement.
     frame_adjusted = round(
-        max(0, min(frame_raw * retained_ratio, 1)),
+        max(
+            0,
+            min(
+                frame_raw * (validated_ratio + contested_ratio * 0.35),
+                1
+            )
+        ),
         3
     )
 
-    attenuation = round(1 - retained_ratio, 3)
+    attenuation = round(
+        1 - (validated_ratio + contested_ratio * 0.35),
+        3
+    )
 
     if len(markers) == 0:
         status = "non détectée"
         interpretation = "Aucun déplacement de cadre notable détecté."
 
-    elif len(retained_markers) == 0:
+    elif len(validated_markers) == 0 and len(contested_markers) == 0:
         status = "neutralisée"
         interpretation = (
             "Les marqueurs détectés semblent principalement explicatifs "
             "ou contextuels."
         )
 
-    elif len(retained_markers) == 1:
+    elif len(validated_markers) == 0 and len(contested_markers) > 0:
+        status = "contestée"
+        interpretation = (
+            "Des déplacements de cadre existent, mais ils sont fortement "
+            "contrebalancés par la cohérence ou le contexte du texte."
+        )
+
+    elif len(validated_markers) == 1:
         status = "validée faiblement"
         interpretation = (
             "Un marqueur de déplacement de cadre est retenu, "
-            "mais son poids reste faible dans l’analyse globale."
+            "mais son poids reste limité."
         )
 
-    elif retained_ratio < 0.50:
+    elif validated_ratio < 0.50:
         status = "atténuée"
         interpretation = (
-            "Plusieurs marqueurs sont détectés, mais une partie importante "
-            "semble neutralisée par le contexte."
+            "Plusieurs déplacements de cadre sont présents, mais une partie "
+            "reste contestée ou contextualisée."
         )
 
     else:
@@ -4694,14 +4730,14 @@ def compute_frame_shift_interpretation(result: dict):
         "frame_shift_raw": round(frame_raw, 3),
         "frame_shift_adjusted": frame_adjusted,
 
-        "frame_shift_retained_ratio": round(retained_ratio, 3),
+        "frame_shift_validated_ratio": round(validated_ratio, 3),
+        "frame_shift_contested_ratio": round(contested_ratio, 3),
         "frame_shift_neutralized_ratio": round(neutralized_ratio, 3),
-        "frame_shift_legitimacy": round(neutralized_ratio, 3),
-        "frame_shift_illegitimacy": round(retained_ratio, 3),
-        "frame_shift_balance": round(neutralized_ratio - retained_ratio, 3),
 
-        "frame_shift_valid_markers": retained_markers,
+        "frame_shift_valid_markers": validated_markers,
+        "frame_shift_contested_markers": contested_markers,
         "frame_shift_neutralized_markers": neutralized_markers,
+
         "frame_shift_marker_validation_details": marker_validation_details,
 
         "frame_shift_interpretation_v2": interpretation,
@@ -4710,9 +4746,10 @@ def compute_frame_shift_interpretation(result: dict):
             "status": status,
             "attenuation": attenuation,
             "attenuation_reasons": attenuation_reasons,
-            "validated_markers": retained_markers,
+            "validated_markers": validated_markers,
+            "contested_markers": contested_markers,
             "neutralized_markers": neutralized_markers,
-            "suspect_markers": retained_markers,
+            "suspect_markers": validated_markers + contested_markers,
             "interpretation": interpretation,
         },
     }
