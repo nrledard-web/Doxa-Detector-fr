@@ -16805,120 +16805,6 @@ st.link_button(
     f"mailto:?subject=Analyse DOXA Detector&body={encoded}",
     use_container_width=True
 )
-# =============================
-# Analyse sémantique du discours
-# =============================
-
-st.subheader("Analyse sémantique du discours")
-st.caption(
-    "Analyse la cohérence du sens et la stabilité conceptuelle du discours afin d’affiner l’évaluation épistémique."
-)
-
-semantic_score = result.get("semantic_score", None)
-
-if st.session_state.get("semantic_mode", False):
-
-    if semantic_score is not None:
-
-        st.progress(semantic_score / 20)
-        st.caption(f"Score sémantique : {semantic_score}/20")
-
-        delta = round(semantic_score - base_score, 1)
-
-        st.metric(
-            "Influence sémantique sur l’évaluation épistémique",
-            f"{delta:+}/20"
-        )
-
-    else:
-        st.info("Analyse sémantique activée, mais aucun score n’est encore calculé.")
-
-else:
-    st.info("Activez l’analyse sémantique pour calculer cette jauge.")
-
-# -----------------------------
-# Mode sémantique
-# -----------------------------
-if "semantic_mode" not in st.session_state:
-    st.session_state.semantic_mode = False
-
-st.markdown("### Analyse sémantique")
-st.caption(
-    "Cette analyse sémantique sert à corroborer les jauges ayant déclenché des pénalités. "
-    "Elle vérifie si le sens réel des affirmations confirme les signaux détectés "
-    "par l’analyse analogique du langage."
-)
-
-if st.button(
-    "Activer l’analyse sémantique",
-    key="semantic_normal",
-    use_container_width=True
-):
-    st.session_state.semantic_mode = True
-
-if st.session_state.semantic_mode:
-    st.success("Analyse sémantique activée.")
-else:
-    st.info(
-    "Analyse sémantique inactive. Les pénalités reposent uniquement "
-    "sur l’analyse analogique du discours."
-)
-
-sp1, col_center, sp2 = st.columns([2,3,2])
-
-with col_center:
-
-    st.markdown("### 🧠 Modules d’analyse DOXA")
-
-    with st.expander("🧠 Voir le résumé complet des pénalités", expanded=False):
-
-        # =============================
-        # Pénalités appliquées
-        # =============================
-
-        st.markdown("### Pénalités appliquées")
-
-        # =============================
-        # Résumé chiffré
-        # =============================
-        
-
-        colp1, colp2, colp3 = st.columns(3)
-
-        with colp1:
-            st.metric(
-                "Pénalité crédibilité",
-                round(result.get("credibility_penalty_total", 0), 2)
-            )
-
-        with colp2:
-            st.metric(
-                "Boost mensonge",
-                round(result.get("lie_boost_total", 0), 2)
-            )
-
-        with colp3:
-            st.metric(
-                "Score final",
-                f"{result.get('final_credibility_score', result['hard_fact_score'])}/20"
-            )
-
-        st.caption(
-            "Les pénalités corrigent le score lorsque le texte accumule des signaux "
-            "de fermeture cognitive, de manipulation ou de raisonnement fragile."
-        )
-
-        with st.expander("Voir le détail des pénalités"):
-            st.write(result.get("weighted_red_flags", []))
-
-
-    st.divider()
-
-    st.subheader("Diagnostic cognitif")
-    life_score = round((result["hard_fact_score"] / 20) * 100, 1)
-    mecroyance_bar = max(0.0, min(1.0, (result["M"] + 10) / 30))
-
-
     st.divider()
 
     # =============================
@@ -21823,6 +21709,119 @@ st.markdown("""
 ──── 🧠 ────
 </div>
 """, unsafe_allow_html=True)
+
+# =============================
+# Analyse sémantique du discours
+# =============================
+
+st.subheader("Analyse sémantique du discours")
+st.caption(
+    "Analyse la cohérence du sens et la stabilité conceptuelle du discours afin d’affiner l’évaluation épistémique."
+)
+
+semantic_score = result.get("semantic_score", None)
+
+if st.session_state.get("semantic_mode", False):
+
+    if semantic_score is not None:
+
+        st.progress(semantic_score / 20)
+        st.caption(f"Score sémantique : {semantic_score}/20")
+
+        delta = round(semantic_score - base_score, 1)
+
+        st.metric(
+            "Influence sémantique sur l’évaluation épistémique",
+            f"{delta:+}/20"
+        )
+
+    else:
+        st.info("Analyse sémantique activée, mais aucun score n’est encore calculé.")
+
+else:
+    st.info("Activez l’analyse sémantique pour calculer cette jauge.")
+
+# -----------------------------
+# Mode sémantique
+# -----------------------------
+if "semantic_mode" not in st.session_state:
+    st.session_state.semantic_mode = False
+
+st.markdown("### Analyse sémantique")
+st.caption(
+    "Cette analyse sémantique sert à corroborer les jauges ayant déclenché des pénalités. "
+    "Elle vérifie si le sens réel des affirmations confirme les signaux détectés "
+    "par l’analyse analogique du langage."
+)
+
+if st.button(
+    "Activer l’analyse sémantique",
+    key="semantic_normal",
+    use_container_width=True
+):
+    st.session_state.semantic_mode = True
+
+if st.session_state.semantic_mode:
+    st.success("Analyse sémantique activée.")
+else:
+    st.info(
+    "Analyse sémantique inactive. Les pénalités reposent uniquement "
+    "sur l’analyse analogique du discours."
+)
+
+sp1, col_center, sp2 = st.columns([2,3,2])
+
+with col_center:
+
+    st.markdown("### 🧠 Modules d’analyse DOXA")
+
+    with st.expander("🧠 Voir le résumé complet des pénalités", expanded=False):
+
+        # =============================
+        # Pénalités appliquées
+        # =============================
+
+        st.markdown("### Pénalités appliquées")
+
+        # =============================
+        # Résumé chiffré
+        # =============================
+        
+
+        colp1, colp2, colp3 = st.columns(3)
+
+        with colp1:
+            st.metric(
+                "Pénalité crédibilité",
+                round(result.get("credibility_penalty_total", 0), 2)
+            )
+
+        with colp2:
+            st.metric(
+                "Boost mensonge",
+                round(result.get("lie_boost_total", 0), 2)
+            )
+
+        with colp3:
+            st.metric(
+                "Score final",
+                f"{result.get('final_credibility_score', result['hard_fact_score'])}/20"
+            )
+
+        st.caption(
+            "Les pénalités corrigent le score lorsque le texte accumule des signaux "
+            "de fermeture cognitive, de manipulation ou de raisonnement fragile."
+        )
+
+        with st.expander("Voir le détail des pénalités"):
+            st.write(result.get("weighted_red_flags", []))
+
+
+    st.divider()
+
+    st.subheader("Diagnostic cognitif")
+    life_score = round((result["hard_fact_score"] / 20) * 100, 1)
+    mecroyance_bar = max(0.0, min(1.0, (result["M"] + 10) / 30))
 
 # -----------------------------
 # Synthèse critique IA
