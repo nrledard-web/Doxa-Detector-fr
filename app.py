@@ -4382,9 +4382,33 @@ def compute_victimization(text: str):
         "markers": unique_keep_order(hits),
         "interpretation": interpretation,
     }
+
+def extract_evidence_window(text: str, terms: list, window: int = 220) -> str:
+    if not text:
+        return ""
+
+    text_lower = text.lower()
+
+    positions = []
+
+    for term in terms:
+        term_lower = term.lower()
+        index = text_lower.find(term_lower)
+        if index != -1:
+            positions.append(index)
+
+    if not positions:
+        return ""
+
+    start = max(0, min(positions) - window)
+    end = min(len(text), max(positions) + window)
+
+    return text[start:end].strip()
 # =========================================================
 # FRAME SHIFT
 # =========================================================
+evidence = []
+
 def compute_frame_shift(text: str):
     if not text or not text.strip():
         return {
@@ -4399,6 +4423,14 @@ def compute_frame_shift(text: str):
         term for term in FRAME_SHIFT_TERMS
         if contains_term(t, term)
     ])
+    for marker in hits:
+    excerpt = extract_evidence_window(text, [marker])
+
+    evidence.append({
+        "marker": marker,
+        "excerpt": excerpt,
+        "detection_reason": "marqueur lexical de déplacement du cadre",
+    })
 
     # Marqueurs de transition / bascule
     shift_connectors = [
@@ -4443,10 +4475,39 @@ def compute_frame_shift(text: str):
     has_certainty_or_threat = any(term in t for term in certainty_or_threat_terms)
 
     if has_connector and has_nuance and has_certainty_or_threat:
-        hits.append("bascule nuance → certitude/menace")
-
+        marker = "bascule nuance → certitude/menace"
+        hits.append(marker)
+    
+        excerpt = extract_evidence_window(
+            text,
+            shift_connectors + nuance_terms + certainty_or_threat_terms
+        )
+    
+        evidence.append({
+            "marker": marker,
+            "excerpt": excerpt,
+            "detection_reason": (
+                "présence conjointe d’un connecteur de bascule, "
+                "d’une nuance prudente et d’un terme de certitude ou de menace"
+            ),
+        })
+    
     elif has_nuance and has_certainty_or_threat:
-        hits.append("coexistence nuance prudente / conclusion forte")
+        marker = "coexistence nuance prudente / conclusion forte"
+        hits.append(marker)
+    
+        excerpt = extract_evidence_window(
+            text,
+            nuance_terms + certainty_or_threat_terms
+        )
+    
+        evidence.append({
+            "marker": marker,
+            "excerpt": excerpt,
+            "detection_reason": (
+                "coexistence d’une formulation prudente et d’une conclusion forte"
+            ),
+        })
 
     hits = unique_keep_order(hits)
     score = min(len(hits) * 0.12, 1.0)
@@ -4463,8 +4524,10 @@ def compute_frame_shift(text: str):
     return {
         "score": round(score, 3),
         "markers": hits,
+        "marker_evidence": evidence,
         "interpretation": interpretation,
     }
+    
 def compute_frame_shift_interpretation(result: dict):
 
     frame_raw = result.get("frame_shift_score", 0)
