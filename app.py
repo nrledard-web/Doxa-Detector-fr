@@ -11713,6 +11713,15 @@ def analyze_article(text: str) -> Dict:
         reported_speech_reduction,
         3
     )
+    # -----------------------------
+    # frame shift
+    # -----------------------------
+    frame_shift = compute_frame_shift(text)
+
+    result["frame_shift_score"] = frame_shift["score"]
+    result["frame_shift_markers"] = frame_shift["markers"]
+    result["frame_shift_interpretation"] = frame_shift["interpretation"]
+    result["frame_shift_marker_evidence"] = frame_shift.get("marker_evidence", [])
     
     # -----------------------------
     # Interprétation frame shift
