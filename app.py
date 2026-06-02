@@ -16807,20 +16807,20 @@ st.link_button(
 )
 st.divider()
 
-    # =============================
-    # Triangle cognitif
-    # =============================
-    st.subheader("Triangle cognitif G-N-D")
-    st.caption(
-        "Le triangle G–N–D positionne un texte selon trois forces : "
-        "savoir articulé (G), compréhension intégrée (N) et certitude stabilisée (D). "
-        "L’équilibre entre ces dimensions permet d’observer si le discours demeure ouvert, "
-        "fragile, surchargé ou cognitivement fermé. "
-        "👉 Si un texte sort du triangle, cela suggère une configuration atypique ou instable."
-    )
-    
-    fig_triangle = plot_cognitive_triangle_3d(result["G"], result["N"], result["D"])
-    st.pyplot(fig_triangle, use_container_width=True)
+# =============================
+# Triangle cognitif
+# =============================
+st.subheader("Triangle cognitif G-N-D")
+st.caption(
+    "Le triangle G–N–D positionne un texte selon trois forces : "
+    "savoir articulé (G), compréhension intégrée (N) et certitude stabilisée (D). "
+    "L’équilibre entre ces dimensions permet d’observer si le discours demeure ouvert, "
+    "fragile, surchargé ou cognitivement fermé. "
+    "👉 Si un texte sort du triangle, cela suggère une configuration atypique ou instable."
+)
+
+fig_triangle = plot_cognitive_triangle_3d(result["G"], result["N"], result["D"])
+st.pyplot(fig_triangle, use_container_width=True)
 
 
 st.divider()
