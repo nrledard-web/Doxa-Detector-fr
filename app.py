@@ -18436,7 +18436,6 @@ with sr7:
             "frame_shift_interpretation_v2",
             result.get("frame_shift_interpretation", "")
         )
-    )
 
     validation = result.get("frame_shift_validation", {})
 
