@@ -18577,7 +18577,7 @@ with sr7:
         )
         
         st.write(
-            f"Atténuation : **{round(validation.get('attenuation', 0) * 100, 1)}%**"
+            f"Légitimation contextuelle : **{round(validation.get('context_legitimation', 0) * 100, 1)}%**"
         )
         
         st.write(
