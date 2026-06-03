@@ -12521,6 +12521,15 @@ def detect_rhetorical_structures(text: str):
             "hier", "demain", "histoire", "destin", "peuple", "nation"
         ],
 
+        "historique": [
+            "histoire", "historique", "siècle", "époque", "antiquité",
+            "premier siècle", "nouveau testament", "évangiles", "bible",
+            "christianisme", "chrétien", "chrétiens", "rabbin",
+            "paul", "pierre", "jean", "théologiens", "historiens",
+            "universitaires", "sources anciennes", "preuve matérielle",
+            "existence historique", "mythe", "mythologie religieuse"
+        ],
+
         "poeticite": [
             "ombre", "lumière", "silence", "flamme", "ciel", "âme",
             "souffle", "écho", "chant", "nuit", "soleil", "sang"
@@ -12884,10 +12893,11 @@ def detect_discourse_type_from_rhetoric(text: str, rhetorical_scores: dict):
     # =====================================================
     # Historique
     # =====================================================
-    scores["historique"] += rhetorical_scores.get("historique", 0) * 1.8
-    scores["historique"] += rhetorical_scores.get("encyclopedique", 0) * 0.35
+    scores["historique"] += rhetorical_scores.get("historique", 0) * 2.4
+    scores["historique"] += rhetorical_scores.get("encyclopedique", 0) * 0.55
     scores["historique"] += rhetorical_scores.get("biographique", 0) * 0.25
-    scores["historique"] += rhetorical_scores.get("mythique", 0) * 0.20
+    scores["historique"] += rhetorical_scores.get("mythique", 0) * 0.35
+    scores["historique"] += rhetorical_scores.get("reported_discourse_factor", 0) * 0.60
     
     # Cas typique : article sur personnages, sources anciennes, religions, textes anciens
     if (
