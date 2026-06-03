@@ -18611,7 +18611,7 @@ with sr7:
                     st.info("Aucune raison forte de validation.")
         
                 if neutralization_reasons:
-                    st.markdown("Raisons de neutralisation :")
+                    st.markdown("Facteurs de légitimité :")
                     for reason in neutralization_reasons:
                         st.success(reason)
                 else:
