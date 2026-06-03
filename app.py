@@ -18446,13 +18446,7 @@ with sr7:
             f"— légitimation contextuelle : "
             f"{round(validation.get('context_legitimation', 0) * 100, 1)}%"
         )
-    
-        st.caption(
-            validation.get(
-                "interpretation",
-                ""
-            )
-        )
+    )
 
     with st.expander("🔎 Voir les marqueurs", expanded=False):
         markers = result.get("frame_shift_markers", [])
