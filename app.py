@@ -18481,8 +18481,30 @@ with sr7:
         st.markdown("**Formule utilisée**")
         st.code(
             "markers = déplacements de cadre détectés\n"
-            "score = min(len(markers) * coefficient / 10, 1.0)",
+            "score_brut = min(len(markers) * coefficient / 10, 1.0)\n\n"
+            "légitimité = cohérence_discursive + ancrage_réel + robustesse_quantitative\n"
+            "aggravation = pression_rhétorique + propagande + menace + omission\n"
+            "balance = aggravation - légitimité\n\n"
+            "score_corrigé = score_brut * (part_illégitime + 0.35 * part_contestée)",
             language="python"
+        )
+        st.markdown("**Nature de l’analyse**")
+
+        st.write(
+            "Cette jauge repose sur des marqueurs lexicaux, "
+            "des structures discursives et des heuristiques analogiques. "
+            "Elle ne prétend pas produire une compréhension sémantique profonde du texte."
+        )
+        
+        st.markdown("**Formules de qualification contextuelle**")
+        
+        st.code(
+            "détection = présence de marqueurs lexicaux ou structurels\n\n"
+            "légitimité = cohérence_discursive + ancrage_réel + robustesse_quantitative\n\n"
+            "aggravation = pression_rhétorique + propagande + menace + omission\n\n"
+            "balance = aggravation - légitimité\n\n"
+            "score_corrigé = score_brut * (part_illégitime + 0.35 * part_contestée)",
+            language="text"
         )
 
         markers = result.get("frame_shift_markers", [])
