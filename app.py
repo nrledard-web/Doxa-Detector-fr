@@ -4797,7 +4797,6 @@ def compute_frame_shift_interpretation(result: dict):
             "status": status,
             "context_legitimation": attenuation,
             "illegitimate_markers": illegitimate_markers,
-                illegitimate_markers,
 
             "contested_markers":
                 contested_markers,
