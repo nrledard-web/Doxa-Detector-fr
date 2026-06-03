@@ -18519,12 +18519,12 @@ with sr7:
         
         st.metric(
             "Marqueurs retenus",
-            f"{len(result.get('frame_shift_valid_markers', []))} / {len(result.get('frame_shift_markers', []))}"
+            f"{len(result.get('frame_shift_illegitimate_markers', []))} / {len(result.get('frame_shift_markers', []))}"
         )
         
         st.metric(
             "Marqueurs neutralisés",
-            f"{len(result.get('frame_shift_neutralized_markers', []))} / {len(result.get('frame_shift_markers', []))}"
+            f"{len(result.get('frame_shift_legitimate_markers', []))} / {len(result.get('frame_shift_markers', []))}"
         )
         
         validation = result.get("frame_shift_validation", {})
@@ -18559,7 +18559,7 @@ with sr7:
         
         st.markdown("**Marqueurs retenus dans le calcul**")
         
-        valid_markers = result.get("frame_shift_valid_markers", [])
+        valid_markers = result.get("frame_shift_illegitimate_markers", [])
         
         if valid_markers:
             for marker in valid_markers:
@@ -18574,7 +18574,7 @@ with sr7:
         
         st.markdown("**Marqueurs neutralisés**")
         
-        neutralized_markers = result.get("frame_shift_neutralized_markers", [])
+        neutralized_markers = result.get("frame_shift_legitimate_markers", [])
         
         if neutralized_markers:
             for marker in neutralized_markers:
