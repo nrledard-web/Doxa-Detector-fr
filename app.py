@@ -18443,7 +18443,8 @@ with sr7:
     if validation:
         st.caption(
             f"Validation contextuelle : {validation.get('status', 'non calculée')} "
-            f"— atténuation : {round(validation.get('attenuation', 0) * 100, 1)}%"
+            f"— légitimation contextuelle : "
+            f"{round(validation.get('context_legitimation', 0) * 100, 1)}%"
         )
     
         st.caption(
