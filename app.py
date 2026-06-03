@@ -4639,31 +4639,24 @@ def compute_frame_shift_interpretation(result: dict):
         )
 
         if not shift_detected:
-
+        
             status = "légitime"
-
             legitimate_markers.append(marker)
-
+        
         else:
-
+        
             balance = aggravation_strength - legitimacy_strength
-
+        
             if balance >= 2:
-
                 status = "illégitime"
-
                 illegitimate_markers.append(marker)
-
-            elif balance <= -1:
-
-                status = "légitime"
-
-                legitimate_markers.append(marker)
-
-            else:
-
+        
+            elif legitimacy_strength > 0 and aggravation_strength == 0:
                 status = "contesté"
-
+                contested_markers.append(marker)
+        
+            else:
+                status = "contesté"
                 contested_markers.append(marker)
 
         marker_validation_details.append({
