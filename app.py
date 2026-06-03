@@ -18503,6 +18503,11 @@ with sr7:
                 st.warning(marker)
         else:
             st.success("Aucun marqueur retenu comme frame shift pénalisant.")
+
+        st.metric(
+            "Marqueurs contestés",
+            f"{len(result.get('frame_shift_contested_markers', []))} / {len(result.get('frame_shift_markers', []))}"
+        )
         
         st.markdown("**Marqueurs neutralisés**")
         
