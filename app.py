@@ -12748,6 +12748,7 @@ def detect_discourse_type_from_rhetoric(text: str, rhetorical_scores: dict):
         "biographique": 0,
         "fictionnel": 0,
         "mythique": 0,
+        "historique": 0,
     }
 
     scores["pamphlétaire"] += rhetorical_scores.get("attaque", 0) * 1.6
@@ -12785,10 +12786,12 @@ def detect_discourse_type_from_rhetoric(text: str, rhetorical_scores: dict):
     scores["scientifique"] += rhetorical_scores.get("technicite", 0) * 1.1
     scores["scientifique"] += rhetorical_scores.get("dissimulation_attenuation", 0) * 0.3
 
-    scores["journalistique"] += rhetorical_scores.get("technicite", 0) * 0.45
+    scores["journalistique"] += rhetorical_scores.get("technicite", 0) * 0.35
     scores["journalistique"] += rhetorical_scores.get("narrativité", 0) * 0.35
-    scores["journalistique"] += rhetorical_scores.get("coherence_performative", 0) * 0.15
-    scores["journalistique"] += rhetorical_scores.get("saturation_rhetorique", 0) * 0.20
+    scores["journalistique"] += rhetorical_scores.get("coherence_performative", 0) * 0.10
+    scores["journalistique"] += rhetorical_scores.get("saturation_rhetorique", 0) * 0.10
+    scores["journalistique"] += rhetorical_scores.get("reported_discourse_factor", 0) * 1.2
+    scores["journalistique"] += rhetorical_scores.get("encyclopedique", 0) * 0.35
 
     scores["technocratique"] += rhetorical_scores.get("dissimulation_attenuation", 0) * 1.8
     scores["technocratique"] += rhetorical_scores.get("technicite", 0) * 0.5
@@ -12877,6 +12880,21 @@ def detect_discourse_type_from_rhetoric(text: str, rhetorical_scores: dict):
     
     scores["mythique"] += rhetorical_scores.get("mythique", 0) * 1.3
     scores["mythique"] += rhetorical_scores.get("abstraction", 0) * 0.15
+    
+    # =====================================================
+    # Historique
+    # =====================================================
+    scores["historique"] += rhetorical_scores.get("historique", 0) * 1.8
+    scores["historique"] += rhetorical_scores.get("encyclopedique", 0) * 0.35
+    scores["historique"] += rhetorical_scores.get("biographique", 0) * 0.25
+    scores["historique"] += rhetorical_scores.get("mythique", 0) * 0.20
+    
+    # Cas typique : article sur personnages, sources anciennes, religions, textes anciens
+    if (
+        rhetorical_scores.get("religieux", 0) > 0.15
+        and rhetorical_scores.get("encyclopedique", 0) > 0.15
+    ):
+        scores["historique"] += 0.35
 
     scores["philosophique"] += rhetorical_scores.get("compression_cognitive", 0) * 0.03
     scores["pamphlétaire"] += rhetorical_scores.get("compression_cognitive", 0) * 0.3
