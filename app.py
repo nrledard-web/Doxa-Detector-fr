@@ -18497,6 +18497,19 @@ with sr7:
         )
         
         st.markdown("**Formules de qualification contextuelle**")
+
+        st.code(
+            "recadrage détecté\n"
+            "↓\n"
+            "évaluation du contexte\n\n"
+            "contexte fortement orientant\n"
+            "→ illégitime\n\n"
+            "contexte ambigu ou discutable\n"
+            "→ contesté\n\n"
+            "contexte principalement justificatif\n"
+            "→ légitime",
+            language="text"
+        )
         
         st.code(
             "détection = présence de marqueurs lexicaux ou structurels\n\n"
@@ -18533,12 +18546,17 @@ with sr7:
         )
         
         st.metric(
-            "Marqueurs retenus",
+            "Marqueurs illégitimes",
             f"{len(result.get('frame_shift_illegitimate_markers', []))} / {len(result.get('frame_shift_markers', []))}"
         )
         
         st.metric(
-            "Marqueurs neutralisés",
+            "Marqueurs contestés",
+            f"{len(result.get('frame_shift_contested_markers', []))} / {len(result.get('frame_shift_markers', []))}"
+        )
+        
+        st.metric(
+            "Marqueurs légitimes",
             f"{len(result.get('frame_shift_legitimate_markers', []))} / {len(result.get('frame_shift_markers', []))}"
         )
         
@@ -18572,30 +18590,44 @@ with sr7:
         st.markdown("**Raisons de l’atténuation :**")
         st.write(validation.get("attenuation_reasons", []))
         
-        st.markdown("**Marqueurs retenus dans le calcul**")
+        st.markdown("**Marqueurs illégitimes**")
         
-        valid_markers = result.get("frame_shift_illegitimate_markers", [])
+        for marker in result.get(
+            "frame_shift_illegitimate_markers",
+            []
+        ):
+            st.error(marker)
         
-        if valid_markers:
-            for marker in valid_markers:
-                st.warning(marker)
-        else:
-            st.success("Aucun marqueur retenu comme frame shift pénalisant.")
-
-        st.metric(
-            "Marqueurs contestés",
-            f"{len(result.get('frame_shift_contested_markers', []))} / {len(result.get('frame_shift_markers', []))}"
-        )
+        if not result.get("frame_shift_illegitimate_markers"):
+            st.success(
+                "Aucun marqueur considéré comme illégitime."
+            )
         
-        st.markdown("**Marqueurs neutralisés**")
+        st.markdown("**Marqueurs contestés**")
         
-        neutralized_markers = result.get("frame_shift_legitimate_markers", [])
+        for marker in result.get(
+            "frame_shift_contested_markers",
+            []
+        ):
+            st.warning(marker)
         
-        if neutralized_markers:
-            for marker in neutralized_markers:
-                st.success(marker)
-        else:
-            st.info("Aucun marqueur neutralisé.")
+        if not result.get("frame_shift_contested_markers"):
+            st.success(
+                "Aucun marqueur contesté."
+            )
+        
+        st.markdown("**Marqueurs légitimes**")
+        
+        for marker in result.get(
+            "frame_shift_legitimate_markers",
+            []
+        ):
+            st.success(marker)
+        
+        if not result.get("frame_shift_legitimate_markers"):
+            st.info(
+                "Aucun marqueur légitime."
+            )
 
         st.markdown("**Diagnostic détaillé des marqueurs**")
 
