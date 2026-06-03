@@ -18434,19 +18434,22 @@ with sr7:
     st.caption(
         result.get(
             "frame_shift_interpretation_v2",
-            result.get("frame_shift_interpretation", "")
+            result.get(
+                "frame_shift_interpretation",
+                ""
+            )
+        )
     )
-
+    
     validation = result.get("frame_shift_validation", {})
-
+    
     if validation:
         st.caption(
             f"Validation contextuelle : {validation.get('status', 'non calculée')} "
             f"— légitimation contextuelle : "
             f"{round(validation.get('context_legitimation', 0) * 100, 1)}%"
         )
-    )
-
+    
     with st.expander("🔎 Voir les marqueurs", expanded=False):
         markers = result.get("frame_shift_markers", [])
         if not markers:
