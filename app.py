@@ -4537,9 +4537,10 @@ def compute_frame_shift_interpretation(result: dict):
     markers = result.get("frame_shift_markers", [])
     marker_evidence = result.get("frame_shift_marker_evidence", [])
 
-    validated_markers = []
+    illegitimate_markers = []
     contested_markers = []
-    neutralized_markers = []
+    legitimate_markers = []
+
     marker_validation_details = []
 
     real_anchor = result.get("real_anchor_score", 0)
@@ -4554,90 +4555,80 @@ def compute_frame_shift_interpretation(result: dict):
     for marker in markers:
 
         validation_reasons = []
-        neutralization_reasons = []
+        legitimacy_reasons = []
+        aggravation_reasons = []
 
         # -----------------------------
-        # Validation générale
-        # -----------------------------
-        if rhetorical_pressure >= 0.35:
-            validation_reasons.append("pression rhétorique élevée")
-
-        if propaganda >= 0.30:
-            validation_reasons.append("propagande détectée")
-
-        if threat >= 0.30:
-            validation_reasons.append("amplification de menace")
-
-        if omission >= 0.25:
-            validation_reasons.append("omission stratégique détectée")
-
-        # -----------------------------
-        # Validation spécifique
+        # Détection de recadrage
         # -----------------------------
         if marker == "souveraineté énergétique":
             validation_reasons.append(
                 "recadrage du débat climatique vers la souveraineté"
             )
 
-        if marker == "sécurité économique":
+        elif marker == "sécurité économique":
             validation_reasons.append(
                 "recadrage du débat écologique vers les enjeux économiques"
             )
 
-        if marker == "indépendance nationale":
+        elif marker == "indépendance nationale":
             validation_reasons.append(
                 "recadrage du débat écologique vers la géopolitique"
             )
 
-        if marker == "bascule nuance → certitude/menace":
+        elif marker == "bascule nuance → certitude/menace":
             validation_reasons.append(
-                "glissement d'un registre prudent vers une conclusion plus catégorique ou menaçante"
+                "glissement d’un registre prudent vers une conclusion plus catégorique"
             )
 
         # -----------------------------
-        # Neutralisation spécifique
+        # Facteurs aggravants
+        # -----------------------------
+        if rhetorical_pressure >= 0.35:
+            aggravation_reasons.append(
+                "pression rhétorique élevée"
+            )
+
+        if propaganda >= 0.30:
+            aggravation_reasons.append(
+                "propagande détectée"
+            )
+
+        if threat >= 0.30:
+            aggravation_reasons.append(
+                "amplification de menace"
+            )
+
+        if omission >= 0.25:
+            aggravation_reasons.append(
+                "omission stratégique détectée"
+            )
+
+        # -----------------------------
+        # Facteurs de légitimité
         # -----------------------------
         if coherence >= 12:
-            neutralization_reasons.append(
+            legitimacy_reasons.append(
                 "cohérence discursive élevée"
             )
 
-        if real_anchor >= 8 and marker not in [
-            "souveraineté énergétique",
-            "sécurité économique",
-            "indépendance nationale",
-            "bascule nuance → certitude/menace",
-        ]:
-            neutralization_reasons.append(
+        if real_anchor >= 8:
+            legitimacy_reasons.append(
                 "ancrage réel élevé"
             )
 
-        if quantitative >= 0.50 and marker not in [
-            "souveraineté énergétique",
-            "sécurité économique",
-            "indépendance nationale",
-            "bascule nuance → certitude/menace",
-        ]:
-            neutralization_reasons.append(
+        if quantitative >= 0.50:
+            legitimacy_reasons.append(
                 "robustesse quantitative présente"
             )
 
-        marker_score = (
-            len(validation_reasons)
-            - len(neutralization_reasons)
-        )
+        # -----------------------------
+        # Classification
+        # -----------------------------
+        shift_detected = len(validation_reasons) > 0
 
-        if len(validation_reasons) == 0:
-            status = "neutralisé"
-            neutralized_markers.append(marker)
-
-        elif marker_score <= 0:
-            status = "contesté"
-            contested_markers.append(marker)
-
-        else:
-            status = "validé"
-            validated_markers.append(marker)
+        legitimacy_strength = len(legitimacy_reasons)
+        aggravation_strength = len(aggravation_reasons)
 
         evidence_item = next(
             (
@@ -4647,28 +4638,73 @@ def compute_frame_shift_interpretation(result: dict):
             {}
         )
 
+        if not shift_detected:
+
+            status = "légitime"
+
+            legitimate_markers.append(marker)
+
+        else:
+
+            balance = aggravation_strength - legitimacy_strength
+
+            if balance >= 2:
+
+                status = "illégitime"
+
+                illegitimate_markers.append(marker)
+
+            elif balance <= -1:
+
+                status = "légitime"
+
+                legitimate_markers.append(marker)
+
+            else:
+
+                status = "contesté"
+
+                contested_markers.append(marker)
+
         marker_validation_details.append({
             "marker": marker,
             "status": status,
-            "marker_score": marker_score,
             "validation_reasons": validation_reasons,
-            "neutralization_reasons": neutralization_reasons,
-            "detection_reason": evidence_item.get("detection_reason", ""),
-            "excerpt": evidence_item.get("excerpt", ""),
+            "legitimacy_reasons": legitimacy_reasons,
+            "aggravation_reasons": aggravation_reasons,
+            "detection_reason": evidence_item.get(
+                "detection_reason",
+                ""
+            ),
+            "excerpt": evidence_item.get(
+                "excerpt",
+                ""
+            ),
         })
 
     total_markers = max(len(markers), 1)
 
-    validated_ratio = len(validated_markers) / total_markers
-    contested_ratio = len(contested_markers) / total_markers
-    neutralized_ratio = len(neutralized_markers) / total_markers
+    illegitimate_ratio = (
+        len(illegitimate_markers) / total_markers
+    )
 
-    # Les marqueurs contestés comptent partiellement.
+    contested_ratio = (
+        len(contested_markers) / total_markers
+    )
+
+    legitimate_ratio = (
+        len(legitimate_markers) / total_markers
+    )
+
     frame_adjusted = round(
         max(
             0,
             min(
-                frame_raw * (validated_ratio + contested_ratio * 0.35),
+                frame_raw * (
+                    illegitimate_ratio
+                    +
+                    contested_ratio * 0.35
+                ),
                 1
             )
         ),
@@ -4676,81 +4712,108 @@ def compute_frame_shift_interpretation(result: dict):
     )
 
     attenuation = round(
-        1 - (validated_ratio + contested_ratio * 0.35),
+        1 -
+        (
+            illegitimate_ratio
+            +
+            contested_ratio * 0.35
+        ),
         3
     )
 
     if len(markers) == 0:
+
         status = "non détectée"
-        interpretation = "Aucun déplacement de cadre notable détecté."
 
-    elif len(validated_markers) == 0 and len(contested_markers) == 0:
-        status = "neutralisée"
         interpretation = (
-            "Les marqueurs détectés semblent principalement explicatifs "
-            "ou contextuels."
+            "Aucun déplacement de cadre notable détecté."
         )
 
-    elif len(validated_markers) == 0 and len(contested_markers) > 0:
+    elif (
+        len(illegitimate_markers) == 0
+        and
+        len(contested_markers) == 0
+    ):
+
+        status = "légitime"
+
+        interpretation = (
+            "Les déplacements de cadre détectés semblent "
+            "principalement justifiés par le sujet traité."
+        )
+
+    elif len(illegitimate_markers) == 0:
+
         status = "contestée"
+
         interpretation = (
-            "Des déplacements de cadre existent, mais ils sont fortement "
-            "contrebalancés par la cohérence ou le contexte du texte."
+            "Des déplacements de cadre existent, "
+            "mais ils semblent largement légitimés "
+            "par le contexte."
         )
 
-    elif len(validated_markers) == 1:
-        status = "validée faiblement"
-        interpretation = (
-            "Un marqueur de déplacement de cadre est retenu, "
-            "mais son poids reste limité."
-        )
+    elif illegitimate_ratio < 0.50:
 
-    elif validated_ratio < 0.50:
         status = "atténuée"
+
         interpretation = (
-            "Plusieurs déplacements de cadre sont présents, mais une partie "
-            "reste contestée ou contextualisée."
+            "Certains déplacements de cadre apparaissent "
+            "potentiellement orientants, mais une partie "
+            "reste légitimée ou contestée."
         )
 
     else:
-        status = "validée"
+
+        status = "illégitime"
+
         interpretation = (
-            "La majorité des marqueurs détectés correspond à de vrais "
-            "déplacements de cadre pénalisants."
+            "Une proportion importante des déplacements "
+            "de cadre semble orienter activement la lecture."
         )
 
-    attenuation_reasons = []
-
-    for detail in marker_validation_details:
-        for reason in detail.get("neutralization_reasons", []):
-            if reason not in attenuation_reasons:
-                attenuation_reasons.append(reason)
-
     return {
+
         "frame_shift_raw": round(frame_raw, 3),
         "frame_shift_adjusted": frame_adjusted,
 
-        "frame_shift_validated_ratio": round(validated_ratio, 3),
-        "frame_shift_contested_ratio": round(contested_ratio, 3),
-        "frame_shift_neutralized_ratio": round(neutralized_ratio, 3),
+        "frame_shift_illegitimate_ratio":
+            round(illegitimate_ratio, 3),
 
-        "frame_shift_valid_markers": validated_markers,
-        "frame_shift_contested_markers": contested_markers,
-        "frame_shift_neutralized_markers": neutralized_markers,
+        "frame_shift_contested_ratio":
+            round(contested_ratio, 3),
 
-        "frame_shift_marker_validation_details": marker_validation_details,
+        "frame_shift_legitimate_ratio":
+            round(legitimate_ratio, 3),
 
-        "frame_shift_interpretation_v2": interpretation,
+        "frame_shift_illegitimate_markers":
+            illegitimate_markers,
+
+        "frame_shift_contested_markers":
+            contested_markers,
+
+        "frame_shift_legitimate_markers":
+            legitimate_markers,
+
+        "frame_shift_marker_validation_details":
+            marker_validation_details,
+
+        "frame_shift_interpretation_v2":
+            interpretation,
 
         "frame_shift_validation": {
             "status": status,
             "attenuation": attenuation,
-            "attenuation_reasons": attenuation_reasons,
-            "validated_markers": validated_markers,
-            "contested_markers": contested_markers,
-            "neutralized_markers": neutralized_markers,
-            "suspect_markers": validated_markers + contested_markers,
-            "interpretation": interpretation,
+            "validated_markers":
+                illegitimate_markers,
+
+            "contested_markers":
+                contested_markers,
+
+            "legitimate_markers":
+                legitimate_markers,
+
+            "interpretation":
+                interpretation,
         },
     }
 
