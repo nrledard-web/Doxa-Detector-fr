@@ -15707,7 +15707,7 @@ Position observée :
 
 ### Interprétation de la jauge
 
-0.00–0.20 : mécroyance forte  
+0.00–0.20 : mécroyance cognitive  
 0.20–0.40 : mécroyance modérée  
 0.40–0.60 : zone ambiguë  
 0.60–0.80 : mensonge probable  
