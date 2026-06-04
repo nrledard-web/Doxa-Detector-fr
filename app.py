@@ -10391,6 +10391,34 @@ def compute_discursive_morphology(text: str) -> dict:
         for key, value in DISCURSIVE_FAMILIES.items()
     }
 
+    # -----------------------------
+    # Famille journalistique ajoutée
+    # -----------------------------
+    journalistic_markers = [
+        "article", "selon", "source", "sources", "référence",
+        "repéré sur", "temps de lecture", "professeur",
+        "université", "chercheurs", "universitaires",
+        "historiens", "affirme", "estime", "explique",
+        "rapporte", "déclare"
+    ]
+
+    journalistic_hits = [
+        m for m in journalistic_markers
+        if contains_term(text.lower(), m)
+    ]
+
+    family_scores["journalistique"] = {
+        "label": "Journalistique",
+        "score": round(min(len(journalistic_hits) / 8, 1.0), 3),
+        "markers_detected": journalistic_hits,
+        "closure_risk": 0.15,
+        "linked_gauges": [
+            "real_anchor_score",
+            "reported_speech_score",
+            "discursive_coherence_score"
+        ],
+    }
+
     mode_scores = {
         key: {
             **score_marker_group(text, value),
@@ -10398,6 +10426,7 @@ def compute_discursive_morphology(text: str) -> dict:
         }
         for key, value in DISCURSIVE_MODES.items()
     }
+
     rhythmic_scores = {
         key: {
             **score_marker_group(text, value),
@@ -10405,6 +10434,7 @@ def compute_discursive_morphology(text: str) -> dict:
         }
         for key, value in RHYTHMIC_REGIMES.items()
     }
+
     morphological_density = compute_morphological_density(text)
     structural_repetition = compute_structural_repetition(text)
     homoeoteleutic_density = compute_homoeoteleutic_density(text)
@@ -10418,15 +10448,31 @@ def compute_discursive_morphology(text: str) -> dict:
         for key, value in DISCURSIVE_REGIMES.items()
     }
 
+    # -----------------------------
+    # Neutralisation faux positifs
+    # contexte historique / journalistique
+    # -----------------------------
+    history_score = domain_scores.get("histoire", {}).get("score", 0)
+    journalism_score = family_scores.get("journalistique", {}).get("score", 0)
+
+    if history_score >= 0.25 or journalism_score >= 0.25:
+        if "publicitaire" in mode_scores:
+            mode_scores["publicitaire"]["score"] = round(
+                mode_scores["publicitaire"]["score"] * 0.35,
+                3
+            )
+
+        if "incantatoire" in regime_scores:
+            regime_scores["incantatoire"]["score"] = round(
+                regime_scores["incantatoire"]["score"] * 0.45,
+                3
+            )
+
     dominant_domain = max(domain_scores.items(), key=lambda x: x[1]["score"])
     dominant_family = max(family_scores.items(), key=lambda x: x[1]["score"])
     dominant_mode = max(mode_scores.items(), key=lambda x: x[1]["score"])
     dominant_regime = max(regime_scores.items(), key=lambda x: x[1]["score"])
     dominant_rhythm = max(rhythmic_scores.items(), key=lambda x: x[1]["score"])
-    
-    # -----------------------------
-    # Stabilisation des dominantes
-    # -----------------------------
     
     dominant_domain_label = dominant_domain[1]["label"]
     dominant_family_label = dominant_family[1]["label"]
