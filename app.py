@@ -12656,6 +12656,13 @@ def detect_rhetorical_structures(text: str):
             "macroéconomique", "économie", "investisseurs",
             "charge des intérêts", "modèle de société"
         ],
+            "journalistique": [
+            "article", "selon", "source", "sources", "référence",
+            "repéré sur", "temps de lecture", "professeur",
+            "université", "chercheurs", "universitaires",
+            "historiens", "affirme", "estime", "déclare",
+            "explique", "avance", "rapporte"
+        ],
     }
     scores = {}
 
@@ -12759,6 +12766,12 @@ def detect_rhetorical_structures(text: str):
     scores["biographique"] = min(biographical_count * 0.12, 1.0)
     scores["fictionnel"] = min(fiction_count * 0.12, 1.0)
     scores["mythique"] = min(mythic_count * 0.12, 1.0)
+    journalistic_count = sum(
+        1 for m in JOURNALISTIC_MARKERS
+        if contains_term(t, m) or m in t
+    )
+
+    scores["journalistique"] = min(journalistic_count * 0.12, 1.0)
 
     # =====================================================
     # Facteur de discours rapporté / documentaire
