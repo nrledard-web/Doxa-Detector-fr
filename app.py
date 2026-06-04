@@ -21301,8 +21301,9 @@ with bf8:
     st.markdown("### Argument du silence")
 
     st.caption(
-        "Cette jauge détecte les raisonnements qui s’appuient sur l’absence "
-        "de preuve, de trace ou de mention pour soutenir une conclusion forte."
+        "Cette jauge n’évalue pas l’absence de preuve elle-même. "
+        "Elle estime si une absence de preuve, de trace ou de mention "
+        "est transformée en argument positif de validation ou de réfutation."
     )
 
     value = result.get("argument_silence_score", 0)
@@ -21328,7 +21329,13 @@ with bf8:
         st.markdown("""
 ### Argument du silence
 
-Cette jauge détecte les raisonnements qui utilisent l’absence de preuve, de trace, de mention ou de témoignage comme appui pour soutenir une conclusion forte.
+Cette jauge n’évalue pas l’absence de preuve elle-même.
+
+Elle estime dans quelle mesure un discours transforme une absence de preuve, de trace, de mention ou de témoignage en argument positif de validation ou de réfutation.
+
+Une absence peut constituer une information légitime.
+
+Ce qui est analysé ici n’est donc pas la simple constatation d’un manque de preuve, mais le passage éventuel d’une absence observée vers une conclusion dont le niveau de certitude dépasse ce que cette absence permet raisonnablement d’établir.
 
 ## Principe
 
@@ -21372,20 +21379,25 @@ Elle ne prétend pas démontrer qu’un raisonnement est faux.
 
 Elle signale seulement qu’un discours semble transformer une absence de preuve en argument positif.
 
-## Formules de qualification contextuelle
 
-absence détectée
+
+## Ce que mesure réellement la jauge
+
+absence constatée
 ↓
-évaluation du contexte
+interprétation
+↓
+certitude excessive
 
-absence présentée prudemment
-→ légitime
+et non :
 
-absence utilisée comme indice partiel
-→ contestée
+absence constatée
+↓
+prudence méthodologique
 
-absence transformée en preuve forte
-→ problématique
+L’observation prudente d’une absence n’est donc pas considérée comme problématique.
+
+La jauge cherche uniquement à détecter le moment où cette absence devient le principal support d’une conclusion.
 """)
 
         markers = result.get("argument_silence_markers", [])
