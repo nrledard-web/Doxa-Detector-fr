@@ -14123,7 +14123,7 @@ Comment interpréter
 
 Elles indiquent un niveau de pression linguistique, à croiser avec :
 
-- la solidité argumentative  
+- la crédibilité épistémique apparente  
 - la vérifiabilité  
 - l’équilibre G / N / D  
 
