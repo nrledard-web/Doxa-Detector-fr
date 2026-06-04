@@ -14220,7 +14220,7 @@ st.caption(message_r)
 with st.popover("ℹ️ Comprendre cette jauge"):
 
     st.markdown(f"""
-### Solidité argumentative
+### Crédibilité épistémique apparente
 
 ### Méthodologie du moteur
 
