@@ -3275,7 +3275,40 @@ VAGUE_AUTHORITY_TERMS += [
     "l’agence internationale de l’énergie",
     "réseau de transport d'électricité",
     "réseau de transport d’électricité",
+
+    # Historiographie
+    "la plupart des historiens",
+    "la plupart des historiens universitaires",
+    "les historiens universitaires",
+    "les spécialistes de l'antiquité",
+    "les spécialistes de l’antiquité",
+
+    # Universitaires
+    "un nombre croissant d'universitaires",
+    "un nombre croissant d’universitaires",
+    "de nombreux universitaires",
+    "la plupart des universitaires",
+
+    # Chercheurs
+    "les chercheurs modernes",
+    "les chercheurs sérieux",
+    "de nombreux chercheurs",
+    "un grand nombre de chercheurs",
+    "plusieurs chercheurs",
+
+    # Historiens / théologiens
+    "un grand nombre de théologiens",
+    "un grand nombre d'historiens",
+    "un grand nombre de théologiens et d’historiens",
+    "un grand nombre de théologiens et d'historiens",
+
+    # Consensus flou
+    "la plupart pensent que",
+    "la plupart estiment que",
+    "de nombreux spécialistes pensent que",
+    "de nombreux historiens pensent que",
 ]
+
 
 # -----------------------------
 # Généralisation abusive
