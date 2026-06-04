@@ -12656,7 +12656,8 @@ def detect_rhetorical_structures(text: str):
             "macroéconomique", "économie", "investisseurs",
             "charge des intérêts", "modèle de société"
         ],
-            "journalistique": [
+        
+        "journalistique": [
             "article", "selon", "source", "sources", "référence",
             "repéré sur", "temps de lecture", "professeur",
             "université", "chercheurs", "universitaires",
