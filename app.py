@@ -5562,6 +5562,17 @@ VAGUE_AUTHORITY_PATTERNS = [
     "certains spécialistes",
     "les chercheurs disent",
 ]
+VAGUE_AUTHORITY_PATTERNS += [
+    "la plupart des historiens",
+    "les historiens universitaires",
+    "les chercheurs modernes",
+    "les chercheurs sérieux",
+    "un nombre croissant d'universitaires",
+    "de nombreux chercheurs",
+    "un grand nombre d'historiens",
+    "un grand nombre de théologiens",
+]
+
 FALSE_DILEMMA_PATTERNS = [
     "soit",
     "il n'y a que deux choix",
