@@ -1600,7 +1600,7 @@ def generate_share_block(result):
     summary = f"""Analyse DOXA Detector
 
 Crédibilité finale : {cred_final}/20
-Solidité argumentative brute : {hard_fact}/20
+Crédibilité épistémique apparente brute : {hard_fact}/20
 
 Mécroyance (M) : {M}
 Dérive cognitive globale : {global_drift}
