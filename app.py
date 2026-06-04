@@ -21228,6 +21228,35 @@ with bf7:
             "Une saturation normative élevée ne signifie pas que le texte est faux. "
             "Elle indique que le discours accumule des jugements de valeur, parfois au détriment de la démonstration."
         )
+# -----------------------------
+# Manipulation statistique
+# -----------------------------
+with bf8:
+    st.markdown("### Argument du silence")
+
+    st.caption(
+        "Cette jauge détecte les raisonnements qui s’appuient sur l’absence "
+        "de preuve, de trace ou de mention pour soutenir une conclusion forte."
+    )
+
+    value = result.get("argument_silence_score", 0)
+    color = result.get("argument_silence_color", "#22c55e")
+    label = result.get("argument_silence_label", "Faible")
+
+    render_custom_gauge(value, color)
+
+    st.markdown(
+        f"<b style='color:{color}'>{label}</b> — {round(value * 100, 1)}%",
+        unsafe_allow_html=True
+    )
+
+    st.caption(
+        result.get(
+            "argument_silence_interpretation",
+            "Argument du silence non calculé."
+        )
+    )
+
 st.divider()
 
 st.markdown("""
