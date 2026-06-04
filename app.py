@@ -21256,50 +21256,123 @@ with bf8:
             "Argument du silence non calculé."
         )
     )
+
     with st.popover("ℹ️ Comprendre cette jauge"):
 
         st.markdown("""
-    ### Argument du silence
-    
-    Cette jauge détecte les raisonnements qui utilisent l’absence de preuve, de trace, de mention ou de témoignage comme appui pour soutenir une conclusion forte.
-    
-    #### Principe
-    
-    Le texte est analysé pour repérer les formulations où une absence documentaire ou factuelle devient un argument positif.
-    
-    Exemples :
-    
-    - absence de preuve ;
-    - absence de trace ;
-    - absence de mention ;
-    - absence de source contemporaine ;
-    - passage de l’absence à une conclusion forte.
-    
-    #### Formule utilisée
-    
-    ```python
-    markers = marqueurs d’absence détectés
-    
-    score_brut = min(len(markers) * coefficient, 1.0)
-    
-    aggravation = (
-        affirmation_abusive
-        + omission_stratégique
-        + asymétrie_informationnelle
-        + certitude
-    )
-    
-    atténuation = (
-        prudence_épistémique
-        + révisabilité
-        + ancrage_au_réel
-        + contextualisation
-    )
-    
-    balance = aggravation - atténuation
-    
-    score_corrigé = score_brut ajusté selon le contexte
+### Argument du silence
+
+Cette jauge détecte les raisonnements qui utilisent l’absence de preuve, de trace, de mention ou de témoignage comme appui pour soutenir une conclusion forte.
+
+## Principe
+
+Le texte est analysé pour repérer les formulations où une absence documentaire ou factuelle devient un argument positif.
+
+Exemples :
+
+- absence de preuve ;
+- absence de trace ;
+- absence de mention ;
+- absence de source contemporaine ;
+- passage de l’absence à une conclusion forte.
+
+## Formule utilisée
+
+markers = marqueurs d’absence détectés
+
+score_brut = min(len(markers) * coefficient, 1.0)
+
+aggravation = (
+    affirmation_abusive
+    + omission_stratégique
+    + certitude
+)
+
+atténuation = (
+    révisabilité
+    + ancrage_au_réel
+    + contextualisation
+)
+
+balance = aggravation - atténuation
+
+score_corrigé = score_brut ajusté selon le contexte
+
+## Nature de l’analyse
+
+Cette jauge repose sur des marqueurs lexicaux, des structures discursives et des heuristiques analogiques.
+
+Elle ne prétend pas démontrer qu’un raisonnement est faux.
+
+Elle signale seulement qu’un discours semble transformer une absence de preuve en argument positif.
+
+## Formules de qualification contextuelle
+
+absence détectée
+↓
+évaluation du contexte
+
+absence présentée prudemment
+→ légitime
+
+absence utilisée comme indice partiel
+→ contestée
+
+absence transformée en preuve forte
+→ problématique
 """)
+
+        markers = result.get("argument_silence_markers", [])
+        details = result.get("argument_silence_details", {})
+
+        st.markdown("## Valeur actuelle")
+
+        st.write(f"Score : {round(value * 100, 1)}%")
+        st.write(f"Niveau : {label}")
+        st.write(f"Marqueurs détectés : {len(markers)}")
+
+        st.markdown("## Interprétation actuelle")
+
+        st.write(
+            result.get(
+                "argument_silence_interpretation",
+                "Argument du silence non calculé."
+            )
+        )
+
+        st.markdown("## Marqueurs détectés")
+
+        if markers:
+            for category, hits in details.items():
+                if hits:
+                    st.markdown(
+                        f"**{category.replace('_', ' ').title()}**"
+                    )
+
+                    for hit in hits:
+                        st.write(f"• {hit}")
+        else:
+            st.write("Aucun marqueur significatif détecté.")
+
+        st.markdown("""
+## Lecture
+
+🟢 Faible : peu ou pas d’argument du silence
+
+🟡 Modérée : absence utilisée comme indice ponctuel
+
+🟠 Élevée : absence documentaire fortement mobilisée
+
+🔴 Très élevée : absence transformée en preuve centrale
+
+## Attention
+
+Un argument du silence élevé ne signifie pas que le texte est faux.
+
+Il indique seulement que le discours s’appuie fortement sur ce qui n’est pas attesté, mentionné ou prouvé pour soutenir une conclusion.
+""")
+
+st.divider()
         
 st.divider()
 
