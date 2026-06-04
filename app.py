@@ -3271,21 +3271,15 @@ VAGUE_AUTHORITY_TERMS += [
     "les études montrent",
     "les scénarios de transition énergétique montrent",
     "les scénarios établis par",
-    "l'agence internationale de l'énergie",
-    "l’agence internationale de l’énergie",
-    "réseau de transport d'électricité",
-    "réseau de transport d’électricité",
 
     # Historiographie
     "la plupart des historiens",
     "la plupart des historiens universitaires",
     "les historiens universitaires",
     "les spécialistes de l'antiquité",
-    "les spécialistes de l’antiquité",
 
     # Universitaires
     "un nombre croissant d'universitaires",
-    "un nombre croissant d’universitaires",
     "de nombreux universitaires",
     "la plupart des universitaires",
 
@@ -3300,7 +3294,6 @@ VAGUE_AUTHORITY_TERMS += [
     "un grand nombre de théologiens",
     "un grand nombre d'historiens",
     "un grand nombre de théologiens et d’historiens",
-    "un grand nombre de théologiens et d'historiens",
 
     # Consensus flou
     "la plupart pensent que",
