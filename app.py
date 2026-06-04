@@ -5867,11 +5867,21 @@ def detect_hasty_generalization(text: str):
 
 def detect_vague_authority_basic(text: str):
     text_lower = text.lower()
-    matches = [p for p in VAGUE_AUTHORITY_PATTERNS if contains_term(text_lower, p) or p in text_lower]
+
+    matches = [
+        p
+        for p in VAGUE_AUTHORITY_PATTERNS
+        if contains_term(text_lower, p) or p in text_lower
+    ]
+
     return {
-        "score = min(len(matches) * 0.20, 1.0),
+        "score": min(len(matches) * 0.20, 1.0),
         "matches": matches,
-        "interpretation": "Autorité invoquée sans source précise." if matches else "Aucune autorité vague saillante détectée."
+        "interpretation": (
+            "Autorité invoquée sans source précise."
+            if matches
+            else "Aucune autorité vague saillante détectée."
+        )
     }
 
 def detect_false_dilemma(text: str):
