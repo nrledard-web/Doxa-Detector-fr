@@ -10928,6 +10928,100 @@ def compute_cognitive_vitality(result: dict) -> dict:
         "negative": round(negative, 3),
     }
 
+# =============================
+# Argument du silence
+# =============================
+
+ARGUMENT_SILENCE_MARKERS = {
+    "absence_preuve": [
+        "aucune preuve",
+        "pas de preuve",
+        "absence de preuve",
+        "nulle preuve",
+        "rien ne prouve",
+        "rien ne démontre",
+    ],
+    "absence_trace": [
+        "aucune trace",
+        "pas de trace",
+        "absence de trace",
+        "aucun vestige",
+        "aucun document",
+        "aucune archive",
+        "aucune source",
+        "aucun témoignage",
+    ],
+    "absence_mention": [
+        "aucune mention",
+        "pas de mention",
+        "n'est jamais mentionné",
+        "jamais mentionné",
+        "aucun contemporain",
+        "aucune référence",
+        "aucune attestation",
+    ],
+    "conclusion_par_absence": [
+        "donc il n'existe pas",
+        "donc cela n'existe pas",
+        "donc il n'a jamais existé",
+        "cela montre que",
+        "cela prouve que",
+        "on peut en conclure que",
+    ],
+}
+
+def compute_argument_silence(text: str) -> dict:
+    """
+    Détecte les raisonnements fondés sur l'absence de preuve,
+    de trace, de mention ou de témoignage pour soutenir une
+    conclusion forte.
+    """
+
+    if not text or not text.strip():
+        return {
+            "score": 0.0,
+            "label": "Faible",
+            "color": "#22c55e",
+            "markers": [],
+            "details": {},
+            "interpretation": "Aucun argument du silence significatif détecté."
+        }
+
+    t = text.lower()
+    markers = []
+    details = {}
+
+    for category, terms in ARGUMENT_SILENCE_MARKERS.items():
+        hits = [term for term in terms if term in t]
+        details[category] = hits
+        markers.extend(hits)
+
+    raw = len(markers)
+
+    score = min(raw * 0.12, 1.0)
+
+    if score < 0.20:
+        label, color = "Faible", "#22c55e"
+        interpretation = "Peu d’arguments fondés sur l’absence de preuve ou de trace détectés."
+    elif score < 0.40:
+        label, color = "Modéré", "#eab308"
+        interpretation = "Le texte mobilise ponctuellement l’absence de preuve ou de trace comme appui argumentatif."
+    elif score < 0.70:
+        label, color = "Élevé", "#f97316"
+        interpretation = "Le texte s’appuie fortement sur l’absence de preuve, de trace ou de mention pour soutenir son raisonnement."
+    else:
+        label, color = "Très élevé", "#dc2626"
+        interpretation = "Le texte transforme massivement l’absence de preuve ou de trace en argument central."
+
+    return {
+        "score": score,
+        "label": label,
+        "color": color,
+        "markers": markers,
+        "details": details,
+        "interpretation": interpretation
+    }
+
 def analyze_article(text: str) -> Dict:
     article = text
     words = text.split()
@@ -11760,6 +11854,18 @@ def analyze_article(text: str) -> Dict:
     result["cognitive_vitality_label"] = vitality["label"]
     result["cognitive_vitality_text"] = vitality["text"]
     result["cognitive_vitality_details"] = vitality
+
+    # -----------------------------
+    # Argument de silenc
+    # -----------------------------
+    argument_silence = compute_argument_silence(text)
+
+    result["argument_silence_score"] = argument_silence["score"]
+    result["argument_silence_label"] = argument_silence["label"]
+    result["argument_silence_color"] = argument_silence["color"]
+    result["argument_silence_markers"] = argument_silence["markers"]
+    result["argument_silence_details"] = argument_silence["details"]
+    result["argument_silence_interpretation"] = argument_silence["interpretation"]
 
     # -----------------------------
     # Morphologie cognitive
