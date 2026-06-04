@@ -21229,7 +21229,7 @@ with bf7:
             "Elle indique que le discours accumule des jugements de valeur, parfois au détriment de la démonstration."
         )
 # -----------------------------
-# Manipulation statistique
+# Argument du silence
 # -----------------------------
 with bf8:
     st.markdown("### Argument du silence")
@@ -21256,6 +21256,49 @@ with bf8:
             "Argument du silence non calculé."
         )
     )
+    with st.popover("ℹ️ Comprendre cette jauge"):
+
+        st.markdown("""
+    ### Argument du silence
+    
+    Cette jauge détecte les raisonnements qui utilisent l’absence de preuve, de trace, de mention ou de témoignage comme appui pour soutenir une conclusion forte.
+    
+    #### Principe
+    
+    Le texte est analysé pour repérer les formulations où une absence documentaire ou factuelle devient un argument positif.
+    
+    Exemples :
+    
+    - absence de preuve ;
+    - absence de trace ;
+    - absence de mention ;
+    - absence de source contemporaine ;
+    - passage de l’absence à une conclusion forte.
+    
+    #### Formule utilisée
+    
+    ```python
+    markers = marqueurs d’absence détectés
+    
+    score_brut = min(len(markers) * coefficient, 1.0)
+    
+    aggravation = (
+        affirmation_abusive
+        + omission_stratégique
+        + asymétrie_informationnelle
+        + certitude
+    )
+    
+    atténuation = (
+        prudence_épistémique
+        + révisabilité
+        + ancrage_au_réel
+        + contextualisation
+    )
+    
+    balance = aggravation - atténuation
+    
+    score_corrigé = score_brut ajusté selon le contexte
 
 st.divider()
 
