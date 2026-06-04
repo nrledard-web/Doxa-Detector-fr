@@ -728,7 +728,7 @@ with st.container(border=True):
     with col3:
         st.markdown("### 3️⃣ Comprendre les résultats")
         st.write(
-            "L’analyse produit plusieurs indicateurs : solidité argumentative, "
+            "L’analyse produit plusieurs indicateurs : crédibilité épistémique apparente, "
             "mécroyance, tension cognitive, pression rhétorique, propagande, "
             "gravité cognitive et diagnostic du cerveau DOXA."
         )
