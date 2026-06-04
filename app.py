@@ -12970,8 +12970,9 @@ def detect_discourse_type_from_rhetoric(text: str, rhetorical_scores: dict):
     scores["journalistique"] += rhetorical_scores.get("narrativité", 0) * 0.35
     scores["journalistique"] += rhetorical_scores.get("coherence_performative", 0) * 0.10
     scores["journalistique"] += rhetorical_scores.get("saturation_rhetorique", 0) * 0.10
-    scores["journalistique"] += rhetorical_scores.get("reported_discourse_factor", 0) * 1.2
-    scores["journalistique"] += rhetorical_scores.get("encyclopedique", 0) * 0.35
+    scores["journalistique"] += rhetorical_scores.get("reported_discourse_factor", 0) * 1.6
+    scores["journalistique"] += rhetorical_scores.get("encyclopedique", 0) * 0.45
+    scores["journalistique"] += rhetorical_scores.get("journalistique", 0) * 0.65
 
     scores["technocratique"] += rhetorical_scores.get("dissimulation_attenuation", 0) * 1.8
     scores["technocratique"] += rhetorical_scores.get("technicite", 0) * 0.5
