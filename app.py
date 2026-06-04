@@ -21299,7 +21299,8 @@ with bf8:
     balance = aggravation - atténuation
     
     score_corrigé = score_brut ajusté selon le contexte
-
+""")
+        
 st.divider()
 
 st.markdown("""
