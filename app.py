@@ -5730,8 +5730,19 @@ CHERRY_PICKING_PATTERNS += [
     "une seule étude sérieuse suffit",
     "quelques cas récents prouvent",
     "quelques cas récents le prouvent",
+    "voilà cinq de leurs arguments",
+    "voici cinq arguments",
+    "voilà leurs arguments",
+    "voici leurs arguments",
+    "plusieurs arguments pour douter",
+    "arguments pour douter",
+    "arguments contre",
+    "arguments en faveur",
 ]
+
 def detect_cherry_picking(text: str):
+    import re
+
     if not text or not text.strip():
         return {
             "score": 0.0,
@@ -5771,14 +5782,41 @@ def detect_cherry_picking(text: str):
     ):
         structural_hits.append("cas ou étude isolée utilisée comme preuve")
 
+    # Liste argumentative unilatérale
+    numbered_arguments = len(re.findall(r"(?m)^\s*-\d+-", text))
+
+    if numbered_arguments >= 3:
+        structural_hits.append(
+            f"liste argumentative unilatérale : {numbered_arguments} arguments numérotés"
+        )
+
+    if (
+        numbered_arguments >= 3
+        and not any(term in t for term in [
+            "en revanche",
+            "à l'inverse",
+            "cependant",
+            "toutefois",
+            "contre-argument",
+            "objection",
+            "réponse des historiens",
+            "arguments opposés",
+            "nuancer",
+            "nuance"
+        ])
+    ):
+        structural_hits.append(
+            "liste d’arguments sans contrepoids explicite"
+        )
+
     all_markers = unique_keep_order(matches + omission_hits + structural_hits)
 
     raw_score = (
-        len(matches) * 0.25 +
-        len(omission_hits) * 0.35 +
-        len(structural_hits) * 0.35
+        len(matches) * 0.20 +
+        len(omission_hits) * 0.30 +
+        len(structural_hits) * 0.25
     )
-    
+
     score = min(raw_score, 1.0)
 
     if score < 0.15:
