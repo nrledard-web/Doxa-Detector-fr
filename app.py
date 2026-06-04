@@ -12645,6 +12645,13 @@ def detect_rhetorical_structures(text: str):
             "étude", "rapport", "source", "données", "statistique",
             "méthode", "analyse", "pourcentage", "%", "selon", "chiffres"
         ],
+        "journalistique": [
+            "article", "selon", "source", "sources", "référence",
+            "repéré sur", "temps de lecture", "professeur",
+            "université", "chercheurs", "universitaires",
+            "historiens", "affirme", "estime", "déclare",
+            "explique", "avance", "rapporte"
+        ],
         
         "economie_politique": [
             "dette", "dette publique", "déficit", "budget", "budgétaire",
@@ -12655,14 +12662,6 @@ def detect_rhetorical_structures(text: str):
             "ressources disponibles", "marges de manœuvre",
             "macroéconomique", "économie", "investisseurs",
             "charge des intérêts", "modèle de société"
-        ],
-        
-        "journalistique": [
-            "article", "selon", "source", "sources", "référence",
-            "repéré sur", "temps de lecture", "professeur",
-            "université", "chercheurs", "universitaires",
-            "historiens", "affirme", "estime", "déclare",
-            "explique", "avance", "rapporte"
         ],
     }
     scores = {}
