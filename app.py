@@ -7894,8 +7894,20 @@ def compute_omission_score(result):
 
     doxa_omission = (G + D) - (2 * N)
 
+    # -----------------------------
+    # Incidence de l’argument du silence
+    # -----------------------------
+    argument_silence_influence = (
+        result.get("argument_silence_score", 0) * 0.15
+    )
+    
     # Score final
-    raw = raw_heuristic + (doxa_omission * 0.15)
+    raw = (
+        raw_heuristic
+        + (doxa_omission * 0.15)
+        + argument_silence_influence
+    )
+    
     score = max(0.0, min(raw / 12, 1.0))
 
     # Interprétation
