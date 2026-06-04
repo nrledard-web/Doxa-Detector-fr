@@ -7898,7 +7898,7 @@ def compute_omission_score(result):
     # Incidence de l’argument du silence
     # -----------------------------
     argument_silence_influence = (
-        result.get("argument_silence_score", 0) * 0.15
+        result.get("argument_silence_score", 0) * 0.75
     )
     
     # Score final
@@ -7942,6 +7942,7 @@ def compute_omission_score(result):
         "omission_raw": round(raw, 3),
         "omission_raw_heuristic": round(raw_heuristic, 3),
         "omission_doxa_modulator": round(doxa_omission, 3),
+        "omission_argument_silence_influence": round(argument_silence_influence, 3),
         "omission_label": label,
         "omission_color": color,
         "omission_interpretation": interpretation,
