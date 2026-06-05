@@ -15600,18 +15600,21 @@ st.subheader("Clôture cognitive", anchor=False)
 
 st.caption(
     "Cette jauge mesure le degré de verrouillage cognitif du texte. "
-    "Plus elle monte, plus la certitude domine le savoir et l’intégration."
+    "La clôture peut provenir d’un excès de certitude, mais aussi d’un doute excessif "
+    "lorsque celui-ci empêche toute stabilisation raisonnable du jugement."
 )
 # -----------------------------
 # Calcul clôture cognitive
 # -----------------------------
 closure = round(
     (
-        result.get("doxic_rigidity_score", 0) * 0.50
+        result.get("doxic_rigidity_score", 0) * 0.40
         +
-        result.get("certainty_score", 0) * 0.30
+        result.get("certainty_score", 0) * 0.25
         +
-        result.get("strong_certainty_score", 0) * 0.20
+        result.get("strong_certainty_score", 0) * 0.15
+        +
+        result.get("excessive_doubt_score", 0) * 0.20
     )
     -
     (
