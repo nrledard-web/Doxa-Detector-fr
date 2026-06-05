@@ -8006,25 +8006,31 @@ def compute_omission_score(result):
     PX = result.get("precision_score", 0)
     CA = result.get("argument_counterweight_count", 0)
 
+    AS = result.get("argument_silence_score", 0)
+    FO = result.get("factual_overinterpretation_score", 0)
+    VA = result.get("vague_authority_score", 0)
+
     # -----------------------------
     # Calcul heuristique principal
     # -----------------------------
     raw_heuristic = (
-        CP
-        + (DR * 1.5)
-        + PI
-        + AA
-        + CF
-        + CC
+        (CP * 1.4)
+        + (DR * 1.2)
+        + (PI * 1.0)
+        + (AA * 0.8)
+        + (CF * 0.6)
+        + (CC * 0.7)
         + (MS * 0.35)
+        + (AS * 0.8)
+        + (FO * 1.0)
+        + (VA * 0.6)
     ) - (
-        LM
-        + RV
-        + AR
-        + PX
-        + CA
+        (LM * 1.0)
+        + (RV * 0.8)
+        + (AR * 0.6)
+        + (PX * 0.6)
+        + (CA * 0.8)
     )
-
     # -----------------------------
     # Modulateur DOXA léger
     # MO ≈ (G + D) − 2N
@@ -8045,19 +8051,10 @@ def compute_omission_score(result):
 
     # -----------------------------
     # Incidence de l’argument du silence
-    # -----------------------------
-    argument_silence_influence = (
-        result.get("argument_silence_score", 0) * 0.75
-    )
-    
+    # -----------------------------    
     # Score final
-    raw = (
-        raw_heuristic
-        + (doxa_omission * 0.15)
-        + argument_silence_influence
-    )
-    
-    score = max(0.0, min(raw / 12, 1.0))
+    raw = raw_heuristic + (doxa_omission * 0.15)
+    score = max(0.0, min(raw / 4, 1.0))
 
     # Interprétation
     if score < 0.15:
@@ -8091,7 +8088,6 @@ def compute_omission_score(result):
         "omission_raw": round(raw, 3),
         "omission_raw_heuristic": round(raw_heuristic, 3),
         "omission_doxa_modulator": round(doxa_omission, 3),
-        "omission_argument_silence_influence": round(argument_silence_influence, 3),
         "omission_label": label,
         "omission_color": color,
         "omission_interpretation": interpretation,
