@@ -11226,6 +11226,52 @@ def compute_argument_silence(text: str) -> dict:
         "interpretation": interpretation
     }
 
+def compute_excessive_doubt(result: dict) -> dict:
+    """
+    Détecte le doute excessif : scepticisme absolu, relativisme intégral,
+    impossibilité de conclure malgré un savoir disponible.
+    """
+
+    uncertainty = result.get("uncertainty_score", 0)
+    relativism = result.get("relativism_score", 0)
+    argument_silence = result.get("argument_silence_score", 0)
+    revisability = result.get("bonus_revisability", 0)
+    hard_fact = result.get("hard_fact_score", 0)
+    cognitive_vitality = result.get("cognitive_vitality_score", 0)
+
+    raw = (
+        uncertainty * 0.35
+        + relativism * 0.30
+        + argument_silence * 0.15
+        + max(0, hard_fact - uncertainty) * 0.10
+        + max(0, cognitive_vitality - uncertainty) * 0.10
+    )
+
+    # la vraie révisabilité réduit le doute pathologique
+    raw -= revisability * 0.25
+
+    score = max(0, min(raw, 1))
+
+    if score < 0.20:
+        label = "Faible"
+        text = "Peu de doute excessif détecté."
+    elif score < 0.45:
+        label = "Modéré"
+        text = "Le texte présente une hésitation ou une prudence notable."
+    elif score < 0.70:
+        label = "Élevé"
+        text = "Le doute semble parfois empêcher la stabilisation d’un jugement."
+    else:
+        label = "Très élevé"
+        text = "Le doute devient potentiellement clôturant : aucune conclusion ne semble pouvoir être admise."
+
+    return {
+        "score": score,
+        "percent": round(score * 100, 1),
+        "label": label,
+        "text": text,
+    }
+
 def analyze_article(text: str) -> Dict:
     article = text
     words = text.split()
@@ -12091,6 +12137,16 @@ def analyze_article(text: str) -> Dict:
     result["validation_summary"] = (
         compute_validation_summary(result)
     )
+    # =====================================================
+    # Doute excessif
+    # =====================================================
+    excessive_doubt = compute_excessive_doubt(result)
+
+    result["excessive_doubt_score"] = excessive_doubt["score"]
+    result["excessive_doubt_percent"] = excessive_doubt["percent"]
+    result["excessive_doubt_label"] = excessive_doubt["label"]
+    result["excessive_doubt_text"] = excessive_doubt["text"]
+    result["excessive_doubt_details"] = excessive_doubt
     
     # -----------------------------
     # Régime cognitif
