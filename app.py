@@ -7176,6 +7176,13 @@ def analyze_claim(sentence: str) -> Claim:
         if contains_term(s, term)
     )
 
+    normative_structure = compute_normative_structure_score(text)
+    scores["normatif"] += (
+        len(normative_hits) * 1.5
+        +
+        normative_structure * 0.8
+    )
+
     judgment_hits = sum(
         1 for term in JUDGMENT_MARKERS
         if contains_term(s, term)
