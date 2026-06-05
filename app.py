@@ -13277,6 +13277,7 @@ def detect_discourse_type_from_rhetoric(text: str, rhetorical_scores: dict):
         "fictionnel": 0,
         "mythique": 0,
         "historique": 0,
+        "normatif": 0,
     }
 
     scores["pamphlétaire"] += rhetorical_scores.get("attaque", 0) * 1.6
