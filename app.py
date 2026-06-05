@@ -11272,6 +11272,72 @@ def compute_excessive_doubt(result: dict) -> dict:
         "text": text,
     }
 
+# =====================================================
+# Hégémonie cognitive
+# =====================================================
+
+def compute_cognitive_hegemony(result: dict) -> dict:
+    """
+    Mesure la tendance d'un discours à présenter un cadre de pensée
+    comme naturel, évident, inévitable ou indiscutable.
+    """
+
+    false_consensus = result.get("false_consensus_score", 0)
+    doxic_rigidity = result.get("doxic_rigidity_score", 0)
+    closure = result.get("closure", result.get("cognitive_closure_score", 0))
+    frame_shift = result.get("frame_shift_adjusted", result.get("frame_shift_score", 0))
+    authority = result.get("authority_score", 0)
+    revisability = result.get("bonus_revisability", 0)
+    anchor = result.get("bonus_anchor", 0)
+
+    raw = (
+        false_consensus * 0.25
+        + doxic_rigidity * 0.20
+        + closure * 0.20
+        + frame_shift * 0.15
+        + authority * 0.10
+    ) - (
+        revisability * 0.25
+        + anchor * 0.15
+    )
+
+    score = max(0, min(raw, 1))
+
+    if score < 0.20:
+        label = "Faible"
+        color = "#16a34a"
+        text = "Peu d’hégémonie cognitive détectée."
+    elif score < 0.45:
+        label = "Modérée"
+        color = "#ca8a04"
+        text = "Le texte présente quelques indices de cadre dominant ou peu discuté."
+    elif score < 0.70:
+        label = "Élevée"
+        color = "#f97316"
+        text = "Le discours tend à présenter un cadre de pensée comme évident ou difficilement contestable."
+    else:
+        label = "Très élevée"
+        color = "#dc2626"
+        text = "Le texte semble fortement naturaliser un paradigme, en marginalisant les alternatives possibles."
+
+    return {
+        "score": score,
+        "percent": round(score * 100, 1),
+        "label": label,
+        "color": color,
+        "text": text,
+        "details": {
+            "false_consensus": false_consensus,
+            "doxic_rigidity": doxic_rigidity,
+            "closure": closure,
+            "frame_shift": frame_shift,
+            "authority": authority,
+            "revisability": revisability,
+            "anchor": anchor,
+            "raw": raw,
+        }
+    }
+
 def analyze_article(text: str) -> Dict:
     article = text
     words = text.split()
@@ -12104,6 +12170,18 @@ def analyze_article(text: str) -> Dict:
     result["cognitive_vitality_label"] = vitality["label"]
     result["cognitive_vitality_text"] = vitality["text"]
     result["cognitive_vitality_details"] = vitality
+
+    # -----------------------------
+    # Hégémonie cognitive
+    # -----------------------------
+    cognitive_hegemony = compute_cognitive_hegemony(result)
+    
+    result["cognitive_hegemony_score"] = cognitive_hegemony["score"]
+    result["cognitive_hegemony_percent"] = cognitive_hegemony["percent"]
+    result["cognitive_hegemony_label"] = cognitive_hegemony["label"]
+    result["cognitive_hegemony_color"] = cognitive_hegemony["color"]
+    result["cognitive_hegemony_text"] = cognitive_hegemony["text"]
+    result["cognitive_hegemony_details"] = cognitive_hegemony["details"]
 
     # -----------------------------
     # Argument de silenc
