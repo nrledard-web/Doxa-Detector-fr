@@ -15662,7 +15662,7 @@ Elle ne mesure pas :
 - le mensonge ;
 - l’intention réelle du locuteur.
 
-Elle mesure plutôt un **risque de verrouillage cognitif** : le moment où la certitude domine le savoir articulé et la compréhension intégrée.
+Elle mesure plutôt un **risque de verrouillage cognitif** : le moment où le discours perd sa capacité de révision, soit par excès de certitude, soit par excès de doute.
 
 ---
 
@@ -15675,7 +15675,7 @@ Le moteur observe la tension entre :
 - le niveau de certitude ;
 - la capacité du discours à rester révisable.
 
-Plus la clôture monte, plus le texte semble difficile à corriger, nuancer ou réviser.
+Plus la clôture monte, plus le texte semble difficile à corriger, nuancer ou réviser : soit parce qu’il affirme trop, soit parce qu’il doute au point de rendre toute conclusion impossible.
 La clôture cognitive est affichée séparément comme indicateur transversal de révisabilité du discours et n’entre pas directement dans le calcul de cet indice.
 
 ---
