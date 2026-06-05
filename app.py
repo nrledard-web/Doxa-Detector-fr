@@ -4986,7 +4986,7 @@ def compute_threat_amplification(text: str):
     return round(score, 3), interpretation, hits
 
 # -----------------------------
-# 19) Fausse analogie
+# Fausse analogie
 # -----------------------------
 FALSE_ANALOGY_TERMS = [
     "comme si", "c'est comme", "c’est comme",
@@ -5051,7 +5051,7 @@ def compute_false_analogy(text: str):
         "interpretation": interpretation,
     }
 # -----------------------------
-# 20) Surinterprétation factuelle
+# Surinterprétation factuelle
 # -----------------------------
 FACTUAL_OVERINTERPRETATION_TERMS = [
     "cela prouve que", "cela démontre que", "cela montre bien que",
@@ -5150,9 +5150,9 @@ def compute_factual_overinterpretation(text: str):
     all_hits = unique_keep_order(hits + accel_hits + structural_hits)
 
     raw_score = (
-        len(hits) * 0.18
-        + len(accel_hits) * 0.18
-        + len(structural_hits) * 0.22
+        len(hits) * 0.12
+        + len(accel_hits) * 0.12
+        + len(structural_hits) * 0.18
     )
 
     score = min(raw_score, 1.0)
@@ -5172,7 +5172,7 @@ def compute_factual_overinterpretation(text: str):
         "interpretation": interpretation,
     }
 # -----------------------------
-# 21) Dissonance interne
+# Dissonance interne
 # -----------------------------
 INTERNAL_DISSONANCE_PATTERNS = [
     r"\bil n'y a pas de preuve\b.{0,180}\bc'est certain\b",
@@ -5274,7 +5274,7 @@ def compute_internal_dissonance(text: str):
         "interpretation": interpretation,
     }
 # -----------------------------
-# 22) Saturation normative
+# Saturation normative
 # -----------------------------
 SATURATION_NORMATIVE_TERMS = [
     "scandaleux", "inacceptable", "honteux", "immoral", "criminel",
@@ -5327,7 +5327,7 @@ def compute_normative_saturation(text: str):
         "interpretation": interpretation,
     }
 # -----------------------------
-# 23) Rigidité doxique
+# Rigidité doxique
 # -----------------------------
 DOXIC_RIGIDITY_TERMS = [
     "il est évident que", "il est clair que", "sans aucun doute",
@@ -5363,7 +5363,7 @@ def compute_doxic_rigidity(text: str):
         "interpretation": interpretation,
     }
 # -----------------------------
-# 24) Surdétermination narrative
+# Surdétermination narrative
 # -----------------------------
 NARRATIVE_OVERDETERMINATION_TERMS = [
     "tout s'explique par", "tout vient de", "tout est lié à",
