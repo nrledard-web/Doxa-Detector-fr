@@ -11275,7 +11275,40 @@ def compute_excessive_doubt(result: dict) -> dict:
 # =====================================================
 # Hégémonie cognitive
 # =====================================================
+PARADIGM_NATURALIZATION_MARKERS = [
 
+    "il est évident que",
+    "il va de soi",
+    "naturellement",
+    "bien entendu",
+
+    "personne ne conteste",
+    "la question est réglée",
+
+    "tout le monde sait",
+    "on sait désormais",
+
+    "les experts s'accordent",
+    "la science a tranché",
+
+    "il n'existe pas d'alternative",
+    "c'est simplement ainsi",
+
+    "cela ne peut être autrement",
+    "les faits parlent d'eux-mêmes",
+
+    "plus personne ne remet en cause",
+    "plus personne ne conteste",
+
+    "tout observateur honnête reconnaîtra",
+    "aucune personne raisonnable ne peut nier",
+
+    "c'est un fait établi",
+    "la question ne se pose plus",
+
+    "le débat est clos",
+    "le débat est terminé"
+]
 def compute_cognitive_hegemony(result: dict) -> dict:
     """
     Mesure la tendance d'un discours à présenter un cadre de pensée
