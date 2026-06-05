@@ -5812,9 +5812,9 @@ def detect_cherry_picking(text: str):
     all_markers = unique_keep_order(matches + omission_hits + structural_hits)
 
     raw_score = (
-        len(matches) * 0.20 +
-        len(omission_hits) * 0.30 +
-        len(structural_hits) * 0.25
+        len(matches) * 0.10 +
+        len(omission_hits) * 0.20 +
+        len(structural_hits) * 0.18
     )
 
     score = min(raw_score, 1.0)
