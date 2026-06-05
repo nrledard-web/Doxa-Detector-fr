@@ -5061,6 +5061,8 @@ FACTUAL_OVERINTERPRETATION_TERMS = [
 ]
 
 def compute_factual_overinterpretation(text: str):
+    import re
+
     if not text or not text.strip():
         return {
             "score": 0.0,
@@ -5069,10 +5071,11 @@ def compute_factual_overinterpretation(text: str):
         }
 
     text_lower = text.lower()
+    t = normalize_text_for_markers(text)
 
     hits = [
-        t for t in FACTUAL_OVERINTERPRETATION_TERMS
-        if contains_term(text_lower, t) or t in text_lower
+        term for term in FACTUAL_OVERINTERPRETATION_TERMS
+        if contains_term(t, term) or term in t
     ]
 
     accelerator_terms = [
@@ -5081,16 +5084,77 @@ def compute_factual_overinterpretation(text: str):
         "cela démontre clairement",
         "on voit bien que",
         "la preuve absolue",
+        "mène à la même conclusion",
+        "mènent à la même conclusion",
     ]
 
     accel_hits = [
-        t for t in accelerator_terms
-        if contains_term(text_lower, t) or t in text_lower
+        term for term in accelerator_terms
+        if contains_term(t, term) or term in t
     ]
 
-    all_hits = unique_keep_order(hits + accel_hits)
+    structural_hits = []
 
-    raw_score = len(hits) * 0.28 + len(accel_hits) * 0.20
+    # Absence transformée en conclusion forte
+    absence_terms = [
+        "aucune preuve",
+        "pas de preuve",
+        "aucune trace",
+        "pas de trace",
+        "aucune mention",
+        "pas de mention",
+        "ne dit jamais",
+        "ne fait pas référence",
+        "ne présente jamais",
+        "rien",
+    ]
+
+    conclusion_terms = [
+        "n’aurait jamais existé",
+        "n'aurait jamais existé",
+        "serait un mythe",
+        "mythe construit",
+        "construction du christianisme",
+        "pas sa cause",
+        "donner un socle",
+        "douter de la réalité",
+        "réalité de l’existence",
+        "réalité de l'existence",
+    ]
+
+    absence_count = sum(1 for term in absence_terms if term in t)
+    conclusion_count = sum(1 for term in conclusion_terms if term in t)
+
+    if absence_count >= 2 and conclusion_count >= 1:
+        structural_hits.append(
+            "passage d’absences documentaires vers une conclusion historique forte"
+        )
+
+    if absence_count >= 4:
+        structural_hits.append(
+            f"accumulation d’absences interprétées : {absence_count} signaux"
+        )
+
+    # Liste argumentative qui converge vers une conclusion générale
+    numbered_arguments = len(re.findall(r"(?m)^\s*-\d+-", text))
+
+    if numbered_arguments >= 3 and (
+        "mènent à la même conclusion" in t
+        or "mène à la même conclusion" in t
+        or "ces arguments mènent" in t
+    ):
+        structural_hits.append(
+            "liste d’indices partiels convertie en conclusion globale"
+        )
+
+    all_hits = unique_keep_order(hits + accel_hits + structural_hits)
+
+    raw_score = (
+        len(hits) * 0.18
+        + len(accel_hits) * 0.18
+        + len(structural_hits) * 0.22
+    )
+
     score = min(raw_score, 1.0)
 
     if score < 0.15:
@@ -5098,9 +5162,9 @@ def compute_factual_overinterpretation(text: str):
     elif score < 0.35:
         interpretation = "Le texte tire quelques conclusions un peu rapides."
     elif score < 0.60:
-        interpretation = "Le texte surinterprète plusieurs éléments factuels."
+        interpretation = "Le texte surinterprète plusieurs éléments factuels ou documentaires."
     else:
-        interpretation = "Le discours transforme fortement des faits partiels en conclusions globales."
+        interpretation = "Le discours transforme fortement des indices partiels en conclusions globales."
 
     return {
         "score": round(score, 3),
