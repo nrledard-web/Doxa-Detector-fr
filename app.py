@@ -13320,6 +13320,23 @@ def detect_discourse_type_from_rhetoric(text: str, rhetorical_scores: dict):
         "normatif": 0,
     }
 
+    # -----------------------------
+    # Régime normatif
+    # -----------------------------
+    normative_hits = [
+        term
+        for term in NORMATIVE_MARKERS
+        if contains_term(text.lower(), term)
+    ]
+    
+    normative_structure = compute_normative_structure_score(text)
+    
+    scores["normatif"] += (
+        len(normative_hits) * 1.5
+        +
+        normative_structure * 0.8
+    )
+
     scores["pamphlétaire"] += rhetorical_scores.get("attaque", 0) * 1.6
     scores["pamphlétaire"] += rhetorical_scores.get("amplification", 0) * 0.7
     scores["pamphlétaire"] += rhetorical_scores.get("coherence_performative", 0) * 0.4
