@@ -2493,6 +2493,8 @@ def detect_enthymemes_from_claims(claims: List[Claim]) -> List[Dict]:
 def classify_claim_type(sentence: str) -> List[str]:
     s = sentence.lower().strip()
     claim_types = []
+    
+    normative_structure = compute_normative_structure_score(sentence)
 
     # normatif
     normative_terms = [
