@@ -11429,16 +11429,16 @@ def compute_cognitive_hegemony(result: dict) -> dict:
         "color": color,
         "text": text,
         "details": {
-            "false_consensus": false_consensus,
-            "doxic_rigidity": doxic_rigidity,
-            "closure": closure,
-            "frame_shift": frame_shift,
-            "authority": authority,
-            "revisability": revisability,
-            "anchor": anchor,
-            "raw": raw,
-        }
+        "false_consensus": false_consensus,
+        "doxic_rigidity": doxic_rigidity,
+        "closure": closure,
+        "frame_shift": frame_shift,
+        "authority": authority,
+        "revisability": revisability,
+        "anchor": anchor,
+        "raw": raw,
     }
+}
 
 def analyze_article(text: str) -> Dict:
     article = text
