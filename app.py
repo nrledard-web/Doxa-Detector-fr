@@ -8943,7 +8943,7 @@ BIOGRAPHICAL_MARKERS = [
     "parcours de vie",
     "portrait de",
     "figure historique",
-
+]
 def compute_normative_structure_score(text: str):
 
     if not text:
