@@ -14606,25 +14606,30 @@ L’**effet placebo étendu** n’est pas intégré ici sauf cas particulier.
 
 ---
 
-### Formule utilisée
-
-```python
-HFS_brut = (
-    0.18 * G
-    + 0.12 * N
-    + 0.20 * V
-    + 0.22 * QS
-    + 0.18 * VC
+MO_heuristique = (
+    (CP * 1.4)
+    + (DR * 1.2)
+    + (PI * 1.0)
+    + (AA * 0.8)
+    + (CF * 0.6)
+    + (CC * 0.7)
+    + (MS * 0.35)
+    + (AS * 0.8)
+    + (FO * 1.0)
+    + (VA * 0.6)
 ) - (
-    0.16 * D
-    + 0.12 * R
-    + 0.18 * RC
-    + P
+    (LM * 1.0)
+    + (RV * 0.8)
+    + (AR * 0.6)
+    + (PX * 0.6)
+    + (CA * 0.8)
 )
 
-HFS = HFS_brut + 8 + bonus_epistemique
+MO_doxa = (G + D) - (2 * N)
 
-score = max(0, min(HFS, 20))
+MO = MO_heuristique + (MO_doxa * 0.15)
+
+score = max(0.0, min(MO / 4, 1.0))
 ```
 
 ---
@@ -14640,6 +14645,9 @@ score = max(0, min(HFS, 20))
 - **R** = risque rhétorique  
 - **RC** = risque moyen des affirmations  
 - **P** = pénalités de crédibilité  
+- **AS** = argument du silence
+- **FO** = surinterprétation factuelle
+- **VA** = autorité vague
 
 ---
 
