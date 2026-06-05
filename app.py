@@ -11141,6 +11141,7 @@ def compute_validation_summary(result: dict) -> str:
     return (
         "La validation morphologique ne détecte pas de contradiction majeure entre les jauges et la structure du texte."
     )
+    
 def compute_cognitive_vitality(result: dict) -> dict:
     """
     Vitalité cognitive autonome.
