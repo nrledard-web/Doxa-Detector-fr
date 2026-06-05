@@ -16295,6 +16295,115 @@ Le texte contient une tension entre mécroyance et manipulation.
 La certitude paraît plus forte que les preuves disponibles, mais les signaux ne suffisent pas encore à conclure à une manipulation nette.
 """)
 
+# -----------------------------
+# 🧠 Hégémonie cognitive
+# -----------------------------
+st.subheader("Hégémonie cognitive", anchor=False)
+
+st.caption(
+    "Cette jauge mesure dans quelle mesure un discours présente un cadre de pensée "
+    "comme naturel, évident, inévitable ou difficilement contestable."
+)
+
+heg_value = result.get("cognitive_hegemony_score", 0)
+heg_label = result.get("cognitive_hegemony_label", "Faible")
+heg_color = result.get("cognitive_hegemony_color", "#16a34a")
+heg_text = result.get("cognitive_hegemony_text", "")
+
+render_custom_gauge(heg_value, heg_color)
+
+st.markdown(
+    f"<b style='color:{heg_color}'>{heg_label}</b> — {round(heg_value * 100, 1)}%",
+    unsafe_allow_html=True
+)
+
+st.caption(heg_text)
+
+with st.popover("ℹ️ Comprendre cette jauge"):
+    details = result.get("cognitive_hegemony_details", {})
+
+    st.markdown(f"""
+### Hégémonie cognitive
+
+Cette jauge détecte la tendance d’un discours à présenter un cadre de pensée comme naturel, évident ou indiscutable.
+
+Elle ne mesure pas :
+
+- la vérité du texte ;
+- le mensonge ;
+- l’intention du locuteur.
+
+Elle mesure un **risque de domination paradigmatique** : le moment où une interprétation devient si dominante que les alternatives semblent impensables ou illégitimes.
+
+---
+
+### Principe
+
+Le moteur observe notamment :
+
+- le faux consensus ;
+- la rigidité doxique ;
+- la clôture cognitive ;
+- les déplacements de cadre ;
+- l’argument d’autorité ;
+- la faiblesse de la révisabilité ;
+- le manque d’ancrage au réel.
+
+---
+
+### Formule analogique
+
+Hégémonie cognitive =
+Faux consensus
++ Rigidité doxique
++ Clôture cognitive
++ Frame shift
++ Argument d’autorité
+− Révisabilité
+− Ancrage au réel
+
+---
+
+### Valeur actuelle
+
+Score :
+
+**{round(heg_value * 100, 1)}%**
+
+Interprétation :
+
+**{heg_label}**
+
+---
+
+### Détails internes
+
+- Faux consensus : **{round(details.get("false_consensus", 0), 3)}**
+- Rigidité doxique : **{round(details.get("doxic_rigidity", 0), 3)}**
+- Clôture cognitive : **{round(details.get("closure", 0), 3)}**
+- Frame shift : **{round(details.get("frame_shift", 0), 3)}**
+- Argument d’autorité : **{round(details.get("authority", 0), 3)}**
+- Révisabilité : **{round(details.get("revisability", 0), 3)}**
+- Ancrage au réel : **{round(details.get("anchor", 0), 3)}**
+
+---
+
+### Lecture
+
+🟢 **Faible** : le texte reste ouvert à d’autres cadres d’interprétation.  
+🟡 **Modérée** : certains cadres dominants apparaissent.  
+🟠 **Élevée** : le discours tend à naturaliser une vision du monde.  
+🔴 **Très élevée** : le texte semble présenter un paradigme comme presque indiscutable.
+
+---
+
+### Attention
+
+Un score élevé ne signifie pas que le paradigme présenté est faux.
+
+Il indique seulement que le discours tend à réduire la visibilité des alternatives possibles.
+""")
+
 # =============================
 # Indice de baratinage
 # =============================
