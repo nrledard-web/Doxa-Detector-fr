@@ -13290,6 +13290,34 @@ def detect_rhetorical_structures(text: str):
 
     return scores
 
+    # -----------------------------
+    # Marqueurs de discours normatif / juridique
+    # -----------------------------
+    NORMATIVE_MARKERS = [
+        "il est interdit",
+        "il est autorisé",
+        "il est obligatoire",
+        "nul ne peut",
+        "doit",
+        "doivent",
+        "devra",
+        "devront",
+        "est tenu de",
+        "sont tenus de",
+        "conformément à",
+        "en vertu de",
+        "aux fins de",
+        "sous réserve de",
+        "dans les conditions prévues",
+        "est passible de",
+        "est puni de",
+        "constitue une infraction",
+        "entre en vigueur",
+        "prend effet",
+        "applicable à",
+        "applicables aux",
+    ]
+
 # =============================
 # Type de discours enrichi
 # =============================
