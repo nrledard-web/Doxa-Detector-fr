@@ -2500,6 +2500,46 @@ def classify_claim_type(sentence: str) -> List[str]:
         "illégitime", "dangereux", "toxique", "acceptable", "inacceptable",
         "raciste", "xénophobe", "fasciste", "complotiste"
     ]
+    # juridico-normatif
+    legal_normative_terms = [
+        "il est interdit",
+        "il est autorisé",
+        "il est obligatoire",
+        "nul ne peut",
+        "doit",
+        "doivent",
+        "devra",
+        "devront",
+        "est tenu de",
+        "sont tenus de",
+        "conformément à",
+        "en vertu de",
+        "aux fins de",
+        "sous réserve de",
+        "dans les conditions prévues",
+        "est passible de",
+        "est puni de",
+        "constitue une infraction",
+        "entre en vigueur",
+        "prend effet",
+        "applicable à",
+        "applicables aux",
+        "article",
+        "alinéa",
+        "paragraphe",
+        "section",
+        "chapitre",
+        "décret",
+        "loi",
+        "ordonnance",
+        "règlement",
+        "code civil",
+        "code pénal",
+        "code de procédure",
+    ]
+    if any(contains_term(s, term) for term in legal_normative_terms):
+        claim_types.append("legal_normative")
+    
     if any(contains_term(s, term) for term in normative_terms):
         claim_types.append("normative")
 
