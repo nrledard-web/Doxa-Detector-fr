@@ -20181,7 +20181,7 @@ with al6:
 
     value = result.get("cherry_picking_score", 0.0)
 
-    markers = result.get("cherry_picking_matches", [])
+    markers = result.get("cherry_picking_matches", []) 
     omissions = result.get("cherry_picking_omission_markers", [])
     structural = result.get("cherry_picking_structural_markers", [])
 
