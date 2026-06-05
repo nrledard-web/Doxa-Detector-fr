@@ -22881,91 +22881,262 @@ st.markdown("""
 st.markdown("""
 ### Méthode
 
-#### Formule originelle
+## Formule originelle
 
-```text
-M = (G + N) - D
-```
+### Mécroyance
 
-G : densité de savoir articulé — sources, chiffres, noms, références, traces vérifiables.
+**M = (G + N) − D**
 
-N : intégration — contexte, nuances, réserves, cohérence argumentative.
+**G :** densité de savoir articulé
+Sources, données, références, observations, éléments vérifiables.
 
-D : rigidité assertive — certitudes non soutenues, emballement rhétorique.
+**N :** intégration cognitive
+Contexte, nuances, cohérence, prise en compte des limites et des alternatives.
 
----
+**D :** rigidité assertive
+Certitude affichée, fermeture argumentative, degré de conviction non nécessairement soutenu par le savoir disponible.
 
-#### Métriques dérivées
+**Interprétation**
 
-```text
-Surconfiance = D - (G + N)
+Cette formule constitue le noyau conceptuel du modèle.
 
-Calibration relative = D / (G + N)
-
-Révisabilité = (G + N + V) - D
-
-Fermeture cognitive =
-max(0, D - (G_drift + N))
-
-Pseudo-savoir =
-max(0, (G_drift + D) - N)
-
-Intuition dogmatique =
-max(0, (N + D) - G_drift)
-
-Dérive cognitive globale =
-dominant_value * 0.60
-+
-average_value * 0.40
-```
-
-Avec :
-
-```text
-G_drift = G × 0.5
-```
+Lorsque D augmente plus vite que G et N, la croyance tend à se stabiliser au-delà de ce que le savoir et la compréhension permettent réellement de soutenir.
 
 ---
 
-#### Nouvelles jauges structurelles
+# Métriques dérivées
 
-```text
-Baratinage =
-(
-CF + CE + ACE + RP + NP + PI + CS
-)
--
-(
-HF + AR + RV + BC + AS + AN
-)
+## Surconfiance
 
-Omission stratégique =
-(
-CP
-+ DR×1.5
-+ PI
-+ AA
-+ CF
-+ CC
-+ MS×0.35
-)
--
-(
-LM
-+ RV
-+ AR
-+ PX
-+ CA
-)
+**SC = D − (G + N)**
 
-Effet placebo étendu =
-(
-((N + 2D) - G)
-× EX
-)
-+
+Mesure la part de certitude excédant le savoir et la compréhension disponibles.
+
+Plus le score augmente, plus la conviction paraît disproportionnée.
+
+---
+
+## Calibration relative
+
+**CR = D / (G + N)**
+
+Mesure le rapport entre la certitude et son socle cognitif.
+
+* CR ≈ 1 : équilibre relatif.
+* CR > 1 : certitude dominante.
+* CR < 1 : prudence ou sous-certitude.
+
+---
+
+## Révisabilité
+
+**RV = (G + N + V) − D**
+
+**V :** ouverture à la révision.
+
+Mesure la capacité du discours à intégrer des objections, corrections ou informations nouvelles.
+
+Une forte révisabilité réduit le risque de fermeture cognitive.
+
+---
+
+## Fermeture cognitive
+
+**FC = max(0, D − (G_drift + N))**
+
+avec :
+
+**G_drift = G × 0.5**
+
+Mesure le degré de verrouillage cognitif du discours.
+
+La fermeture apparaît lorsque la certitude résiste à l'affaiblissement du savoir disponible.
+
+Plus le score est élevé, plus la conclusion semble stabilisée indépendamment de son support cognitif.
+
+---
+
+## Pseudo-savoir
+
+**PS = max(0, (G_drift + D) − N)**
+
+Détecte les situations où l'accumulation apparente de savoir et de certitude dépasse la compréhension réellement intégrée.
+
+Le discours paraît documenté mais demeure faiblement assimilé.
+
+---
+
+## Intuition dogmatique
+
+**ID = max(0, (N + D) − G_drift)**
+
+Mesure les situations où une compréhension subjective ou intuitive est fortement affirmée malgré un faible niveau de savoir vérifiable.
+
+Elle peut caractériser certaines croyances philosophiques, spirituelles ou idéologiques.
+
+---
+
+## Dérive cognitive globale
+
+**DCG = dominant_value × 0.60 + average_value × 0.40**
+
+Mesure la tendance générale du discours à dériver vers des schémas cognitifs déséquilibrés.
+
+La formule combine :
+
+* la dérive dominante ;
+* la moyenne de l'ensemble des dérives détectées.
+
+---
+
+# Nouveaux indices structurels
+
+## Clôture sceptique
+
+*(ou Clôture par le doute)*
+
+**CS = DS − (G + N + RV)**
+
+où :
+
+**DS :** doute systématique ou scepticisme radical.
+
+Cette formule mesure les situations où le doute cesse d'être un outil critique et devient lui-même une forme de fermeture cognitive.
+
+Le sujet ne défend plus une croyance particulière, mais l'impossibilité même de connaître ou de conclure.
+
+Le doute devient alors aussi rigide que la certitude qu'il prétend combattre.
+
+---
+
+## Pression normative
+
+*(anciennement Consensus Trance)*
+
+**PN = C × I × P**
+
+où :
+
+**C :** consensus observé
+**I :** influence sociale
+**P :** pression normative
+
+Cette formule ne mesure pas un mécanisme cognitif universel mais un mécanisme sociologique de stabilisation des croyances.
+
+Elle cherche à estimer la force avec laquelle un environnement social pousse vers l'adoption ou le maintien d'une position.
+
+Contrairement aux indices de mécroyance, elle ne prend pas directement en compte :
+
+* le savoir ;
+* la compréhension ;
+* la qualité des preuves ;
+* la révisabilité.
+
+Elle constitue donc un facteur contextuel pouvant renforcer la certitude sans pour autant expliquer la validité de celle-ci.
+
+Dans le modèle général :
+
+**PN → augmente potentiellement D**
+
+mais ne constitue pas à elle seule une mesure de mécroyance.
+
+---
+
+# Jauges structurelles
+
+## Baratinage
+
+**IB =**
+
+(CF + CE + ACE + RP + NP + PI + CS)
+
+−
+
+(HF + AR + RV + BC + AS + AN)
+
+Mesure l'écart entre l'apparence discursive et la substance cognitive.
+
+Plus le score est élevé, plus le discours semble produire de l'effet rhétorique avec peu de contenu réellement structurant.
+
+---
+
+## Omission stratégique
+
+**OS =**
+
+(CP
+
+* DR × 1.5
+* PI
+* AA
+* CF
+* CC
+* MS × 0.35)
+
+−
+
+(LM
+
+* RV
+* AR
+* PX
+* CA)
+
+Mesure la probabilité qu'un discours sélectionne ou écarte certaines informations afin d'orienter l'interprétation.
+
+Il ne s'agit pas de détecter un mensonge, mais une asymétrie informative.
+
+---
+
+## Effet placebo étendu
+
+**EPE =**
+
+(((N + 2D) − G) × EX)
+
+*
+
 heuristique pondérée
-```
+
+Mesure la capacité d'un discours à produire un sentiment de compréhension, de cohérence ou de conviction supérieur à la quantité réelle de savoir mobilisée.
+
+L'effet placebo étendu n'implique pas nécessairement une intention de tromper.
+
+Il décrit un phénomène où la forme, la cohérence apparente ou la confiance suscitée produisent davantage d'adhésion que le contenu cognitif lui-même.
+
+---
+
+# Architecture générale
+
+Le modèle distingue trois niveaux :
+
+### Niveau cognitif
+
+* Mécroyance
+* Surconfiance
+* Révisabilité
+* Fermeture cognitive
+* Intuition dogmatique
+* Pseudo-savoir
+
+### Niveau sociologique
+
+* Pression normative
+* Faux consensus
+* Argument du silence
+* Omission stratégique
+
+### Niveau rhétorique
+
+* Baratinage
+* Effet placebo étendu
+* Frame shift
+* Scientificité rhétorique
+* Pression rhétorique
+
+L'objectif n'est pas de déterminer la vérité d'un discours.
+
+L'objectif est d'estimer la relation entre savoir, compréhension, certitude, influence sociale et structure argumentative.
 
 ---
 
