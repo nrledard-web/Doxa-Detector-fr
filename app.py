@@ -16329,9 +16329,9 @@ La certitude paraît plus forte que les preuves disponibles, mais les signaux ne
 """)
 
 # -----------------------------
-# 🧠 Hégémonie cognitive
+# 🧠 Hégémonie cognitive biais
 # -----------------------------
-st.subheader("Hégémonie cognitive", anchor=False)
+st.subheader("Hégémonie cognitive biais", anchor=False)
 
 st.caption(
     "Cette jauge mesure dans quelle mesure un discours présente un cadre de pensée "
