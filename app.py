@@ -15712,20 +15712,20 @@ Le texte reste révisable, nuancé ou ouvert à la correction.
 🟡 **Jaune — Tension cognitive**  
 Certaines certitudes apparaissent, mais sans verrouillage dominant.
 
-🟠 **Orange — Clôture partielle**  
-La certitude commence à limiter la révisabilité du discours.
+🟠 Orange — Clôture partielle  
+Le discours commence à perdre en révisabilité, soit par excès d’affirmation, soit par doute excessif.
 
-🔴 **Rouge — Clôture forte**  
-La certitude semble dominer le savoir et la compréhension intégrée.
+🔴 Rouge — Clôture forte  
+Le discours semble fortement verrouillé : il affirme trop, ou doute au point de rendre toute conclusion impossible.
 
 ---
 
 ### Lecture
 
-🟢 **Ouverture** : le doute structure encore la cognition  
-🟡 **Tension** : certitude présente mais encore révisable  
-🟠 **Clôture partielle** : réduction de la nuance  
-🔴 **Clôture forte** : verrouillage interprétatif dominant  
+🟢 Ouverture : le discours reste révisable
+🟡 Tension : affirmation ou doute notable, mais encore ajustable
+🟠 Clôture partielle : la révisabilité commence à diminuer
+🔴 Clôture forte : verrouillage interprétatif dominant, par excès de certitude ou de doute
 
 ---
 
@@ -15733,7 +15733,7 @@ La certitude semble dominer le savoir et la compréhension intégrée.
 
 Un score élevé ne signifie pas que le texte est faux.
 
-Il indique seulement que le discours semble moins révisable, plus affirmatif, ou davantage fermé à la correction.
+Il indique seulement que le discours semble moins révisable : soit parce qu’il affirme trop fortement, soit parce qu’il doute excessivement au point d’empêcher toute stabilisation du jugement.
 """)
     
 # -----------------------------
