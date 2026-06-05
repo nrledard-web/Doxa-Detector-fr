@@ -20193,7 +20193,7 @@ with al6:
         label, color = "Faible", "#ca8a04"
     elif value < 0.35:
         label, color = "Modérée", "#f97316"
-    elif value < 0.60:
+    elif value < 0.75:
         label, color = "Élevée", "#ea580c"
     else:
         label, color = "Très élevée", "#dc2626"
@@ -20252,9 +20252,9 @@ with al6:
             "markers = exemples isolés détectés\n"
             "omissions = indices d’omission stratégique\n"
             "structural = structures exemple → conclusion\n"
-            "score = min((len(markers)*0.25 + "
-            "len(omissions)*0.35 + "
-            "len(structural)*0.35), 1.0)",
+            "score = min((len(markers)*0.10 + "
+            "len(omissions)*0.20 + "
+            "len(structural)*0.18), 1.0)",
             language="python"
         )
 
