@@ -8943,7 +8943,36 @@ BIOGRAPHICAL_MARKERS = [
     "parcours de vie",
     "portrait de",
     "figure historique",
-]
+
+def compute_normative_structure_score(text: str):
+
+    if not text:
+        return 0
+
+    score = 0
+
+    patterns = [
+
+        r"\barticle\s+\d+",
+        r"\bart\.\s*\d+",
+        r"\bchapitre\b",
+        r"\bsection\b",
+        r"\balinéa\b",
+        r"\bparagraphe\b",
+        r"\btitre\s+[ivxlcdm]+",
+        r"\bcode\b",
+        r"\bdécret\b",
+        r"\bloi\b",
+        r"\bordonnance\b",
+        r"\brèglement\b",
+
+    ]
+
+    for pattern in patterns:
+        score += len(re.findall(pattern, text, re.IGNORECASE))
+
+    return min(score, 10)
+    
 # =========================================================
 # FICTIONNEL / NARRATIF
 # =========================================================
